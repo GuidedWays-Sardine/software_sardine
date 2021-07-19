@@ -14,6 +14,12 @@ def initialise(path, version, log_level):
     log_level : `int`
         Le niveau de logging (log.ERROR, log.WARNING, log.DEBUG, log.NOTSET)
     """
+    # Vérifie si un fichier log a déjà été créé, si oui, change le niveau de logging sinon le crée
+    if logging.getLogger().hasHandlers():
+        logging.getLogger().setLevel(log_level)
+        logging.warning("tentative de création d'un nouveau fichier log")
+        return
+
     # Si aucun log n'est demandé, définit le niveau de log comme "aucun" et retourne
     if log_level is logging.NOTSET:
         logging.basicConfig(level=logging.NOTSET)
