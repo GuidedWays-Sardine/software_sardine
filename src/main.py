@@ -1,5 +1,6 @@
 import logging
 import log.log as log
+import traceback
 
 import initialisation.initialisation_window as ini
 
