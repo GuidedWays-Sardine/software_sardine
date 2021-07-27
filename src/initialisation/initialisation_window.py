@@ -4,6 +4,9 @@ import sys
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtQml import QQmlApplicationEngine
 
+from initialisation.signals import right_buttons as rb
+from initialisation.signals import bottom_buttons as bb
+
 class InitialisationWindow:
     """Classe contenant tous les éléments pour la fenêtre d'initialisation simulateur"""
 
@@ -11,6 +14,8 @@ class InitialisationWindow:
     app = None
     engine = None
     win = None
+    bottom_buttons = None
+    right_buttons = None
 
     def __init__(self):
         """initialise toutes les fenêtre du programme d'initialisation du simulateur sardine
@@ -34,7 +39,11 @@ class InitialisationWindow:
         elif not self.engine.rootObjects() and os.path.isfile('initialisation/initialisation_window.qml'):
             raise SyntaxError('Le fichier .qml pour la fenêtre d\'initialisation contient des erreurs.')
 
-        # Lance l'application
+        # Si le fichier qml a été compris, récupère la fenêtre et initialise les différents boutons et pages
         self.win = self.engine.rootObjects()[0]
+        self.bottom_buttons = bb.BottomButtons(self)
+        self.right_buttons = rb.RightButtons(self)
+
+        # Lance l'application
         self.win.show()
         self.app.exec()
