@@ -3,6 +3,7 @@ import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import "../DMI_default"
 import "graphics"
+import "graphics/page_rb"
 
 Window {
     id: window
