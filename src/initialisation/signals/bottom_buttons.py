@@ -17,4 +17,14 @@ class BottomButtons:
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
         # Boutons quitter/lancer (obligatoires pour le lancement de l'application)
-        logging.info("bottom buttons")
+        application.win.findChild(QObject, "quitter").clicked.connect(lambda: self.on_quit_clicked(application))
+
+    def on_quit_clicked(self, application):
+        """Ferme la fenêtre d'initialisation
+
+        Parameters
+        ----------
+        application: `InitialisationWindow`
+            L'instance source de l'application d'initialisation, pour les widgets
+        """
+        application.app.quit()
