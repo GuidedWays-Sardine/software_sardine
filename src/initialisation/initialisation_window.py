@@ -17,6 +17,9 @@ class InitialisationWindow:
     bottom_buttons = None
     right_buttons = None
 
+    # Variable stockant si le simulateur va être lancé
+    launch_simulator = False
+
     def __init__(self):
         """initialise toutes les fenêtre du programme d'initialisation du simulateur sardine
 
