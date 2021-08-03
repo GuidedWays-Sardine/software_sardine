@@ -50,3 +50,13 @@ class InitialisationWindow:
         # Lance l'application
         self.win.show()
         self.app.exec()
+
+    def save_configuration_file(self, file_name):
+        """Sauvegarde les informations visibles sur l'écran d'initialisation
+
+        Parameters
+        ----------
+        file_name : `string`
+            Le chemin du fichier où seront enregistré les informations
+        """
+        # TODO : faire une fonction qui récupère les informations et les enregistres
