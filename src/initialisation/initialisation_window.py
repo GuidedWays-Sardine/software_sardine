@@ -51,6 +51,16 @@ class InitialisationWindow:
         self.win.show()
         self.app.exec()
 
+    def open_configuration_file(self, file_name):
+        """Ouvre un fichier de configuration et retranscrit toutes ses informations sur l'application d'initialisation
+
+        Parameters
+        ----------
+        file_name : `string`
+            Le chemin du fichier à lire
+        """
+        # TODO : faire une fonction qui récupère les informations d'un fichier et les mets sur l'initialisation
+
     def save_configuration_file(self, file_name):
         """Sauvegarde les informations visibles sur l'écran d'initialisation
 

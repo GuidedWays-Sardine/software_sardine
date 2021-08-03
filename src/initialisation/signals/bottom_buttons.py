@@ -22,6 +22,7 @@ class BottomButtons:
 
         # Boutons sauvegarder/ouvrir (non obligatoire pour le lancement de l'application)
         try:
+            application.win.findChild(QObject, "ouvrir").clicked.connect(lambda: self.on_open_clicked(application))
             application.win.findChild(QObject, "sauvegarder").clicked.connect(lambda: self.on_save_clicked(application))
         except AttributeError as error:
             logging.warning('Problème lors du chargement du signal handler du bouton sauvegarder ou ouvrir\n\t' +
@@ -49,6 +50,21 @@ class BottomButtons:
         # Indique que le simulateur va être lancée et ferme l'application
         application.launch_simulator = True
         application.app.quit()
+
+    def on_open_clicked(self, application):
+        """Fonction appelée lorsque le bouton ouvrir est cliqué.
+        Permet l'ouverture d'un fichier avec les settings.
+
+        Parameters
+        ----------
+        application: `InitialisationWindow`
+            L'instance source de l'application d'initialisation, pour les widgets"""
+        # Ouvre la fenêtre de sauvegarde et enregegistre le fichier si un nom a été donné
+        file_name = QFileDialog.getSaveFileName(caption="Ouvrir un fichier de configuration",
+                                                directory="../settings/",
+                                                filter="Fichiers de configuration Sardine (*.csv)")
+        if file_name[0] != '':
+            application.open_configuration_file(file_name)
 
     def on_save_clicked(self, application):
         """Fonction appelée lorsque le bouton sauvegarder est cliqué.
