@@ -47,9 +47,11 @@ class BottomButtons:
         ----------
         application: `InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets"""
-        # Indique que le simulateur va être lancée et ferme l'application
-        application.launch_simulator = True
-        application.app.quit()
+        # Vérifie que toutes les pages accessibles sont complètes
+        if application.right_buttons.is_fully_loaded == application.right_buttons.is_completed:
+            # Indique que le simulateur va être lancée et ferme l'application
+            application.launch_simulator = True
+            application.app.quit()
 
     def on_open_clicked(self, application):
         """Fonction appelée lorsque le bouton ouvrir est cliqué.
