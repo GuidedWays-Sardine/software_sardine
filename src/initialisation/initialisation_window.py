@@ -91,6 +91,38 @@ class InitialisationWindow:
         # Retourne le dictionnaire complété grâce aux différentes valeurs des get_values() de chaques pages
         return parameters
 
+    def set_values(self, data):
+        """A partir d'un dictionnaire de valeur, essaye de changer les settings des différentes pages
+
+        Parameters
+        ----------
+        data: `dict`
+            Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
+        """
+        # Vérifie pour chaque page existante si une fonction set_values existe.
+        # Si oui, appelle la fonction en envoyant le dictionnaire
+        # Sinon, met un message d'erreur dans le fichier log et passe à la page suivante
+        for index in range(1, 9):
+            # Vérifie d'abord si la page a des signals handlers (et donc potentiellement des valeurs à récupérer)
+            if self.right_buttons.is_fully_loaded[index - 1] is not None:
+                page_path = "initialisation/signals/page_rb/page_rb" + str(index) + ".py"
+                try:
+                    # Import localement le fichier de la page
+                    # Appelle la fonction set_values()
+                    exec("from initialisation.signals.page_rb import page_rb" + str(index) + "\n"
+                         + "self.right_buttons.is_signals_loaded[" + str(index - 1) + "].set_values(data)")
+                except AttributeError as error:
+                    # Erreur appelée si jamais la page n'a pas de fonction get_values()
+                    logging.warning("La page : " + page_path + "n\'a pas de fonction set_values()"
+                                    + "\n\t\t Assurez-vous que la fonction est implémentée"
+                                    + "\n\t\t Les paramêtres de la page ne seront pas pris en comptre\n")
+                except Exception as error:
+                    # Permet de rattraper une autre potentielle erreur par sécurité (dû au exec())
+                    logging.warning("Erreur inconnu lors de du changement des donnés sur " + page_path
+                                    + "\n\t\tErreur de type : " + str(type(error))
+                                    + "\n\t\tAvec comme message d\'erreur : " + error.args[0]
+                                    + ''.join(traceback.format_tb(error.__traceback__)).replace('\n', '\n\t\t') + "\n")
+
     def open_configuration_file(self, file_name):
         """Ouvre un fichier de configuration et retranscrit toutes ses informations sur l'application d'initialisation
 
