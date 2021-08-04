@@ -4,6 +4,8 @@ import traceback
 from PyQt5.QtCore import QObject
 from PyQt5.QtWidgets import QFileDialog
 
+from file_io import data_file_interaction as dfi
+
 
 class BottomButtons:
 
@@ -55,18 +57,19 @@ class BottomButtons:
 
     def on_open_clicked(self, application):
         """Fonction appelée lorsque le bouton ouvrir est cliqué.
-        Permet l'ouverture d'un fichier avec les settings.
+        Permet l'ouverture d'un fichier texte et la récupération de ses paramètres.
 
         Parameters
         ----------
         application: `InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets"""
-        # Ouvre la fenêtre de sauvegarde et enregegistre le fichier si un nom a été donné
-        file_name = QFileDialog.getSaveFileName(caption="Ouvrir un fichier de configuration",
+        # Ouvre la fenêtre d'ouverture de fichier
+        file_path = QFileDialog.getOpenFileName(caption="Ouvrir un fichier de configuration",
                                                 directory="../settings/",
                                                 filter="Fichiers de configuration Sardine (*.csv)")
-        if file_name[0] != '':
-            application.open_configuration_file(file_name)
+        if file_path[0] != '':
+            # Récupère les donnés et les envoies aux différentes de paramètres et les mettre à jour sur l'application
+            application.set_values(dfi.read_data_file(file_path[0]))
 
     def on_save_clicked(self, application):
         """Fonction appelée lorsque le bouton sauvegarder est cliqué.
