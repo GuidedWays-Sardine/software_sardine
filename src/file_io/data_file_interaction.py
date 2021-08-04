@@ -31,8 +31,7 @@ def read_data_file(file_path, delimiter = ';'):
     for line in file:
         # Si la ligne ne contient pas le délimiteur (et donc que le fichier
         if not delimiter in line:
-            logging.warning("Aucun délimiteur : \"" + delimiter + "\" dans la ligne : " + line +
-                            + "\n\t\t La ligne n\'est pas prise en compte")
+            logging.warning("Ligne sautée ; le délimiteur : \"" + delimiter + "\" dans la ligne : " + line + 'manque\n')
         else:
             line = line.rstrip('\n').split(delimiter)
             data[line[0]] = line[1]
