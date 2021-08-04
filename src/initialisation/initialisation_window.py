@@ -68,7 +68,7 @@ class InitialisationWindow:
         # Sinon, met un message d'erreur dans le fichier log et passe à la page suivante
         for index in range(1, 9):
             # Vérifie d'abord si la page a des signals handlers (et donc potentiellement des valeurs à récupérer)
-            if self.right_buttons.is_fully_loaded[index - 1] is not None:
+            if self.right_buttons.is_fully_loaded[index - 1]:
                 page_path = "initialisation/signals/page_rb/page_rb" + str(index) + ".py"
                 try:
                     # Import localement le fichier de la page
@@ -104,7 +104,7 @@ class InitialisationWindow:
         # Sinon, met un message d'erreur dans le fichier log et passe à la page suivante
         for index in range(1, 9):
             # Vérifie d'abord si la page a des signals handlers (et donc potentiellement des valeurs à récupérer)
-            if self.right_buttons.is_fully_loaded[index - 1] is not None:
+            if self.right_buttons.is_fully_loaded[index - 1]:
                 page_path = "initialisation/signals/page_rb/page_rb" + str(index) + ".py"
                 try:
                     # Import localement le fichier de la page
