@@ -68,7 +68,7 @@ class BottomButtons:
                                                 directory="../settings/",
                                                 filter="Fichiers de configuration Sardine (*.csv)")
         if file_path[0] != '':
-            # Récupère les donnés et les envoies aux différentes de paramètres et les mettre à jour sur l'application
+            # Récupère les donnés du fichier text et mets à jour les différentes pages de paramètres
             application.set_values(dfi.read_data_file(file_path[0]))
 
     def on_save_clicked(self, application):
@@ -80,8 +80,9 @@ class BottomButtons:
         application: `InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets"""
         # Ouvre la fenêtre de sauvegarde et enregegistre le fichier si un nom a été donné
-        file_name = QFileDialog.getSaveFileName(caption="Sauvegarder un fichier de configuration",
+        file_path = QFileDialog.getSaveFileName(caption="Sauvegarder un fichier de configuration",
                                                 directory="../settings/",
                                                 filter="Fichiers de configuration Sardine (*.csv)")
-        if file_name[0] != '':
-            application.save_configuration_file(file_name)
+        if file_path[0] != '':
+            # Récupère les donnés des différentes pages de paramètres et les écrits dans le fichier
+            dfi.write_data_file(file_path, application.get_values())
