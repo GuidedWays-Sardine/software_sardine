@@ -25,7 +25,7 @@ def read_data_file(file_path, delimiter = ';'):
     data = {}
 
     # Essaye d'ouvrir le fichier envoyer, et jette une erreur si le fichier n'exsite pas
-    file = open(file_path, "r")
+    file = open(file_path, "r", encoding='utf-8-sig')
 
     # Lit chaque ligne du fichier
     for line in file:
@@ -34,7 +34,7 @@ def read_data_file(file_path, delimiter = ';'):
             logging.warning("Aucun délimiteur : \"" + delimiter + "\" dans la ligne : " + line +
                             + "\n\t\t La ligne n\'est pas prise en compte")
         else:
-            line = line.split(delimiter)
+            line = line.rstrip('\n').split(delimiter)
             data[line[0]] = line[1]
 
     # Ferme le fichier et retourne le dictionnaire avec les valeurs récupérées
@@ -56,7 +56,7 @@ def write_data_file(file_path, data, delimiter=';'):
         (Attention: à envoyer des donnés compatible avec la fonction str())
     """
     # Essaye d'ouvrir le fichier envoyer, et jette une erreur si le fichier n'exsite pas
-    file = open(file_path, "w")
+    file = open(file_path, "w", encoding='utf-8-sig')
 
     # Récupère chaque clé/valeur du dictionnaire
     for key in data.keys():
