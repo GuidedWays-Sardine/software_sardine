@@ -20,6 +20,11 @@ class InitialisationWindow:
     bottom_buttons = None
     right_buttons = None
 
+    # Stocke si la page est chargée et si elle est complète (pour lancer le simulateur
+    visible_pages = [None] * 8     # Stocke les pages que l'utilisateur peut afficher
+    is_fully_loaded = [False] * 8  # Stocke directement l'instance de la classe
+    is_completed = [False] * 8     # Détecte si la page est complété (égale à self.visible_pages si tout est complété)
+
     # Variable stockant si le simulateur va être lancé
     launch_simulator = False
 
@@ -68,14 +73,14 @@ class InitialisationWindow:
         # Sinon, met un message d'erreur dans le fichier log et passe à la page suivante
         for index in range(1, 9):
             # Vérifie d'abord si la page a des signals handlers (et donc potentiellement des valeurs à récupérer)
-            if self.right_buttons.is_fully_loaded[index - 1]:
+            if self.is_fully_loaded[index - 1]:
                 page_path = "initialisation/signals/page_rb/page_rb" + str(index) + ".py"
 
                 # Ensuite vérifie que la page contient bien une fonction get_values()
-                if "get_values" in dir(self.right_buttons.visible_pages[index - 1]):
+                if "get_values" in dir(self.visible_pages[index - 1]):
                     try:
                         # Appelle la fonction get_values de la page et récupère une potentielle erreur sur la fonction
-                        self.right_buttons.visible_pages[index - 1].get_values()
+                        self.visible_pages[index - 1].get_values()
                     except Exception as error:
                         # Permet de rattraper une autre potentielle erreur par sécurité (dû au exec())
                         logging.warning("Erreur inconnu lors de la récupération des donnés pour : " + page_path
@@ -102,14 +107,14 @@ class InitialisationWindow:
         # Sinon, met un message d'erreur dans le fichier log et passe à la page suivante
         for index in range(1, 9):
             # Ensuite vérifie que la page contient bien une fonction set_values()
-            if self.right_buttons.is_fully_loaded[index - 1]:
+            if self.is_fully_loaded[index - 1]:
                 page_path = "initialisation/signals/page_rb/page_rb" + str(index) + ".py"
 
                 # Ensuite vérifie que la page contient bien une fonction set_values()
-                if "set_values" in dir(self.right_buttons.visible_pages[index - 1]):
+                if "set_values" in dir(self.visible_pages[index - 1]):
                     try:
                         # Appelle la fonction get_values de la page et récupère une potentielle erreur sur la fonction
-                        self.right_buttons.visible_pages[index - 1].set_values(data)
+                        self.visible_pages[index - 1].set_values(data)
                     except Exception as error:
                         # Permet de rattraper une autre potentielle erreur par sécurité (dû au exec())
                         logging.warning("Erreur inconnu lors du changement des donnés pour : " + page_path

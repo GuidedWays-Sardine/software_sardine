@@ -50,7 +50,7 @@ class BottomButtons:
         application: `InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets"""
         # Vérifie que toutes les pages accessibles sont complètes
-        if application.right_buttons.is_fully_loaded == application.right_buttons.is_completed:
+        if application.is_fully_loaded == application.is_completed:
             # Indique que le simulateur va être lancée et ferme l'application
             application.launch_simulator = True
             application.app.quit()

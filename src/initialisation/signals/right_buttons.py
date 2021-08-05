@@ -8,14 +8,9 @@ from PyQt5.QtCore import QObject
 
 class RightButtons:
 
-    #stoque les éléments de bases des boutons de droite
+    # stocke les éléments de bases des boutons de droite
     right_buttons = None
     pages_stackview = None
-
-    # Stoque si la page est chargée et si elle est complète (pour lancer le simulateur
-    visible_pages = [None] * 8     # Stoque les pages que l'utilisateur peut afficher
-    is_fully_loaded = [False] * 8  # Stoque directement l'instance de la classe
-    is_completed = [False] * 8     # Détecte si la page est complété (égale à self.visible_pages si tout est complété)
 
     def __init__(self, application):
         """
@@ -40,11 +35,11 @@ class RightButtons:
             current_button = self.right_buttons.findChild(QObject, "rb" + str(index))
 
             # Essaye d'initialiser la page et si elle est correctement initialisé, tente de charger les signals
-            if self.initialise_page(engine, index, page_path, current_button):
+            if self.initialise_page(application, engine, index, page_path, current_button):
                 self.initialise_signals(application, engine, index, page_path)
 
         # Vérifie si au moins une page est chargée, sinon l'indique et cache les boutons ouvrir et sauvegarder
-        if not any(self.is_fully_loaded):
+        if not any(application.is_fully_loaded):
             logging.error("Aucune des pages n'a été correctement chargée. Les valeurs par défaut seront utilisés\n\t\t"
                           + "seuls les boutons quitter et lancer sont fonctionnels\n\t\t"
                           + "Veuillez lire les warnings ci-dessus pour comprendre la cause du problème et le régler\n")
@@ -55,12 +50,14 @@ class RightButtons:
             if open_button is not None:
                 open_button.setProperty("isVisible", False)
 
-    def initialise_page(self, engine, index, page_path, current_button):
+    def initialise_page(self, application, engine, index, page_path, current_button):
         """Fonction permettant d'initialiser une des pages de l'application d'initialisation lié à un bouton de droite.
         Celle-ci sera initialiser si elle existe et qu'elle a un format valide
 
         Parameters
         ----------
+        application: `InitialisationWindow`
+            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         engine: `QQmlApplicationEngine`
             La QQmlApplicationEngine sur laquelle on a tenté de charger la page
         index: `int`
@@ -81,11 +78,11 @@ class RightButtons:
             current_button.setProperty("isActivable", True)
 
             # Si c'est la première page existante, la charge
-            if self.visible_pages == [None] * 8:
+            if application.visible_pages == [None] * 8:
                 self.pages_stackview.set_active_page(engine.rootObjects()[0])
 
             # store l'engine comme étant la page chargée
-            self.visible_pages[index - 1] = engine
+            application.visible_pages[index - 1] = engine
 
             # Connecte le bouton de droite correspondant pour charger la page
             current_button.clicked.connect(lambda new_page=engine:
@@ -132,11 +129,11 @@ class RightButtons:
                 # Import localement le fichier de la page
                 # Appelle le constructeur de la page pour affilier tous les signals aux widgets
                 exec("from initialisation.signals.page_rb import page_rb" + str(index) + " as rb" + str(index)
-                     + "\n" + "self.visible_pages[index - 1] = "
+                     + "\n" + "application.visible_pages[index - 1] = "
                      + "(rb" + str(index) + ".PageRB" + str(index) + "(application, engine, index))")
 
                 # Indique que la page a entièrement été chargée (partie visuelle et signals)
-                self.is_fully_loaded[index - 1] = True
+                application.is_fully_loaded[index - 1] = True
             except Exception as error:
                 # Permet de rattraper une erreur si le code est incorrect où qu'il ne suit pas la documentation
                 logging.warning("Erreur lors du chargement des signaux de la page : " + page_path
