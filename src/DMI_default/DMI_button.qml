@@ -112,40 +112,40 @@ Item {
         anchors.bottom: outbottomshadow.top
     }
 
-    //Rectangle pour l'ombre extérieure inférieure
+    //Rectangle pour l'ombre intérieure inférieure
     Rectangle {
         id: inbottomshadow
-        color: !isActivable || (!area.pressed && isPositive) ? "#000000" : "transparent"
+        color: isPositive && !(area.pressed && isActivable) ? "#000000" : "transparent"
         height: 2 * root.ratio
         anchors.bottom: outbottomshadow.top
         anchors.left: outleftshadow.right
         anchors.right: outrightshadow.left
     }
 
-    //Rectangle pour l'ombre extérieure droite
+    //Rectangle pour l'ombre intérieure droite
     Rectangle {
         id: inrightshadow
-        color: !isActivable || (!area.pressed && isPositive) ? "#000000" : "transparent"
+        color: isPositive && !(area.pressed && isActivable) ? "#000000" : "transparent"
         width: 2 * root.ratio
         anchors.right: outrightshadow.left
         anchors.bottom: outbottomshadow.top
         anchors.top: outtopshadow.bottom
     }
 
-    //Rectangle pour l'ombre extérieure supérieure
+    //Rectangle pour l'ombre intérieure supérieure
     Rectangle {
         id: intopshadow
-        color: !isActivable || (!area.pressed && isPositive) ? "#08182f" : "transparent"
+        color: isPositive && !(area.pressed && isActivable) ? "#08182f" : "transparent"
         height: 2 * root.ratio
         anchors.top: outtopshadow.bottom
         anchors.left: outleftshadow.right
         anchors.right: inrightshadow.left
     }
 
-    //Rectangle pour l'ombre extérieure gauche
+    //Rectangle pour l'ombre intérieure gauche
     Rectangle {
         id: inleftshadow
-        color: !isActivable || (!area.pressed && isPositive) ? "#08182f" : "transparent"
+        color: isPositive && !(area.pressed && isActivable) ? "#08182f" : "transparent"
         width: 2 * root.ratio
         anchors.left: outleftshadow.right
         anchors.top: outtopshadow.bottom
