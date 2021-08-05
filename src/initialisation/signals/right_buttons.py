@@ -36,7 +36,7 @@ class RightButtons:
 
             # Essaye d'initialiser la page et si elle est correctement initialisé, tente de charger les signals
             if self.initialise_page(application, engine, index, page_path, current_button):
-                self.initialise_signals(application, engine, index, page_path)
+                self.initialise_signals(application, engine, index, page_path, current_button)
 
         # Vérifie si au moins une page est chargée, sinon l'indique et cache les boutons ouvrir et sauvegarder
         if not any(application.is_fully_loaded):
@@ -89,7 +89,8 @@ class RightButtons:
                                            self.pages_stackview.set_active_page(new_page.rootObjects()[0]))
             return True
         else:
-            # Sinon définit le bouton comme non activable et enlève le potentiel texte
+            # Sinon définit le bouton comme non activable et en négatif et enlève le potentiel texte
+            current_button.setProperty("isPositive", False)
             current_button.setProperty("isActivable", False)
             current_button.setProperty("text", "")
 
@@ -107,7 +108,7 @@ class RightButtons:
                                 + "\n\t\tAssurez-vous que le fichier source est au bon endroit ou créez le\n")
             return False
 
-    def initialise_signals(self, application, engine, index, page_path):
+    def initialise_signals(self, application, engine, index, page_path, current_button):
         """Permet lorsqu'une page de paramètres de l'application a été chargée, de charger les signals ainsi
         que des fonctions de bases (get_values() et set_values()) si celle-ci existe
 
@@ -121,6 +122,8 @@ class RightButtons:
             index de la page (1 pour le bouton d'en haut -> 8 pour le bouton d'en bas
         page_path: `string`
             Chemin vers la page de widgets (.qml) à charger (par rapport au main.py)
+        current_button: `QObject`
+            Le bouton auquel sera relié la page (généralement d'id : page_rb + index)
         """
         # Vérifie si la page a des signals handlers associés (en recherchant un ficher .py associé)
         if os.path.isfile("initialisation/signals/page_rb/page_rb" + str(index) + ".py"):
@@ -134,14 +137,16 @@ class RightButtons:
 
                 # Indique que la page a entièrement été chargée (partie visuelle et signals)
                 application.is_fully_loaded[index - 1] = True
+                current_button.setProperty("isPositive", True)
             except Exception as error:
                 # Permet de rattraper une erreur si le code est incorrect où qu'il ne suit pas la documentation
                 logging.warning("Erreur lors du chargement des signaux de la page : " + page_path
                                 + "\n\t\tErreur de type : " + str(type(error))
                                 + "\n\t\tAvec comme message d\'erreur : " + error.args[0]
                                 + ''.join(traceback.format_tb(error.__traceback__)).replace('\n', '\n\t\t') + "\n")
+                current_button.setProperty("isPositive", False)
         else:
             # Sinon pas de signals handlers associé, le précise dans les logs
             logging.warning("La page " + str(index) + " n\'a aucun fichier signals associé"
-                            + "\n\t\tLa page sera visible, mais aucun bouton ne sera fonctionnelle " +
-                            "et aucun paramètre n'y sera récupéré\n")
+                            + "\n\t\tLa page sera visible mais ne sera pas fonctionnelle\n")
+            current_button.setProperty("isPositive", False)
