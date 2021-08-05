@@ -69,7 +69,14 @@ class BottomButtons:
                                                 filter="Fichiers de configuration Sardine (*.csv)")
         if file_path[0] != '':
             # Récupère les donnés du fichier text et mets à jour les différentes pages de paramètres
-            application.set_values(dfi.read_data_file(file_path[0]))
+            try:
+                data = dfi.read_data_file(file_path[0])
+            except FileNotFoundError:
+                logging.error("Le fichier ouvert n'existe plus. Aucun paramètre ne sera modifié\n")
+            except OSError:
+                logging.error("Le fichier n\'a pas pu être ouvert. Assurez vous qu'il ne soit pas déjà ouvert.\n")
+            else:
+                application.set_values(data)
 
     def on_save_clicked(self, application):
         """Fonction appelée lorsque le bouton sauvegarder est cliqué.
@@ -85,4 +92,7 @@ class BottomButtons:
                                                 filter="Fichiers de configuration Sardine (*.csv)")
         if file_path[0] != '':
             # Récupère les donnés des différentes pages de paramètres et les écrits dans le fichier
-            dfi.write_data_file(file_path, application.get_values())
+            try :
+                dfi.write_data_file(file_path, application.get_values())
+            except OSError:
+                logging.error("Vous n'avez pas les droit d'enregistrer un fichier dans cet emplacement")
