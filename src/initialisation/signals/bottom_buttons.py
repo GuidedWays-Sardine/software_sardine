@@ -65,8 +65,8 @@ class BottomButtons:
             L'instance source de l'application d'initialisation, pour les widgets"""
         # Ouvre la fenêtre d'ouverture de fichier
         file_path = QFileDialog.getOpenFileName(caption="Ouvrir un fichier de configuration",
-                                                directory="../settings/",
-                                                filter="Fichiers de configuration Sardine (*.csv)")
+                                                directory="../settings/general_settings",
+                                                filter="Fichiers de configuration Sardine (*.settings)")
         if file_path[0] != '':
             # Récupère les donnés du fichier text et mets à jour les différentes pages de paramètres
             try:
@@ -88,8 +88,8 @@ class BottomButtons:
             L'instance source de l'application d'initialisation, pour les widgets"""
         # Ouvre la fenêtre de sauvegarde et enregegistre le fichier si un nom a été donné
         file_path = QFileDialog.getSaveFileName(caption="Sauvegarder un fichier de configuration",
-                                                directory="../settings/",
-                                                filter="Fichiers de configuration Sardine (*.csv)")
+                                                directory="../settings/general_settings",
+                                                filter="Fichiers de configuration Sardine (*.settings)")
         if file_path[0] != '':
             # Récupère les donnés des différentes pages de paramètres et les écrits dans le fichier
             try :
