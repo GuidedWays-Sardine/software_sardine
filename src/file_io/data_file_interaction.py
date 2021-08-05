@@ -1,7 +1,7 @@
 import logging
 
 
-def read_data_file(file_path, delimiter = ';'):
+def read_data_file(file_path, delimiter=';'):
     """Ouvre un fichier au format csv récupère les donés et les retournes dans un dictionnaire
 
     Parameters
@@ -14,7 +14,9 @@ def read_data_file(file_path, delimiter = ';'):
     Raises
     ------
     FileNotFoundError
-        Si le fichier ouvert n'existe pas ou que le chemin fournis n'est pas correct
+        Si le fichier ouvert n'existe pas ou que le chemin fournit n'est pas correct
+    OSError
+        Si l'utilisateur n'a pas la permission d'ouvrir le fichier
 
     Return
     ------
@@ -30,8 +32,8 @@ def read_data_file(file_path, delimiter = ';'):
     # Lit chaque ligne du fichier
     for line in file:
         # Si la ligne ne contient pas le délimiteur (et donc que le fichier
-        if not delimiter in line:
-            logging.warning("Ligne sautée ; le délimiteur : \"" + delimiter + "\" dans la ligne : " + line + 'manque\n')
+        if delimiter not in line:
+            logging.warning("Ligne sautée ; délimiteur : \"" + delimiter + "\" manquant dans la ligne : " + line + '\n')
         else:
             line = line.rstrip('\n').split(delimiter)
             data[line[0]] = line[1]
@@ -48,11 +50,16 @@ def write_data_file(file_path, data, delimiter=';'):
     ----------
     file_path: `str`
         chemin vers le fichier à ouvrir
-    delimiter: `str`
-        charactère délimitant le nom de lma variable et sa valeur : ";" par défaut
     data: `dict`
         Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
-        (Attention: à envoyer des donnés compatible avec la fonction str())
+        (Attention: à envoyer des donnés ayant un overwrite de la fonction __str__())
+    delimiter: `str`
+        charactère délimitant le nom de lma variable et sa valeur : ";" par défaut
+
+    Raises
+    ------
+    OSError
+        Si l'utilisateur n'a pas la permission d'ouvrir le fichier
     """
     # Essaye d'ouvrir le fichier envoyer, et jette une erreur si le fichier n'exsite pas
     file = open(file_path, "w", encoding='utf-8-sig')
