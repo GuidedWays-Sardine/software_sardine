@@ -70,23 +70,20 @@ class InitialisationWindow:
             # Vérifie d'abord si la page a des signals handlers (et donc potentiellement des valeurs à récupérer)
             if self.right_buttons.is_fully_loaded[index - 1]:
                 page_path = "initialisation/signals/page_rb/page_rb" + str(index) + ".py"
-                try:
-                    # Import localement le fichier de la page
-                    # Appelle la fonction get_values()
-                    exec("from initialisation.signals.page_rb import page_rb" + str(index) + "\n"
-                         + "parameters.update(" +
-                         "self.right_buttons.is_signals_loaded[" + str(index - 1) + "].get_values())")
-                except AttributeError as error:
-                    # Erreur appelée si jamais la page n'a pas de fonction get_values()
-                    logging.warning("La page : " + page_path + "n\'a pas de fonction get_values()"
-                                    + "\n\t\t Assurez-vous que la fonction est implémentée"
-                                    + "\n\t\t Les paramêtres d la page ne seront pas pris en comptre\n")
-                except Exception as error:
-                    # Permet de rattraper une autre potentielle erreur par sécurité (dû au exec())
-                    logging.warning("Erreur inconnu lors de la récupération des donnés " + page_path
-                                    + "\n\t\tErreur de type : " + str(type(error))
-                                    + "\n\t\tAvec comme message d\'erreur : " + error.args[0]
-                                    + ''.join(traceback.format_tb(error.__traceback__)).replace('\n', '\n\t\t') + "\n")
+                # Ensuite vérifie que la page contient bien une fonction get_values()
+                if "get_values" in dir(self.right_buttons.visible_pages[index - 1]):
+                    try:
+                        #Appelle la fonction get_values de la page et récupère une potentielle erreur sur la fonction
+                        self.right_buttons.visible_pages[index - 1].get_values()
+                    except Exception as error:
+                        # Permet de rattraper une autre potentielle erreur par sécurité (dû au exec())
+                        logging.warning("Erreur inconnu lors de la récupération des donnés " + page_path
+                                        + "\n\t\tErreur de type : " + str(type(error))
+                                        + "\n\t\tAvec comme message d\'erreur : " + error.args[0]
+                                        + ''.join(traceback.format_tb(error.__traceback__)).replace('\n', '\n\t\t')
+                                        + "\n")
+                else:
+                    logging.warning("la page " + str(index) + "de paramètre : " + page_path + "n\'a pas get_values()")
 
         # Retourne le dictionnaire complété grâce aux différentes valeurs des get_values() de chaques pages
         return parameters
