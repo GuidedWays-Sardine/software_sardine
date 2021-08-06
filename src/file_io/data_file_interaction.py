@@ -33,7 +33,7 @@ def read_data_file(file_path, delimiter=';'):
     for line in file:
         # Si la ligne ne contient pas le délimiteur (et donc que le fichier
         if delimiter not in line:
-            logging.warning("Ligne sautée ; délimiteur : \"" + delimiter + "\" manquant dans la ligne : " + line + '\n')
+            logging.debug("Ligne sautée. Délimiteur : \"" + delimiter + "\" manquant dans la ligne : " + line + '\n')
         else:
             line = line.rstrip('\n').split(delimiter)
             data[line[0]] = line[1]
@@ -71,3 +71,5 @@ def write_data_file(file_path, data, delimiter=';'):
 
     # Ferme le fichier
     file.close()
+
+# FEATURE : Ajouter un main qui réutilise l'application d'initialisation mais en ajoutant un terminal afin de créer des fichiers settings et vérifier/mettre à jour ceux déjà créés

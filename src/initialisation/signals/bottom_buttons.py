@@ -26,11 +26,11 @@ class BottomButtons:
         try:
             application.win.findChild(QObject, "ouvrir").clicked.connect(lambda: self.on_open_clicked(application))
             application.win.findChild(QObject, "sauvegarder").clicked.connect(lambda: self.on_save_clicked(application))
-        except AttributeError as error:
-            logging.warning('Problème lors du chargement du signal handler du bouton sauvegarder ou ouvrir\n\t' +
-                            'Erreur de type : ' + str(type(error)) + '\n\t' +
-                            'Avec comme message d\'erreur : ' + error.args[0] + '\n\n\t' +
-                            ''.join(traceback.format_tb(error.__traceback__)).replace('\n', '\n\t'))
+        except Exception as error:
+            logging.warning('Problème lors du chargement du signal du bouton sauvegarder ou ouvrir.\n\t' +
+                            'Erreur de type : ' + str(type(error)) + '\n\t\t' +
+                            'Avec comme message d\'erreur : ' + error.args[0] + '\n\n\t\t' +
+                            ''.join(traceback.format_tb(error.__traceback__)).replace('\n', '\n\t\t') + '\n')
 
     def on_quit_clicked(self, application):
         """Ferme la fenêtre d'initialisation
@@ -72,11 +72,15 @@ class BottomButtons:
             try:
                 data = dfi.read_data_file(file_path[0])
             except FileNotFoundError:
-                logging.error("Le fichier ouvert n'existe plus. Aucun paramètre ne sera modifié\n")
+                logging.error("Le fichier ouvert n'existe plus. Aucun paramètre ne sera modifié.\n")
             except OSError:
                 logging.error("Le fichier n\'a pas pu être ouvert. Assurez vous qu'il ne soit pas déjà ouvert.\n")
             else:
-                application.set_values(data)
+                # Si le dictionnaire de donnés n'a aucune valeur, un message d'erreur est levé sur le fichier
+                if len(data) != 0:
+                    application.set_values(data)
+                else:
+                    logging.warning(file_path[0] + " n'a aucune donné ou n'est pas dans un format compatible.\n")
 
     def on_save_clicked(self, application):
         """Fonction appelée lorsque le bouton sauvegarder est cliqué.
@@ -92,7 +96,11 @@ class BottomButtons:
                                                 filter="Fichiers de configuration Sardine (*.settings)")
         if file_path[0] != '':
             # Récupère les donnés des différentes pages de paramètres et les écrits dans le fichier
+            data = application.get_values()
             try :
-                dfi.write_data_file(file_path, application.get_values())
+                dfi.write_data_file(file_path, data)
             except OSError:
-                logging.error("Vous n'avez pas les droit d'enregistrer un fichier dans cet emplacement")
+                logging.error("Vous n'avez pas les droit d'enregistrer un fichier dans cet emplacement.\n")
+            else:
+                if len(data) == 0:
+                    logging.warning("Aucune valeur récupéré, le fichier créé sera vide")

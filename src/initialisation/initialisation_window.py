@@ -2,6 +2,7 @@ import os.path
 import sys
 import logging
 import traceback
+import time
 
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtQml import QQmlApplicationEngine
@@ -38,6 +39,8 @@ class InitialisationWindow:
         SyntaxError
             Soulevé quand le fichier .qml de la fenêtre d'initialisation a une erreur de syntaxe et n'est pas lisible
         """
+        initial_time = time.time()
+
         # Lance l'application et cherche pour le fichier QML avec tous les éléments de la fenêtre d'initialisation
         self.app = QApplication(sys.argv)
         self.app.setQuitOnLastWindowClosed(True)
@@ -46,7 +49,7 @@ class InitialisationWindow:
 
         # Vérifie si le fichier qml de la fenêtre a bien été ouvert et compris, sinon jête une erreur
         if not self.engine.rootObjects() and not os.path.isfile('initialisation/initialisation_window.qml'):
-            raise FileNotFoundError('Le fichier .qml pour la fenêtre d\'initialisation n\'a pas été trouvé')
+            raise FileNotFoundError('Le fichier .qml pour la fenêtre d\'initialisation n\'a pas été trouvé.')
         elif not self.engine.rootObjects() and os.path.isfile('initialisation/initialisation_window.qml'):
             raise SyntaxError('Le fichier .qml pour la fenêtre d\'initialisation contient des erreurs.')
 
@@ -56,6 +59,8 @@ class InitialisationWindow:
         self.right_buttons = rb.RightButtons(self)
 
         # Lance l'application
+        logging.info("Application d'initialisation chargée en " +
+                     str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n")
         self.win.show()
         self.app.exec()
 
@@ -81,17 +86,17 @@ class InitialisationWindow:
                     try:
                         # Appelle la fonction get_values de la page et récupère une potentielle erreur sur la fonction
                         self.visible_pages[index - 1].get_values()
-                    except Exception as error:
+                    except Exception as err:
                         # Permet de rattraper une autre potentielle erreur par sécurité (dû au exec())
-                        logging.warning("Erreur inconnu lors de la récupération des donnés pour : " + page_path
-                                        + "\n\t\tErreur de type : " + str(type(error))
-                                        + "\n\t\tAvec comme message d\'erreur : " + error.args[0]
-                                        + ''.join(traceback.format_tb(error.__traceback__)).replace('\n', '\n\t\t')
-                                        + "\n")
+                        logging.warning("Erreur inconnu lors de la récupération des donnés pour : " + page_path +
+                                        "\n\t\tErreur de type : " + str(type(err)) +
+                                        "\n\t\tAvec comme message d\'erreur : " + err.args[0] + "\n\n\t\t" +
+                                        ''.join(traceback.format_tb(err.__traceback__)).replace('\n', '\n\t\t') + "\n")
                 else:
-                    logging.warning("la page " + str(index) + "de paramètre : " + page_path + "n\'a pas get_values()")
+                    logging.warning("La page " + str(index) + "de paramètre : " + page_path + "n\'a pas get_values.\n")
 
         # Retourne le dictionnaire complété grâce aux différentes valeurs des get_values() de chaques pages
+        logging.info("Récupération de " + str(len(parameters)) + " paramètres sur l'application d'initialisation.\n")
         return parameters
 
     def set_values(self, data):
@@ -105,6 +110,7 @@ class InitialisationWindow:
         # Vérifie pour chaque page existante si une fonction set_values existe.
         # Si oui, appelle la fonction en envoyant le dictionnaire
         # Sinon, met un message d'erreur dans le fichier log et passe à la page suivante
+        count = 0
         for index in range(1, 9):
             # Ensuite vérifie que la page contient bien une fonction set_values()
             if self.is_fully_loaded[index - 1]:
@@ -115,6 +121,7 @@ class InitialisationWindow:
                     try:
                         # Appelle la fonction get_values de la page et récupère une potentielle erreur sur la fonction
                         self.visible_pages[index - 1].set_values(data)
+                        count += 1
                     except Exception as error:
                         # Permet de rattraper une autre potentielle erreur par sécurité (dû au exec())
                         logging.warning("Erreur inconnu lors du changement des donnés pour : " + page_path
@@ -123,4 +130,9 @@ class InitialisationWindow:
                                         + ''.join(traceback.format_tb(error.__traceback__)).replace('\n', '\n\t\t')
                                         + "\n")
                 else:
-                    logging.warning("la page " + str(index) + "de paramètre : " + page_path + "n\'a pas set_values()")
+                    logging.warning("La page " + str(index) + "de paramètre : " + page_path + "n\'a pas set_values.\n")
+
+        # Indique le nombre de pages dont les paramètres on été changés
+        logging.info("Paramètres changés sur " + str(count) + " pages.\n")
+
+

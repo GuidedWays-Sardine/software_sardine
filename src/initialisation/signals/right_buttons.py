@@ -1,6 +1,7 @@
 import logging
 import os
 import traceback
+import time
 
 from PyQt5.QtQml import QQmlApplicationEngine
 from PyQt5.QtCore import QObject
@@ -35,14 +36,20 @@ class RightButtons:
             current_button = self.right_buttons.findChild(QObject, "rb" + str(index))
 
             # Essaye d'initialiser la page et si elle est correctement initialisé, tente de charger les signals
+            initial_time = time.time()
             if self.initialise_page(application, engine, index, page_path, current_button):
-                self.initialise_signals(application, engine, index, page_path, current_button)
+                if self.initialise_signals(application, engine, index, page_path, current_button):
+                    logging.info("Chargement complet (graphique et fonctionelle) de la  page " + str(index) +
+                                 " en " + str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n")
+                else:
+                    logging.info("Chargement partiel (graphique uniquement) de la page " + str(index) +
+                                 " en " + str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n")
 
         # Vérifie si au moins une page est chargée, sinon l'indique et cache les boutons ouvrir et sauvegarder
         if not any(application.is_fully_loaded):
-            logging.error("Aucune des pages n'a été correctement chargée. Les valeurs par défaut seront utilisés\n\t\t"
-                          + "seuls les boutons quitter et lancer sont fonctionnels\n\t\t"
-                          + "Veuillez lire les warnings ci-dessus pour comprendre la cause du problème et le régler\n")
+            logging.error("Aucune des pages n'a été correctement chargée. Les valeurs par défaut seront utilisés.\n\t\t"
+                          + "Seuls les boutons quitter et lancer sont fonctionnels.\n\t\t"
+                          + "Veuillez lire les warnings ci-dessus pour comprendre la cause du problème et le régler.\n")
             save_button = application.win.findChild(QObject, "sauvegarder")
             if save_button is not None:
                 save_button.setProperty("isVisible", False)
@@ -69,8 +76,8 @@ class RightButtons:
 
         Returns
         -------
-        page_loaded: `bool`
-            La page a-t-elle été chargé correctement ?
+        graphics_loaded: `bool`
+            La partie graphique de la page a-t-elle été chargé correctement ?
         """
         # Si la page est chargée, alors elle existe et elle est ajoutée
         if engine.rootObjects():
@@ -96,16 +103,16 @@ class RightButtons:
 
             # Si le fichier existe mais n'a pas été ouvert, cela veut dire qu'il y a une erreur dans le fichier
             if os.path.isfile(page_path):
-                logging.warning("le chargement de la page " + str(index)
-                                + " relié au bouton rb" + str(index) + " est impossible"
-                                + "\n\t\tLe fichier " + page_path + " existe mais ne se charge pas correctement"
-                                + "\n\t\tAssurez-vous que celui-ci ne contient pas d'erreurs\n")
+                logging.warning("le chargement de la page " + str(index) +
+                                " relié au bouton rb" + str(index) + " est impossible.\n\t\t" +
+                                "Le fichier " + page_path + " existe mais ne se charge pas correctement.\n\t\t" +
+                                "Assurez-vous que celui-ci ne contient pas d'erreurs.\n")
             # Sinon c'est qu'il n'existe pas où qu'il est mal placé
             else:
-                logging.warning("le chargement de la page " + str(index)
-                                + " relié au bouton rb" + str(index) + " est impossible"
-                                + "\n\t\tLe fichier " + page_path + " n'existe pas"
-                                + "\n\t\tAssurez-vous que le fichier source est au bon endroit ou créez le\n")
+                logging.warning("le chargement de la page " + str(index) +
+                                " relié au bouton rb" + str(index) + " est impossible.\n\t\t" +
+                                "Le fichier " + page_path + " n'existe pas.\n\t\t" +
+                                "Assurez-vous que le fichier source est au bon endroit ou créez le\n")
             return False
 
     def initialise_signals(self, application, engine, index, page_path, current_button):
@@ -124,6 +131,11 @@ class RightButtons:
             Chemin vers la page de widgets (.qml) à charger (par rapport au main.py)
         current_button: `QObject`
             Le bouton auquel sera relié la page (généralement d'id : page_rb + index)
+
+        Returns
+        -------
+        logic_loaded: `bool`
+            La partie fonctionnelle de la page a-t-elle été chargé correctement ?
         """
         # Vérifie si la page a des signals handlers associés (en recherchant un ficher .py associé)
         if os.path.isfile("initialisation/signals/page_rb/page_rb" + str(index) + ".py"):
@@ -131,22 +143,25 @@ class RightButtons:
             try:
                 # Import localement le fichier de la page
                 # Appelle le constructeur de la page pour affilier tous les signals aux widgets
-                exec("from initialisation.signals.page_rb import page_rb" + str(index) + " as rb" + str(index)
-                     + "\n" + "application.visible_pages[index - 1] = "
-                     + "(rb" + str(index) + ".PageRB" + str(index) + "(application, engine, index, current_button))")
+                exec("from initialisation.signals.page_rb import page_rb" + str(index) + " as rb" + str(index) + "\n" +
+                     "application.visible_pages[index - 1] = " +
+                     "(rb" + str(index) + ".PageRB" + str(index) + "(application, engine, index, current_button))")
 
                 # Indique que la page a entièrement été chargée (partie visuelle et signals)
                 application.is_fully_loaded[index - 1] = True
                 current_button.setProperty("isPositive", True)
+                return True
             except Exception as error:
                 # Permet de rattraper une erreur si le code est incorrect où qu'il ne suit pas la documentation
-                logging.warning("Erreur lors du chargement des signaux de la page : " + page_path
-                                + "\n\t\tErreur de type : " + str(type(error))
-                                + "\n\t\tAvec comme message d\'erreur : " + error.args[0]
-                                + ''.join(traceback.format_tb(error.__traceback__)).replace('\n', '\n\t\t') + "\n")
+                logging.warning("Erreur lors du chargement des signaux de la page : " + page_path + ".\n\t\t" +
+                                "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                                "Avec comme message d\'erreur : " + error.args[0] +
+                                ''.join(traceback.format_tb(error.__traceback__)).replace('\n', '\n\t\t') + "\n")
                 current_button.setProperty("isPositive", False)
+                return False
         else:
             # Sinon pas de signals handlers associé, le précise dans les logs
-            logging.warning("La page " + str(index) + " n\'a aucun fichier signals associé"
-                            + "\n\t\tLa page sera visible mais ne sera pas fonctionnelle\n")
+            logging.warning("La page " + str(index) + " n\'a aucun fichier signals associé.\n\t\t" +
+                            "La page sera visible mais ne sera pas fonctionnelle.\n")
             current_button.setProperty("isPositive", False)
+            return False
