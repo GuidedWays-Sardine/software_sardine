@@ -23,6 +23,24 @@ class PageRB5:
         self.page = page
         self.current_button = current_button
 
+        # Récupère le nombre d'écrans présents
+        self.screen_count = QDesktopWidget().screenCount()
+        self.screen_list = [None] * self.screen_count
+        logging.info("[page_rb5] : " + str(self.screen_count) + " écrans détectés.\n")
+
+        # Charge autant de fenêtres que besoins
+        for screen_index in range(0, self.screen_count):
+            application.engine.load('initialisation/graphics/page_rb/screen_index_rb5.qml')
+            self.screen_list[screen_index] = application.engine.rootObjects()[len(application.engine.rootObjects()) - 1]
+            self.screen_list[screen_index].hide()
+
+        # Change les informations sur chaque pages
+        for screen_index in range(0, self.screen_count):
+            sg = QDesktopWidget().screenGeometry(screen_index).getCoords()
+            self.screen_list[screen_index].setPosition(sg[0], sg[1])
+            window = self.screen_list[screen_index].findChild(QObject, "screen_index")
+            window.setProperty("text", str(screen_index + 1))
+
         # Définit la page comme complète
         application.is_completed[4] = True
 
