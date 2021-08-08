@@ -118,12 +118,17 @@ class RightButtons:
             return False
 
     def on_new_page_selected(self, application, engine, new_index):
-        """
+        """Fonction permettant le changement de la page de paramètres active lorsqu'un bouton rb est cliqué
+        Appelle aussi deux fonctions permettant le déchargement de la page actuelle et le chargement de la nouvelle page
 
-        :param application:
-        :param engine:
-        :param new_index:
-        :return:
+        Parameters
+        ----------
+        application: `InitialisationWindow`
+            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+        engine: `QQmlApplicationEngine`
+            La QQmlApplicationEngine sur laquelle on a tenté de charger la page
+        new_index: `int`
+            index de la page de paramètre à charger (de 1 à 8)
         """
         # Vérifie que la page que l'on veut charger n'est pas celle qui est déjà chargée
         if new_index != application.active_settings_page:
