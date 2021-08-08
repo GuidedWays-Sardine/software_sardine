@@ -32,8 +32,7 @@ Item {
     signal selection_changed()                      //détecte quand l'utilisateur changed la sélection de la combobox (selection_changed() appelé avant combobox_closed())
 
     //permet à partir des valeurs de positions et dimensions par défauts de calculer le ratio à appliquer aux dimensions
-    readonly property real ratio:  parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480)  //parent.height et parent.width représentent la taille de la fenêtre
-    width: (root.defaultWidth - 2) * root.ratio
+    readonly property real ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtrewidth: (root.defaultWidth - 2) * root.ratio
     height: (root.defaultHeight - 2) * root.ratio
     x: (root.defaultX + 1) * root.ratio
     y: (root.defaultY + 1) * root.ratio

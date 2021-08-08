@@ -34,7 +34,7 @@ Item {
 
 
     //permet à partir des valeurs de positions et dimensions par défauts de calculer
-    readonly property real ratio:  parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480)  //parent.height et parent.width représentent la taille de la fenêtre
+    readonly property real ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
     width: (root.defaultWidth - 2) * root.ratio
     height: (root.defaultHeight - 2) * root.ratio
     x: (root.defaultX + 1) * root.ratio
