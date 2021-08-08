@@ -9,6 +9,7 @@ from PyQt5.QtCore import QObject
 
 
 class PageRB5:
+    """Class de la page de settings 5"""
 
     index = 5   # Attention dans les tableaux l'index comment à 0 donc index_tab = index - 1
     page = None
@@ -22,6 +23,7 @@ class PageRB5:
         self.index = index
         self.page = page
         self.current_button = current_button
+        self.current_button.setProperty("text", "Écrans")
 
         # Récupère le nombre d'écrans présents
         self.screen_count = QDesktopWidget().screenCount()
@@ -44,3 +46,10 @@ class PageRB5:
         # Définit la page comme complète
         application.is_completed[4] = True
 
+    def on_page_opened(self, application):
+        for screen in self.screen_list:
+            screen.show()
+
+    def on_page_closed(self, application):
+        for screen in self.screen_list:
+            screen.hide()
