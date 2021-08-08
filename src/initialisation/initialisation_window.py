@@ -26,6 +26,9 @@ class InitialisationWindow:
     is_fully_loaded = [False] * 8  # Stocke directement l'instance de la classe
     is_completed = [False] * 8     # Détecte si la page est complété (égale à self.visible_pages si tout est complété)
 
+    # Variable stockant l'index de la fenêtre de paramètres actuellement chargée
+    active_settings_page = -1
+
     # Variable stockant si le simulateur va être lancé
     launch_simulator = False
 

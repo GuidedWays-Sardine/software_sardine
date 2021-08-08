@@ -87,13 +87,15 @@ class RightButtons:
             # Si c'est la première page existante, la charge
             if application.visible_pages == [None] * 8:
                 self.pages_stackview.set_active_page(engine.rootObjects()[0])
+                application.active_settings_page = index
 
             # store l'engine comme étant la page chargée
             application.visible_pages[index - 1] = engine
 
-            # Connecte le bouton de droite correspondant pour charger la page
-            current_button.clicked.connect(lambda new_page=engine:
-                                           self.pages_stackview.set_active_page(new_page.rootObjects()[0]))
+            # Connect le bouton de droite à une fonction permettant de charger la page et d'appeler d'autres fonctions :
+            # Une pour décharger la page active, et l'autre pour charger la nouvelle page
+            current_button.clicked.connect(lambda new_page=engine, new_index=index:
+                                           self.on_new_page_selected(application, new_page.rootObjects()[0], new_index))
             return True
         else:
             # Sinon définit le bouton comme non activable et en négatif et enlève le potentiel texte
@@ -114,6 +116,48 @@ class RightButtons:
                                 "Le fichier " + page_path + " n'existe pas.\n\t\t" +
                                 "Assurez-vous que le fichier source est au bon endroit ou créez le\n")
             return False
+
+    def on_new_page_selected(self, application, engine, new_index):
+        """
+
+        :param application:
+        :param engine:
+        :param new_index:
+        :return:
+        """
+        # Vérifie que la page que l'on veut charger n'est pas celle qui est déjà chargée
+        if new_index != application.active_settings_page:
+            if application.is_fully_loaded[application.active_settings_page - 1]:
+                # Vérifie si la page que l'on va décharger a un protocole de déchargement spécifique
+                if "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
+                    try:
+                        application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
+                    except Exception as error:
+                        logging.error("La fonction on_page_closed de la page " + str(application.active_settings_page)
+                                      + " contient une erreur\n\t\t" +
+                                      "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                                      "Avec comme message d\'erreur : " + error.args[0] + "\n\n\t\t" +
+                                      "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                else:
+                    logging.debug("Aucune fonction on_page_close page " + str(application.active_settings_page) + "\n")
+
+            # Charge le graphique de la nouvelle page et indique à l'application l'index de la nouvelle page chargée
+            self.pages_stackview.set_active_page(engine.rootObjects[0])
+            application.active_settings_page = new_index
+
+            if application.is_fully_loaded[application.active_settings_page - 1]:
+                # Vérifie si la page que l'on charge  a un protocole de chargement particulier
+                if "on_page_open" in dir(application.visible_pages[application.active_settings_page - 1]):
+                    try:
+                        application.visible_pages[application.active_settings_page - 1].on_page_open(application)
+                    except Exception as error:
+                        logging.error("La fonction on_page_closed de la page " + str(application.active_settings_page)
+                                      + " contient une erreur\n\t\t" +
+                                      "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                                      "Avec comme message d\'erreur : " + error.args[0] + "\n\n\t\t" +
+                                      "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                else:
+                    logging.debug("Aucune fonction on_page_open page " + str(application.active_settings_page) + "\n")
 
     def initialise_signals(self, application, engine, index, page_path, current_button):
         """Permet lorsqu'une page de paramètres de l'application a été chargée, de charger les signals ainsi
