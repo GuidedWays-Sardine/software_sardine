@@ -19,7 +19,7 @@ Item {
     property int defaultY: 0
     property string text: ""          //texte à afficher
     property int fontSize: 12
-    property bool darkGrey: !isActive //est ce que le texte doit-être en gris foncé ?
+    property bool darkGrey: !isActivable //est ce que le texte doit-être en gris foncé ?
     property string image: ""         //image à afficher
     property bool isActivable: true   //si le bouton peut être activée
     property bool isPositive: false   //si le bouton doit-être visible en couche positive (sinon négatif)
