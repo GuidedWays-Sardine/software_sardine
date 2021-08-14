@@ -56,7 +56,7 @@ Item {
         text: root.text
         font.pixelSize: root.fontSize * ratio
         font.family: "Verdana"
-        color: root.darkGrey ? "969696" : "#C3C3C3"
+        color: root.darkGrey ? "#969696" : "#C3C3C3"
         anchors.horizontalCenter: body.horizontalCenter
         anchors.verticalCenter: body.verticalCenter
     }
