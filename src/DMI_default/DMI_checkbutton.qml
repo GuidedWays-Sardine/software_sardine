@@ -7,6 +7,7 @@ import QtQuick.Controls 2.15
 
 //https://doc.qt.io/qt-5/qtquickcontrols2-customize.html#customizing-button
 //Comment personaliser un bouton
+// Ici le DMI_checkbutton utilise une structure similaire au DMI_button. on déplace juste le texte en dehors du bouton, et l'image d'une croix apparait quand le checkbutton est activé
 
 Item {
     id: root
