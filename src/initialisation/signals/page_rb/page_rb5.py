@@ -32,7 +32,8 @@ class PageRB5:
 
         # Charge autant de fenêtres que besoins
         for screen_index in range(0, self.screen_count):
-            application.engine.load('initialisation/graphics/page_rb/screen_index_rb5.qml')
+            application.engine.load('initialisation/graphics/page_rb/page_rb5/screen_index.qml')
+            print(len(application.engine.rootObjects()))
             self.screen_list[screen_index] = application.engine.rootObjects()[len(application.engine.rootObjects()) - 1]
             self.screen_list[screen_index].hide()
 
@@ -47,9 +48,9 @@ class PageRB5:
         application.is_completed[4] = True
 
     def on_page_opened(self, application):
-        for screen in self.screen_list:
-            screen.show()
+        for screen_index in self.screen_list:
+            screen_index.show()
 
     def on_page_closed(self, application):
-        for screen in self.screen_list:
-            screen.hide()
+        for screen_index in self.screen_list:
+            screen_index.hide()
