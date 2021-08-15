@@ -8,34 +8,52 @@ import QtQuick.Controls 2.15
 //https://doc.qt.io/qt-5/qtquickcontrols2-customize.html#customizing-combobox
 //Comment personaliser un combobox
 
+
 Item {
     id:root
 
-    //Arguments supplémentaires (en plus de la position et de la taille)
-    property int defaultWidth: 200   //dimensions de la combobox quand celle-ci est fermée et que la fenêtre fait du 640x480
-    property int defaultHeight: 60
-    property int defaultX: 0        //position du bouton pour les dimensions quand la fenêtre fait du 640x480
+
+    //Propriétés liés à la position et à la taille de l'objet
+    property int defaultWidth: 100          //dimensions de la combobox quand celle-ci est fermée et que la fenêtre fait du 640x480
+    property int defaultHeight: 40
+    property int defaultX: 0                //position du bouton pour les dimensions quand la fenêtre fait du 640x480
     property int defaultY: 0
-    property int fontSize: 12
-    property bool darkGrey: !isActivable //est ce que le texte doit-être en gris foncé ?
-    property var elements: ["NaN"]
+
+    //Propriétés liés aux donnés de la combobox
+    property var elements: ["NaN"]          //définit les éléments sélectionables de la combobox
     property int amountElementsDisplayed: 4 //définit le nombre d'éléments visibles dans la popup
     property string selection: combo.displayText
-    property bool isActivable: true //si la combobox peut être activée (Elle le sera que si isActivable est à true et qu'il y a plus d'un élément dans la combobox)
-    property bool isPositive: false
-    property bool isVisible: true   //si le bouton est visible
-    visible: isVisible
+    property int fontSize: 12
+    property bool isDarkGrey: !isActivable //est ce que le texte doit-être en gris foncé ?
+
+    //Propriétés liés à l'état de la combobox
+    property bool isActivable: true        //si la combobox peut être activée (Elle le sera que si isActivable est à true et qu'il y a plus d'un élément dans la combobox)
+    property bool isPositive: false        //si la combobox doit-être visible en couche positive (sinon négative)
+    property bool isVisible: true          //si le bouton est visible
+
 
     //Différents signal handlers (à écrire en python)
     signal combobox_opened()                        //détecte quand le popup de la combobox s'ouvre
     signal combobox_closed()                        //détecte quand le popup de la combobox se ferme
-    signal selection_changed()                      //détecte quand l'utilisateur changed la sélection de la combobox (selection_changed() appelé avant combobox_closed())
+    signal selection_changed()                      //détecte quand l'utilisateur changed la sélection de la combobox (selection_changed() appelé après combobox_closed())
+
+    //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
+    readonly property string darkBlue : "#031122"   //partie 5.2.1.3.3  Nr 6
+    readonly property string black: "#000000"       //partie 5.2.1.3.3  Nr 2
+    readonly property string grey: "#C3C3C3"        //partie 5.2.1.3.3  Nr 3
+    readonly property string darkGrey: "#969696"    //partie 5.2.1.3.3  Nr 5
+    readonly property string shadow: "#08182F"      //partie 5.2.1.3.3  Nr 7
+
 
     //permet à partir des valeurs de positions et dimensions par défauts de calculer le ratio à appliquer aux dimensions
-    readonly property real ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtrewidth: (root.defaultWidth - 2) * root.ratio
+    readonly property real ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
+    width: (root.defaultWidth - 2) * root.ratio
     height: (root.defaultHeight - 2) * root.ratio
     x: (root.defaultX + 1) * root.ratio
     y: (root.defaultY + 1) * root.ratio
+    visible: isVisible
+
+
 
     //Inline component : combobox (crée une templace de la combobox)
     component DMI_combo: ComboBox {
@@ -45,6 +63,7 @@ Item {
         font.family: "Verdana"
 
         anchors.fill: parent
+
 
         //Flèche visible lorsque la combobox est fermée
         indicator: Canvas {
@@ -58,23 +77,24 @@ Item {
             Connections {
                 target: body
                 function onPressedChanged() {
+                    canvas.requestPaint()
                     if(root.isActivable && body.count > 1 && !body.pressed && !popup.visible)
                     {
-                        root.combobox_opened();
+                        root.combobox_opened()
                     }
                 }
             }
 
             //Gère la couleur et le placement de la flèche
             onPaint: {
-                var ctx = getContext("2d");
-                ctx.reset();
-                ctx.moveTo(0, 0);
-                ctx.lineTo(width, 0);
-                ctx.lineTo(width / 2, height);
-                ctx.closePath();
-                ctx.fillStyle = !body.pressed && root.isActivable && body.count > 1 ? "#c3c3c3" : "#969696";
-                ctx.fill();
+                var ctx = getContext("2d")
+                ctx.reset()
+                ctx.moveTo(0, 0)
+                ctx.lineTo(width, 0)
+                ctx.lineTo(width / 2, height)
+                ctx.closePath()
+                ctx.fillStyle = !body.pressed && !root.isDarkGrey && body.count > 1 ? root.grey : root.darkGrey
+                ctx.fill()
             }
         }
 
@@ -82,7 +102,7 @@ Item {
         contentItem: Text {
             text: body.displayText
             font: body.font
-            color: !body.pressed && root.isActivable && body.count > 1 ? "#c3c3c3" : "#969696"
+            color: !body.pressed && !root.isDarkGrey && body.count > 1 ? root.grey : root.darkGrey
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
 
@@ -90,28 +110,32 @@ Item {
 
             //Détecte quand la valeur du combobox est changé
             onTextChanged: {
-                root.selection_changed();
+                root.selection_changed()
             }
         }
 
-        //Rectangle visible lorsque la combobox est fermée (ici peut utile car même couleur que le fond)
+        //Rectangle visible lorsque la combobox est fermée
         background: Rectangle {
             id: text_zone
-            color: "#031122"
+            color: root.darkBlue
             anchors.fill: parent
         }
 
         //Menu de popup quand la combobox est ouverte
         popup: Popup {
             id: popup
-            y: (root.defaultHeight - 1) * root.ratio
-            width: root.width * root.ratio
-            implicitHeight: body.count < root.amountElementsDisplayed ? body.height*body.count : body.height * root.amountElementsDisplayed
-            padding: 1 * ratio
+            y: (root.defaultHeight - 2) * root.ratio
+            x: (root.isPositive ? 4 : 2) * root.ratio
+            width: root.width - (isPositive ? 6 : 2) * root.ratio
+            implicitHeight: (body.count < root.amountElementsDisplayed ? body.height*body.count : body.height * root.amountElementsDisplayed) + (root.isPositive ? 6 : 8) * root.ratio
+            padding: 1 * root.ratio
 
             //Détecte quand celui-ci est fermé (peu importe la façon)
             onClosed: {
-                root.combobox_closed();
+                if(root.isActivable && body.count > 1 && !body.pressed && !popup.visible)
+                {
+                    root.combobox_closed()
+                }
             }
 
             //Permet de lister les différents éléments, ajoute aussi une scrollbar s'il y a plus de 4 éléments
@@ -126,7 +150,7 @@ Item {
 
             //Rectangle de fond
             background: Rectangle {
-                color: "transparent"
+                color: root.darkBlue
             }
         }
     }
@@ -142,13 +166,13 @@ Item {
             width: combo.width
             height: combo.height
 
-            Rectangle{
-                color: "#032211"
+            background: Rectangle {
+                color: "transparent"
             }
 
             contentItem: Text {
                 text: modelData
-                color: combo.highlightedIndex === index ? "#969696" : "#c3c3c3"
+                color: combo.highlightedIndex === index ? root.darkGrey : root.grey
                 font: combo.font
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
@@ -156,84 +180,87 @@ Item {
         }
     }
 
+
+    //Ombre extérieure
+    //Rectangle pour l'ombre extérieure supérieure
+    Rectangle {
+        id: outtopshadow
+        color: root.black
+        width: root.width
+        height: 2 * root.ratio
+        anchors.verticalCenter: body.top
+        anchors.left: body.left
+        anchors.leftMargin: - 1 * root.ratio
+    }
+
+    //Rectangle pour l'ombre extérieure droite
+    Rectangle {
+        id: outrightshadow
+        color: root.shadow
+        width: 2 * root.ratio
+        height: combo.popup.visible && isActivable && combo.count > 1 ? combo.height*((combo.count < root.amountElementsDisplayed ? combo.count : root.amountElementsDisplayed) + 1) + 10 * root.ratio : combo.height
+        anchors.top: outtopshadow.top
+        anchors.left: outtopshadow.right
+    }
+
+    //Rectangle pour l'ombre extérieure gauche
+    Rectangle {
+        id: outleftshadow
+        color: root.black
+        width: 2 * root.ratio
+        anchors.top: outtopshadow.top
+        anchors.left: outtopshadow.left
+        anchors.bottom: outbottomshadow.top
+    }
+
     //Rectangle pour l'ombre extérieure inférieure
-        Rectangle {
-            id: outbottomshadow
-            color: "#08182f"
-            width: root.width + 2 * root.ratio
-            height: 2 * root.ratio
-            anchors.horizontalCenter: combo.horizontalCenter
-            anchors.bottom: outrightshadow.bottom
-        }
+    Rectangle {
+        id: outbottomshadow
+        color: root.shadow
+        height: 2 * root.ratio
+        anchors.right: outrightshadow.right
+        anchors.bottom: outrightshadow.bottom
+        anchors.left: outtopshadow.left
+    }
 
-        //Rectangle pour l'ombre extérieure droite
-        Rectangle {
-            id: outrightshadow
-            color: "#08182f"
-            width: 2 * root.ratio
-            height: outleftshadow.height
-            anchors.horizontalCenter: combo.right
-            //anchors.verticalCenter: combo.verticalCenter
-        }
+    //Ombre intérieure
+    //Rectangle pour l'ombre extérieure inférieure
+    Rectangle {
+        id: inbottomshadow
+        color: root.isPositive ? root.black : "transparent"
+        height: 2 * root.ratio
+        anchors.bottom: outbottomshadow.top
+        anchors.left: outleftshadow.right
+        anchors.right: outrightshadow.left
+    }
 
-        //Rectangle pour l'ombre extérieure supérieure
-        Rectangle {
-            id: outtopshadow
-            color: "#000000"
-            width: root.width
-            height: 2 * root.ratio
-            anchors.left: outbottomshadow.left
-            anchors.verticalCenter: combo.top
-        }
+    //Rectangle pour l'ombre extérieure droite
+    Rectangle {
+        id: inrightshadow
+        color: root.isPositive ? root.black : "transparent"
+        width: 2 * root.ratio
+        anchors.right: outrightshadow.left
+        anchors.bottom: outbottomshadow.top
+        anchors.top: outtopshadow.bottom
+    }
 
-        //Rectangle pour l'ombre extérieure gauche
-        Rectangle {
-            id: outleftshadow
-            color: "#000000"
-            width: 2 * root.ratio
-            height: combo.popup.visible && isActivable && combo.count > 1 ? combo.height*((combo.count < root.amountElementsDisplayed ? combo.count : root.amountElementsDisplayed) + 1) : combo.height
-            anchors.horizontalCenter: combo.left
-            //anchors.bottom: outbottomshadow.top
-            anchors.top: outtopshadow.top
-        }
+    //Rectangle pour l'ombre extérieure supérieure
+    Rectangle {
+        id: intopshadow
+        color: root.isPositive ? root.shadow : "transparent"
+        height: 2 * root.ratio
+        anchors.top: outtopshadow.bottom
+        anchors.left: outleftshadow.right
+        anchors.right: inrightshadow.left
+    }
 
-        //Rectangle pour l'ombre extérieure inférieure
-        Rectangle {
-            id: inbottomshadow
-            color: root.isPositive ? "#000000" : "transparent"
-            height: 2 * root.ratio
-            anchors.bottom: outbottomshadow.top
-            anchors.left: outleftshadow.right
-            anchors.right: outrightshadow.left
-        }
-
-        //Rectangle pour l'ombre extérieure droite
-        Rectangle {
-            id: inrightshadow
-            color: root.isPositive ? "#000000" : "transparent"
-            width: 2 * root.ratio
-            anchors.right: outrightshadow.left
-            anchors.bottom: outbottomshadow.top
-            anchors.top: outtopshadow.bottom
-        }
-
-        //Rectangle pour l'ombre extérieure supérieure
-        Rectangle {
-            id: intopshadow
-            color: root.isPositive ? "#08182f" : "transparent"
-            height: 2 * root.ratio
-            anchors.top: outtopshadow.bottom
-            anchors.left: outleftshadow.right
-            anchors.right: inrightshadow.left
-        }
-
-        //Rectangle pour l'ombre extérieure gauche
-        Rectangle {
-            id: inleftshadow
-            color: root.isPositive ? "#08182f" : "transparent"
-            width: 2 * root.ratio
-            anchors.left: outleftshadow.right
-            anchors.top: outtopshadow.bottom
-            anchors.bottom: inbottomshadow.top
-        }
+    //Rectangle pour l'ombre extérieure gauche
+    Rectangle {
+        id: inleftshadow
+        color: root.isPositive ? root.shadow : "transparent"
+        width: 2 * root.ratio
+        anchors.left: outleftshadow.right
+        anchors.top: outtopshadow.bottom
+        anchors.bottom: inbottomshadow.top
+    }
 }
