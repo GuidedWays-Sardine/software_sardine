@@ -32,6 +32,11 @@ Item {
     property bool isVisible: true     //si le bouton est visible
 
 
+    //Fonction pour changer la valeur de isChecked
+    function set_checked(status) {
+            root.isChecked = status;
+    }
+
     //Différents signal handlers (à écrire en python)
     signal clicked()                //détecte quand le bouton est cliqué (après que l'état ait été changé)
 
@@ -77,7 +82,7 @@ Item {
     //Image visible sur le bouton
     Image {
         id: image
-        source: isActivated ? (isDarkGrey ? "../../assets/DMI_icons/dark_grey_cross.png" : "../../assets/DMI_icons/white_cross.png") : ""
+        source: isChecked ? (isDarkGrey ? "../../assets/DMI_icons/dark_grey_cross.png" : "../../assets/DMI_icons/white_cross.png") : ""
         anchors.fill: parent
         anchors.bottom: body.bottom
         anchors.right: body.right
