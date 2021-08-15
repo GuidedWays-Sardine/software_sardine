@@ -142,7 +142,7 @@ Item {
             contentItem: ListView {
                 clip: true
                 implicitHeight: contentHeight
-                model: body.popup.visible && isActivable && body.count > 1 ? body.delegateModel : null               //FIXME: enlever la couleur de fond quand élément sélectionné
+                model: body.popup.visible && isActivable && body.count > 1 ? body.delegateModel : null
                 currentIndex: body.highlightedIndex
 
                 ScrollIndicator.vertical: ScrollIndicator { }
