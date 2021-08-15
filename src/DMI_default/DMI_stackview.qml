@@ -6,23 +6,27 @@ import QtQuick.Controls 2.15
 //Comment créer un élément personalisé
 
 //https://doc.qt.io/qt-5/qtquickcontrols2-customize.html#customizing-stackview
-//Comment personaliser un bouton
+//Comment personaliser un stackview
+
 
 Item {
     id: root
 
-    //fonction à appeler en python pour changer la page active
-    function set_active_page(text){
-        settings_pages.clear()
-        settings_pages.push(text)
+
+    //Fonction à appeler en python pour changer la page active
+    function set_active_page(page){
+        body.clear()
+        body.push(page)
     }
 
+
+    //Un DMI_stackview peut contenir des widgets, il doit donc toujours recouvrir
     anchors.fill: parent
+
 
     //stackview permettant de superposer les différentes pages
     StackView {
-        id: settings_pages
-        objectName: "settings_pages"
+        id: body
 
         anchors.fill: parent
 
