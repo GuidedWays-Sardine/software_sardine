@@ -6,8 +6,6 @@ from PyQt5.QtQml import QQmlApplicationEngine
 from PyQt5.QtCore import QObject
 
 
-
-
 class PageRB5:
     """Class de la page de settings 5"""
 
@@ -43,6 +41,8 @@ class PageRB5:
             self.screen_list[screen_index].setPosition(sg[0], sg[1])
             window = self.screen_list[screen_index].findChild(QObject, "screen_index")
             window.setProperty("text", str(screen_index + 1))
+
+
 
         # Définit la page comme complète
         application.is_completed[4] = True
