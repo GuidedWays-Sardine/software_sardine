@@ -15,21 +15,21 @@ Item {
 
 
     //Propriétés liés à la position et à la taille de l'objet
-    property int boxLenght: 20           //dimensions de la partie cochable du checkbutton quand la fenêtre fait du 640x480
-    property int defaultX: 0             //position du bouton pour les dimensions quand la fenêtre fait du 640x480
+    property int boxLenght: 20              //dimensions de la partie cochable du checkbutton quand la fenêtre fait du 640x480
+    property int defaultX: 0                //position du bouton pour les dimensions quand la fenêtre fait du 640x480
     property int defaultY: 0
 
     //Propriétés liés à l'image et au texte que l'utilisateur peut rajouter sur le bouton
-    property string text: ""            //texte à afficher
+    property string text: ""                //texte à afficher
     property int fontSize: 12
-    property bool isDarkGrey: !isActive   //est ce que le texte doit-être en gris foncé ?
+    property bool isDarkGrey: !isActivable  //est ce que le texte doit-être en gris foncé ?
 
     //Propriétés liés à l'état de la combobox
     property bool isChecked: false
-    property bool isActivated: false  //si le bouton est activé
-    property bool isActivable: true   //si le bouton peut être activée
-    property bool isPositive: false   //si le bouton doit-être visible en couche positive (sinon négatif)
-    property bool isVisible: true     //si le bouton est visible
+    property bool isActivated: false        //si le bouton est activé
+    property bool isActivable: true         //si le bouton peut être activée
+    property bool isPositive: false         //si le bouton doit-être visible en couche positive (sinon négatif)
+    property bool isVisible: true           //si le bouton est visible
 
 
     //Fonction pour changer la valeur de isChecked
@@ -38,7 +38,7 @@ Item {
     }
 
     //Différents signal handlers (à écrire en python)
-    signal clicked()                //détecte quand le bouton est cliqué (après que l'état ait été changé)
+    signal clicked()                        //détecte quand le bouton est cliqué (après que l'état ait été changé)
 
     //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
     readonly property string darkBlue : "#031122"   //partie 5.2.1.3.3  Nr 6
@@ -181,7 +181,7 @@ Item {
 
         onReleased: {
             if(isActivable){
-                root.isActivated = !root.isActivated
+                root.isChecked = !root.isChecked
                 root.clicked()
             }
         }

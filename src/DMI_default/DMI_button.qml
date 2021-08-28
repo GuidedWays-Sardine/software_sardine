@@ -23,7 +23,7 @@ Item {
     property string image: ""               //image à afficher
     property string text: ""                //texte à afficher
     property int fontSize: 12
-    property bool isDarkGrey: !isActivable    //est ce que le texte doit-être en gris foncé ?
+    property bool isDarkGrey: !isActivable  //est ce que le texte doit-être en gris foncé ?
 
     //Propriétés liés à l'état du bouton
     property bool isActivable: true         //si le bouton peut être activée
@@ -32,9 +32,9 @@ Item {
 
 
     //Différents signal handlers (à écrire en python)
-    signal clicked()                //détecte quand le bouton est cliqué
-    signal click_start()            //détecte quand l'utilisateur commence à appuyer sur le bouton
-    signal click_end()              //détecte quand l'utilisateur relache le bouton (similaire à .clicked())
+    signal clicked()                        //détecte quand le bouton est cliqué
+    signal click_start()                    //détecte quand l'utilisateur commence à appuyer sur le bouton
+    signal click_end()                      //détecte quand l'utilisateur relache le bouton (similaire à .clicked())
 
     //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
     readonly property string darkBlue : "#031122"   //partie 5.2.1.3.3  Nr 6

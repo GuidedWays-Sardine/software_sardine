@@ -24,7 +24,7 @@ Item {
     property int amountElementsDisplayed: 4 //définit le nombre d'éléments visibles dans la popup
     property string selection: combo.displayText
     property int fontSize: 12
-    property bool isDarkGrey: !isActivable //est ce que le texte doit-être en gris foncé ?
+    property bool isDarkGrey: !isActivable  //est ce que le texte doit-être en gris foncé ?
 
     //Propriétés liés à l'état de la combobox
     property bool isActivable: true        //si la combobox peut être activée (Elle le sera que si isActivable est à true et qu'il y a plus d'un élément dans la combobox)
