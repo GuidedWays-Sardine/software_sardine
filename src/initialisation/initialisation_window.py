@@ -97,7 +97,7 @@ class InitialisationWindow:
                                         "\n\t\tAvec comme message d\'erreur : " + err.args[0] + "\n\n\t\t" +
                                         ''.join(traceback.format_tb(err.__traceback__)).replace('\n', '\n\t\t') + "\n")
                 else:
-                    logging.warning("La page " + str(index) + "de paramètre : " + page_path + "n\'a pas get_values.\n")
+                    logging.warning("La page " + str(index) + " de paramètre : " + page_path + " n'a pas get_values.\n")
 
         # Retourne le dictionnaire complété grâce aux différentes valeurs des get_values() de chaques pages
         logging.info("Récupération de " + str(len(parameters)) + " paramètres sur l'application d'initialisation.\n")
@@ -134,9 +134,31 @@ class InitialisationWindow:
                                         + ''.join(traceback.format_tb(error.__traceback__)).replace('\n', '\n\t\t')
                                         + "\n")
                 else:
-                    logging.warning("La page " + str(index) + "de paramètre : " + page_path + "n\'a pas set_values.\n")
+                    logging.warning("La page " + str(index) + " de paramètre : " + page_path + " n'a pas set_values.\n")
 
         # Indique le nombre de pages dont les paramètres on été changés
         logging.info("Paramètres changés sur " + str(count) + " pages.\n")
 
+    def set_languages(self, translation_data):
+        # Appel de la fonction set_languages pour les boutons du bas
+        self.bottom_buttons.change_language(self, translation_data)
 
+        # Tentative d'appel de la fonction pour toutes les pages
+        for index in range(1, 9):
+            # Vérifie d'abord si la page a des signals handlers (et donc potentiellement des valeurs à récupérer)
+            if self.is_fully_loaded[index - 1]:
+                page_path = "initialisation/signals/page_rb/page_rb" + str(index) + ".py"
+
+                # Ensuite vérifie que la page contient bien une fonction get_values()
+                if "change_language" in dir(self.visible_pages[index - 1]):
+                    try:
+                        # Appelle la fonction get_values de la page et récupère une potentielle erreur sur la fonction
+                        self.visible_pages[index - 1].change_language(translation_data)
+                    except Exception as err:
+                        # Permet de rattraper une autre potentielle erreur par sécurité (dû au exec())
+                        logging.warning("Erreur inconnu lors du changement de langue pour : " + page_path +
+                                        "\n\t\tErreur de type : " + str(type(err)) +
+                                        "\n\t\tAvec comme message d\'erreur : " + err.args[0] + "\n\n\t\t" +
+                                        ''.join(traceback.format_tb(err.__traceback__)).replace('\n', '\n\t\t') + "\n")
+                else:
+                    logging.warning("La page " + str(index) + " de paramètre : " + page_path + " n'a pas change_language.\n")
