@@ -1,11 +1,13 @@
 import logging
 import traceback
+import time
 
 from PyQt5.QtCore import QObject
 from PyQt5.QtWidgets import QFileDialog
 
 
 class BottomButtons:
+    """Classe s'occupant du chargement et du fonctionnement des boutons inférieurs de l'application d'initialisation"""
 
     def __init__(self, application):
         """Permet d'initialiser les boutons permanents (quitter, ouvrir, sauvegarder, lancer) en bas de la fenêtre.
@@ -16,6 +18,9 @@ class BottomButtons:
         application: `InitialisationWindow`
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
+        initial_time = time.time()
+        logging.info("Tentative de chargement des boutons inférieurs.\n")
+
         # Boutons quitter/lancer (obligatoires pour le lancement de l'application)
         application.win.findChild(QObject, "quit").clicked.connect(lambda: self.on_quit_clicked(application))
         application.win.findChild(QObject, "launch").clicked.connect(lambda: self.on_launch_clicked(application))
@@ -29,6 +34,9 @@ class BottomButtons:
                             'Erreur de type : ' + str(type(error)) + '\n\t\t' +
                             'Avec comme message d\'erreur : ' + error.args[0] + '\n\n\t\t' +
                             ''.join(traceback.format_tb(error.__traceback__)).replace('\n', '\n\t\t') + '\n')
+
+        logging.info("Boutons inférieurs chargés en " +
+                     str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n\n")
 
     def on_quit_clicked(self, application):
         """Ferme la fenêtre d'initialisation
@@ -128,7 +136,7 @@ class BottomButtons:
             else:
                 # Dans le cas où aucune donnée n'a été récupérée, le signale dans les logs
                 if len(data) == 0:
-                    logging.warning("Aucune valeur récupéré, le fichier créé sera vide")
+                    logging.warning("Aucune valeur récupérée, le fichier créé sera vide.\n")
 
     def change_language(self, application, translation_data):
         """Permet à partir d'un dictionnaire de traduction de traduire le textes des 4 boutons inférieurs.

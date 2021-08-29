@@ -8,6 +8,7 @@ from PyQt5.QtCore import QObject
 
 
 class RightButtons:
+    """Classe s'occupant du chargement et du fonctionnement des boutons de droite de l'application d'initialisation"""
 
     # stocke les éléments de bases des boutons de droite
     right_buttons = None
@@ -35,15 +36,17 @@ class RightButtons:
             engine.load(page_path)
             current_button = self.right_buttons.findChild(QObject, "rb" + str(index))
 
-            # Essaye d'initialiser la page et si elle est correctement initialisé, tente de charger les signals
             initial_time = time.time()
+            logging.info("Tentative du chargement de la page " + str(index) + ".\n")
+
+            # Essaye d'initialiser la page et si elle est correctement initialisé, tente de charger les signals
             if self.initialise_page(application, engine, index, page_path, current_button):
                 if self.initialise_signals(application, engine, index, page_path, current_button):
-                    logging.info("Chargement complet (graphique et fonctionelle) de la  page " + str(index) +
-                                 " en " + str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n")
+                    logging.info("Chargement complet (graphique et fonctionelle) de la  page " + str(index) + " en " +
+                                 str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n\n")
                 else:
-                    logging.info("Chargement partiel (graphique uniquement) de la page " + str(index) +
-                                 " en " + str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n")
+                    logging.info("Chargement partiel (graphique uniquement) de la page " + str(index) + " en " +
+                                 str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n\n")
 
         # Vérifie si au moins une page est chargée, sinon l'indique et cache les boutons ouvrir et sauvegarder
         if not any(application.is_fully_loaded):
@@ -205,7 +208,7 @@ class RightButtons:
                 logging.warning("Erreur lors du chargement des signaux de la page : " + page_path + ".\n\t\t" +
                                 "Erreur de type : " + str(type(error)) + "\n\t\t" +
                                 "Avec comme message d\'erreur : " + error.args[0] +
-                                ''.join(traceback.format_tb(error.__traceback__)).replace('\n', '\n\t\t') + "\n")
+                                "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
                 current_button.setProperty("isPositive", False)
                 return False
         else:
