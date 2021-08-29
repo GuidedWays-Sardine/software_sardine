@@ -47,6 +47,9 @@ Item {
     readonly property string darkGrey: "#969696"    //partie 5.2.1.3.3  Nr 5
     readonly property string shadow: "#08182F"      //partie 5.2.1.3.3  Nr 7
 
+    //Chemin d'accès vers les icones utiles pour le check_button
+    readonly property string iconPath : "../../../assets/DMI_icons/ETCS_3.6.0/"
+
 
     //permet à partir des valeurs de positions et dimensions par défauts de calculer
     readonly property real ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
@@ -82,7 +85,7 @@ Item {
     //Image visible sur le bouton
     Image {
         id: image
-        source: isChecked ? (isDarkGrey ? "../../assets/DMI_icons/dark_grey_cross.png" : "../../assets/DMI_icons/white_cross.png") : ""
+        source: isChecked ? (isDarkGrey ? root.iconPath + "dark_grey_cross.png" : root.iconPath + "white_cross.png") : ""
         anchors.fill: parent
         anchors.bottom: body.bottom
         anchors.right: body.right

@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.15
-import "../../../DMI_default"
+import "../../../DMI_default/ETCS_3.6.0"
 
 
 DMI_page {

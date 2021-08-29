@@ -1,7 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
-import "../../../../DMI_default"
+import "../../../../DMI_default/ETCS_3.6.0"
 
 Item {
     id: root
