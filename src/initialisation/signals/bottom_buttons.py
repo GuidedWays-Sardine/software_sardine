@@ -4,8 +4,6 @@ import traceback
 from PyQt5.QtCore import QObject
 from PyQt5.QtWidgets import QFileDialog
 
-from file_io import data_file_interaction as dfi
-
 
 class BottomButtons:
 
@@ -70,7 +68,22 @@ class BottomButtons:
         if file_path[0] != '':
             # Récupère les donnés du fichier text et mets à jour les différentes pages de paramètres
             try:
-                data = dfi.read_data_file(file_path[0])
+                data = {}
+
+                # Essaye d'ouvrir le fichier envoyer, et jette une erreur si le fichier n'exsite pas
+                file = open(file_path[0], "r", encoding='utf-8-sig')
+
+                # Lit chaque ligne du fichier
+                for line in file:
+                    # Si la ligne ne contient pas le délimiteur (ici ;) l'indique dans les logs
+                    if ";" not in line:
+                        logging.debug("Ligne sautée. Délimiteur : \";\" manquant dans la ligne : " + line + '\n')
+                    else:
+                        line = line.rstrip('\n').split(";")
+                        data[line[0]] = line[1]
+
+                # Ferme le fichier et retourne le dictionnaire avec les valeurs récupérées
+                file.close()
             except FileNotFoundError:
                 logging.error("Le fichier ouvert n'existe plus. Aucun paramètre ne sera modifié.\n")
             except OSError:
@@ -95,12 +108,24 @@ class BottomButtons:
                                                 directory="../settings/general_settings",
                                                 filter="Fichiers de configuration Sardine (*.settings)")
         if file_path[0] != '':
-            # Récupère les donnés des différentes pages de paramètres et les écrits dans le fichier
+            # Récupère les donnés des différentes pages de paramètres et les écrit dans le fichier
             data = application.get_values()
-            try :
-                dfi.write_data_file(file_path, data)
+            try:
+                # Essaye d'ouvrir le fichier envoyer, et jette une erreur si le fichier n'exsite pas
+                file = open(file_path[0], "w", encoding='utf-8-sig')
+
+                # Récupère chaque clé/valeur du dictionnaire
+                for key in data.keys():
+                    # Ecrit une ligne contenant la clé et la valeur séparé par le délimiteur (ici ;)
+                    file.write(str(key) + ";" + str(data[key]))
+
+                # Ferme le fichier
+                file.close()
+
+            # Exception soulevée dans le cas où le fichier ne peut pas être créé ou modifié
             except OSError:
                 logging.error("Vous n'avez pas les droit d'enregistrer un fichier dans cet emplacement.\n")
             else:
+                # Dans le cas où aucune donnée n'a été récupérée, le signale dans les logs
                 if len(data) == 0:
                     logging.warning("Aucune valeur récupéré, le fichier créé sera vide")
