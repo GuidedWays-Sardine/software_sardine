@@ -120,53 +120,6 @@ class RightButtons:
                                 "Assurez-vous que le fichier source est au bon endroit ou créez le\n")
             return False
 
-    def on_new_page_selected(self, application, engine, new_index):
-        """Fonction permettant le changement de la page de paramètres active lorsqu'un bouton rb est cliqué
-        Appelle aussi deux fonctions permettant le déchargement de la page actuelle et le chargement de la nouvelle page
-
-        Parameters
-        ----------
-        application: `InitialisationWindow`
-            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
-        engine: `QQmlApplicationEngine`
-            La QQmlApplicationEngine sur laquelle on a tenté de charger la page
-        new_index: `int`
-            index de la page de paramètre à charger (de 1 à 8)
-        """
-        # Vérifie que la page que l'on veut charger n'est pas celle qui est déjà chargée
-        if new_index != application.active_settings_page:
-            if application.is_fully_loaded[application.active_settings_page - 1]:
-                # Vérifie si la page que l'on va décharger a un protocole de déchargement spécifique
-                if "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
-                    try:
-                        application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
-                    except Exception as error:
-                        logging.error("La fonction on_page_closed de la page " + str(application.active_settings_page)
-                                      + " contient une erreur\n\t\t" +
-                                      "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                                      "Avec comme message d\'erreur : " + error.args[0] + "\n\n\t\t" +
-                                      "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-                else:
-                    logging.debug("Aucune fonction on_page_closed page " + str(application.active_settings_page) + "\n")
-
-            # Charge le graphique de la nouvelle page et indique à l'application l'index de la nouvelle page chargée
-            self.pages_stackview.set_active_page(engine.rootObjects()[0])
-            application.active_settings_page = new_index
-
-            if application.is_fully_loaded[application.active_settings_page - 1]:
-                # Vérifie si la page que l'on charge  a un protocole de chargement particulier
-                if "on_page_opened" in dir(application.visible_pages[application.active_settings_page - 1]):
-                    try:
-                        application.visible_pages[application.active_settings_page - 1].on_page_opened(application)
-                    except Exception as error:
-                        logging.error("La fonction on_page_opened de la page " + str(application.active_settings_page) +
-                                      " contient une erreur.\n\t\t" +
-                                      "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                                      "Avec comme message d\'erreur : " + error.args[0] + "\n\n\t\t" +
-                                      "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-                else:
-                    logging.debug("Aucune fonction on_page_opened page " + str(application.active_settings_page) + "\n")
-
     def initialise_signals(self, application, engine, index, page_path, current_button):
         """Permet lorsqu'une page de paramètres de l'application a été chargée, de charger les signals ainsi
         que des fonctions de bases (get_values() et set_values()) si celle-ci existe
@@ -217,3 +170,50 @@ class RightButtons:
                             "La page sera visible mais ne sera pas fonctionnelle.\n")
             current_button.setProperty("isPositive", False)
             return False
+
+    def on_new_page_selected(self, application, engine, new_index):
+        """Fonction permettant le changement de la page de paramètres active lorsqu'un bouton rb est cliqué
+        Appelle aussi deux fonctions permettant le déchargement de la page actuelle et le chargement de la nouvelle page
+
+        Parameters
+        ----------
+        application: `InitialisationWindow`
+            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+        engine: `QQmlApplicationEngine`
+            La QQmlApplicationEngine sur laquelle on a tenté de charger la page
+        new_index: `int`
+            index de la page de paramètre à charger (de 1 à 8)
+        """
+        # Vérifie que la page que l'on veut charger n'est pas celle qui est déjà chargée
+        if new_index != application.active_settings_page:
+            if application.is_fully_loaded[application.active_settings_page - 1]:
+                # Vérifie si la page que l'on va décharger a un protocole de déchargement spécifique
+                if "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
+                    try:
+                        application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
+                    except Exception as error:
+                        logging.error("La fonction on_page_closed de la page " + str(application.active_settings_page)
+                                      + " contient une erreur\n\t\t" +
+                                      "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                                      "Avec comme message d\'erreur : " + error.args[0] + "\n\n\t\t" +
+                                      "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                else:
+                    logging.debug("Aucune fonction on_page_closed page " + str(application.active_settings_page) + "\n")
+
+            # Charge le graphique de la nouvelle page et indique à l'application l'index de la nouvelle page chargée
+            self.pages_stackview.set_active_page(engine.rootObjects()[0])
+            application.active_settings_page = new_index
+
+            if application.is_fully_loaded[application.active_settings_page - 1]:
+                # Vérifie si la page que l'on charge  a un protocole de chargement particulier
+                if "on_page_opened" in dir(application.visible_pages[application.active_settings_page - 1]):
+                    try:
+                        application.visible_pages[application.active_settings_page - 1].on_page_opened(application)
+                    except Exception as error:
+                        logging.error("La fonction on_page_opened de la page " + str(application.active_settings_page) +
+                                      " contient une erreur.\n\t\t" +
+                                      "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                                      "Avec comme message d\'erreur : " + error.args[0] + "\n\n\t\t" +
+                                      "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                else:
+                    logging.debug("Aucune fonction on_page_opened page " + str(application.active_settings_page) + "\n")
