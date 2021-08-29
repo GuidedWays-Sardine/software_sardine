@@ -17,13 +17,13 @@ class BottomButtons:
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
         # Boutons quitter/lancer (obligatoires pour le lancement de l'application)
-        application.win.findChild(QObject, "quitter").clicked.connect(lambda: self.on_quit_clicked(application))
-        application.win.findChild(QObject, "lancer").clicked.connect(lambda: self.on_launch_clicked(application))
+        application.win.findChild(QObject, "quit").clicked.connect(lambda: self.on_quit_clicked(application))
+        application.win.findChild(QObject, "launch").clicked.connect(lambda: self.on_launch_clicked(application))
 
         # Boutons sauvegarder/ouvrir (non obligatoire pour le lancement de l'application)
         try:
-            application.win.findChild(QObject, "ouvrir").clicked.connect(lambda: self.on_open_clicked(application))
-            application.win.findChild(QObject, "sauvegarder").clicked.connect(lambda: self.on_save_clicked(application))
+            application.win.findChild(QObject, "open").clicked.connect(lambda: self.on_open_clicked(application))
+            application.win.findChild(QObject, "save").clicked.connect(lambda: self.on_save_clicked(application))
         except Exception as error:
             logging.warning('Problème lors du chargement du signal du bouton sauvegarder ou ouvrir.\n\t' +
                             'Erreur de type : ' + str(type(error)) + '\n\t\t' +
@@ -129,3 +129,31 @@ class BottomButtons:
                 # Dans le cas où aucune donnée n'a été récupérée, le signale dans les logs
                 if len(data) == 0:
                     logging.warning("Aucune valeur récupéré, le fichier créé sera vide")
+
+    def change_language(self, application, translation_data):
+        """Permet à partir d'un dictionnaire de traduction de traduire le textes des 4 boutons inférieurs.
+
+        Parameters
+        ----------
+        application: `InitialisationWindow`
+            L'instance source de l'application d'initialisation, pour les widgets
+        translation_data: `dict`
+            dictionaire contenant en clé les mots de la langue actuelle et en valeurs, leurs traductions
+        """
+        # Liste les id de chaque boutons pour simplifier la structure
+        buttons_id = ["quit", "launch", "open", "save"]
+
+        # Pour chaque boutons : récupère le texte, prend sa traduction dans translation_data et change son texte
+        for id in buttons_id:
+            # Récupère le bouton et vérifie s'il a bien été récupéré
+            widget = application.win.findChild(QObject, id)
+            if widget is not None:
+
+                # S'il existe, essaye de traduire le texte sur le bouton
+                try:
+                    widget.setProperty("text", translation_data[widget.property("text").upper()])
+                # Si la clé n'existe pas c'est que le mot n'existe pas dans le dictionnaire ou qu'il est mal traduit.
+                except KeyError:
+                    logging.debug("aucune traduction de : " + widget.property("text") + " n'existe pas.\n")
+            else:
+                logging.debug("Bouton d'objectName : " + id + " dans Bottom_Buttons introuvable.\n")

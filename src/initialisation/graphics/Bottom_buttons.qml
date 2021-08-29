@@ -8,8 +8,8 @@ Item {
 
     //Bouton quitter
     DMI_button{
-        id: quitter
-        objectName: "quitter"
+        id: quit
+        objectName: "quit"
         text: "Quitter"
 
         defaultX: 0
@@ -25,8 +25,8 @@ Item {
 
     //Bouton ouvrir
     DMI_button{
-        id: ouvrir
-        objectName: "ouvrir"
+        id: open
+        objectName: "open"
         text: "Ouvrir"
 
         defaultX: 280
@@ -41,8 +41,8 @@ Item {
 
     //Bouton sauvegarder
     DMI_button{
-        id: sauvegarder
-        objectName: "sauvegarder"
+        id: save
+        objectName: "save"
         text: "Sauvegarder"
 
         defaultX: 400
@@ -57,8 +57,8 @@ Item {
 
     //Bouton lancer
     DMI_button{
-        id: lancer
-        objectName: "lancer"
+        id: launch
+        objectName: "launch"
         text: "Lancer"
 
         defaultX: 520
