@@ -15,12 +15,6 @@ Window {
     //flags: Qt.FramelessWindowHint | Qt.Window
     //FIXME : trouver une façons d'avoir une fenètre sans bordure mais avec les fonctions de "snap" et "resize"
 
-    //affiche les différentes pages de settings de l'application d'initialisation
-    DMI_stackview{
-        id: settings_pages
-        objectName: "settings_pages"
-    }
-
     //stoque tous les boutons à droite de la page et affichant les différentes pages de settings
     Right_buttons{
         id: right_buttons
@@ -31,5 +25,11 @@ Window {
     Bottom_buttons{
         id: bottom_buttons
         objectName: "right_buttons"
+    }
+
+    //affiche les différentes pages de settings de l'application d'initialisation
+    DMI_stackview{
+        id: settings_pages
+        objectName: "settings_pages"
     }
 }
