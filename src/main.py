@@ -5,10 +5,14 @@ import traceback
 import initialisation.initialisation_window as ini
 
 
+VERSION = "1.0.1"
+INITIAL_LOGGING = logging.DEBUG
+
+
 def main():
 
     # Lance le fichier de log en mode warning pour récupérer les warnings et erreurs critiques
-    log.initialise('../log/', '1.0.1', logging.INFO)
+    log.initialise('../log/', VERSION, INITIAL_LOGGING)
     logging.info("Lancement de l'application d'initialisation du simulateur\n\n\n")
 
     # lance le programme d'initialisation et vérifie qu'il n'y a pas d'erreurs au lancement
