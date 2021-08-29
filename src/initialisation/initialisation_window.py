@@ -139,7 +139,7 @@ class InitialisationWindow:
         # Indique le nombre de pages dont les paramètres on été changés
         logging.info("Paramètres changés sur " + str(count) + " pages.\n")
 
-    def set_languages(self, translation_data):
+    def change_language(self, translation_data):
         # Appel de la fonction set_languages pour les boutons du bas
         self.bottom_buttons.change_language(self, translation_data)
 
