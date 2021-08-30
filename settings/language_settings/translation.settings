@@ -1,7 +1,27 @@
 Français;English
+#Pour rajouter une langue, ajouter la langue sur la ligne 1, puis la traduction de chaque mots séparé des autres traductions par un ;
 
 
+
+#Bottom_buttons
 Sauvegarder;Save
 Ouvrir;Open
 Quitter;Quit
 Lancer;Launch
+
+#page_rb1
+Général;General
+Clavier;Keyboard
+Pupitre léger;Light command board
+Regio2N;Regio2N
+ETCS 3.6.0;ETCS 3.6.0
+Pupitre;Command board
+Connecté à Renard ?;Connected to Renard
+Activation du PCC ?;Activation of CCC
+Interface pupitre;Command board interface
+Registre;Log level
+Complet;Complete
+Suffisant;Sufficient
+Minimal;Minimal
+Aucune;None
+Langue;Language
