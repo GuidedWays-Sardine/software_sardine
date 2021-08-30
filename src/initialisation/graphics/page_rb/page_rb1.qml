@@ -12,7 +12,6 @@ DMI_page {
     readonly property real ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
 
 
-
     //Checkbutton pour savoir si le pupitre léger est connecté à UE (ou à Renard)
     DMI_checkbutton {
         id: renard_checkbutton
@@ -20,7 +19,7 @@ DMI_page {
 
         boxLenght: 20
         defaultX: 55
-        defaultY: 80
+        defaultY: 104
 
         text: "Connecté à Renard ?"
 
@@ -36,26 +35,68 @@ DMI_page {
 
         boxLenght: 20
         defaultX: 55
-        defaultY: 125
+        defaultY: 149
 
-        text: "activation du PCC ?"
+        text: "Activation du PCC ?"
 
         isChecked: false
         isActivable: true
         isPositive: false
     }
 
-    //Combobox du pupitre utilisé (pupitre léger ou lourd)
+    //Combobox du pupitre utilisé
+    Text{
+        id: command_board_text
+        objectName: "command_board_text"
+        text: "Pupitre"
+        color: "#C3C3C3"
+        font.pixelSize: 12 * page_rb1.ratio
+
+        anchors.left: command_board_combo.left
+        anchors.leftMargin: (1 + 2 * command_board_combo.isPositive) * page_rb1.ratio
+        anchors.bottom: command_board_combo.top
+        anchors.bottomMargin: command_board_text.font.pixelSize
+    }
+
     DMI_combobox{
         id: command_board_combo
         objectName: "command_board_combo"
 
         defaultX: 54
-        defaultY: 15
+        defaultY: 39
         defaultWidth: 280
         defaultHeight: 50
 
-        elements: ["Pupitre lourd", "Pupitre léger"]
+        elements: ["Pupitre lourd"]
+        amountElementsDisplayed: 2
+
+        isPositive: false
+    }
+
+    //Combobox du choix du DMI
+    Text{
+        id: dmi_text
+        objectName: "dmi_text"
+        text: "Interface pupitre"
+        color: "#C3C3C3"
+        font.pixelSize: 12 * page_rb1.ratio
+
+        anchors.left: dmi_combo.left
+        anchors.leftMargin: (1 + 2 * dmi_combo.isPositive) * page_rb1.ratio
+        anchors.bottom: dmi_combo.top
+        anchors.bottomMargin: dmi_text.font.pixelSize
+    }
+
+    DMI_combobox{
+        id: dmi_combo
+        objectName: "dmi_combo"
+
+        defaultX: 54
+        defaultY: 230
+        defaultWidth: 280
+        defaultHeight: 50
+
+        elements: ["ETCS 3.6.0"]
         amountElementsDisplayed: 2
 
         isPositive: false
@@ -65,7 +106,7 @@ DMI_page {
     Text{
         id: log_text
         objectName: "log_text"
-        text: "registre"
+        text: "Registre"
         color: "#C3C3C3"
         font.pixelSize: 12 * page_rb1.ratio
 
@@ -94,7 +135,7 @@ DMI_page {
     Text{
         id: language_text
         objectName: "language_text"
-        text: "langue"
+        text: "Langue"
         color: "#C3C3C3"
         font.pixelSize: 12 * page_rb1.ratio
 
