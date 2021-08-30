@@ -149,8 +149,8 @@ class RightButtons:
                 # Import localement le fichier de la page
                 # Appelle le constructeur de la page pour affilier tous les signals aux widgets
                 exec("from initialisation.signals.page_rb import page_rb" + str(index) + " as rb" + str(index) + "\n" +
-                     "application.visible_pages[index - 1] = " +
-                     "(rb" + str(index) + ".PageRB" + str(index) + "(application, engine, index, current_button))")
+                     "application.visible_pages[index - 1] = " + "(rb" + str(index) + ".PageRB" + str(index) +
+                     "(application, engine.rootObjects()[0], index, current_button))")
 
                 # Indique que la page a entièrement été chargée (partie visuelle et signals)
                 application.is_fully_loaded[index - 1] = True
