@@ -127,7 +127,7 @@ Item {
             y: (root.defaultHeight - 2) * root.ratio
             x: (root.isPositive ? 4 : 2) * root.ratio
             width: root.width - (isPositive ? 6 : 2) * root.ratio
-            implicitHeight: (body.count < root.amountElementsDisplayed ? body.height*body.count : body.height * root.amountElementsDisplayed) + (root.isPositive ? 6 : 8) * root.ratio
+            implicitHeight: ((body.count < root.amountElementsDisplayed ? body.height*body.count : body.height * root.amountElementsDisplayed) + (root.isPositive ? 6 : 8) * root.ratio) * (root.isActivable && body.count > 1)
             padding: 1 * root.ratio
 
             //Détecte quand celui-ci est fermé (peu importe la façon)
