@@ -148,7 +148,7 @@ class PageRB1:
         # Récupère toutes les traductions
         for line in file:
             # Si la ligne est vide la saute, sinon récupère les traductions des mots
-            if line != "\n":
+            if line != "\n" and line[0] != "#":
                 translations = line.rstrip('\n').split(";")
                 # Si la ligne est complète l'ajoute dans le dictionaire (clé = langue actuelle, valeur = traduction)
                 if len(translations) == len(language_list):
