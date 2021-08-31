@@ -125,7 +125,7 @@ class BottomButtons:
                 # Récupère chaque clé/valeur du dictionnaire
                 for key in data.keys():
                     # Ecrit une ligne contenant la clé et la valeur séparé par le délimiteur (ici ;)
-                    file.write(str(key) + ";" + str(data[key]))
+                    file.write(str(key) + ";" + str(data[key]) + "\n")
 
                 # Ferme le fichier
                 file.close()
