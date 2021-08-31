@@ -25,8 +25,7 @@ Item {
     property bool isDarkGrey: !isActivable  //est ce que le texte doit-être en gris foncé ?
 
     //Propriétés liés à l'état de la combobox
-    property bool isChecked: false
-    property bool isActivated: false        //si le bouton est activé
+    property bool isChecked: false          //si le bouton est activé
     property bool isActivable: true         //si le bouton peut être activée
     property bool isPositive: false         //si le bouton doit-être visible en couche positive (sinon négatif)
     property bool isVisible: true           //si le bouton est visible
