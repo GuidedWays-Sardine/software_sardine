@@ -78,26 +78,22 @@ class InitialisationWindow:
         Returns
         -------
         parameters : `dictionary`
-            un dictionaire de paramètres si le simulateur a été lancé, sinon None"""
+            un dictionaire de paramètres avec tous les paramètres du simulateur"""
         initial_time = time.time()
         logging.info("Tentative de récupération des paramètres.\n")
         parameters = {}
 
-        # Comme les fichiers de paramètres sont en Français, traduit temporairement l'application en Français
-        translation_success = False
-        if self.language != "Français":
-            try:
-                translation_data = self.read_language_file(self.language, "Français")
-            except Exception as error:
-                # Rattrape une potentielle erreur lors de la création du dictionaire de traduction
-                logging.error("Erreur lors de la traduction temporaire dans la fonction get_values. " +
-                              "Certains arguments seront sauvegardés dans une mauvaise langue et non considérés." +
-                              "\n\t\tErreur de type : " + str(type(error)) +
-                              "\n\t\tAvec comme message d'erreur : " + error.args[0] + "\n\n\t\t" +
-                              "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-            else:
-                self.change_language(translation_data)
-                translation_success = True
+        # Récupère la traduction anglaise car certains paramètres (exemple : chemins de fichiers) sont en anglais
+        translation_data = {}
+        try:
+            translation_data = self.read_language_file(self.language, "English")
+        except Exception as error:
+            # Rattrape une potentielle erreur lors de la création du dictionaire de traduction
+            logging.error("Erreur lors de la récupération du dictionaire de traduction dans get_values. " +
+                          "Certains arguments ne pourront pas être enregistrés." +
+                          "\n\t\tErreur de type : " + str(type(error)) +
+                          "\n\t\tAvec comme message d'erreur : " + error.args[0] + "\n\n\t\t" +
+                          "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
 
         # Pour chaque page ayant une partie logique fonctionnelle :
         for page in (x for x in self.visible_pages if x is not None and not isinstance(x, type(self.engine))):
@@ -105,7 +101,7 @@ class InitialisationWindow:
             if "get_values" in dir(page):
                 try:
                     # Appelle la fonction get_values de la page et si celle-ci fonctionne, récupère ses paramètres
-                    page.get_values()
+                    parameters = page.get_values(translation_data)
                 except Exception as error:
                     # Permet de rattraper une potentielle erreur dans la fonction get_values()
                     logging.warning("Erreur lors de la récupération des paramètres pour la page : " + str(page.index) +
@@ -114,22 +110,6 @@ class InitialisationWindow:
                                     "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
             else:
                 logging.warning("La page " + str(page.index) + " n'a pas de fonction get_values.\n")
-
-        # Si la langue choisie n'était pas le Français et que la traduction temporaire à fonctionner,
-        # Change la langue du simulateur en Français
-        if self.language != "Français" and translation_success:
-            try:
-                translation_data = self.read_language_file("Françqis", self.language)
-            except Exception as error:
-                # Rattrape une potentielle erreur lors de la création du dictionaire de traduction
-                logging.error("Erreur lors de la détraduction dans la fonction get_values. " +
-                              "La langue de l'application d'initialisation a été changée en Français." +
-                              "\n\t\tErreur de type : " + str(type(error)) +
-                              "\n\t\tAvec comme message d'erreur : " + error.args[0] + "\n\n\t\t" +
-                              "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-                self.language = "Français"
-            else:
-                self.change_language(translation_data)
 
         # Retourne le dictionnaire complété grâce aux différentes valeurs des get_values() de chaques pagesee
         logging.info("Récupération de " + str(len(parameters)) + " paramètres sur l'application d'initialisation en " +
@@ -148,21 +128,17 @@ class InitialisationWindow:
         logging.info("Tentative de changement des paramètres.\n")
         count = 0
 
-        # Comme les fichiers de paramètres sont en Français, traduit temporairement l'application en Français
-        translation_success = False
-        if self.language != "Français":
-            try:
-                translation_data = self.read_language_file(self.language, "Français")
-            except Exception as error:
-                # Rattrape une potentielle erreur lors de la création du dictionaire de traduction
-                logging.error("Erreur lors de la traduction temporaire dans la fonction set_values. " +
-                              "Certains arguments risquent d'apparaitre dans la mauvaise langue." +
-                              "\n\t\tErreur de type : " + str(type(error)) +
-                              "\n\t\tAvec comme message d'erreur : " + error.args[0] + "\n\n\t\t" +
-                              "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-            else:
-                self.change_language(translation_data)
-                translation_success = True
+        # Récupère la traduction anglaise car certains paramètres (exemple : chemins de fichiers) sont en anglais
+        translation_data = {}
+        try:
+            translation_data = self.read_language_file("English", self.language)
+        except Exception as error:
+            # Rattrape une potentielle erreur lors de la création du dictionaire de traduction
+            logging.error("Erreur lors de la récupération du dictionaire de traduction dans set_values. " +
+                          "Certains arguments ne pourront pas être changés." +
+                          "\n\t\tErreur de type : " + str(type(error)) +
+                          "\n\t\tAvec comme message d'erreur : " + error.args[0] + "\n\n\t\t" +
+                          "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
 
         # Pour chaque page ayant une partie logique fonctionnelle :
         for page in (x for x in self.visible_pages if x is not None and not isinstance(x, type(self.engine))):
@@ -170,7 +146,7 @@ class InitialisationWindow:
             if "set_values" in dir(page):
                 try:
                     # Appelle la fonction get_values de la page et récupère une potentielle erreur sur la fonction
-                    page.set_values(data)
+                    page.set_values(data, translation_data)
                     count += 1
                 except Exception as error:
                     # Permet de rattraper une potentielle erreur dans la fonction get_values()
@@ -180,22 +156,6 @@ class InitialisationWindow:
                                     "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
             else:
                 logging.warning("La page " + str(page.index) + " n'a pas de fonction set_values.\n")
-
-            # Si la langue choisie n'était pas le Français et que la traduction temporaire à fonctionner,
-            # Change la langue du simulateur en Français
-            if self.language != "Français" and translation_success:
-                try:
-                    translation_data = self.read_language_file("Français", self.language)
-                except Exception as error:
-                    # Rattrape une potentielle erreur lors de la création du dictionaire de traduction
-                    logging.error("Erreur lors de la détraduction dans la fonction set_values. " +
-                                  "La langue de l'application d'initialisation a été changée en Français." +
-                                  "\n\t\tErreur de type : " + str(type(error)) +
-                                  "\n\t\tAvec comme message d'erreur : " + error.args[0] + "\n\n\t\t" +
-                                  "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-                    self.language = "Français"
-                else:
-                    self.change_language(translation_data)
 
             # Indique le nombre de pages dont les paramètres on été changés
             logging.info("Paramètres changés sur " + str(count) + " pages en " +
