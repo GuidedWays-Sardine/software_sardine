@@ -11,6 +11,18 @@ class PageRB1:
     page = None
     current_button = None
 
+    # constantes nécessaires au fonctionnement
+    next_log_level = {"Aucun": "Minimal",
+                      "Minimal": "Suffisant",
+                      "Suffisant": "Complet",
+                      "Complet": "Aucun"
+                      }
+    log_type_converter = {"Aucun": logging.NOTSET,
+                          "Minimal": logging.ERROR,
+                          "Suffisant": logging.WARNING,
+                          "Complet": logging.DEBUG
+                          }
+
     def __init__(self, application, page, index, current_button):
         """Fonction d'initialisation de la page de paramtètres 1 (page paramètres général)
 
@@ -82,8 +94,56 @@ class PageRB1:
                     logging.debug("pas de traduction française pour : " + dmi_list[index] + "\n")
         self.page.findChild(QObject, "dmi_combo").setProperty("elements", dmi_list)
 
+        # Rend le bouton registre fonctionel (quand cliqué, indique le registre suivant)
+        log_button = self.page.findChild(QObject, "log_button")
+        log_button.clicked.connect(lambda l=log_button: l.setProperty("text", self.next_log_level[l.property("text")]))
+
         # Définit la page comme validée (toutes les valeurs par défaut suffisent)
         application.is_completed[0] = True
+
+    def get_values(self, translation_data):
+        """Récupère les paramètres de la page de paramètres page_rb1
+
+        Returns
+        -------
+        parameters : `dictionary`
+            un dictionaire de paramètres de la page de paramètres page_rb1
+        translation_data: `dict`
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) /!\\ clés en majuscules"""
+        page_parameters = {}
+
+        # Paramètre du pupitre
+        try:
+            command_board = self.page.findChild(QObject, "command_board_combo").property("selection")
+            command_board = translation_data[command_board.upper()].replace(" ", "_")
+        except KeyError:
+            logging.debug("traduction pour le pupitre non trouvée, pupitre par défaut sélectioné.\n")
+        else:
+            page_parameters["Pupitre"] = command_board
+
+        # Paramètre si connecté à Renard
+        page_parameters["Renard"] = self.page.findChild(QObject, "renard_checkbutton").property("isChecked")
+
+        # Paramètre si PCC connecté
+        page_parameters["PCC"] = self.page.findChild(QObject, "pcc_checkbutton").property("isChecked")
+
+        # Paramètre choix du DMI
+        try:
+            dmi_selection = self.page.findChild(QObject, "dmi_combo").property("selection")
+            dmi_selection = translation_data[dmi_selection.upper()].replace(" ", "_")
+        except KeyError:
+            logging.debug("traduction pour le dmi non trouvée, DMI par défaut sélectioné (ETCS 3.6.0)")
+        else:
+            page_parameters["DMI"] = dmi_selection
+
+        # Paramètre niveau de logging
+        log_text = self.page.findChild(QObject, "log_button").property("text")
+        page_parameters["Registre"] = self.log_type_converter[log_text]
+
+        # Paramètre langue
+        page_parameters["Langue"] = self.page.findChild(QObject, "language_combo").property("selection")
+
+        return page_parameters
 
     def on_language_change(self, application):
         """Fonction permettant de changer la langue de l'application d'initialisation.

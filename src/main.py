@@ -38,7 +38,7 @@ def main():
     # Change le niveau de log à celui précisé par l'utilisateur
     logging.info("Lancement du simulateur\n\n\n")
     try:
-        logging.getLogger().setLevel(parameters["log_level"])
+        logging.getLogger().setLevel(parameters["Registre"])
     except KeyError as error:
         logging.warning("Aucun paramêtre \"log_level\" récupéré du programme d'initialisation"
                         + "\n\t\tNiveau par défaut gardé à suffisant (log.WARNING)\n")
