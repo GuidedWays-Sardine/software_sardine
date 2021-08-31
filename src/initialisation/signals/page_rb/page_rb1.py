@@ -11,9 +11,6 @@ class PageRB1:
     page = None
     current_button = None
 
-    # Variable stockant la langue actuelle de l'application d'initialisation
-    language = "Français"
-
     def __init__(self, application, page, index, current_button):
         """Fonction d'initialisation de la page de paramtètres 1 (page paramètres général)
 
@@ -54,11 +51,11 @@ class PageRB1:
         # Essaye de récupérer le dictionaire Anglais -> Français afin de traduire les répertoires par défaut en anglais
         found_translation = False
         try:
-            translation_data = PageRB1.read_language_file("English", "Français")
+            translation_data = application.read_language_file("English", "Français")
             found_translation = True
         except Exception as error:
             # Rattrape une potentielle erreur lors de la création du dictionaire de traduction
-            logging.warning("Erreur lors de la récupération du dictionaire de traduction dans l'initialisation." +
+            logging.warning("Erreur lors de la récupération du dictionaire de traduction dans l'initialisation. " +
                             "Certains éléments de la page seront par défaut en anglais." +
                             "\n\t\tErreur de type : " + str(type(error)) +
                             "\n\t\tAvec comme message d'erreur : " + error.args[0] + "\n\n\t\t" +
@@ -98,64 +95,17 @@ class PageRB1:
             L'instance source de l'application d'initialisation, pour les widgets"""
         # Récupère le dictionaire de traduction et change la langue de l'application d'initialisation et du DMI
         new_language = self.page.findChild(QObject, "language_combo").property("selection")
-        try:
-            translation_data = PageRB1.read_language_file(self.language, new_language)
-        except Exception as error:
-            # Rattrape une potentielle erreur lors de la création du dictionaire de traduction
-            logging.warning("Erreur lors de la récupération du dictionaire de traduction"
-                            "\n\t\tErreur de type : " + str(type(error)) +
-                            "\n\t\tAvec comme message d'erreur : " + error.args[0] + "\n\n\t\t" +
-                            "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-        else:
-            application.change_language(translation_data)
+        if application.language.upper() != new_language.upper():
+            try:
+                translation_data = application.read_language_file(application.language, new_language)
+            except Exception as error:
+                # Rattrape une potentielle erreur lors de la création du dictionaire de traduction
+                logging.warning("Erreur lors de la récupération du dictionaire de traduction"
+                                "\n\t\tErreur de type : " + str(type(error)) +
+                                "\n\t\tAvec comme message d'erreur : " + error.args[0] + "\n\n\t\t" +
+                                "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+            else:
+                application.change_language(translation_data)
 
         # Définit la nouvelle langue comme celle sélectionée
-        self.language = new_language
-
-    @staticmethod
-    def read_language_file(current_language, new_language):
-        """Fonction permettant de lire le fichier de traduction et d'en resortir un dictionnaire de traduction
-
-        Parameters
-        ----------
-        current_language: `str`
-            langage actuel du texte à traduire
-        new_language: `str`
-            langage dans lequel le texte doit être traduit
-
-        Returns
-        -------
-        translation_data: `dict`
-            dictionaire contenant les traductions (clés = langage actuel ; valeurs = traductions)
-
-        Raises
-        ------
-        FileNotFoundError
-            Erreur émise si le fichier de traduction n'est pas trouvé
-        ValueError
-            Erreur émise si l'une des langues fournis n'existe pas
-        """
-        translation_data = {}
-
-        # Ouvre le fichier et récupère la liste des langues
-        file = open("../settings/language_settings/translation.settings", "r", encoding='utf-8-sig')
-        language_list = file.readline().upper().rstrip('\n').split(";")
-
-        # Récupère les index des langues
-        current_index = language_list.index(current_language.upper())
-        new_index = language_list.index(new_language.upper())
-
-        # Récupère toutes les traductions
-        for line in file:
-            # Si la ligne est vide la saute, sinon récupère les traductions des mots
-            if line != "\n" and line[0] != "#":
-                translations = line.rstrip('\n').split(";")
-                # Si la ligne est complète l'ajoute dans le dictionaire (clé = langue actuelle, valeur = traduction)
-                if len(translations) == len(language_list):
-                    translation_data[translations[current_index].upper()] = translations[new_index]
-                # S'il n'y a pas autant de traductions que de langue, cela signifie que la ligne est incomplète
-                else:
-                    logging.debug("Certaines traductions manquantes sur la ligne suivante (langues attendus, mots) :" +
-                                  "\n\t\t" + ";".join(language_list) + "\n\t\t" + line)
-        file.close()
-        return translation_data
+        application.language = new_language
