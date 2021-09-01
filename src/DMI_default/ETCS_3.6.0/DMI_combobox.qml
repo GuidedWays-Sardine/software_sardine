@@ -37,6 +37,24 @@ Item {
     signal combobox_closed()                        //détecte quand le popup de la combobox se ferme
     signal selection_changed()                      //détecte quand l'utilisateur changed la sélection de la combobox (selection_changed() appelé après combobox_closed())
 
+    //Fonction pour changer l'index de la combobox en fonction du texte
+    function change_selection(new_selection){
+        // Si la nouvelle sélection est un int, change le currentIndex en fonction de l'index envoyé
+        if(typeof new_selection === typeof root.fontSize){
+            if(new_selection <= combo.count){
+                combo.currentIndex = new_selection - 1
+            }
+        }
+        // Si la nouvelle sélection est un string, cherche l'élément avec le même index
+        else if(typeof new_selection === typeof root.selection){
+            for(var i = 0; i < combo.count; i++){
+                if(root.elements[i].toUpperCase() === new_selection.toUpperCase()){
+                    combo.currentIndex =  i
+                }
+            }
+        }
+    }
+
     //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
     readonly property string darkBlue : "#031122"   //partie 5.2.1.3.3  Nr 6
     readonly property string black: "#000000"       //partie 5.2.1.3.3  Nr 2
