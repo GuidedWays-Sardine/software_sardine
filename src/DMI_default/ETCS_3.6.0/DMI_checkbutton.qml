@@ -31,11 +31,6 @@ Item {
     property bool isVisible: true           //si le bouton est visible
 
 
-    //Fonction pour changer la valeur de isChecked
-    function set_checked(status) {
-            root.isChecked = status;
-    }
-
     //Différents signal handlers (à écrire en python)
     signal clicked()                        //détecte quand le bouton est cliqué (après que l'état ait été changé)
 
