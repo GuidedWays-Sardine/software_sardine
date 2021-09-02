@@ -65,15 +65,32 @@ Item {
     }
 
     //Texte visible à côté de la boite
-    Text{
-        id: button_text
-        text: root.text
-        font.pixelSize: root.fontSize * ratio
-        font.family: "Verdana"
-        color: root.isDarkGrey ? root.darkGrey : root.grey
-        anchors.horizontalCenter: body.horizontalCenter
+    Rectangle {
+        id: rect_text
+        color: "transparent"
+
+        width: text_metrics.tightBoundingRect.width
+        height: text_metrics.tightBoundingRect.height
+
+        anchors.verticalCenter: body.verticalCenter
         anchors.left: body.right
         anchors.leftMargin: root.fontSize * ratio
+
+        //Permet d'afficher le texte
+        Text{
+            id: button_text
+            text: root.text
+            font.pixelSize: root.fontSize * ratio
+            font.family: "Verdana"
+            color: root.isDarkGrey ? root.darkGrey : root.grey
+        }
+
+        //Permet de connaitre la taille du texte afin de pouvoir placer une MouseArea dessus pour pouvoir sélectioner l'option en cliquant sur le text
+        TextMetrics {
+            id: text_metrics
+            font: button_text.font
+            text: button_text.text
+        }
     }
 
     //Image visible sur le bouton
@@ -91,7 +108,7 @@ Item {
     //Rectangle pour l'ombre extérieure inférieure
     Rectangle {
         id: outbottomshadow
-        color: !isActivable || !area.pressed ? root.shadow : "transparent"
+        color: !isActivable || !(box_area.pressed || text_area.pressed) ? root.shadow : "transparent"
         width: root.width + 2 * root.ratio
         height: 2 * root.ratio
         anchors.horizontalCenter: body.horizontalCenter
@@ -101,7 +118,7 @@ Item {
     //Rectangle pour l'ombre extérieure droite
     Rectangle {
         id: outrightshadow
-        color: !isActivable || !area.pressed ? root.shadow : "transparent"
+        color: !isActivable || !(box_area.pressed || text_area.pressed) ? root.shadow : "transparent"
         width: 2 * root.ratio
         height: root.height + 2 * root.ratio
         anchors.right: outbottomshadow.right
@@ -111,7 +128,7 @@ Item {
     //Rectangle pour l'ombre extérieure supérieure
     Rectangle {
         id: outtopshadow
-        color: !isActivable || !area.pressed ? root.black : "transparent"
+        color: !isActivable || !(box_area.pressed || text_area.pressed) ? root.black : "transparent"
         height: 2 * root.ratio
         anchors.top: outrightshadow.top
         anchors.right: outrightshadow.left
@@ -121,7 +138,7 @@ Item {
     //Rectangle pour l'ombre extérieure gauche
     Rectangle {
         id: outleftshadow
-        color: !isActivable || !area.pressed ? root.black : "transparent"
+        color: !isActivable || !(box_area.pressed || text_area.pressed) ? root.black : "transparent"
         width: 2 * root.ratio
         anchors.top: outtopshadow.top
         anchors.left: outtopshadow.left
@@ -133,7 +150,7 @@ Item {
     //Rectangle pour l'ombre intérieure inférieure
     Rectangle {
         id: inbottomshadow
-        color: isPositive && !(area.pressed && isActivable) ? root.black : "transparent"
+        color: isPositive && !((box_area.pressed || text_area.pressed) && isActivable) ? root.black : "transparent"
         height: 2 * root.ratio
         anchors.bottom: outbottomshadow.top
         anchors.left: outleftshadow.right
@@ -143,7 +160,7 @@ Item {
     //Rectangle pour l'ombre intérieure droite
     Rectangle {
         id: inrightshadow
-        color: isPositive && !(area.pressed && isActivable) ? root.black : "transparent"
+        color: isPositive && !((box_area.pressed || text_area.pressed) && isActivable) ? root.black : "transparent"
         width: 2 * root.ratio
         anchors.right: outrightshadow.left
         anchors.bottom: outbottomshadow.top
@@ -153,7 +170,7 @@ Item {
     //Rectangle pour l'ombre intérieure supérieure
     Rectangle {
         id: intopshadow
-        color: isPositive && !(area.pressed && isActivable) ? root.shadow : "transparent"
+        color: isPositive && !((box_area.pressed || text_area.pressed) && isActivable) ? root.shadow : "transparent"
         height: 2 * root.ratio
         anchors.top: outtopshadow.bottom
         anchors.left: outleftshadow.right
@@ -163,20 +180,34 @@ Item {
     //Rectangle pour l'ombre intérieure gauche
     Rectangle {
         id: inleftshadow
-        color: isPositive && !(area.pressed && isActivable) ? root.shadow : "transparent"
+        color: isPositive && !((box_area.pressed || text_area.pressed) && isActivable) ? root.shadow : "transparent"
         width: 2 * root.ratio
         anchors.left: outleftshadow.right
         anchors.top: outtopshadow.bottom
         anchors.bottom: inbottomshadow.top
     }
 
-    //Zone de détection de souris (utile pour détecter les cliques)
+    //Zone de détection de souris pour la boite (utile pour détecter les cliques)
     MouseArea{
-        id: area
+        id: box_area
         anchors.fill: parent
         hoverEnabled: false
 
-        onReleased: {
+        onPressed: {
+            if(isActivable){
+                root.isChecked = !root.isChecked
+                root.clicked()
+            }
+        }
+    }
+
+    //Zone de détection de souris pour le texte (utile pour détecter les cliques)
+    MouseArea{
+        id: text_area
+        anchors.fill: rect_text
+        hoverEnabled: false
+
+        onPressed: {
             if(isActivable){
                 root.isChecked = !root.isChecked
                 root.clicked()
