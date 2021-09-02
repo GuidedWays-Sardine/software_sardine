@@ -111,13 +111,13 @@ class RightButtons:
                 logging.warning("le chargement de la page " + str(index) +
                                 " relié au bouton rb" + str(index) + " est impossible.\n\t\t" +
                                 "Le fichier " + page_path + " existe mais ne se charge pas correctement.\n\t\t" +
-                                "Assurez-vous que celui-ci ne contient pas d'erreurs.\n")
+                                "Assurez-vous que celui-ci ne contient pas d'erreurs.\n\n")
             # Sinon c'est qu'il n'existe pas où qu'il est mal placé
             else:
                 logging.warning("le chargement de la page " + str(index) +
                                 " relié au bouton rb" + str(index) + " est impossible.\n\t\t" +
                                 "Le fichier " + page_path + " n'existe pas.\n\t\t" +
-                                "Assurez-vous que le fichier source est au bon endroit ou créez le\n")
+                                "Assurez-vous que le fichier source est au bon endroit ou créez le\n\n")
             return False
 
     def initialise_signals(self, application, engine, index, page_path, current_button):
