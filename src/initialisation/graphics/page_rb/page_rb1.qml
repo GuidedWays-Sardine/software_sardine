@@ -20,7 +20,7 @@ DMI_page {
         defaultX: 55
         defaultY: 329
 
-        text: "Activation du PCC ?"
+        text: "Activation du PCC (Poste de Commande Centralisé) ?"
 
         isChecked: false
         isActivable: true

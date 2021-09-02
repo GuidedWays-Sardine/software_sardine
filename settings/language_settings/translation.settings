@@ -9,6 +9,7 @@ Ouvrir;Open
 Quitter;Quit
 Lancer;Launch
 
+
 #page_rb1
 Général;General
 
@@ -31,5 +32,6 @@ Aucune;None
 
 Langue;Language
 
-Activation du PCC ?;Activation of CCC
+Activation du PCC (Poste de Commande Centralisé) ?;Activation of CCS (Centralised Control Station) ?
 Affichage en direct des données du train?;Live display of train's data ?
+
