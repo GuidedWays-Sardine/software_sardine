@@ -36,7 +36,7 @@ DMI_page {
         defaultX: 55
         defaultY: 369
 
-        text: "Affichage en direct des donnés du train ?"
+        text: "Affichage en direct des données du train ?"
 
         isChecked: false
         isActivable: true
@@ -47,7 +47,7 @@ DMI_page {
     Text{
         id: log_text
         objectName: "log_text"
-        text: "Registre"
+        text: "Niveau de registre"
         color: "#C3C3C3"
         font.pixelSize: 12 * page_rb1.ratio
 

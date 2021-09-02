@@ -11,17 +11,25 @@ Lancer;Launch
 
 #page_rb1
 Général;General
+
+Pupitre;Command board
 Clavier;Keyboard
 Pupitre léger;Light command board
 Regio2N;Regio2N
+
+Connecté à Renard ?;Connected to Renard ?
+Connecté à une caméra?; Connected to a camera ?
+
+Interface pupitre;command board interface
 ETCS 3.6.0;ETCS 3.6.0
-Pupitre;Command board
-Connecté à Renard ?;Connected to Renard
-Activation du PCC ?;Activation of CCC
-Interface pupitre;Command board interface
-Registre;Log level
+
+Niveau de Registre;Log level
 Complet;Complete
 Suffisant;Sufficient
 Minimal;Minimal
 Aucune;None
+
 Langue;Language
+
+Activation du PCC ?;Activation of CCC
+Affichage en direct des données du train?;Live display of train's data ?
