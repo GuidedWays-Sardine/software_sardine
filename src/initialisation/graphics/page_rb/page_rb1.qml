@@ -131,7 +131,7 @@ DMI_page {
         isVisible: true
     }
 
-    //Bouton langue
+    //Combobox langue
     Text{
         id: language_text
         objectName: "language_text"

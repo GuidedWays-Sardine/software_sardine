@@ -22,6 +22,8 @@ class PageRB1:
                           "Suffisant": logging.WARNING,
                           "Complet": logging.DEBUG
                           }
+    log_type_converter.update(dict([reversed(i) for i in log_type_converter.items()]))
+    # Permet de faire un dictionaire bi-directionel
 
     def __init__(self, application, page, index, current_button):
         """Fonction d'initialisation de la page de paramtètres 1 (page paramètres général)
@@ -144,6 +146,63 @@ class PageRB1:
         page_parameters["Langue"] = self.page.findChild(QObject, "language_combo").property("selection")
 
         return page_parameters
+
+    def set_values(self, data, translation_data):
+        """A partir d'un dictionnaire de valeur, essaye de changer les settings des différentes pages
+
+        Parameters
+        ----------
+        data: `dict`
+            Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
+        translation_data: `dict`
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) /!\\ clés en majuscules"""
+        # Changement de la langue dans la combobox (la langue a été changée dans set_values de InitialisationWindow)
+        try:
+            # Si la langue indiquée est incorrect, change_selection ne changera rien, aucune précautions à prendre
+            self.page.findChild(QObject, "language_combo").change_selection(data["Langue"])
+        # Si aucun paramètre Langue, cela sera indiqué lors de la traduction. Aucune manoeuvre supplémentaire nécessaire
+        except KeyError:
+            pass
+
+        # Paramètre du pupitre (quel pupitre sera utilisé)
+        try:
+            command_board = data["Pupitre"].replace("_", " ").upper()
+        except KeyError:
+            logging.debug("Impossible de changer le paramètre: \"Pupitre\" manquant dans le fichier ouvert.\n")
+        else:
+            try:
+                self.page.findChild(QObject, "command_board_combo").change_selection(translation_data[command_board])
+            except KeyError:
+                logging.debug("Impossible de changer la donnée : \"Pupitre\" car sa traduction est manquante.\n")
+
+        # Paramètre pour Renard (savoir si le pupitre est connecté à Renard)
+        try:
+            self.page.findChild(QObject, "renard_checkbutton").setProperty("isChecked", data["Renard"] == "True")
+        except KeyError:
+            logging.debug("Impossible de changer le paramètre : \"Renard\" manquant dans le fichier ouvert.\n")
+
+        # Paramètre pour le PCC (savoir s'il sera activé)
+        try:
+            self.page.findChild(QObject, "pcc_checkbutton").setProperty("isChecked", data["PCC"] == "True")
+        except KeyError:
+            logging.debug("Impossible de changer le paramètre : \"PCC\" manquant dans le fichier ouvert.\n")
+
+        # Paramètre pour le DMI (savoir quel Interface sera utilisée pour le pupitre
+        try:
+            dmi = data["DMI"].replace("_", " ").upper()
+        except KeyError:
+            logging.debug("Impossible de changer le paramètre: \"Pupitre\" manquant dans le fichier ouvert.\n")
+        else:
+            try:
+                self.page.findChild(QObject, "dmi_combo").change_selection(translation_data[dmi])
+            except KeyError:
+                logging.debug("Impossible de changer la donnée : \"DMI\" car sa traduction est manquante.\n")
+
+        # Paramètre niveau de registre (pour suivre les potentiels bugs lors de la simulation)
+        try:
+            self.page.findChild(QObject, "log_button").setProperty("text", self.log_type_converter[int(data["Registre"])])
+        except KeyError:
+            logging.debug("Impossible de changer le paramètre : \"Registre\" manquant dans le fichier ouvert.\n")
 
     def on_language_change(self, application):
         """Fonction permettant de changer la langue de l'application d'initialisation.
