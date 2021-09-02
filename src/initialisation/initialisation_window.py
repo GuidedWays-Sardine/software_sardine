@@ -128,17 +128,39 @@ class InitialisationWindow:
         logging.info("Tentative de changement des paramètres.\n")
         count = 0
 
+        # Change la langue et le paramètre langue
         # Récupère la traduction anglaise car certains paramètres (exemple : chemins de fichiers) sont en anglais
         translation_data = {}
         try:
-            translation_data = self.read_language_file("English", self.language)
-        except Exception as error:
-            # Rattrape une potentielle erreur lors de la création du dictionaire de traduction
-            logging.error("Erreur lors de la récupération du dictionaire de traduction dans set_values. " +
-                          "Certains arguments ne pourront pas être changés." +
-                          "\n\t\tErreur de type : " + str(type(error)) +
-                          "\n\t\tAvec comme message d'erreur : " + error.args[0] + "\n\n\t\t" +
-                          "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+            translation_data = self.read_language_file("English", data["Langue"])
+        # Cas où le paramètre Langue n'est pas dans le fichier de paramètres, oû qu'elle n'est pas valide
+        except (KeyError, ValueError) as error:
+            # D'abord identifie l'erreur pour mettre le message d'erreur adéquat
+            if type(error) == KeyError:
+                logging.debug("Impossible de changer la langue du simulateur car : \"Langue\" est manquant.\n")
+            else:
+                logging.debug("La langue " + data["Langue"] + "n'existe pas. La langue restera inchangée.\n")
+
+            # Charge alors le dictionnaire de traduction avec la langue actuelle
+            try:
+                translation_data = self.read_language_file("English", self.language)
+            except Exception as error:
+                # Rattrape une potentielle erreur lors de la création du dictionaire de traduction
+                logging.error("Erreur lors de la récupération du dictionaire de traduction. " +
+                              "Certains arguments ne pourront pas être changés." +
+                              "\n\t\tErreur de type : " + str(type(error)) +
+                              "\n\t\tAvec comme message d'erreur : " + error.args[0] + "\n\n\t\t" +
+                              "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+
+        # Cas oû le fichier de traduction n'est pas trouvé
+        except FileNotFoundError:
+            logging.error("Impossible de changer la langue car le fichier de traduction n'existe pas.\n\t\t" +
+                          "La langue restera inchangée et certains paramètre ne pourront pas être changés.\n")
+        else:
+            # Si le dictionaire a correctement été récupéré et que la langue du fichier paramètre n'est pas l'actuelle
+            # Change la langue (Le changement de la langue dans la combobox page_rb1 sera changée dans son set_values
+            if self.language.upper() != data["Langue"].upper():
+                self.change_language(translation_data)
 
         # Pour chaque page ayant une partie logique fonctionnelle :
         for page in (x for x in self.visible_pages if x is not None and not isinstance(x, type(self.engine))):
