@@ -225,6 +225,74 @@ class PageRB1:
         except KeyError:
             logging.debug("Impossible de changer le paramètre : \"DonnéesDirect\" manquant dans le fichier ouvert.\n")
 
+    def change_language(self, translation_data):
+        """Permet à partir d'un dictionaire de traduction, de traduire les textes de la page de paramètres
+
+        Parameters
+        ----------
+        translation_data: `dict`
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) /!\\ clés en majuscules"""
+        # Essaye de traduire chaque textes au dessus des widgets et check_button
+        for text in ["command_board_text", "dmi_text", "log_text", "language_text",
+                     "renard_checkbutton", "camera_checkbutton", "pcc_checkbutton", "data_checkbutton"]:
+            widget = self.page.findChild(QObject, text)
+            try:
+                widget.setProperty("text", translation_data[widget.property("text").upper()])
+            except KeyError:
+                logging.debug("Pas de traduction pour le widget : " + text + ", traduction sautée.\n")
+
+        # Pour les combobox du pupitre et du DMI, essaye de traduire chaque éléments, et remet l'index sélectioné
+        # La combobox langue ne nécessite aucune traduction car les langes sont dans leur langue d'origine
+        for combo in ["command_board_combo", "dmi_combo"]:
+            widget = self.page.findChild(QObject, combo)
+            selection = widget.property("selection")
+            new_list = []
+
+            # Pour chaque combobox récupère chaque éléments et essaye de les traduire
+            for element in widget.property("elements").toVariant():
+                try:
+                    new_list.append(translation_data[element.upper()])
+                # Si la traduction n'existe pas, laisse un message de debug et remet l'élément dans sa langue d'origine
+                except KeyError:
+                    logging.debug("Pas de traduction pour l'élément " + element + " du widget " + combo + ".\n")
+                    new_list.append(element)
+
+            # Enfin, remet la nouvelle list dans la combobox et change l'index
+            widget.setProperty("elements", new_list)
+            try:
+                widget.change_selection(translation_data[selection.upper()])
+            except KeyError:
+                widget.change_selection(selection)
+
+        # Pour le bouton registre, laissé à part car son fonctionnement est particulier
+        keys = list(self.next_log_level.keys())
+        try:
+            for key in keys:
+                e = translation_data[key.upper()]
+        # Si au moins une des clés n'a pas de traduction, ne traduit pas le registre
+        except KeyError:
+            logging.error("Au moins un des niveaux de registre n'a pas de traduction, bouton registre sauté.\n")
+        else:
+            # Modification du convertiseur de niveau de log + création du dictionaire bidirectionel
+            self.log_type_converter = {translation_data[keys[0].upper()]: self.log_type_converter[keys[0]],
+                                       translation_data[keys[1].upper()]: self.log_type_converter[keys[1]],
+                                       translation_data[keys[2].upper()]: self.log_type_converter[keys[2]],
+                                       translation_data[keys[3].upper()]: self.log_type_converter[keys[3]]
+                                       }
+            self.log_type_converter.update(dict([reversed(i) for i in self.log_type_converter.items()]))
+
+            # Modification du changeur de niveau de log
+            self.next_log_level = \
+                {translation_data[keys[0].upper()]: translation_data[self.next_log_level[keys[0]].upper()],
+                 translation_data[keys[1].upper()]: translation_data[self.next_log_level[keys[1]].upper()],
+                 translation_data[keys[2].upper()]: translation_data[self.next_log_level[keys[2]].upper()],
+                 translation_data[keys[3].upper()]: translation_data[self.next_log_level[keys[3]].upper()]
+                 }
+
+            # Change la langue du registre indiqué sur le bouton
+            log_button = self.page.findChild(QObject, "log_button")
+            log_button.setProperty("text", translation_data[log_button.property("text").upper()])
+
     def on_language_change(self, application):
         """Fonction permettant de changer la langue de l'application d'initialisation.
         Permet aussi de choisir la langue pour le DMI du pupitre
