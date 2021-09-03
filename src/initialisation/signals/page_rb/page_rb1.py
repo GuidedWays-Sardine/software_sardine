@@ -168,14 +168,6 @@ class PageRB1:
             Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
         translation_data: `dict`
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) /!\\ clés en majuscules"""
-        # Changement de la langue dans la combobox (la langue a été changée dans set_values de InitialisationWindow)
-        try:
-            # Si la langue indiquée est incorrect, change_selection ne changera rien, aucune précautions à prendre
-            self.page.findChild(QObject, "language_combo").change_selection(data["Langue"])
-        # Si aucun paramètre Langue, cela sera indiqué lors de la traduction. Aucune manoeuvre supplémentaire nécessaire
-        except KeyError:
-            pass
-
         # Paramètre du pupitre (quel pupitre sera utilisé)
         try:
             command_board = data["Pupitre"].replace("_", " ").upper()
@@ -185,7 +177,9 @@ class PageRB1:
             try:
                 self.page.findChild(QObject, "command_board_combo").change_selection(translation_data[command_board])
             except KeyError:
-                logging.debug("Impossible de changer la donnée : \"Pupitre\" car sa traduction est manquante.\n")
+                logging.debug("La traduction du paramètre: \"Pupitre\" : " + data["Pupitre"] + " est manquate.\n\t\t" +
+                              "Il est possible que le pupitre ne soit pas changé pour celui du fichier ouvert.\n")
+                self.page.findChild(QObject, "command_board_combo").change_selection(command_board)
 
         # Paramètre pour Renard (savoir si le pupitre est connecté à Renard)
         try:
@@ -193,13 +187,14 @@ class PageRB1:
         except KeyError:
             logging.debug("Impossible de changer le paramètre : \"Renard\" manquant dans le fichier ouvert.\n")
 
-        # Paramètre pour le PCC (savoir s'il sera activé)
+        # Paramètre pour la caméra (savoir si elle est connecté ou si on a un visu direct sur Renard)
         try:
-            self.page.findChild(QObject, "pcc_checkbutton").setProperty("isChecked", data["PCC"] == "True")
+            self.page.findChild(QObject, "camera_checkbutton").setProperty("isChecked", data["Caméra"] == "True")
         except KeyError:
-            logging.debug("Impossible de changer le paramètre : \"PCC\" manquant dans le fichier ouvert.\n")
+            logging.debug("Impossible de changer le paramètre : \"Caméra\" manquant dans le fichier ouvert.\n")
+        self.on_renard_selected()
 
-        # Paramètre pour le DMI (savoir quel Interface sera utilisée pour le pupitre
+        # Paramètre pour le DMI (savoir quelle Interface sera utilisée pour le pupitre
         try:
             dmi = data["DMI"].replace("_", " ").upper()
         except KeyError:
@@ -208,13 +203,27 @@ class PageRB1:
             try:
                 self.page.findChild(QObject, "dmi_combo").change_selection(translation_data[dmi])
             except KeyError:
-                logging.debug("Impossible de changer la donnée : \"DMI\" car sa traduction est manquante.\n")
+                logging.debug("La traduction du paramètre : \"DMI\" : " + data["DMI"] + " est manquante.\n\t\t" +
+                              "Il est possible que le DMI ne soit pas changé pour celui du fichier ouvert.\n")
+                self.page.findChild(QObject, "dmi_combo").change_selection(dmi)
 
         # Paramètre niveau de registre (pour suivre les potentiels bugs lors de la simulation)
         try:
             self.page.findChild(QObject, "log_button").setProperty("text", self.log_type_converter[int(data["Registre"])])
         except KeyError:
             logging.debug("Impossible de changer le paramètre : \"Registre\" manquant dans le fichier ouvert.\n")
+
+        # Paramètre pour le PCC (savoir s'il sera activé)
+        try:
+            self.page.findChild(QObject, "pcc_checkbutton").setProperty("isChecked", data["PCC"] == "True")
+        except KeyError:
+            logging.debug("Impossible de changer le paramètre : \"PCC\" manquant dans le fichier ouvert.\n")
+
+        # Paramètre pour l'affichage des données en direct (genre vitesse, ...)
+        try:
+            self.page.findChild(QObject, "data_checkbutton").setProperty("isChecked", data["DonnéesDirect"] == "True")
+        except KeyError:
+            logging.debug("Impossible de changer le paramètre : \"DonnéesDirect\" manquant dans le fichier ouvert.\n")
 
     def on_language_change(self, application):
         """Fonction permettant de changer la langue de l'application d'initialisation.
