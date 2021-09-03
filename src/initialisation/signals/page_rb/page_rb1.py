@@ -12,14 +12,15 @@ class PageRB1:
     current_button = None
 
     # constantes nécessaires au fonctionnement
-    next_log_level = {"Aucun": "Minimal",
-                      "Minimal": "Suffisant",
-                      "Suffisant": "Complet",
-                      "Complet": "Aucun"
+    next_log_level = {"Complet": "Suffisant",
+                      "Suffisant": "Minimal",
+                      "Minimal": "Aucun",
+                      "Aucun": "Complet"
                       }
+
     log_type_converter = {"Aucun": logging.NOTSET,
                           "Minimal": logging.ERROR,
-                          "Suffisant": logging.WARNING,
+                          "Suffisant": logging.INFO,
                           "Complet": logging.DEBUG
                           }
     log_type_converter.update(dict([reversed(i) for i in log_type_converter.items()]))
