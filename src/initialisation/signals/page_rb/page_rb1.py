@@ -97,6 +97,11 @@ class PageRB1:
                     logging.debug("pas de traduction française pour : " + dmi_list[index] + "\n")
         self.page.findChild(QObject, "dmi_combo").setProperty("elements", dmi_list)
 
+        # Rend le checkbutton renard et le checkbutton caméra fonctionnel
+        renard = self.page.findChild(QObject, "renard_checkbutton")
+        renard.clicked.connect(self.on_renard_selected)
+        self.page.findChild(QObject, "camera_checkbutton").setProperty("isActivable", renard.property("isChecked"))
+
         # Rend le bouton registre fonctionel (quand cliqué, indique le registre suivant)
         log_button = self.page.findChild(QObject, "log_button")
         log_button.clicked.connect(lambda l=log_button: l.setProperty("text", self.next_log_level[l.property("text")]))
@@ -116,28 +121,28 @@ class PageRB1:
         page_parameters = {}
 
         # Paramètre du pupitre
+        command_board = self.page.findChild(QObject, "command_board_combo").property("selection")
         try:
-            command_board = self.page.findChild(QObject, "command_board_combo").property("selection")
             command_board = translation_data[command_board.upper()].replace(" ", "_")
         except KeyError:
-            logging.debug("traduction pour le pupitre non trouvée, pupitre par défaut sélectioné.\n")
-        else:
-            page_parameters["Pupitre"] = command_board
+            logging.debug("Traduction pour le pupitre non trouvée.\n")
+            command_board = command_board.replace(" ", "_")
+        page_parameters["Pupitre"] = command_board
 
         # Paramètre si connecté à Renard
         page_parameters["Renard"] = self.page.findChild(QObject, "renard_checkbutton").property("isChecked")
 
-        # Paramètre si PCC connecté
-        page_parameters["PCC"] = self.page.findChild(QObject, "pcc_checkbutton").property("isChecked")
+        # Paramètre si caméra connecté pour Renard (ou alors visu direct sur renard)
+        page_parameters["Caméra"] = self.page.findChild(QObject, "camera_checkbutton").property("isChecked")
 
         # Paramètre choix du DMI
+        dmi_selection = self.page.findChild(QObject, "dmi_combo").property("selection")
         try:
-            dmi_selection = self.page.findChild(QObject, "dmi_combo").property("selection")
             dmi_selection = translation_data[dmi_selection.upper()].replace(" ", "_")
         except KeyError:
-            logging.debug("traduction pour le dmi non trouvée, DMI par défaut sélectioné (ETCS 3.6.0)")
-        else:
-            page_parameters["DMI"] = dmi_selection
+            logging.debug("traduction pour le dmi non trouvée.\n")
+            dmi_selection = dmi_selection.replace(" ", "_")
+        page_parameters["DMI"] = dmi_selection
 
         # Paramètre niveau de logging
         log_text = self.page.findChild(QObject, "log_button").property("text")
@@ -145,6 +150,12 @@ class PageRB1:
 
         # Paramètre langue
         page_parameters["Langue"] = self.page.findChild(QObject, "language_combo").property("selection")
+
+        # Paramètre si PCC connecté
+        page_parameters["PCC"] = self.page.findChild(QObject, "pcc_checkbutton").property("isChecked")
+
+        # Paramètre si affichage des données en direct (vitesse, ...)
+        page_parameters["DonnéesDirect"] = self.page.findChild(QObject, "data_checkbutton").property("isChecked")
 
         return page_parameters
 
