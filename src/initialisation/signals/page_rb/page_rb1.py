@@ -240,3 +240,18 @@ class PageRB1:
 
         # Définit la nouvelle langue comme celle sélectionée
         application.language = new_language
+
+    def on_renard_selected(self):
+        """Fonction appelée lorsque le checkbutton renard_checkbutton est sélectioné.
+        Permet d'activer ou de désactiver le checkbutton pour la caméra"""
+        # Récupère si le checkbutton de renard est activé ainsi que le checkbutton caméra
+        connected = self.page.findChild(QObject, "renard_checkbutton").property("isChecked")
+        camera_checkbutton = self.page.findChild(QObject, "camera_checkbutton")
+
+        # Cas où renard est activé -> le bouton est sélectionable
+        if connected:
+            camera_checkbutton.setProperty("isActivable", True)
+        # Cas où renard est désactivé -> le bouton n'est pas sélectionable et est désactivé
+        else:
+            camera_checkbutton.setProperty("isActivable", False)
+            camera_checkbutton.setProperty("isChecked", False)
