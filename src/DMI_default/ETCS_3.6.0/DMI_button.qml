@@ -66,7 +66,7 @@ Item {
     //Image visible sur le bouton
     Image {
         id: image
-        source: root.source
+        source: root.image
         anchors.fill: parent
         anchors.bottom: body.bottom
         anchors.right: body.right
