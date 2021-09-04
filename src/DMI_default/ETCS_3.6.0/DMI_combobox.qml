@@ -56,11 +56,6 @@ Item {
                 }
             }
         }
-
-        //Si la sélection a été changée, appelle le signal
-        if(root.selection != old_selection){
-            selection_changed()
-        }
     }
 
     //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
