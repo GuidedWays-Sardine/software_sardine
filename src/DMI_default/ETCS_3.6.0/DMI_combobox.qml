@@ -39,6 +39,9 @@ Item {
 
     //Fonction pour changer l'index de la combobox en fonction du texte
     function change_selection(new_selection){
+        //récupère la sélection actuelle
+        var old_selection = root.selection
+
         // Si la nouvelle sélection est un int, change le currentIndex en fonction de l'index envoyé
         if(typeof new_selection === typeof root.fontSize){
             if(new_selection <= combo.count){
@@ -52,6 +55,11 @@ Item {
                     combo.currentIndex =  i
                 }
             }
+        }
+
+        //Si la sélection a été changée, appelle le signal
+        if(root.selection != old_selection){
+            selection_changed()
         }
     }
 
