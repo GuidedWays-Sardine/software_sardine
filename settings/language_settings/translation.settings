@@ -1,0 +1,37 @@
+Français;English
+#Pour rajouter une langue, ajouter la langue sur la ligne 1, puis la traduction de chaque mots séparé des autres traductions par un ;
+
+
+
+#Bottom_buttons
+Sauvegarder;Save
+Ouvrir;Open
+Quitter;Quit
+Lancer;Launch
+
+
+#page_rb1
+Général;General
+
+Pupitre;Command board
+Clavier;Keyboard
+Pupitre léger;Light command board
+Regio2N;Regio2N
+
+Connecté à Renard ?;Connected to Renard ?
+Connecté par une caméra ?; Connected to a camera ?
+
+Interface pupitre;Command board interface
+ETCS 3.6.0;ETCS 3.6.0
+
+Niveau de Registre;Log level
+Complet;Complete
+Suffisant;Sufficient
+Minimal;Minimal
+Aucun;None
+
+Langue;Language
+
+Activation du PCC (Poste de Commande Centralisé) ?;Activation of CCS (Centralised Control Station) ?
+Affichage en direct des données du train ?;Live display of train's data ?
+
