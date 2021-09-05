@@ -232,6 +232,12 @@ class PageRB1:
         ----------
         translation_data: `dict`
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) /!\\ clés en majuscules"""
+        # Traduit le nom de la catégorie
+        try:
+            self.current_button.setProperty("text", translation_data[self.current_button.property("text").upper()])
+        except KeyError:
+            logging.debug("Impossible de traduire le nom de la catégorie de la page_rb1.\n")
+
         # Essaye de traduire chaque textes au dessus des widgets et check_button
         for text in ["command_board_text", "dmi_text", "log_text", "language_text",
                      "renard_checkbutton", "camera_checkbutton", "pcc_checkbutton", "data_checkbutton"]:
