@@ -8,6 +8,7 @@ from PyQt5.QtCore import QObject
 
 
 class RightButtons:
+    """Classe s'occupant du chargement et du fonctionnement des boutons de droite de l'application d'initialisation"""
 
     # stocke les éléments de bases des boutons de droite
     right_buttons = None
@@ -35,15 +36,17 @@ class RightButtons:
             engine.load(page_path)
             current_button = self.right_buttons.findChild(QObject, "rb" + str(index))
 
-            # Essaye d'initialiser la page et si elle est correctement initialisé, tente de charger les signals
             initial_time = time.time()
+            logging.info("Tentative du chargement de la page " + str(index) + ".\n")
+
+            # Essaye d'initialiser la page et si elle est correctement initialisé, tente de charger les signals
             if self.initialise_page(application, engine, index, page_path, current_button):
                 if self.initialise_signals(application, engine, index, page_path, current_button):
-                    logging.info("Chargement complet (graphique et fonctionelle) de la  page " + str(index) +
-                                 " en " + str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n")
+                    logging.info("Chargement complet (graphique et fonctionelle) de la  page " + str(index) + " en " +
+                                 str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n\n")
                 else:
-                    logging.info("Chargement partiel (graphique uniquement) de la page " + str(index) +
-                                 " en " + str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n")
+                    logging.info("Chargement partiel (graphique uniquement) de la page " + str(index) + " en " +
+                                 str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n\n")
 
         # Vérifie si au moins une page est chargée, sinon l'indique et cache les boutons ouvrir et sauvegarder
         if not any(application.is_fully_loaded):
@@ -87,13 +90,15 @@ class RightButtons:
             # Si c'est la première page existante, la charge
             if application.visible_pages == [None] * 8:
                 self.pages_stackview.set_active_page(engine.rootObjects()[0])
+                application.active_settings_page = index
 
             # store l'engine comme étant la page chargée
             application.visible_pages[index - 1] = engine
 
-            # Connecte le bouton de droite correspondant pour charger la page
-            current_button.clicked.connect(lambda new_page=engine:
-                                           self.pages_stackview.set_active_page(new_page.rootObjects()[0]))
+            # Connect le bouton de droite à une fonction permettant de charger la page et d'appeler d'autres fonctions :
+            # Une pour décharger la page active, et l'autre pour charger la nouvelle page
+            current_button.clicked.connect(lambda new_page=engine, new_index=index:
+                                           self.on_new_page_selected(application, new_page, new_index))
             return True
         else:
             # Sinon définit le bouton comme non activable et en négatif et enlève le potentiel texte
@@ -106,13 +111,13 @@ class RightButtons:
                 logging.warning("le chargement de la page " + str(index) +
                                 " relié au bouton rb" + str(index) + " est impossible.\n\t\t" +
                                 "Le fichier " + page_path + " existe mais ne se charge pas correctement.\n\t\t" +
-                                "Assurez-vous que celui-ci ne contient pas d'erreurs.\n")
+                                "Assurez-vous que celui-ci ne contient pas d'erreurs.\n\n")
             # Sinon c'est qu'il n'existe pas où qu'il est mal placé
             else:
                 logging.warning("le chargement de la page " + str(index) +
                                 " relié au bouton rb" + str(index) + " est impossible.\n\t\t" +
                                 "Le fichier " + page_path + " n'existe pas.\n\t\t" +
-                                "Assurez-vous que le fichier source est au bon endroit ou créez le\n")
+                                "Assurez-vous que le fichier source est au bon endroit ou créez le\n\n")
             return False
 
     def initialise_signals(self, application, engine, index, page_path, current_button):
@@ -144,8 +149,8 @@ class RightButtons:
                 # Import localement le fichier de la page
                 # Appelle le constructeur de la page pour affilier tous les signals aux widgets
                 exec("from initialisation.signals.page_rb import page_rb" + str(index) + " as rb" + str(index) + "\n" +
-                     "application.visible_pages[index - 1] = " +
-                     "(rb" + str(index) + ".PageRB" + str(index) + "(application, engine, index, current_button))")
+                     "application.visible_pages[index - 1] = " + "(rb" + str(index) + ".PageRB" + str(index) +
+                     "(application, engine.rootObjects()[0], index, current_button))")
 
                 # Indique que la page a entièrement été chargée (partie visuelle et signals)
                 application.is_fully_loaded[index - 1] = True
@@ -156,7 +161,7 @@ class RightButtons:
                 logging.warning("Erreur lors du chargement des signaux de la page : " + page_path + ".\n\t\t" +
                                 "Erreur de type : " + str(type(error)) + "\n\t\t" +
                                 "Avec comme message d\'erreur : " + error.args[0] +
-                                ''.join(traceback.format_tb(error.__traceback__)).replace('\n', '\n\t\t') + "\n")
+                                "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
                 current_button.setProperty("isPositive", False)
                 return False
         else:
@@ -165,3 +170,50 @@ class RightButtons:
                             "La page sera visible mais ne sera pas fonctionnelle.\n")
             current_button.setProperty("isPositive", False)
             return False
+
+    def on_new_page_selected(self, application, engine, new_index):
+        """Fonction permettant le changement de la page de paramètres active lorsqu'un bouton rb est cliqué
+        Appelle aussi deux fonctions permettant le déchargement de la page actuelle et le chargement de la nouvelle page
+
+        Parameters
+        ----------
+        application: `InitialisationWindow`
+            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+        engine: `QQmlApplicationEngine`
+            La QQmlApplicationEngine sur laquelle on a tenté de charger la page
+        new_index: `int`
+            index de la page de paramètre à charger (de 1 à 8)
+        """
+        # Vérifie que la page que l'on veut charger n'est pas celle qui est déjà chargée
+        if new_index != application.active_settings_page:
+            if application.is_fully_loaded[application.active_settings_page - 1]:
+                # Vérifie si la page que l'on va décharger a un protocole de déchargement spécifique
+                if "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
+                    try:
+                        application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
+                    except Exception as error:
+                        logging.error("La fonction on_page_closed de la page " + str(application.active_settings_page)
+                                      + " contient une erreur\n\t\t" +
+                                      "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                                      "Avec comme message d\'erreur : " + error.args[0] + "\n\n\t\t" +
+                                      "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                else:
+                    logging.debug("Aucune fonction on_page_closed page " + str(application.active_settings_page) + "\n")
+
+            # Charge le graphique de la nouvelle page et indique à l'application l'index de la nouvelle page chargée
+            self.pages_stackview.set_active_page(engine.rootObjects()[0])
+            application.active_settings_page = new_index
+
+            if application.is_fully_loaded[application.active_settings_page - 1]:
+                # Vérifie si la page que l'on charge  a un protocole de chargement particulier
+                if "on_page_opened" in dir(application.visible_pages[application.active_settings_page - 1]):
+                    try:
+                        application.visible_pages[application.active_settings_page - 1].on_page_opened(application)
+                    except Exception as error:
+                        logging.error("La fonction on_page_opened de la page " + str(application.active_settings_page) +
+                                      " contient une erreur.\n\t\t" +
+                                      "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                                      "Avec comme message d\'erreur : " + error.args[0] + "\n\n\t\t" +
+                                      "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                else:
+                    logging.debug("Aucune fonction on_page_opened page " + str(application.active_settings_page) + "\n")

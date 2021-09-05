@@ -5,10 +5,14 @@ import traceback
 import initialisation.initialisation_window as ini
 
 
+VERSION = "1.0.1"
+INITIAL_LOGGING = logging.DEBUG
+
+
 def main():
 
     # Lance le fichier de log en mode warning pour récupérer les warnings et erreurs critiques
-    log.initialise('../log/', '1.0.1', logging.INFO)
+    log.initialise('../log/', VERSION, INITIAL_LOGGING)
     logging.info("Lancement de l'application d'initialisation du simulateur\n\n\n")
 
     # lance le programme d'initialisation et vérifie qu'il n'y a pas d'erreurs au lancement
@@ -34,7 +38,7 @@ def main():
     # Change le niveau de log à celui précisé par l'utilisateur
     logging.info("Lancement du simulateur\n\n\n")
     try:
-        logging.getLogger().setLevel(parameters["log_level"])
+        logging.getLogger().setLevel(parameters["Registre"])
     except KeyError as error:
         logging.warning("Aucun paramêtre \"log_level\" récupéré du programme d'initialisation"
                         + "\n\t\tNiveau par défaut gardé à suffisant (log.WARNING)\n")

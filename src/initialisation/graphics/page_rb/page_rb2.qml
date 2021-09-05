@@ -2,7 +2,10 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 
-Pane {
+import "../../../DMI_default/ETCS_3.6.0"
+
+
+DMI_page {
     id: page_rb2
     objectName: "page_rb2"
     anchors.fill: parent
@@ -18,5 +21,4 @@ Pane {
         verticalAlignment: Label.AlignVCenter
         wrapMode: Label.Wrap
     }
-
 }

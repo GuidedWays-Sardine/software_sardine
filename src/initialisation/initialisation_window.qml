@@ -1,7 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
-import "../DMI_default"
+import "../DMI_default/ETCS_3.6.0"
 import "graphics"
 import "graphics/page_rb"
 
@@ -15,6 +15,7 @@ Window {
     //flags: Qt.FramelessWindowHint | Qt.Window
     //FIXME : trouver une façons d'avoir une fenètre sans bordure mais avec les fonctions de "snap" et "resize"
 
+    //FIXME : trouver un moyen que les combobx se mettent bien au dessus des autres boutons (bottom and right buttons)
     //affiche les différentes pages de settings de l'application d'initialisation
     DMI_stackview{
         id: settings_pages
