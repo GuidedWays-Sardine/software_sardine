@@ -17,4 +17,10 @@ Pane {
     background: Rectangle {
         color: "transparent"
     }
+
+    // Rajoute une MouseArea pour que les widget perdent le focus quand un endroit quelconque est selectioné (surtout pour les DMI_valueinput)
+    MouseArea {
+        anchors.fill: parent
+        onClicked: forceActiveFocus()
+    }
 }
