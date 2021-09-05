@@ -177,6 +177,7 @@ Item {
 
         onPressed: {                //Détecte quand la zone (le bouton) commence à être appuyée
             if(isActivable){
+                forceActiveFocus()
                 root.click_start()
             }
         }

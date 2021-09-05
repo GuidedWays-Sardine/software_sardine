@@ -65,6 +65,7 @@ Item {
     }
 
     //Texte visible à côté de la boite
+    // FIXME: texte pas centré horizontalement
     Rectangle {
         id: rect_text
         color: "transparent"
@@ -194,6 +195,7 @@ Item {
         hoverEnabled: false
 
         onPressed: {
+            forceActiveFocus()
             if(isActivable){
                 root.isChecked = !root.isChecked
                 root.clicked()
@@ -208,6 +210,7 @@ Item {
         hoverEnabled: false
 
         onPressed: {
+            forceActiveFocus()
             if(isActivable){
                 root.isChecked = !root.isChecked
                 root.clicked()

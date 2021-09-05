@@ -22,7 +22,7 @@ Item {
     //Propriétés liés aux donnés de la combobox
     property var elements: ["NaN"]          //définit les éléments sélectionables de la combobox
     property int amountElementsDisplayed: 4 //définit le nombre d'éléments visibles dans la popup
-    property string selection: combo.displayText
+    readonly property string selection: combo.displayText
     property int fontSize: 12
     property bool isDarkGrey: !isActivable  //est ce que le texte doit-être en gris foncé ?
 
@@ -95,6 +95,7 @@ Item {
             Connections {
                 target: body
                 function onPressedChanged() {
+                    forceActiveFocus()
                     canvas.requestPaint()
                     if(root.isActivable && body.count > 1 && !body.pressed && !popup.visible)
                     {
