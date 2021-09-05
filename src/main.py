@@ -5,7 +5,7 @@ import traceback
 import initialisation.initialisation_window as ini
 
 
-VERSION = "1.0.1"
+VERSION = "1.0.2"
 INITIAL_LOGGING = logging.DEBUG
 
 
