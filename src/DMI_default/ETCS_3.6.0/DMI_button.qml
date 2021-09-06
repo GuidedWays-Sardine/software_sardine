@@ -21,6 +21,8 @@ Item {
 
     //Propriétés liés à l'image et au texte que l'utilisateur peut rajouter sur le bouton
     property string image: ""               //image à afficher
+    property string imageActivable          //image à afficher quand le bouton est cliquable
+    property string imageNotActivable       //image à afficher quand le bouton n'est pas cliquable
     property string text: ""                //texte à afficher
     property int fontSize: 12
     property bool isDarkGrey: !isActivable  //est ce que le texte doit-être en gris foncé ?
@@ -42,6 +44,9 @@ Item {
     readonly property string grey: "#C3C3C3"        //partie 5.2.1.3.3  Nr 3
     readonly property string darkGrey: "#969696"    //partie 5.2.1.3.3  Nr 5
     readonly property string shadow: "#08182F"      //partie 5.2.1.3.3  Nr 7
+
+    //Chemin d'accès vers les icones utiles pour le check_button
+    readonly property string iconPath : "../../../assets/DMI_icons/ETCS_3.6.0/"
 
 
     //permet à partir des valeurs de positions et dimensions par défauts de calculer
@@ -66,7 +71,7 @@ Item {
     //Image visible sur le bouton
     Image {
         id: image
-        source: root.image
+        source: (root.imageActivable != "" || root.imageNotActivable != "") ? root.iconPath + (root.isActivable ? imageActivable : imageNotActivable) : root.iconPath + root.image
         anchors.fill: parent
         anchors.bottom: body.bottom
         anchors.right: body.right

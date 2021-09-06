@@ -97,7 +97,7 @@ Item {
     //Image visible sur le bouton
     Image {
         id: image
-        source: isChecked ? (isDarkGrey ? root.iconPath + "dark_grey_cross.png" : root.iconPath + "white_cross.png") : ""
+        source: root.isChecked ? root.iconPath + (root.isDarkGrey ? "Navigation/NA_12.bmp" : "Navigation/NA_11.bmp") : ""
         anchors.fill: parent
         anchors.bottom: body.bottom
         anchors.right: body.right
