@@ -8,9 +8,6 @@ DMI_page {
     objectName: "page_rb1"
 
 
-    //définit le ratio entre les dimensions de base de la fenètre et les dimensions de la fenètre actuelles
-    readonly property real ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
-
     //Checkbutton pour savoir si le pupitre léger est connecté à UE (ou à Renard)
     DMI_checkbutton {
         id: pcc_checkbutton
@@ -44,17 +41,14 @@ DMI_page {
     }
 
     //Bouton registre
-    Text{
+    DMI_text {
         id: log_text
         objectName: "log_text"
-        text: "Niveau de registre"
-        color: "#C3C3C3"
-        font.pixelSize: 12 * page_rb1.ratio
 
-        anchors.left: log_button.left
-        anchors.leftMargin: (1 + 2 * log_button.isPositive) * page_rb1.ratio
-        anchors.bottom: log_button.top
-        anchors.bottomMargin: log_text.font.pixelSize
+        text: "Niveau de registre"
+
+        defaultX: log_button.defaultX + 2
+        defaultY: log_button.defaultY - 2 * fontSize
     }
 
     DMI_button{
@@ -73,17 +67,16 @@ DMI_page {
     }
 
     //Combobox langue
-    Text{
-        id: language_text
+    DMI_text {
         objectName: "language_text"
-        text: "Langue"
-        color: "#C3C3C3"
-        font.pixelSize: 12 * page_rb1.ratio
+        id: language_text
 
-        anchors.left: language_combo.left
-        anchors.leftMargin: (1 + 2 * language_combo.isPositive) * page_rb1.ratio
-        anchors.bottom: language_combo.top
-        anchors.bottomMargin: language_text.font.pixelSize
+        text: "Langue"
+
+        defaultX: language_combo.defaultX + 2
+        defaultY: language_combo.defaultY - 2 * fontSize
+
+        isDarkGrey: language_combo.elementsCount <= 1
     }
 
     DMI_combobox{
@@ -101,19 +94,17 @@ DMI_page {
         isVisible: true
     }
 
-
     //Combobox du choix du DMI
-    Text{
+    DMI_text {
         id: dmi_text
         objectName: "dmi_text"
-        text: "Interface pupitre"
-        color: "#C3C3C3"
-        font.pixelSize: 12 * page_rb1.ratio
 
-        anchors.left: dmi_combo.left
-        anchors.leftMargin: (1 + 2 * dmi_combo.isPositive) * page_rb1.ratio
-        anchors.bottom: dmi_combo.top
-        anchors.bottomMargin: dmi_text.font.pixelSize
+        text: "Interface pupitre"
+
+        defaultX: dmi_combo.defaultX + 2
+        defaultY: dmi_combo.defaultY - 2 * fontSize
+
+        isDarkGrey: dmi_combo.elementsCount <= 1
     }
 
     DMI_combobox{
@@ -125,7 +116,7 @@ DMI_page {
         defaultWidth: 280
         defaultHeight: 50
 
-        elements: ["ETCS 3.6.0"]
+        elements: ["NaN"]
         amountElementsDisplayed: 2
 
         isPositive: false
@@ -164,17 +155,16 @@ DMI_page {
     }
 
     //Combobox du pupitre utilisé
-    Text{
+    DMI_text {
         id: command_board_text
         objectName: "command_board_text"
-        text: "Pupitre"
-        color: "#C3C3C3"
-        font.pixelSize: 12 * page_rb1.ratio
 
-        anchors.left: command_board_combo.left
-        anchors.leftMargin: (1 + 2 * command_board_combo.isPositive) * page_rb1.ratio
-        anchors.bottom: command_board_combo.top
-        anchors.bottomMargin: command_board_text.font.pixelSize
+        text: "Pupitre"
+
+        defaultX: command_board_combo.defaultX + 2
+        defaultY: command_board_combo.defaultY - 2 * fontSize
+
+        isDarkGrey: command_board_combo.elementsCount <= 1
     }
 
     DMI_combobox{
@@ -186,7 +176,7 @@ DMI_page {
         defaultWidth: 280
         defaultHeight: 50
 
-        elements: ["Pupitre lourd"]
+        elements: ["NaN"]
         amountElementsDisplayed: 2
 
         isPositive: false
