@@ -31,7 +31,7 @@ Item{
 
     //Propriétés liés à l'état du bouton
     property bool isActivable: true         //si le bouton peut être activée
-    property bool isPositive: true         //si le bouton doit-être visible en couche positive (sinon négatif)
+    property bool isPositive: false         //si le bouton doit-être visible en couche positive (sinon négatif)
     property bool isVisible: true           //si le bouton est visible
 
 
