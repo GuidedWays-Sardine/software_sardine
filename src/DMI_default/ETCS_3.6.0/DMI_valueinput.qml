@@ -20,7 +20,7 @@ Item{
 
     //Propriétés liés aux valeurs limites
     property int minimumValue: 0
-    property int maximumValue: 10
+    property int maximumValue: 1
 
     //Propriétés liés à l'état du DMI_valueinput
     property bool isMaxDefault: false       //définit si la valeur par défaut (dans le placeholder) est la valeur max (ou mini si mis sur false)
