@@ -21,6 +21,7 @@ Item {
 
     //Propriétés liés aux donnés de la combobox
     property var elements: ["NaN"]          //définit les éléments sélectionables de la combobox
+    readonly property int elementsCount: combo.count
     property int amountElementsDisplayed: 4 //définit le nombre d'éléments visibles dans la popup
     readonly property string selection: combo.displayText
     property int fontSize: 12
