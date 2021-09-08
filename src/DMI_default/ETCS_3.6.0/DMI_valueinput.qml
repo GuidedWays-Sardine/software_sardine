@@ -38,6 +38,11 @@ Item{
     //Différents signal handlers (à écrire en python)
     signal value_changed()
 
+    //Fonction pour remettre la valeur par défaut dans le valueinput
+    function clear(){
+        body.text = ""
+    }
+
     //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
     readonly property string darkBlue: "#031122"   //partie 5.2.1.3.3  Nr 6
     readonly property string black: "#000000"       //partie 5.2.1.3.3  Nr 2
@@ -67,6 +72,7 @@ Item{
         font.pixelSize: root.fontSize * root.ratio
 
         anchors.fill: parent
+        readOnly: !root.isActivable
 
         background: Rectangle {
             anchors.fill: parent
