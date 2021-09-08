@@ -64,17 +64,14 @@ DMI_page{
 
     Screen_Parameters_Item {
         index: 4
-        screenName: "écran 4"
     }
 
     Screen_Parameters_Item {
         index: 3
-        screenName: "écran 3"
     }
 
     Screen_Parameters_Item {
         index: 2
-        screenName: "écran 2"
     }
 
     Screen_Parameters_Item {

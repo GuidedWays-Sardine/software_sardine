@@ -10,19 +10,18 @@ Item {
     property int index: 1
     property string screenName: ""
     property int fontSize: 12
-    property var screenList: ["Aucun", "1"]
+    property var screenSize: [[1080, 1920], [0, 0]] //FIXME : à vider
+    ComboBox {
+        id: screen_size
+        model: root.screenSize
+        visible: false
+    }
+    property var screenList: ["Aucun", "1"] //FIXME : enlever l'option 1
+    readonly property bool screenValid: false
 
-    //Valeurs des DMI_valueinput sur le positionnement et la taille de la fenêtre
-    property int minX: 0
-    property int maxX: 0
-    property int minY: 0
-    property int maxY: 0
-    property int minAbsoluteWidth: 0
-    property int minWidth: 0
-    property int maxWidth: 0
-    property int maxAbsoluteHeight: 0
-    property int minHeight: 0
-    property int maxHeight: 0
+    //Valeurs dans le cas où la fenêtre doit avoir une taille minimum
+    property int minimumWidth: 0
+    property int minimumHeight: 0
 
     //Valeur à récupérer (les dimensions, la position, l'écran sélectionné)
     property int selectedScreen: 0
@@ -88,7 +87,39 @@ Item {
         isVisible: root.screenName != ""
 
         //Signal handler pour griser les textes pour l'emplacement de l'écran et changer les valeurs/valeurs par défaut des DMI_valueinput
+        onSelection_changed: {
+            //vide les cases pour les dimensions (car celles-ci changent avec les écrans
+            x_input.clear()
+            y_input.clear()
+            height_input.clear()
+            width_input.clear()
 
+            //cas si l'écran est passé à aucun
+            if(screen_index_combo.selection === screen_index_combo.elements[0]) {
+                //décoche l'option fullscreen
+                fullscreen_on.isChecked = false
+            }
+            //cas si un écran a été sélectioné
+            else {
+                //Si les valeurs pour l'écran sélectionné ont été rentrées et que la résolution de l'écran est suffisante
+                fullscreen_on.text = screen_size.count.toString()
+                if(selectionIndex - 1 <= root.screenSize.lenght ){//&& root.sceenSize[selectionIndex - 2][0] >= root.minimumWidth && root.screenSize[selectionIndex - 2][1] >= root.minimumHeight){
+                    //Change les valeurs pour chaque DMI_valueinput
+                    //x_input.maximumValue =
+
+
+                    root.screenValid = true
+                }
+                else {
+                    root.screenValid = false
+                }
+
+
+
+                //Active la combobox plein écran si l'écran sélectionné est valide
+                fullscreen_on.isChecked = root.screenValid
+            }
+        }
     }
 
     //Checkbutton pour savoir si l'écran sera en fullscreen
@@ -102,7 +133,7 @@ Item {
         text: "plein écran ?"
 
         isChecked: false
-        isActivable: false
+        isActivable: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0]
         isPositive: false
         isVisible: root.screenName != ""
     }
@@ -117,7 +148,7 @@ Item {
         text: "h:"
 
         isVisible: root.screenName != ""
-        isDarkGrey: true
+        isDarkGrey: !root.screenValid || !(screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.isChecked)
     }
 
     DMI_valueinput {
@@ -129,7 +160,10 @@ Item {
         defaultWidth: defaultHeight * 2
         defaultHeight: screen_index_combo.defaultHeight - 1
 
-        isActivable: false
+        minimumValue: root.screenValid ? root.minimumHeight : 0
+
+        isMaxDefault: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0]
+        isActivable: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.isChecked
         isPositive: false
         isVisible: root.screenName != ""
     }
@@ -143,8 +177,8 @@ Item {
 
         text: "w:"
 
+        isDarkGrey: !root.screenValid || !(screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.isChecked)
         isVisible: root.screenName != ""
-        isDarkGrey: true
     }
 
     DMI_valueinput {
@@ -156,7 +190,10 @@ Item {
         defaultWidth: defaultHeight * 2
         defaultHeight: screen_index_combo.defaultHeight - 1
 
-        isActivable: false
+        minimumValue: root.screenValid ? root.minimumWidth : 0
+
+        isMaxDefault: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0]
+        isActivable: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.isChecked
         isPositive: false
         isVisible: root.screenName != ""
     }
@@ -170,8 +207,8 @@ Item {
 
         text: "y:"
 
+        isDarkGrey: !root.screenValid || !(screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.isChecked)
         isVisible: root.screenName != ""
-        isDarkGrey: true
     }
 
     DMI_valueinput {
@@ -183,7 +220,10 @@ Item {
         defaultWidth: defaultHeight * 2
         defaultHeight: screen_index_combo.defaultHeight - 1
 
-        isActivable: false
+        minimumValue: 0
+
+        isMaxDefault: false
+        isActivable: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.isChecked
         isPositive: false
         isVisible: root.screenName != ""
     }
@@ -197,8 +237,8 @@ Item {
 
         text: "x:"
 
+        isDarkGrey: !root.screenValid || !(screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.isChecked)
         isVisible: root.screenName != ""
-        isDarkGrey: true
     }
 
     DMI_valueinput {
@@ -210,7 +250,10 @@ Item {
         defaultWidth: defaultHeight * 2
         defaultHeight: screen_index_combo.defaultHeight - 1
 
-        isActivable: false
+        minimumValue: 0
+
+        isMaxDefault: false
+        isActivable: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.isChecked
         isPositive: false
         isVisible: root.screenName != ""
     }
