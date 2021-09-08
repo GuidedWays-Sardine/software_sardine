@@ -24,6 +24,7 @@ Item {
     readonly property int elementsCount: combo.count
     property int amountElementsDisplayed: 4 //définit le nombre d'éléments visibles dans la popup
     readonly property string selection: combo.displayText
+    readonly property int selectionIndex: combo.currentIndex + 1
     property int fontSize: 12
     property bool isDarkGrey: !isActivable  //est ce que le texte doit-être en gris foncé ?
 
