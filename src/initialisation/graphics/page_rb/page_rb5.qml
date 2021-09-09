@@ -10,6 +10,13 @@ DMI_page{
     id: page_rb5
     objectName: "page_rb5"
 
+    //Propriété pour avoir la liste des écrans et leurs dimensions
+    property var screenList: ["Aucun"]
+    property var screenSize: []
+
+    //propriétés sur le nom, les dimensions minimales de chaque écran
+    property var screenNames: []
+    property var minimumWH: []
 
     //Flèche de droite pour naviguer à gauche sur les catégories d'écrans
     DMI_button {
@@ -63,20 +70,52 @@ DMI_page{
     }
 
     Screen_Parameters_Item {
+        id: screen4
         index: 4
+
+        screenList: page_rb5.screenList
+        screenSize: page_rb5.screenSize
+
+        screenName: screenNames.length >= index ? screenNames[index - 1].toString() : ""
+        minimumWidth: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][0] : 0
+        minimumHeight: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][1] : 0
     }
 
     Screen_Parameters_Item {
+        id: screen3
         index: 3
+
+        screenList: page_rb5.screenList
+        screenSize: page_rb5.screenSize
+
+        screenName: screenNames.length >= index ? screenNames[index - 1].toString() : ""
+        minimumWidth: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][0] : 0
+        minimumHeight: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][1] : 0
     }
 
     Screen_Parameters_Item {
+        id: screen2
         index: 2
+
+        screenList: page_rb5.screenList
+        screenSize: page_rb5.screenSize
+
+        screenName: screenNames.length >= index ? screenNames[index - 1].toString() : ""
+        minimumWidth: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][0] : 0
+        minimumHeight: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][1] : 0
     }
 
     Screen_Parameters_Item {
+        id: screen1
         index: 1
-        screenName: "écran 1"
+
+        screenList: page_rb5.screenList
+        screenSize: page_rb5.screenSize
+
+        screenName: page_rb5.screenNames.length >= index ? page_rb5.screenNames[index - 1].toString() : ""
+        minimumWidth: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][0] : 0
+        minimumHeight: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][1] : 0
+
     }
 
     //checkbutton pour savoir si l'application doit éteindre les écrans qui ne sont pas utilisés
