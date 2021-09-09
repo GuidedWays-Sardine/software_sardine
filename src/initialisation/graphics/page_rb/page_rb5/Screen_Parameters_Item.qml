@@ -22,7 +22,7 @@ Item {
             screen_name.isDarkGrey = true
             screen_index_combo.isActivable = false
             screen_index_combo.change_selection(1)
-            root.screenValid: false
+            root.screenValid = false
         }
     }
 
@@ -32,11 +32,6 @@ Item {
 
     //Liste des écrans disponibles pour l'utilisateur et leurs tailles (liste de paires de dimensions [width, height]
     property var screenSize: []
-    ComboBox {  //combobox invisible permettant de traduire la liste screenSize en éléments lisibles
-        id: screen_size
-        model: root.screenSize
-        visible: false
-    }
 
     //Liste des écrans disponibles pour l'utilisateur
     property var screenList: ["Aucun"]
@@ -128,7 +123,7 @@ Item {
             //cas si un écran a été sélectioné
             else {
                 //Si les valeurs pour l'écran sélectionné ont été rentrées et que la résolution de l'écran est suffisante
-                if(selectionIndex - 1 <= screen_size.count && root.screenSize[selectionIndex - 2][0] >= root.minimumWidth && root.screenSize[selectionIndex - 2][1] >= root.minimumHeight){
+                if(selectionIndex - 1 <= root.screenSize.length && root.screenSize[selectionIndex - 2].length >= 2 && root.screenSize[selectionIndex - 2][0] >= root.minimumWidth && root.screenSize[selectionIndex - 2][1] >= root.minimumHeight){
                     x_input.maximumValue = root.screenSize[selectionIndex - 2][0] - root.minimumWidth
                     y_input.maximumValue = root.screenSize[selectionIndex - 2][1] - root.minimumHeight
                     width_input.maximumValue = root.screenSize[selectionIndex - 2][0]
