@@ -28,7 +28,7 @@ Item {
 
     //Indication sur l'utilisation de l'écran paramétré
     property string screenName: ""
-    property int fontSize: 16
+    property int fontSize: 12
 
     //Liste des écrans disponibles pour l'utilisateur et leurs tailles (liste de paires de dimensions [width, height]
     property var screenSize: []
