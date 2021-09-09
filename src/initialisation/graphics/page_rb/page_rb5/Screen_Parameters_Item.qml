@@ -6,33 +6,55 @@ import "../../../../DMI_default/ETCS_3.6.0"
 Item {
     id: root
 
-    //Valeurs pour le positionnement et l'utilisation de l'écran et les écrans où il peut se situer
-    property int index: 1
+
+    //information sur le positionnement de l'encadré et sur son utilisabilité
+    property int index: 0
+    property bool screenValid: false
+    property bool isActivable: true
+    onIsActivableChanged: {     //fonction pour activer ou désactiver l'encadré si demandé
+        //S'il est changé comme activable, rend la combobox de choix d'écran activable
+        if(root.isActivable){
+            screen_name.isDarkGrey = false
+            screen_index_combo.isActivable = true
+        }
+        // S'il est changé comme inactivable, rend la combobox de choix d'écran inactivable et redéfinit son choix comme aucun
+        else {
+            screen_name.isDarkGrey = true
+            screen_index_combo.isActivable = false
+            screen_index_combo.change_selection(1)
+            root.screenValid: false
+        }
+    }
+
+    //Indication sur l'utilisation de l'écran paramétré
     property string screenName: ""
-    property int fontSize: 12
-    property var screenSize: [[1080, 1920], [0, 0]] //FIXME : à vider
-    ComboBox {
+    property int fontSize: 16
+
+    //Liste des écrans disponibles pour l'utilisateur et leurs tailles (liste de paires de dimensions [width, height]
+    property var screenSize: []
+    ComboBox {  //combobox invisible permettant de traduire la liste screenSize en éléments lisibles
         id: screen_size
         model: root.screenSize
         visible: false
     }
-    property var screenList: ["Aucun", "1"] //FIXME : enlever l'option 1
-    readonly property bool screenValid: false
 
-    //Valeurs dans le cas où la fenêtre doit avoir une taille minimum
+    //Liste des écrans disponibles pour l'utilisateur
+    property var screenList: ["Aucun"]
+
+    //Valeurs dans le cas où la fenêtre doit avoir une taille minimale
     property int minimumWidth: 0
     property int minimumHeight: 0
 
     //Valeur à récupérer (les dimensions, la position, l'écran sélectionné)
-    property int selectedScreen: 0
-    property bool isFullScreen: false
-    property int inputX: 0
-    property int inputY: 0
-    property int inputWidth: 0
-    property int inputHeight: 0
+    property int selectedScreen: screen_index_combo.selectionIndex
+    property bool isFullScreen: fullscreen_on.isChecked
+    property int inputX: x_input.value
+    property int inputY: y_input.value
+    property int inputWidth: width_input.value
+    property int inputHeight: height_input.value
 
 
-    //fonctions utiles pour la traduction des textes de la page
+    //fonctions utiles pour la traduction des textes de la page (actuellement, que le fullscreen)
     function translate_fullscreen(translation)
     {
         fullscreen_on.text = translation.toString()
@@ -43,6 +65,9 @@ Item {
     readonly property real ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
     anchors.fill: parent
 
+
+
+    //Bouton permettant de créer l'encadré du combobox
     DMI_button {
         id: body
 
@@ -81,6 +106,7 @@ Item {
 
         elements: root.screenList
         amountElementsDisplayed: 3
+        fontSize: root.fontSize
 
         isPositive: false
         isActivable: true
@@ -102,25 +128,25 @@ Item {
             //cas si un écran a été sélectioné
             else {
                 //Si les valeurs pour l'écran sélectionné ont été rentrées et que la résolution de l'écran est suffisante
-                fullscreen_on.text = screen_size.count.toString()
-                if(selectionIndex - 1 <= root.screenSize.lenght ){//&& root.sceenSize[selectionIndex - 2][0] >= root.minimumWidth && root.screenSize[selectionIndex - 2][1] >= root.minimumHeight){
-                    //Change les valeurs pour chaque DMI_valueinput
-                    //x_input.maximumValue =
-
+                if(selectionIndex - 1 <= screen_size.count && root.screenSize[selectionIndex - 2][0] >= root.minimumWidth && root.screenSize[selectionIndex - 2][1] >= root.minimumHeight){
+                    x_input.maximumValue = root.screenSize[selectionIndex - 2][0] - root.minimumWidth
+                    y_input.maximumValue = root.screenSize[selectionIndex - 2][1] - root.minimumHeight
+                    width_input.maximumValue = root.screenSize[selectionIndex - 2][0]
+                    height_input.maximumValue = root.screenSize[selectionIndex - 2][1]
 
                     root.screenValid = true
                 }
+                //Si la résolution de l'écran n'a pas été donnée ou est trop petite
                 else {
                     root.screenValid = false
                 }
-
-
 
                 //Active la combobox plein écran si l'écran sélectionné est valide
                 fullscreen_on.isChecked = root.screenValid
             }
         }
     }
+
 
     //Checkbutton pour savoir si l'écran sera en fullscreen
     DMI_checkbutton {
@@ -131,6 +157,7 @@ Item {
         defaultY: screen_name.defaultY - (boxLenght - root.fontSize) * 0.5
 
         text: "plein écran ?"
+        fontSize: root.fontSize
 
         isChecked: false
         isActivable: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0]
@@ -138,95 +165,6 @@ Item {
         isVisible: root.screenName != ""
     }
 
-    //hauteur de la fenètre
-    DMI_text {
-        id: height_text
-
-        defaultX: height_input.defaultX - root.fontSize * 1.2
-        defaultY: height_input.defaultY + (height_input.defaultHeight - fontSize)/2
-
-        text: "h:"
-
-        isVisible: root.screenName != ""
-        isDarkGrey: !root.screenValid || !(screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.isChecked)
-    }
-
-    DMI_valueinput {
-        id: height_input
-        objectName: "height_input"
-
-        defaultX: body.defaultX + 378 + 2*46 - defaultWidth
-        defaultY: screen_index_combo.defaultY
-        defaultWidth: defaultHeight * 2
-        defaultHeight: screen_index_combo.defaultHeight - 1
-
-        minimumValue: root.screenValid ? root.minimumHeight : 0
-
-        isMaxDefault: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0]
-        isActivable: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.isChecked
-        isPositive: false
-        isVisible: root.screenName != ""
-    }
-
-    //hlargeur de la fenètre
-    DMI_text {
-        id: width_text
-
-        defaultX: width_input.defaultX - root.fontSize * 1.2
-        defaultY: width_input.defaultY + (width_input.defaultHeight - fontSize)/2
-
-        text: "w:"
-
-        isDarkGrey: !root.screenValid || !(screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.isChecked)
-        isVisible: root.screenName != ""
-    }
-
-    DMI_valueinput {
-        id: width_input
-        objectName: "width_input"
-
-        defaultX: body.defaultX + 378 + 2*46 - defaultWidth * 2 - 2 * root.fontSize
-        defaultY: screen_index_combo.defaultY
-        defaultWidth: defaultHeight * 2
-        defaultHeight: screen_index_combo.defaultHeight - 1
-
-        minimumValue: root.screenValid ? root.minimumWidth : 0
-
-        isMaxDefault: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0]
-        isActivable: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.isChecked
-        isPositive: false
-        isVisible: root.screenName != ""
-    }
-
-    //position y de la fenêtre
-    DMI_text {
-        id: y_text
-
-        defaultX: y_input.defaultX - root.fontSize * 1.2
-        defaultY: y_input.defaultY + (y_input.defaultHeight - fontSize)/2
-
-        text: "y:"
-
-        isDarkGrey: !root.screenValid || !(screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.isChecked)
-        isVisible: root.screenName != ""
-    }
-
-    DMI_valueinput {
-        id: y_input
-        objectName: "y_input"
-
-        defaultX: body.defaultX + 378 + 2*46 - defaultWidth * 3 - 6 * root.fontSize
-        defaultY: screen_index_combo.defaultY
-        defaultWidth: defaultHeight * 2
-        defaultHeight: screen_index_combo.defaultHeight - 1
-
-        minimumValue: 0
-
-        isMaxDefault: false
-        isActivable: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.isChecked
-        isPositive: false
-        isVisible: root.screenName != ""
-    }
 
     //position x de la fenêtre
     DMI_text {
@@ -236,6 +174,7 @@ Item {
         defaultY: x_input.defaultY + (x_input.defaultHeight - fontSize)/2
 
         text: "x:"
+        fontSize: root.fontSize
 
         isDarkGrey: !root.screenValid || !(screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.isChecked)
         isVisible: root.screenName != ""
@@ -251,10 +190,123 @@ Item {
         defaultHeight: screen_index_combo.defaultHeight - 1
 
         minimumValue: 0
+        //permet de changer la hauteur maximale quand la position y a été changée
+        onValue_changed: {
+            if(root.screenValid){
+                width_input.maximumValue = root.screenSize[screen_index_combo.selectionIndex - 2][0] - x_input.value
+            }
+        }
+        fontSize: root.fontSize
 
         isMaxDefault: false
         isActivable: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.isChecked
         isPositive: false
         isVisible: root.screenName != ""
     }
+
+//position y de la fenêtre
+    DMI_text {
+        id: y_text
+
+        defaultX: y_input.defaultX - root.fontSize * 1.2
+        defaultY: y_input.defaultY + (y_input.defaultHeight - fontSize)/2
+
+        text: "y:"
+        fontSize: root.fontSize
+
+        isDarkGrey: !root.screenValid || !(screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.isChecked)
+        isVisible: root.screenName != ""
+    }
+
+    DMI_valueinput {
+        id: y_input
+        objectName: "y_input"
+
+        defaultX: body.defaultX + 378 + 2*46 - defaultWidth * 3 - 6 * root.fontSize
+        defaultY: screen_index_combo.defaultY
+        defaultWidth: defaultHeight * 2
+        defaultHeight: screen_index_combo.defaultHeight - 1
+
+        minimumValue: 0
+        //permet de changer la hauteur maximale quand la position y a été changée
+        onValue_changed: {
+            if(root.screenValid){
+                height_input.maximumValue = root.screenSize[screen_index_combo.selectionIndex - 2][1] - y_input.value
+            }
+        }
+        fontSize: root.fontSize
+
+        isMaxDefault: false
+        isActivable: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.isChecked
+        isPositive: false
+        isVisible: root.screenName != ""
+    }
+
+    //hauteur de la fenètre
+    DMI_text {
+        id: height_text
+
+        defaultX: height_input.defaultX - root.fontSize * 1.2
+        defaultY: height_input.defaultY + (height_input.defaultHeight - fontSize)/2
+
+        text: "h:"
+        fontSize: root.fontSize
+
+        isVisible: root.screenName != ""
+        isDarkGrey: !root.screenValid || !(screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.isChecked)
+    }
+
+    DMI_valueinput {
+        id: height_input
+        objectName: "height_input"
+
+        defaultX: body.defaultX + 378 + 2*46 - defaultWidth
+        defaultY: screen_index_combo.defaultY
+        defaultWidth: defaultHeight * 2
+        defaultHeight: screen_index_combo.defaultHeight - 1
+
+        minimumValue: root.screenValid ? root.minimumHeight : 0
+        fontSize: root.fontSize
+
+        isMaxDefault: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0]
+        isActivable: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.isChecked
+        isPositive: false
+        isVisible: root.screenName != ""
+    }
+
+
+
+    //hlargeur de la fenètre
+    DMI_text {
+        id: width_text
+
+        defaultX: width_input.defaultX - root.fontSize * 1.2
+        defaultY: width_input.defaultY + (width_input.defaultHeight - fontSize)/2
+
+        text: "w:"
+        fontSize: root.fontSize
+
+        isDarkGrey: !root.screenValid || !(screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.isChecked)
+        isVisible: root.screenName != ""
+    }
+
+    DMI_valueinput {
+        id: width_input
+        objectName: "width_input"
+
+        defaultX: body.defaultX + 378 + 2*46 - defaultWidth * 2 - 2 * root.fontSize
+        defaultY: screen_index_combo.defaultY
+        defaultWidth: defaultHeight * 2
+        defaultHeight: screen_index_combo.defaultHeight - 1
+
+        minimumValue: root.screenValid ? root.minimumWidth : 0
+        fontSize: root.fontSize
+
+        isMaxDefault: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0]
+        isActivable: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.isChecked
+        isPositive: false
+        isVisible: root.screenName != ""
+    }
+
+
 }
