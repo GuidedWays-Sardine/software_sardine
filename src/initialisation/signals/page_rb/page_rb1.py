@@ -103,9 +103,7 @@ class PageRB1:
         self.page.findChild(QObject, "camera_checkbutton").setProperty("isActivable", renard.property("isChecked"))
 
         # Rend le bouton registre fonctionel (quand cliqué, indique le registre suivant)
-        log_button = self.page.findChild(QObject, "log_button")
-        log_button.clicked.connect(lambda l=log_button: l.setProperty("text", self.next_log_level[l.property("text")]))
-
+        self.page.findChild(QObject, "log_button").clicked.connect(self.on_log_button_clicked)
         # Définit la page comme validée (toutes les valeurs par défaut suffisent)
         application.is_completed[0] = True
 
@@ -338,3 +336,9 @@ class PageRB1:
         else:
             camera_checkbutton.setProperty("isActivable", False)
             camera_checkbutton.setProperty("isChecked", False)
+
+    def on_log_button_clicked(self):
+        """Fonction appelée lorsque le bouton log_button est cliqué.
+        Permet de changer le niveau de registre affiché sur le bouton (et récupéré)"""
+        log_button = self.page.findChild(QObject, "log_button")
+        log_button.setProperty("text", self.next_log_level[log_button.property("text")])
