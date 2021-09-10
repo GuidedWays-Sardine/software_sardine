@@ -48,7 +48,7 @@ class PageRB5:
         for screen_index in range(0, self.screen_count):
             sg = QDesktopWidget().screenGeometry(screen_index).getCoords()
             self.screen_index[screen_index].setPosition(sg[0], sg[1])
-            screen_dimensions.append([sg[2] + 1, sg[3] + 1])
+            screen_dimensions.append([sg[2] - sg[0] + 1, sg[3] - sg[1] + 1])
             window = self.screen_index[screen_index].findChild(QObject, "screen_index")
             window.setProperty("text", str(screen_index + 1))
 
