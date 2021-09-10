@@ -14,6 +14,16 @@ class PageRB5:
     current_button = None
     screen_count = 0
     screen_index = []
+    screen_default = {"Liste 1": {"écran1": [True, 640, 480],
+                                  "écran2": [False, 0, 0]
+                                  },
+                      "Liste 2": {"écran3": [True, 640, 900]}
+                      }
+    screen_settings = {}
+    category_active = ""
+    visible_screen_names = []
+    visible_screen_activable = []
+    visible_screen_minimum_wh = []
 
     def __init__(self, application, page, index, current_button):
         # Stocke les informations nécessaires au fonctionnement de la page
