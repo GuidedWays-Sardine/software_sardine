@@ -16,7 +16,19 @@ DMI_page{
 
     //propriétés sur le nom, les dimensions minimales de chaque écran
     property var screenNames: []
+    property var screenActivable: []
     property var minimumWH: []
+
+
+    //fonctions utiles pour la traduction des textes de la page (actuellement, que le fullscreen)
+    function translate_fullscreen(translation)
+    {
+        screen1.translate_fullscreen(translation)
+        screen2.translate_fullscreen(translation)
+        screen3.translate_fullscreen(translation)
+        screen4.translate_fullscreen(translation)
+    }
+
 
     //Flèche de droite pour naviguer à gauche sur les catégories d'écrans
     DMI_button {
