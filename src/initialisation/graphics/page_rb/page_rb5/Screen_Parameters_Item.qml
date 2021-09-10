@@ -6,9 +6,6 @@ import "../../../../DMI_default/ETCS_3.6.0"
 Item {
     id: root
 
-//FIXME : quand full_screen resélectioné, truc non réinitialisés
-//FIXME : quand écran aucun sélectionné, les valeurs par défauts ne changent pas
-//FIXME : valeur non changée quand récupéré
 
     //information sur le positionnement de l'encadré et sur son utilisabilité
     property int index: 0
@@ -18,6 +15,9 @@ Item {
     onScreenNameChanged: clear_screen_settings()
 
     function clear_screen_settings() {     //fonction pour activer ou désactiver l'encadré si demandé
+        //Remet la sélection à Aucun
+        screen_index_combo.change_selection(1)
+
         //S'il est changé comme activable, rend la combobox de choix d'écran activable
         if(root.isActivable){
             screen_name.isDarkGrey = false
@@ -27,7 +27,6 @@ Item {
         else {
             screen_name.isDarkGrey = true
             screen_index_combo.isActivable = false
-            screen_index_combo.change_selection(1)
             root.screenValid = false
         }
     }
@@ -125,6 +124,14 @@ Item {
             if(screen_index_combo.selection === screen_index_combo.elements[0]) {
                 //décoche l'option fullscreen
                 fullscreen_on.isChecked = false
+
+                //Réinitialise toutes les valeurs par défaut
+                x_input.clear()
+                y_input.clear()
+                width_input.clear()
+                height_input.clear()
+                root.minimumWidth = 0
+                root.minimumHeight = 0
             }
             //cas si un écran a été sélectioné
             else {
