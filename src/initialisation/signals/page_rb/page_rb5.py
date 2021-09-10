@@ -15,12 +15,16 @@ class PageRB5:
     screen_count = 0
     screen_index = []
     screen_default = {"Liste 1": {"écran1": [True, 640, 480],
-                                  "écran2": [False, 0, 0]
+                                  "écran2": [True, 0, 0],
+                                  "écran3": [True, 300, 2000],
+                                  "écran4": [True, 0, 0],
+                                  "écran5": [True, 0, 0],
                                   },
-                      "Liste 2": {"écran3": [True, 640, 900]}
+                      "Liste 2": {"écran6": [False, 640, 900]}
                       }
     screen_settings = {}
     category_active = ""
+    screen_list_index_active = 0
     visible_screen_names = []
     visible_screen_activable = []
     visible_screen_minimum_wh = []
@@ -70,19 +74,18 @@ class PageRB5:
             self.change_visible_screens()
             if len(self.screen_default.keys()) > 1:
                 # S'il y a plus d'une catégorie d'écrans, rend les boutons supérieurs de catégories fonctionnels
-                left_button = self.page.findChild(QObject, "left_category_button")
-                left_button.clicked.connect(lambda l=left_button: self.on_left_category_button_clicked(l))
-                right_button = self.page.findChild(QObject, "right_category_button")
-                right_button.setProperty("isActivable", True)
-                right_button.clicked.connect(lambda r=right_button: self.on_right_category_button_clicked(r))
+                left_category_button = self.page.findChild(QObject, "left_category_button")
+                left_category_button.clicked.connect(self.on_left_category_button_clicked)
+                right_category_button = self.page.findChild(QObject, "right_category_button")
+                right_category_button.setProperty("isActivable", True)
+                right_category_button.clicked.connect(self.on_right_category_button_clicked)
 
             # Rend fonctionnel les boutons inférieurs
+                self.page.findChild(QObject, "left_screen_button").clicked.connect()
         else:
             # Dans le cas où la liste des écrans à paramétrer est nulle
             self.page.findChild(QObject, "category_title").setProperty("isDarkGrey", True)
             raise NameError("Aucun écran à paramétrer. Le dictionnaire \"screen_default\" est vide.")
-
-
 
         # Définit la page comme complète
         application.is_completed[4] = True
@@ -97,7 +100,8 @@ class PageRB5:
         for screen_index in self.screen_index:
             screen_index.hide()
 
-    def on_left_category_button_clicked(self, left_category_button):
+    def on_left_category_button_clicked(self):
+        left_category_button = self.page.findChild(QObject, "left_category_button")
         category_title = self.page.findChild(QObject, "category_title")
         try:
             # Récupère l'index et le nom du nouvel élément
@@ -119,7 +123,8 @@ class PageRB5:
             if new_index == 0:
                 left_category_button.setProperty("isActivable", False)
 
-    def on_right_category_button_clicked(self, right_category_button):
+    def on_right_category_button_clicked(self):
+        right_category_button = self.page.findChild(QObject, "right_category_button")
         category_title = self.page.findChild(QObject, "category_title")
         try:
             # Récupère l'index et le nom du nouvel élément
@@ -148,7 +153,7 @@ class PageRB5:
         except KeyError:
             logging.error("Aucune catégorie d'écrans au nom de : " + self.category_active + ".\n")
         else:
-            #Récupère les clés (nom des écrans) du dictionnaire récupéré (pour optimisation)
+            # Récupère les clés (nom des écrans) du dictionnaire récupéré (pour optimisation)
             category_screen_list = list(category_screen_dict.keys())
 
             # Vide les liste qui seront envoyés à la partie graphique
@@ -171,10 +176,31 @@ class PageRB5:
                     self.visible_screen_activable.append(False)
                     self.visible_screen_minimum_wh.append([0, 0])
 
-        # Maintenant que toutes les valeurs ont été récupérés, les ajoutent à la partie graphique
-        self.page.setProperty("screenNames", self.visible_screen_names)
-        self.page.setProperty("screenActivable", self.visible_screen_activable)
-        self.page.setProperty("minimumWH", self.visible_screen_minimum_wh)
+            # Maintenant que toutes les valeurs ont été récupérés, les ajoutent à la partie graphique
+            self.page.setProperty("screenNames", self.visible_screen_names)
+            self.page.setProperty("screenActivable", self.visible_screen_activable)
+            self.page.setProperty("minimumWH", self.visible_screen_minimum_wh)
+
+            # Remet l'index de la page d'écrans actif à 0
+            self.screen_list_index_active = 0
+
+            # Rend visible et fonctionnel les boutons du bas pour changer de page d'écrans dans le cas
+            if len(category_screen_list) > 4:
+                left_button = self.page.findChild(QObject, "left_screen_button")
+                left_button.setProperty("isVisible", True)
+                left_button.setProperty("isActivable", False)
+                right_button = self.page.findChild(QObject, "right_screen_button")
+                right_button.setProperty("isVisible", True)
+                right_button.setProperty("isActivable", True)
+            else:
+                self.page.findChild(QObject, "left_screen_button").setProperty("isVisible", False)
+                self.page.findChild(QObject, "right_screen_button").setProperty("isVisible", False)
+
+    def on_left_screen_button_pressed(self):
+        print("e")
+
+    def on_right_screen_button_pressed(self):
+        print("e")
 
 
 #TODO prendre en considération si plusieurs pages
