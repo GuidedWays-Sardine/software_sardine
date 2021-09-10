@@ -92,7 +92,7 @@ DMI_page{
         minimumWidth: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][0] : 0
         minimumHeight: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][1] : 0
 
-        isActivable: root.screenActivable.length >= index && root.screenName != "" ? root.screenActivable[index - 1] : false
+        isActivable: page_rb5.screenActivable.length >= index && page_rb5.screenName != "" ? page_rb5.screenActivable[index - 1] : false
     }
 
     Screen_Parameters_Item {
@@ -106,7 +106,7 @@ DMI_page{
         minimumWidth: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][0] : 0
         minimumHeight: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][1] : 0
 
-        isActivable: root.screenActivable.length >= index && root.screenName != "" ? root.screenActivable[index - 1] : false
+        isActivable: page_rb5.screenActivable.length >= index ? page_rb5.screenActivable[index - 1] : false
     }
 
     Screen_Parameters_Item {
@@ -120,7 +120,7 @@ DMI_page{
         minimumWidth: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][0] : 0
         minimumHeight: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][1] : 0
 
-        isActivable: root.screenActivable.length >= index && root.screenName != "" ? root.screenActivable[index - 1] : false
+        isActivable: page_rb5.screenActivable.length >= index && page_rb5.screenName != "" ? page_rb5.screenActivable[index - 1] : false
     }
 
     Screen_Parameters_Item {
@@ -134,7 +134,7 @@ DMI_page{
         minimumWidth: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][0] : 0
         minimumHeight: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][1] : 0
 
-        isActivable: root.screenActivable.length >= index && root.screenName != "" ? root.screenActivable[index - 1] : false
+        isActivable: page_rb5.screenActivable.length >= index && page_rb5.screenName != "" ? page_rb5.screenActivable[index - 1] : false
     }
 
     //checkbutton pour savoir si l'application doit éteindre les écrans qui ne sont pas utilisés
