@@ -20,12 +20,10 @@ Item {
 
         //S'il est changé comme activable, rend la combobox de choix d'écran activable
         if(root.isActivable){
-            screen_name.isDarkGrey = false
             screen_index_combo.isActivable = true
         }
         // S'il est changé comme inactivable, rend la combobox de choix d'écran inactivable et redéfinit son choix comme aucun
         else {
-            screen_name.isDarkGrey = true
             screen_index_combo.isActivable = false
             root.screenValid = false
         }
@@ -122,16 +120,8 @@ Item {
 
             //cas si l'écran est passé à aucun
             if(screen_index_combo.selection === screen_index_combo.elements[0]) {
-                //décoche l'option fullscreen
+                //décoche l'option fullscreen et remt à 0 les valeurs minimales
                 fullscreen_on.isChecked = false
-
-                //Réinitialise toutes les valeurs par défaut
-                x_input.clear()
-                y_input.clear()
-                width_input.clear()
-                height_input.clear()
-                root.minimumWidth = 0
-                root.minimumHeight = 0
             }
             //cas si un écran a été sélectioné
             else {
@@ -273,7 +263,7 @@ Item {
         defaultWidth: defaultHeight * 2
         defaultHeight: screen_index_combo.defaultHeight - 1
 
-        minimumValue: root.screenValid ? root.minimumHeight : 0
+        minimumValue: root.screenValid && screen_index_combo.selection !== screen_index_combo.elements[0] ? root.minimumHeight : 0
         fontSize: root.fontSize
 
         isMaxDefault: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0]
@@ -307,7 +297,7 @@ Item {
         defaultWidth: defaultHeight * 2
         defaultHeight: screen_index_combo.defaultHeight - 1
 
-        minimumValue: root.screenValid ? root.minimumWidth : 0
+        minimumValue: root.screenValid && screen_index_combo.selection !== screen_index_combo.elements[0] ? root.minimumWidth : 0
         fontSize: root.fontSize
 
         isMaxDefault: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0]
