@@ -40,7 +40,25 @@ Item{
 
     //Fonction pour remettre la valeur par défaut dans le valueinput
     function clear(){
+        // Vérifie si la valeur actuellement visible est différente que la valeur quand vidé, change la valeur et appelle le signal value_changed si c'est le cas
+        var changed = root.isMaxDefault ? root.value !== root.maximumValue : root.value !== root.minimumValue
         body.text = ""
+        if(changed){
+            value_changed()
+        }
+    }
+
+    function change_value(new_value){
+        //vérifie en premier lieu si la valeur est valide
+        if( new_value >= root.minimumValue && new_value <= root.maximumValue){
+            // Vérifie si la nouvelle valeur est différente de l'ancienne, la change et appelle le signal value_changed()
+            var changed = (root.value !== new_value)
+            body.text = new_value.toString()
+            //body.displayText = new_value.toString()
+            if(changed){
+                value_changed()
+            }
+        }
     }
 
     //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
@@ -62,6 +80,8 @@ Item{
 
     TextField {
         id: body
+
+        echoMode: TextInput.Normal
 
         // Propriété gardant le précédent nombre rentré afin de savoir s'il est nécessaire d'appeler le signal value_changed()
         property int old_value: root.isMaxDefault ? root.maximumValue : root.minimumValue
