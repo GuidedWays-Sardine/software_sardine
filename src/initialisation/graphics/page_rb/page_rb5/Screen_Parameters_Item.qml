@@ -29,6 +29,37 @@ Item {
         }
     }
 
+    //Informations et fonctions sur l'écran affiché et fonction pour mettre à jour l'encadré de paramètres
+    property var currentSettings: [] //Format [screen_index, fullcreen_on, [x, y], [width, height]]
+    onCurrentSettingsChanged: {
+        var settings_length = currentSettings.length
+        // Récupère l'index de l'écran s'il est indiqué
+        if(settings_length >= 1){
+            fullscreen_on.text = "e"
+            screen_index_combo.change_selection(currentSettings[0] + 1)
+
+            if(settings_length >= 2 && currentSettings[1] != 0) {
+                fullscreen_on.isChecked = currentSettings[1]
+
+                if(settings_length >= 4 && currentSettings[2].length >= 2 && currentSettings[3].length >= 2){
+                    x_input.change_value(currentSettings[2][0])
+                    y_input.change_value(currentSettings[2][1])
+                    width_input.change_value(currentSettings[3][0])
+                    height_input.change_value(currentSettings[3][1])
+                }
+                else {
+                    x_input.clear()
+                    y_input.clear()
+                    height_input.clear()
+                    width_input.clear()
+                }
+            }
+        }
+        else {
+            screen_index_combo.change_selection(1)
+        }
+    }
+
     //Indication sur l'utilisation de l'écran paramétré
     property string screenName: ""
     property int fontSize: 12
