@@ -91,6 +91,7 @@ DMI_page{
         screenSize: page_rb5.screenSize
 
         screenName: screenNames.length >= index ? screenNames[index - 1].toString() : ""
+        initialSettings: page_rb5.initialSettings.length >= index ? page_rb5.initialSettings[index - 1] : []
         minimumWidth: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][0] : 0
         minimumHeight: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][1] : 0
 
@@ -105,6 +106,7 @@ DMI_page{
         screenSize: page_rb5.screenSize
 
         screenName: screenNames.length >= index ? screenNames[index - 1].toString() : ""
+        initialSettings: page_rb5.initialSettings.length >= index ? page_rb5.initialSettings[index - 1] : []
         minimumWidth: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][0] : 0
         minimumHeight: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][1] : 0
 
@@ -119,6 +121,7 @@ DMI_page{
         screenSize: page_rb5.screenSize
 
         screenName: screenNames.length >= index ? screenNames[index - 1].toString() : ""
+        initialSettings: page_rb5.initialSettings.length >= index ? page_rb5.initialSettings[index - 1] : []
         minimumWidth: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][0] : 0
         minimumHeight: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][1] : 0
 
@@ -133,6 +136,7 @@ DMI_page{
         screenSize: page_rb5.screenSize
 
         screenName: page_rb5.screenNames.length >= index ? page_rb5.screenNames[index - 1].toString() : ""
+        initialSettings: page_rb5.initialSettings.length >= index ? page_rb5.initialSettings[index - 1] : []
         minimumWidth: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][0] : 0
         minimumHeight: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][1] : 0
 
