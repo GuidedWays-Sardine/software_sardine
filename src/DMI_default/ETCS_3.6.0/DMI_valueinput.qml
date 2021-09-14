@@ -49,15 +49,20 @@ Item{
     }
 
     function change_value(new_value){
-        //vérifie en premier lieu si la valeur est valide
-        if( new_value >= root.minimumValue && new_value <= root.maximumValue){
-            // Vérifie si la nouvelle valeur est différente de l'ancienne, la change et appelle le signal value_changed()
-            var changed = (root.value !== new_value)
-            body.text = new_value.toString()
-            //body.displayText = new_value.toString()
-            if(changed){
-                value_changed()
-            }
+        //Si la valeur n'est pas valide (trop grand ou trop petite) la change
+        if(new_value < root.minimumValue){
+            new_value = root.minimumValue
+        }
+        else if(new_value > root.maximumValue){
+            new_value = root.maximumValue
+        }
+
+        // Vérifie si la nouvelle valeur change de l'ancienne
+        var changed = (root.value !== new_value)
+        body.text = new_value.toString()
+        if(changed){
+            value_changed()
+            root.old_value = new_value
         }
     }
 
