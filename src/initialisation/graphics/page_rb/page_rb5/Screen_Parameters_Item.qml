@@ -11,47 +11,31 @@ Item {
     property int index: 0
     property bool screenValid: false
     property bool isActivable: true
-    onIsActivableChanged: clear_screen_settings()
-    onScreenNameChanged: clear_screen_settings()
-
-    function clear_screen_settings() {     //fonction pour activer ou désactiver l'encadré si demandé
-        //Remet la sélection à Aucun
-        screen_index_combo.change_selection(1)
-
-        //S'il est changé comme activable, rend la combobox de choix d'écran activable
-        if(root.isActivable){
-            screen_index_combo.isActivable = true
-        }
-        // S'il est changé comme inactivable, rend la combobox de choix d'écran inactivable et redéfinit son choix comme aucun
-        else {
-            screen_index_combo.isActivable = false
+    onIsActivableChanged: { //fonction permettant de changer l'activabilité de l'écran si demandé
+        //Cas où l'écran a été mis comme activable : change la sélection de l'écran à aucun et rend le screen non valide (tous lew widgets sont grisés et désactivés automatiquement)
+        if(!root.isActivable){
+            screen_index_combo.change_selection(1)
             root.screenValid = false
         }
     }
 
     //Informations et fonctions sur l'écran affiché et fonction pour mettre à jour l'encadré de paramètres
-    property var currentSettings: [] //Format [screen_index, fullcreen_on, [x, y], [width, height]]
-    onCurrentSettingsChanged: {
-        var settings_length = currentSettings.length
-        // Récupère l'index de l'écran s'il est indiqué
-        if(settings_length >= 1){
-            fullscreen_on.text = "e"
-            screen_index_combo.change_selection(currentSettings[0] + 1)
+    property var initialSettings: [] //Format [screen_index, fullcreen_on, [x, y], [width, height]]
+    onInitialSettingsChanged: {
+        //Si une sélection d'un écran spécifique a été donnée
+        if(initialSettings.length >= 1) {
+            screen_index_combo.change_selection(initialSettings[0] + 1)
 
-            if(settings_length >= 2 && currentSettings[1] != 0) {
-                fullscreen_on.isChecked = currentSettings[1]
+            //Si un écran particulier a été sélectionné et que plus d'informations ont été données
+            if(screen_index_combo.selectionIndex > 1 && initialSettings.length >= 2) {
+                fullscreen_on.isChecked = initialSettings[1]
 
-                if(settings_length >= 4 && currentSettings[2].length >= 2 && currentSettings[3].length >= 2){
-                    x_input.change_value(currentSettings[2][0])
-                    y_input.change_value(currentSettings[2][1])
-                    width_input.change_value(currentSettings[3][0])
-                    height_input.change_value(currentSettings[3][1])
-                }
-                else {
-                    x_input.clear()
-                    y_input.clear()
-                    height_input.clear()
-                    width_input.clear()
+                //Si l'écran n'est pas en fullscreen et que des données ont été fournis pour la position et la taille de l'écran
+                if(!initialSettings[1] && initialSettings.length >= 4 && initialSettings[2].length >= 2 && initialSettings[3].length >= 2){
+                    x_input.change_value(initialSettings[2][0])
+                    y_input.change_value(initialSettings[2][1])
+                    width_input.change_value(initialSettings[3][0])
+                    height_input.change_value(initialSettings[3][1])
                 }
             }
         }
@@ -138,16 +122,11 @@ Item {
         fontSize: root.fontSize
 
         isPositive: false
-        isActivable: true
+        isActivable: root.isActivable
         isVisible: root.screenName != ""
 
         //Signal handler pour griser les textes pour l'emplacement de l'écran et changer les valeurs/valeurs par défaut des DMI_valueinput
         onSelection_changed: {
-            //vide les cases pour les dimensions (car celles-ci changent avec les écrans
-            x_input.clear()
-            y_input.clear()
-            height_input.clear()
-            width_input.clear()
 
             //cas si l'écran est passé à aucun
             if(screen_index_combo.selection === screen_index_combo.elements[0]) {
@@ -187,6 +166,16 @@ Item {
 
         text: "plein écran ?"
         fontSize: root.fontSize
+
+        //fonction permettant de vider les DMI_valueinput quand le mode fullscreen est activé
+        onClicked: {
+        if(fullscreen_on.isChecked){
+                x_input.clear()
+                y_input.clear()
+                width_input.clear()
+                height_input.clear()
+            }
+        }
 
         isChecked: false
         isActivable: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0]
@@ -336,6 +325,4 @@ Item {
         isPositive: false
         isVisible: root.screenName != ""
     }
-
-
 }
