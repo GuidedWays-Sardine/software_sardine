@@ -26,7 +26,10 @@ Item{
     property bool isMaxDefault: false       //définit si la valeur par défaut (dans le placeholder) est la valeur max (ou mini si mis sur false)
     property int fontSize: 12
     property bool isDarkGrey: !isActivable  //est ce que le texte doit-être en gris foncé ?
+
+    // Propriété gardant la valeur actuelle et la précédente
     readonly property int value: body.text != "" ? parseInt(body.text) : (isMaxDefault ? root.maximumValue : root.minimumValue)
+    property int old_value: root.isMaxDefault ? root.maximumValue : root.minimumValue
 
 
     //Propriétés liés à l'état du bouton
@@ -45,6 +48,7 @@ Item{
         body.text = ""
         if(changed){
             value_changed()
+            root.old_value = root.isMaxDefault ? root.maximumValue : root.minimumValue
         }
     }
 
@@ -88,8 +92,6 @@ Item{
 
         echoMode: TextInput.Normal
 
-        // Propriété gardant le précédent nombre rentré afin de savoir s'il est nécessaire d'appeler le signal value_changed()
-        property int old_value: root.isMaxDefault ? root.maximumValue : root.minimumValue
 
         color: root.isDarkGrey ? root.darkGrey : (body.text != "" ? root.grey : root.darkGrey)
         placeholderText: root.isMaxDefault ? root.maximumValue.toString() : root.minimumValue.toString()
@@ -118,13 +120,14 @@ Item{
                     body.text = root.minimumValue.toString()
                 }
 
-                if(parseInt(body.text) != old_value){
+                if(parseInt(body.text) !== root.old_value){
                     value_changed()
+                    root.old_value = parseInt(body.text)
                 }
             }
-            else if(!body.focus && ((root.isMaxDefault && body.old_value != root.maximumValue) || (!root.isMaxDefault && body.old_value != root.minimumValue))) {
-                body.old_value = root.isMaxDefault ? root.maximumValue : root.minimumValue
+            else if(!body.focus && ((root.isMaxDefault && root.old_value != root.maximumValue) || (!root.isMaxDefault && root.old_value != root.minimumValue))) {
                 value_changed()
+                root.old_value = root.isMaxDefault ? root.maximumValue : root.minimumValue
             }
         }
     }
@@ -133,7 +136,7 @@ Item{
         if(body.text != "" && parseInt(body.text) < root.minimumValue){
             body.text = root.minimumValue.toString()
             value_changed()
-            body.old_value = root.minimumValue
+            root.old_value = root.minimumValue
         }
     }
 
@@ -141,7 +144,7 @@ Item{
         if(body.text != "" && parseInt(body.text) > root.maximumValue){
             body.text = root.maximumValue.toString()
             value_changed()
-            body.old_value = root.maximumValue
+            root.old_value = root.maximumValue
         }
     }
 
