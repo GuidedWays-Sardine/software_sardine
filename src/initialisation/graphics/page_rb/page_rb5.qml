@@ -31,6 +31,39 @@ DMI_page{
         screen4.translate_fullscreen(translation)
     }
 
+    function get_values() {
+        var values = []
+        if(screen1.screenName != "") {
+             values.push([screen1.screenName,
+                          [screen1.selectedScreen,
+                           screen1.isFullScreen,
+                           [screen1.inputX, screen1.inputY],
+                           [screen1.inputWidth, screen1.inputHeight]]])
+        }
+        if(screen2.screenName != "") {
+             values.push([screen2.screenName,
+                          [screen2.selectedScreen,
+                           screen2.isFullScreen,
+                           [screen2.inputX, screen1.inputY],
+                           [screen2.inputWidth, screen1.inputHeight]]])
+        }
+        if(screen3.screenName != "") {
+             values.push([screen3.screenName,
+                          [screen3.selectedScreen,
+                           screen3.isFullScreen,
+                           [screen3.inputX, screen1.inputY],
+                           [screen3.inputWidth, screen1.inputHeight]]])
+        }
+        if(screen4.screenName != "") {
+             values.push([screen4.screenName,
+                          [screen4.selectedScreen,
+                           screen4.isFullScreen,
+                           [screen4.inputX, screen1.inputY],
+                           [screen4.inputWidth, screen1.inputHeight]]])
+        }
+        return values
+    }
+
 
     //Flèche de droite pour naviguer à gauche sur les catégories d'écrans
     DMI_button {
