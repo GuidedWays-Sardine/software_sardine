@@ -19,6 +19,8 @@ DMI_page{
     property var screenActivable: []
     property var minimumWH: []
 
+    //propriété pour les informations lors de l'initialisation d'une nouvelle série de paramètres écrans
+    property var initialSettings: []
 
     //fonctions utiles pour la traduction des textes de la page (actuellement, que le fullscreen)
     function translate_fullscreen(translation)
