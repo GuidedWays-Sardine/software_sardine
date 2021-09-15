@@ -173,13 +173,11 @@ Item {
         fontSize: root.fontSize
 
         //fonction permettant de vider les DMI_valueinput quand le mode fullscreen est activé
-        onClicked: {
-        if(fullscreen_on.isChecked){
-                x_input.clear()
-                y_input.clear()
-                width_input.clear()
-                height_input.clear()
-            }
+        onIsCheckedChanged: {
+            x_input.clear()
+            y_input.clear()
+            width_input.clear()
+            height_input.clear()
         }
 
         isChecked: false
