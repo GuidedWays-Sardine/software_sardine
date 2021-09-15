@@ -131,8 +131,12 @@ Item {
 
             //cas si l'écran est passé à aucun
             if(screen_index_combo.selection === screen_index_combo.elements[0]) {
-                //décoche l'option fullscreen et remt à 0 les valeurs minimales
+                //décoche l'option fullscreen et remet à 0 les valeurs des input pour les dimensions de la fenêtre
                 fullscreen_on.isChecked = false
+                x_input.clear()
+                y_input.clear()
+                width_input.clear()
+                height_input.clear()
             }
             //cas si un écran a été sélectioné
             else {
