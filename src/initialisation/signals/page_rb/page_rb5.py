@@ -14,13 +14,16 @@ class PageRB5:
     current_button = None
     screen_count = 0
     screen_index = []
-    screen_default = {"Liste 1": {"écran1": [True, 640, 480],
-                                  "écran2": [True, 0, 0],
-                                  "écran3": [True, 300, 2000],
-                                  "écran4": [True, 0, 0],
-                                  "écran5": [True, 0, 0],
-                                  },
-                      "Liste 2": {"écran6": [False, 640, 900]}
+    # Informations par défauts des écrans {"nom écran": [sera utilisé ?, longuer minimum, hauteur minimum]}
+    screen_default = {"Simulateur SARDINE": {"DMI central":     [True, 640, 480],
+                                             "DMI gauche":      [True, 640, 480],
+                                             "Ligne virtuelle": [True, 1080, 720],
+                                             "Train caméra":    [False, 640, 480]
+                                             },
+                      "Poste de Commande Centralisé (PCC)": {"TCO": [True, 640, 480]
+                                                             },
+                      "Visualisation des données": {"Courbes": [True, 0, 0]
+                                                    }
                       }
     screen_settings = {}
     category_active = ""
@@ -28,6 +31,7 @@ class PageRB5:
     visible_screen_names = []
     visible_screen_activable = []
     visible_screen_minimum_wh = []
+    visible_screen_default_settings = []
 
     def __init__(self, application, page, index, current_button):
         # Stocke les informations nécessaires au fonctionnement de la page
