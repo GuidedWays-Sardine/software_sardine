@@ -121,13 +121,19 @@ class PageRB5:
         for screen_index in self.screen_index:
             screen_index.show()
 
-        #TODO : fonction pour mettre à jour les écrans visibles
+
+        #TODO changer les différents écrans activables ou non
 
     def on_page_closed(self, application):
         for screen_index in self.screen_index:
             screen_index.hide()
 
     def on_left_category_button_clicked(self):
+        # Récupère les valeurs actuellement sur l'écran
+        old_screens_values = self.page.get_values().toVariant()
+        for index in range(0, len(old_screens_values)):
+            self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
+
         left_category_button = self.page.findChild(QObject, "left_category_button")
         category_title = self.page.findChild(QObject, "category_title")
         try:
@@ -151,6 +157,11 @@ class PageRB5:
                 left_category_button.setProperty("isActivable", False)
 
     def on_right_category_button_clicked(self):
+        # Récupère les valeurs actuellement sur l'écran
+        old_screens_values = self.page.get_values().toVariant()
+        for index in range(0, len(old_screens_values)):
+            self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
+
         right_category_button = self.page.findChild(QObject, "right_category_button")
         category_title = self.page.findChild(QObject, "category_title")
         try:
@@ -177,6 +188,7 @@ class PageRB5:
         # Essaye de récupérer le dictionnaire des écrans de la catégorie sélectionnée
         try:
             category_screen_dict = self.screen_default[self.category_active]
+            default_settings_dict = self.screen_settings[self.category_active]
         except KeyError:
             logging.error("Aucune catégorie d'écrans au nom de : " + self.category_active + ".\n")
         else:
@@ -185,12 +197,14 @@ class PageRB5:
 
             # Vide les liste qui seront envoyés à la partie graphique
             self.visible_screen_names = []
-            self.visible_screen_activable = []
+            self.visible_screen_activable = []          # OPTIMIZE : pas nécessaire de les stocker comme objets de la classe
             self.visible_screen_minimum_wh = []
+            self.visible_screen_default_settings = []
 
             # S'il y a plus de 4 écrans dans la catégorie, montre les 4 premiers sinon les montre tous
             for index in range(0, len(category_screen_list) if len(category_screen_list) <= 4 else 4):
                 screen_data = category_screen_dict[category_screen_list[index]]
+                self.visible_screen_default_settings.append(default_settings_dict[category_screen_list[index]])
                 self.visible_screen_names.append(category_screen_list[index])
                 # Vérifie si l'écran a bien les 3 éléments nécessaires
                 if(len(screen_data)) >= 3:
@@ -207,6 +221,7 @@ class PageRB5:
             self.page.setProperty("screenNames", self.visible_screen_names)
             self.page.setProperty("screenActivable", self.visible_screen_activable)
             self.page.setProperty("minimumWH", self.visible_screen_minimum_wh)
+            self.page.setProperty("initialSettings", self.visible_screen_default_settings)
 
             # Remet l'index de la page d'écrans actif à 0
             self.screen_list_index_active = 0
@@ -224,14 +239,101 @@ class PageRB5:
                 self.page.findChild(QObject, "right_screen_button").setProperty("isVisible", False)
 
     def on_left_screen_button_pressed(self):
-        print("e")
+        # Récupère les valeurs actuellement sur l'écran
+        old_screens_values = self.page.get_values().toVariant()
+        for index in range(0, len(old_screens_values)):
+            self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
+
+        # Diminue l'index et rend le bouton de droite actif
+        self.screen_list_index_active -= 1
+        self.page.findChild(QObject, "right_screen_button").setProperty("isActivable", True)
+
+        # Vide les liste qui seront envoyés à la partie graphique
+        self.visible_screen_names = []
+        self.visible_screen_activable = []
+        self.visible_screen_minimum_wh = []
+        self.visible_screen_default_settings = []
+
+        # Récupère le dictionaire relié à la catégorie visible et récupère les écrans (clés) de cette catégorie
+        category_screen_dict = self.screen_default[self.category_active]
+        default_settings_dict = self.screen_settings[self.category_active]
+        category_screen_list = list(category_screen_dict.keys())
+        for index in range(self.screen_list_index_active * 4,
+                           len(category_screen_list) if len(category_screen_list) <= (self.screen_list_index_active + 1) * 4
+                           else 4 * (self.screen_list_index_active + 1)):
+            screen_data = category_screen_dict[category_screen_list[index]]
+            self.visible_screen_default_settings.append(default_settings_dict[category_screen_list[index]])
+            self.visible_screen_names.append(category_screen_list[index])
+            # Vérifie si l'écran a bien les 3 éléments nécessaires
+            if (len(screen_data)) >= 3:
+                # Si les 3 éléments sont présents, récupère leurs valeurs et les rajoutes
+                self.visible_screen_activable.append(not not screen_data[0])
+                self.visible_screen_minimum_wh.append([int(screen_data[1]), int(screen_data[2])])
+            else:
+                # Si les valeurs ne sont pas présentes, laisse un message d'erreur et rajoute des valeurs par défaut
+                logging.warning("Les caractéristiques de " + category_screen_list[index] + " ne sont pas bonnes.\n")
+                self.visible_screen_activable.append(False)
+                self.visible_screen_minimum_wh.append([0, 0])
+
+        # Maintenant que toutes les valeurs ont été récupérés, les ajoutent à la partie graphique
+        self.page.setProperty("screenNames", self.visible_screen_names)
+        self.page.setProperty("screenActivable", self.visible_screen_activable)
+        self.page.setProperty("minimumWH", self.visible_screen_minimum_wh)
+        self.page.setProperty("initialSettings", self.visible_screen_default_settings)
+
+        # Vérifie maintenant s'il y a encore des écrans sur la page d'après, sinon désactive le bouton
+        if self.screen_list_index_active == 0:
+            self.page.findChild(QObject, "left_screen_button").setProperty("isActivable", False)
 
     def on_right_screen_button_pressed(self):
-        print("e")
+        # Récupère les valeurs actuellement sur l'écran
+        old_screens_values = self.page.get_values().toVariant()
+        for index in range(0, len(old_screens_values)):
+            self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
+
+        # Augmente l'index de la page de 1 (pour suivre les écrans à montrer), et active le bouton de gauche
+        self.screen_list_index_active += 1
+        self.page.findChild(QObject, "left_screen_button").setProperty("isActivable", True)
+
+        # Vide les liste qui seront envoyés à la partie graphique
+        self.visible_screen_names = []
+        self.visible_screen_activable = []
+        self.visible_screen_minimum_wh = []
+        self.visible_screen_default_settings = []
+
+        # Récupère le dictionaire relié à la catégorie visible et récupère les écrans (clés) de cette catégorie
+        category_screen_dict = self.screen_default[self.category_active]
+        default_settings_dict = self.screen_settings[self.category_active]
+        category_screen_list = list(category_screen_dict.keys())
+        for index in range(self.screen_list_index_active * 4,
+                           len(category_screen_list) if len(category_screen_list) <= (self.screen_list_index_active + 1) * 4
+                           else 4 * (self.screen_list_index_active + 1)):
+            screen_data = category_screen_dict[category_screen_list[index]]
+            self.visible_screen_default_settings.append(default_settings_dict[category_screen_list[index]])
+            self.visible_screen_names.append(category_screen_list[index])
+            # Vérifie si l'écran a bien les 3 éléments nécessaires
+            if (len(screen_data)) >= 3:
+                # Si les 3 éléments sont présents, récupère leurs valeurs et les rajoutes
+                self.visible_screen_activable.append(not not screen_data[0])
+                self.visible_screen_minimum_wh.append([int(screen_data[1]), int(screen_data[2])])
+            else:
+                # Si les valeurs ne sont pas présentes, laisse un message d'erreur et rajoute des valeurs par défaut
+                logging.warning("Les caractéristiques de " + category_screen_list[index] + " ne sont pas bonnes.\n")
+                self.visible_screen_activable.append(False)
+                self.visible_screen_minimum_wh.append([0, 0])
+
+        # Maintenant que toutes les valeurs ont été récupérés, les ajoutent à la partie graphique
+        self.page.setProperty("screenNames", self.visible_screen_names)
+        self.page.setProperty("screenActivable", self.visible_screen_activable)
+        self.page.setProperty("minimumWH", self.visible_screen_minimum_wh)
+        self.page.setProperty("initialSettings", self.visible_screen_default_settings)
+
+        # Vérifie maintenant s'il y a encore des écrans sur la page d'après, sinon désactive le bouton
+        if len(category_screen_list) <= (self.screen_list_index_active + 1) * 4:
+            self.page.findChild(QObject, "right_screen_button").setProperty("isActivable", False)
 
 
-#TODO prendre en considération si plusieurs pages
-# TODO faire les fonctions pour récupérer les valeurs de la partie graphique
+#TODO faire les fonctions pour récupérer les valeurs de la partie graphique
 #TODO faire le get_values
-#TODO faire le système de traduction
+#TODO faire le set_values
 #TODO faire le change_language
