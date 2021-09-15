@@ -35,31 +35,31 @@ DMI_page{
         var values = []
         if(screen1.screenName != "") {
              values.push([screen1.screenName,
-                          [screen1.selectedScreen,
+                          [screen1.selectedScreen - 1,
                            screen1.isFullScreen,
                            [screen1.inputX, screen1.inputY],
                            [screen1.inputWidth, screen1.inputHeight]]])
         }
         if(screen2.screenName != "") {
              values.push([screen2.screenName,
-                          [screen2.selectedScreen,
+                          [screen2.selectedScreen - 1,
                            screen2.isFullScreen,
-                           [screen2.inputX, screen1.inputY],
-                           [screen2.inputWidth, screen1.inputHeight]]])
+                           [screen2.inputX, screen2.inputY],
+                           [screen2.inputWidth, screen2.inputHeight]]])
         }
         if(screen3.screenName != "") {
              values.push([screen3.screenName,
-                          [screen3.selectedScreen,
+                          [screen3.selectedScreen - 1,
                            screen3.isFullScreen,
-                           [screen3.inputX, screen1.inputY],
-                           [screen3.inputWidth, screen1.inputHeight]]])
+                           [screen3.inputX, screen3.inputY],
+                           [screen3.inputWidth, screen3.inputHeight]]])
         }
         if(screen4.screenName != "") {
              values.push([screen4.screenName,
-                          [screen4.selectedScreen,
+                          [screen4.selectedScreen - 1,
                            screen4.isFullScreen,
-                           [screen4.inputX, screen1.inputY],
-                           [screen4.inputWidth, screen1.inputHeight]]])
+                           [screen4.inputX, screen4.inputY],
+                           [screen4.inputWidth, screen4.inputHeight]]])
         }
         return values
     }
