@@ -104,6 +104,7 @@ Item {
         text: root.screenName
         fontSize: root.fontSize
 
+        isDarkGrey: !root.isActivable
         isVisible: root.screenName != ""
     }
 
