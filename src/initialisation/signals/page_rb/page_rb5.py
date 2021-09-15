@@ -1,6 +1,6 @@
 import logging
-import os
-import sys
+import traceback
+
 from PyQt5.QtWidgets import QWidget, QDesktopWidget, QApplication
 from PyQt5.QtQml import QQmlApplicationEngine
 from PyQt5.QtCore import QObject
@@ -118,8 +118,38 @@ class PageRB5:
         application.is_completed[4] = True
 
     def on_page_opened(self, application):
+        """Fonction appelée lorsque la page est chargée. Permet d'afficher les fenêtre d'index
+        et actualise les paramètres des écrans"""
+        # Rend visible tous les écrans d'index
         for screen_index in self.screen_index:
             screen_index.show()
+
+        # Vérifie que tous les écrans peuvent être sélectionnés
+        if application.visible_pages[0] is not None \
+            and not isinstance(application.visible_pages[0], type(application.engine)) \
+            and "get_values" in dir(application.visible_pages[0]):
+            # Récupère les données actuelles de la page de paramètres page_rb1
+            page_rb1_data = application.visible_pages[0].get_values(application.read_language_file(application.language,
+                                                                                                   "English"))
+            try:
+                # Met à jours les valeurs nécessaires
+                self.screen_default["Simulateur SARDINE"]["Ligne virtuelle"][0] = page_rb1_data["Caméra"] == "False"
+                self.screen_default["Simulateur SARDINE"]["Train caméra"][0] = page_rb1_data["Caméra"] == "True"
+                self.screen_default["Poste de Commande Centralisé (PCC)"]["TCO"][0] = page_rb1_data["PCC"] == "True"
+            except Exception as error:
+                logging.warning("Erreur lors de la mise à jour des paramètres par défaut des écrans.\n\t\t" +
+                                "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                                "Avec comme message d\'erreur : " + error.args[0] + "\n\n\t\t" +
+                                "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+            else:
+                # Remets à jour la page actuelle
+                print("e") #TODO : appeller la fonction pour mettre à jour la page
+                # FIXME : vérifier si rendre la apge inactive évite la page d'avoir des coordonnées
+        else:
+            # Si la page_rb1 n'est pas complètement chargée, laisse un message d'erreur
+            logging.warning("La page_rb1 n'a pas été chargée complètement." +
+                            " L'utilisation par défaut du simulateur sera prise en compte.\n")
+
 
 
         #TODO changer les différents écrans activables ou non
