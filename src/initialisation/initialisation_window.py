@@ -102,7 +102,7 @@ class InitialisationWindow:
             if "get_values" in dir(page):
                 try:
                     # Appelle la fonction get_values de la page et si celle-ci fonctionne, récupère ses paramètres
-                    parameters = page.get_values(translation_data)
+                    parameters.update(page.get_values(translation_data))
                 except Exception as error:
                     # Permet de rattraper une potentielle erreur dans la fonction get_values()
                     logging.warning("Erreur lors de la récupération des paramètres pour la page : " + str(page.index) +
