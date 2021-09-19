@@ -156,8 +156,14 @@ class PageRB5:
         #TODO changer les différents écrans activables ou non
 
     def on_page_closed(self, application):
+        # Cache toutes les fenêtres d'index
         for screen_index in self.screen_index:
             screen_index.hide()
+
+        # récupère les valeurs des écrans actuels et les sauvegarde
+        old_screens_values = self.page.get_values().toVariant()
+        for index in range(0, len(old_screens_values)):
+            self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
 
     def on_left_category_button_clicked(self):
         # Récupère les valeurs actuellement sur l'écran
