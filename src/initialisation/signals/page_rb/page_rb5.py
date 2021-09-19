@@ -274,3 +274,41 @@ class PageRB5:
         self.screen_list_active += 1
         self.change_visible_screen_list()
 
+    def get_values(self, translation_data):
+        # Initialise les paramètres récupérés et récupère le paramètre sur si les écrans sont éteins
+        page_parameters = {"EcransEteints": self.page.findChild(QObject, "black_screens").property("isChecked")}
+
+        # Récupère les valeurs actuellement sur l'écran
+        old_screens_values = self.page.get_values().toVariant()
+        for index in range(0, len(old_screens_values)):
+            self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
+
+        # Pour chaque catégorie d'écrans
+        for category_key in list(self.screen_settings.keys()):
+            # Pour chaque écrans de cette catégorie
+            for screen_key in list(self.screen_settings[category_key].keys()):
+                # Sauvegarde chaque donné au format : category.screen.data = value
+                try:
+                    screen_settings_key = translation_data[category_key] + "."
+                except KeyError:
+                    logging.debug("Traduction de " + category_key + " manquante.\n")
+                    screen_settings_key = category_key + "."
+                try:
+                    screen_settings_key += translation_data[screen_key] + "."
+                except KeyError:
+                    logging.debug("Traduction de " + screen_key + " manquante.\n")
+                    screen_settings_key += screen_key + "."
+
+                # Récupère les paramètres de l'écran et les sauvegardes (dépend de si l'écran est sélectionable ou non
+                is_activable = self.screen_default[category_key][screen_key][0]
+                screen_settings_values = self.screen_settings[category_key][screen_key]
+                page_parameters[screen_settings_key + "IndexEcran"] = screen_settings_values[0] if is_activable else 0
+                page_parameters[screen_settings_key + "PleinEcran"] = screen_settings_values[1] if is_activable else False
+                page_parameters[screen_settings_key + "positionX"] = screen_settings_values[2][0] if is_activable else 0
+                page_parameters[screen_settings_key + "positionY"] = screen_settings_values[2][1] if is_activable else 0
+                page_parameters[screen_settings_key + "tailleX"] = screen_settings_values[3][0] if is_activable else 0
+                page_parameters[screen_settings_key + "tailleY"] = screen_settings_values[3][1] if is_activable else 0
+
+        return page_parameters
+
+
