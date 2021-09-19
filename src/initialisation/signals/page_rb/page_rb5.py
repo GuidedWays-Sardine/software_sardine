@@ -20,7 +20,7 @@ class PageRB5:
                                              "Ligne virtuelle": [True, 1080, 720],
                                              "Train caméra":    [False, 640, 480]
                                              },
-                      "Poste de Commande Centralisé (PCC)": {"TCO": [True, 640, 480]
+                      "Poste de Commande Centralisé (PCC)": {"Tableau de Contrôle Optique (TCO)":   [True, 640, 480]
                                                              },
                       "Visualisation des données": {"Courbes": [True, 0, 0]
                                                     }
