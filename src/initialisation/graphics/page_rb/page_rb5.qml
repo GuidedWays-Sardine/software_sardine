@@ -21,15 +21,9 @@ DMI_page{
 
     //propriété pour les informations lors de l'initialisation d'une nouvelle série de paramètres écrans
     property var initialSettings: []
+    property string fullscreenText: "Plein écran ?"
 
-    //fonctions utiles pour la traduction des textes de la page (actuellement, que le fullscreen)
-    function translate_fullscreen(translation)
-    {
-        screen1.translate_fullscreen(translation)
-        screen2.translate_fullscreen(translation)
-        screen3.translate_fullscreen(translation)
-        screen4.translate_fullscreen(translation)
-    }
+
 
     function get_values() {
         var values = []
@@ -127,6 +121,7 @@ DMI_page{
         initialSettings: page_rb5.initialSettings.length >= index ? page_rb5.initialSettings[index - 1] : []
         minimumWidth: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][0] : 0
         minimumHeight: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][1] : 0
+        fullscreenText: page_rb5.fullscreenText
 
         isActivable: page_rb5.screenActivable.length >= index && page_rb5.screenName != "" ? page_rb5.screenActivable[index - 1] : false
     }
@@ -142,6 +137,7 @@ DMI_page{
         initialSettings: page_rb5.initialSettings.length >= index ? page_rb5.initialSettings[index - 1] : []
         minimumWidth: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][0] : 0
         minimumHeight: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][1] : 0
+        fullscreenText: page_rb5.fullscreenText
 
         isActivable: page_rb5.screenActivable.length >= index ? page_rb5.screenActivable[index - 1] : false
     }
@@ -157,6 +153,7 @@ DMI_page{
         initialSettings: page_rb5.initialSettings.length >= index ? page_rb5.initialSettings[index - 1] : []
         minimumWidth: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][0] : 0
         minimumHeight: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][1] : 0
+        fullscreenText: page_rb5.fullscreenText
 
         isActivable: page_rb5.screenActivable.length >= index && page_rb5.screenName != "" ? page_rb5.screenActivable[index - 1] : false
     }
@@ -172,6 +169,7 @@ DMI_page{
         initialSettings: page_rb5.initialSettings.length >= index ? page_rb5.initialSettings[index - 1] : []
         minimumWidth: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][0] : 0
         minimumHeight: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][1] : 0
+        fullscreenText: page_rb5.fullscreenText
 
         isActivable: page_rb5.screenActivable.length >= index && page_rb5.screenName != "" ? page_rb5.screenActivable[index - 1] : false
     }

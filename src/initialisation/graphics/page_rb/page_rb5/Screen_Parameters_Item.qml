@@ -23,7 +23,7 @@ Item {
     property var initialSettings: [] //Format [screen_index, fullcreen_on, [x, y], [width, height]]
     onInitialSettingsChanged: {
         //Si une sélection d'un écran spécifique a été donnée
-        if(initialSettings.length >= 1) {
+        if(root.isActivable && initialSettings.length >= 1) {
             screen_index_combo.change_selection(initialSettings[0] + 1)
 
             //Si un écran particulier a été sélectionné et que plus d'informations ont été données
@@ -67,11 +67,8 @@ Item {
     property int inputHeight: height_input.value
 
 
-    //fonctions utiles pour la traduction des textes de la page (actuellement, que le fullscreen)
-    function translate_fullscreen(translation)
-    {
-        fullscreen_on.text = translation.toString()
-    }
+    // propriétés permettant de mettre à jour les différents texts communs de la page (ici que le texte du fullscreen_on)
+    property string fullscreenText: ""
 
 
     //propriété pour le ratio de l'écran par rapport à sa taille originale(640*380)
@@ -169,7 +166,7 @@ Item {
         defaultX: 400
         defaultY: screen_name.defaultY - (boxLenght - root.fontSize) * 0.5
 
-        text: "plein écran ?"
+        text: root.fullscreenText
         fontSize: root.fontSize
 
         //fonction permettant de vider les DMI_valueinput quand le mode fullscreen est activé
