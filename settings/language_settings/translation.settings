@@ -35,3 +35,20 @@ Langue;Language
 Activation du PCC (Poste de Commande Centralisé) ?;Activation of CCS (Centralised Control Station) ?
 Affichage en direct des données du train ?;Live display of train's data ?
 
+#page_rb5
+Écrans;Screens
+
+Plein écran ?;Fullscreen ?
+
+Simulateur SARDINE;SARDINE simulator
+DMI central;central DMI
+DMI gauche;left DMI
+Ligne Virtuelle;Virtual line
+Train caméra;Camera train
+
+Poste de Commande Centralisé (PCC);Centralised Control Station (CCS)
+Tableau de Contrôle Optique (TCO);Optical Control Panel (OCP)
+
+Visualisation des données;Data visualisation
+Courbes;Graphs
+
