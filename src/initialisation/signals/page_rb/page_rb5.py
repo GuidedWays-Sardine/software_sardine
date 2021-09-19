@@ -353,4 +353,59 @@ class PageRB5:
         # Met à jour la page visible de settings
         self.change_visible_screen_list()
 
+    def change_language(self, translation_data):
+        # Traduit le nom de la catégorie
+        try:
+            self.current_button.setProperty("text", translation_data[self.current_button.property("text").upper()])
+        except KeyError:
+            logging.debug("Impossible de traduire le nom de la catégorie de la page_rb5.\n")
 
+        # Change la traduction pour le texte Plein écran ? du DMI_checkbutton
+        try:
+            self.page.setProperty("fullscreenText", translation_data[self.page.property("fullscreenText").upper()])
+        except KeyError:
+            logging.debug("Traduction manquante pour : " + self.page.property("fullscreenText") + ".\n")
+
+        # Pour chaque catégories
+        for category_index in list(self.screen_default.keys()):
+            # Pour chaque écrans de chaques catégories
+            for screen_index in list(self.screen_default[category_index].keys()):
+                try:
+                    # Essaye de rajouter la version avec la clé traduite de l'écran
+                    self.screen_default[category_index][translation_data[screen_index.upper()]] = self.screen_default[category_index][screen_index]
+                    self.screen_settings[category_index][translation_data[screen_index.upper()]] = self.screen_settings[category_index][screen_index]
+                except KeyError:
+                    # Récupère dans l'éventualité d'une traduction manquante
+                    logging.debug("Traduction manquante pour l'écran : " + screen_index +
+                                  " de la catégorie : " + category_index + ", traduction sautée.\n")
+                else:
+                    # Si les écrans traduites ont été rajoutés avec succès enlève les versions non traduites
+                    self.screen_default[category_index].pop(screen_index)
+                    self.screen_settings[category_index].pop(screen_index)
+
+            try:
+                # Essaye de traduire le nom de la catégorie
+                self.screen_default[translation_data[category_index.upper()]] = self.screen_default[category_index]
+                self.screen_settings[translation_data[category_index.upper()]] = self.screen_settings[category_index]
+            except KeyError:
+                # Récupère dans l'éventualité d'une traduction manquante
+                logging.debug("Traduction manquante pour la catégorie : " + category_index + ", traduction sautée.\n")
+            else:
+                # Si les catégories traduites ont été rajoutés avec succès enlève les versions non traduites
+                self.screen_default.pop(category_index)
+                self.screen_settings.pop(category_index)
+
+                # Si la catégorie est la catégorie active, traduit la catégorie active
+                if self.category_active == category_index:
+                    self.category_active = translation_data[self.category_active.upper()]
+
+        # Traduit le texte devant le DMI_checkbutton pour savoir
+        try:
+            black_screens = self.page.findChild(QObject, "black_screens")
+            black_screens.setProperty("text", translation_data[black_screens.property("text").upper()])
+        except KeyError:
+            logging.debug("Traduction manquante pour : " + black_screens.property("text") + ", traduction sautée.\n")
+
+        # Remets à jour la page actuelle et le titre de la catégorie
+        self.page.findChild(QObject, "category_title").setProperty("text", self.category_active)
+        self.change_visible_screen_list()
