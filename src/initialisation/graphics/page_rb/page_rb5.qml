@@ -64,16 +64,16 @@ DMI_page{
         id: left_category_button
         objectName: "left_category_button"
 
-        defaultX: 54
-        defaultY: 15
-        defaultWidth: 46
-        defaultHeight: 40
+        default_x: 54
+        default_y: 15
+        default_width: 46
+        default_height: 40
 
-        imageActivable: "Navigation/NA_18.bmp"
-        imageNotActivable: "Navigation/NA_19.bmp"
+        image_activable: "Navigation/NA_18.bmp"
+        image_not_activable: "Navigation/NA_19.bmp"
 
-        isActivable: false
-        isPositive: true
+        is_activable: false
+        is_positive: true
     }
 
     //Encadré permettant d'afficher le nom de la catégorie d'écrans
@@ -81,16 +81,16 @@ DMI_page{
         id: category_title
         objectName: "category_title"
 
-        defaultX: 54 + 46
-        defaultY: 15
-        defaultWidth: 380
-        defaultHeight: 40
+        default_x: 54 + 46
+        default_y: 15
+        default_width: 380
+        default_height: 40
 
         text: "NaN"
 
-        isActivable: false
-        isPositive: true
-        isDarkGrey: true
+        is_activable: false
+        is_positive: true
+        is_dark_grey: true
     }
 
     //Flèche de droite pour naviguer à droite sur les catégories d'écran
@@ -98,16 +98,16 @@ DMI_page{
         id: right_category_button
         objectName: "right_category_button"
 
-        defaultX: 380 + 54 + 46
-        defaultY: 15
-        defaultWidth: 46
-        defaultHeight: 40
+        default_x: 380 + 54 + 46
+        default_y: 15
+        default_width: 46
+        default_height: 40
 
-        imageActivable: "Navigation/NA_17.bmp"
-        imageNotActivable: "Navigation/NA_18.2.bmp"
+        image_activable: "Navigation/NA_17.bmp"
+        image_not_activable: "Navigation/NA_18.2.bmp"
 
-        isActivable: false
-        isPositive: true
+        is_activable: false
+        is_positive: true
     }
 
     Screen_Parameters_Item {
@@ -123,7 +123,7 @@ DMI_page{
         minimumHeight: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][1] : 0
         fullscreenText: page_rb5.fullscreenText
 
-        isActivable: page_rb5.screenActivable.length >= index && page_rb5.screenName != "" ? page_rb5.screenActivable[index - 1] : false
+        is_activable: page_rb5.screenActivable.length >= index && page_rb5.screenName != "" ? page_rb5.screenActivable[index - 1] : false
     }
 
     Screen_Parameters_Item {
@@ -139,7 +139,7 @@ DMI_page{
         minimumHeight: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][1] : 0
         fullscreenText: page_rb5.fullscreenText
 
-        isActivable: page_rb5.screenActivable.length >= index ? page_rb5.screenActivable[index - 1] : false
+        is_activable: page_rb5.screenActivable.length >= index ? page_rb5.screenActivable[index - 1] : false
     }
 
     Screen_Parameters_Item {
@@ -155,7 +155,7 @@ DMI_page{
         minimumHeight: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][1] : 0
         fullscreenText: page_rb5.fullscreenText
 
-        isActivable: page_rb5.screenActivable.length >= index && page_rb5.screenName != "" ? page_rb5.screenActivable[index - 1] : false
+        is_activable: page_rb5.screenActivable.length >= index && page_rb5.screenName != "" ? page_rb5.screenActivable[index - 1] : false
     }
 
     Screen_Parameters_Item {
@@ -171,7 +171,7 @@ DMI_page{
         minimumHeight: page_rb5.screenNames.length >= index && page_rb5.minimumWH.length >= index && page_rb5.minimumWH[index - 1].length >= 2 ? page_rb5.minimumWH[index - 1][1] : 0
         fullscreenText: page_rb5.fullscreenText
 
-        isActivable: page_rb5.screenActivable.length >= index && page_rb5.screenName != "" ? page_rb5.screenActivable[index - 1] : false
+        is_activable: page_rb5.screenActivable.length >= index && page_rb5.screenName != "" ? page_rb5.screenActivable[index - 1] : false
     }
 
     //checkbutton pour savoir si l'application doit éteindre les écrans qui ne sont pas utilisés
@@ -179,14 +179,14 @@ DMI_page{
         id: black_screens
         objectName: "black_screens"
 
-        defaultX: 15
-        defaultY: 379
-        boxLenght: 20
+        default_x: 15
+        default_y: 379
+        box_length: 20
         text: "Eteindre les écrans qui ne sont pas utilisés"
 
-        isActivable: true
-        isPositive: false
-        isChecked: true
+        is_activable: true
+        is_positive: false
+        is_checked: true
     }
 
     //Flèche de droite pour naviguer sur la liste des écrans d'une même catégorie
@@ -194,17 +194,17 @@ DMI_page{
         id: left_screen_button
         objectName: "left_screen_button"
 
-        defaultX: 54 + 46 + 380 - 46
-        defaultY: 400 - 41
-        defaultWidth: 46
-        defaultHeight: 40
+        default_x: 54 + 46 + 380 - 46
+        default_y: 400 - 41
+        default_width: 46
+        default_height: 40
 
-        imageActivable: "Navigation/NA_18.bmp"
-        imageNotActivable: "Navigation/NA_19.bmp"
+        image_activable: "Navigation/NA_18.bmp"
+        image_not_activable: "Navigation/NA_19.bmp"
 
-        isActivable: false
-        isPositive: true
-        isVisible: false
+        is_activable: false
+        is_positive: true
+        is_visible: false
     }
 
     //Flèche de droite pour naviguer sur la liste des écrans d'une même catégorie
@@ -212,17 +212,17 @@ DMI_page{
         id: right_screen_button
         objectName: "right_screen_button"
 
-        defaultX: 54 + 46 + 380
-        defaultY: 400 - 41
-        defaultWidth: 46
-        defaultHeight: 40
+        default_x: 54 + 46 + 380
+        default_y: 400 - 41
+        default_width: 46
+        default_height: 40
 
-        imageActivable: "Navigation/NA_17.bmp"
-        imageNotActivable: "Navigation/NA_18.2.bmp"
+        image_activable: "Navigation/NA_17.bmp"
+        image_not_activable: "Navigation/NA_18.2.bmp"
 
-        isActivable: false
-        isPositive: true
-        isVisible: false
+        is_activable: false
+        is_positive: true
+        is_visible: false
 
     }
 }

@@ -12,14 +12,14 @@ Item {
         objectName: "quit"
         text: "Quitter"
 
-        defaultX: 0
-        defaultY: 415
-        defaultHeight: 50
-        defaultWidth: 120
+        default_x: 0
+        default_y: 415
+        default_height: 50
+        default_width: 120
 
-        isActivable: true
-        isPositive: true
-        isVisible: true
+        is_activable: true
+        is_positive: true
+        is_visible: true
     }
 
 
@@ -29,14 +29,14 @@ Item {
         objectName: "open"
         text: "Ouvrir"
 
-        defaultX: 280
-        defaultY: 415
-        defaultHeight: 50
-        defaultWidth: 120
+        default_x: 280
+        default_y: 415
+        default_height: 50
+        default_width: 120
 
-        isActivable: true
-        isPositive: true
-        isVisible: true
+        is_activable: true
+        is_positive: true
+        is_visible: true
     }
 
     //Bouton sauvegarder
@@ -45,14 +45,14 @@ Item {
         objectName: "save"
         text: "Sauvegarder"
 
-        defaultX: 400
-        defaultY: 415
-        defaultHeight: 50
-        defaultWidth: 120
+        default_x: 400
+        default_y: 415
+        default_height: 50
+        default_width: 120
 
-        isActivable: true
-        isPositive: true
-        isVisible: true
+        is_activable: true
+        is_positive: true
+        is_visible: true
     }
 
     //Bouton lancer
@@ -61,13 +61,13 @@ Item {
         objectName: "launch"
         text: "Lancer"
 
-        defaultX: 520
-        defaultY: 415
-        defaultHeight: 50
-        defaultWidth: 120
+        default_x: 520
+        default_y: 415
+        default_height: 50
+        default_width: 120
 
-        isActivable: true
-        isPositive: true
-        isVisible: true
+        is_activable: true
+        is_positive: true
+        is_visible: true
     }
 }

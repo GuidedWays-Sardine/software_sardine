@@ -22,12 +22,12 @@ Window {
         objectName: "screen_index"
         text: index
 
-        fontSize: 128
+        font_size: 128
 
         anchors.fill: parent
 
-        isActivable: false
-        isPositive: true
-        isVisible: true
+        is_activable: false
+        is_positive: true
+        is_visible: true
     }
 }

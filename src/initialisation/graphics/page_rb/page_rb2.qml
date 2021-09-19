@@ -14,11 +14,12 @@ DMI_page {
         color: "transparent"
     }
 
-    Label {
-        text: "Page 2"
-        anchors.fill: parent
-        horizontalAlignment: Label.AlignHCenter
-        verticalAlignment: Label.AlignVCenter
-        wrapMode: Label.Wrap
+    DMI_checkbutton {
+        default_x: 100
+        default_y: 100
+
+        text: "button"
+
+        is_activable: true
     }
 }

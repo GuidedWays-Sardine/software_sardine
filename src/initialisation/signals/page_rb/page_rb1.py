@@ -100,7 +100,7 @@ class PageRB1:
         # Rend le checkbutton renard et le checkbutton caméra fonctionnel
         renard = self.page.findChild(QObject, "renard_checkbutton")
         renard.clicked.connect(self.on_renard_selected)
-        self.page.findChild(QObject, "camera_checkbutton").setProperty("isActivable", renard.property("isChecked"))
+        self.page.findChild(QObject, "camera_checkbutton").setProperty("is_activable", renard.property("is_checked"))
 
         # Rend le bouton registre fonctionel (quand cliqué, indique le registre suivant)
         self.page.findChild(QObject, "log_button").clicked.connect(self.on_log_button_clicked)
@@ -128,10 +128,10 @@ class PageRB1:
         page_parameters["Pupitre"] = command_board
 
         # Paramètre si connecté à Renard
-        page_parameters["Renard"] = self.page.findChild(QObject, "renard_checkbutton").property("isChecked")
+        page_parameters["Renard"] = self.page.findChild(QObject, "renard_checkbutton").property("is_checked")
 
         # Paramètre si caméra connecté pour Renard (ou alors visu direct sur renard)
-        page_parameters["Caméra"] = self.page.findChild(QObject, "camera_checkbutton").property("isChecked")
+        page_parameters["Caméra"] = self.page.findChild(QObject, "camera_checkbutton").property("is_checked")
 
         # Paramètre choix du DMI
         dmi_selection = self.page.findChild(QObject, "dmi_combo").property("selection")
@@ -150,10 +150,10 @@ class PageRB1:
         page_parameters["Langue"] = self.page.findChild(QObject, "language_combo").property("selection")
 
         # Paramètre si PCC connecté
-        page_parameters["PCC"] = self.page.findChild(QObject, "pcc_checkbutton").property("isChecked")
+        page_parameters["PCC"] = self.page.findChild(QObject, "pcc_checkbutton").property("is_checked")
 
         # Paramètre si affichage des données en direct (vitesse, ...)
-        page_parameters["DonnéesDirect"] = self.page.findChild(QObject, "data_checkbutton").property("isChecked")
+        page_parameters["DonnéesDirect"] = self.page.findChild(QObject, "data_checkbutton").property("is_checked")
 
         return page_parameters
 
@@ -181,13 +181,13 @@ class PageRB1:
 
         # Paramètre pour Renard (savoir si le pupitre est connecté à Renard)
         try:
-            self.page.findChild(QObject, "renard_checkbutton").setProperty("isChecked", data["Renard"] == "True")
+            self.page.findChild(QObject, "renard_checkbutton").setProperty("is_checked", data["Renard"] == "True")
         except KeyError:
             logging.debug("Impossible de changer le paramètre : \"Renard\" manquant dans le fichier ouvert.\n")
 
         # Paramètre pour la caméra (savoir si elle est connecté ou si on a un visu direct sur Renard)
         try:
-            self.page.findChild(QObject, "camera_checkbutton").setProperty("isChecked", data["Caméra"] == "True")
+            self.page.findChild(QObject, "camera_checkbutton").setProperty("is_checked", data["Caméra"] == "True")
         except KeyError:
             logging.debug("Impossible de changer le paramètre : \"Caméra\" manquant dans le fichier ouvert.\n")
         self.on_renard_selected()
@@ -213,13 +213,13 @@ class PageRB1:
 
         # Paramètre pour le PCC (savoir s'il sera activé)
         try:
-            self.page.findChild(QObject, "pcc_checkbutton").setProperty("isChecked", data["PCC"] == "True")
+            self.page.findChild(QObject, "pcc_checkbutton").setProperty("is_checked", data["PCC"] == "True")
         except KeyError:
             logging.debug("Impossible de changer le paramètre : \"PCC\" manquant dans le fichier ouvert.\n")
 
         # Paramètre pour l'affichage des données en direct (genre vitesse, ...)
         try:
-            self.page.findChild(QObject, "data_checkbutton").setProperty("isChecked", data["DonnéesDirect"] == "True")
+            self.page.findChild(QObject, "data_checkbutton").setProperty("is_checked", data["DonnéesDirect"] == "True")
         except KeyError:
             logging.debug("Impossible de changer le paramètre : \"DonnéesDirect\" manquant dans le fichier ouvert.\n")
 
@@ -326,16 +326,16 @@ class PageRB1:
         """Fonction appelée lorsque le checkbutton renard_checkbutton est sélectioné.
         Permet d'activer ou de désactiver le checkbutton pour la caméra"""
         # Récupère si le checkbutton de renard est activé ainsi que le checkbutton caméra
-        connected = self.page.findChild(QObject, "renard_checkbutton").property("isChecked")
+        connected = self.page.findChild(QObject, "renard_checkbutton").property("is_checked")
         camera_checkbutton = self.page.findChild(QObject, "camera_checkbutton")
 
         # Cas où renard est activé -> le bouton est sélectionable
         if connected:
-            camera_checkbutton.setProperty("isActivable", True)
+            camera_checkbutton.setProperty("is_activable", True)
         # Cas où renard est désactivé -> le bouton n'est pas sélectionable et est désactivé
         else:
-            camera_checkbutton.setProperty("isActivable", False)
-            camera_checkbutton.setProperty("isChecked", False)
+            camera_checkbutton.setProperty("is_activable", False)
+            camera_checkbutton.setProperty("is_checked", False)
 
     def on_log_button_clicked(self):
         """Fonction appelée lorsque le bouton log_button est cliqué.

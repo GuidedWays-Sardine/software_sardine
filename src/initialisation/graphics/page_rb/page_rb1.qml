@@ -8,20 +8,22 @@ DMI_page {
     objectName: "page_rb1"
 
 
+
+
     //Checkbutton pour savoir si le pupitre léger est connecté à UE (ou à Renard)
     DMI_checkbutton {
         id: pcc_checkbutton
         objectName: "pcc_checkbutton"
 
-        boxLenght: 20
-        defaultX: 55
-        defaultY: 329
+        box_length: 20
+        default_x: 55
+        default_y: 329
 
         text: "Activation du PCC (Poste de Commande Centralisé) ?"
 
-        isChecked: false
-        isActivable: true
-        isPositive: false
+        is_checked: false
+        is_activable: true
+        is_positive: false
     }
 
     //Checkbutton pour savoir si l'utilisateur veut un retour direct des donnés (courbe de vitesses, ...)
@@ -29,15 +31,15 @@ DMI_page {
         id: data_checkbutton
         objectName: "data_checkbutton"
 
-        boxLenght: 20
-        defaultX: 55
-        defaultY: 369
+        box_length: 20
+        default_x: 55
+        default_y: 369
 
         text: "Affichage en direct des données du train ?"
 
-        isChecked: false
-        isActivable: true
-        isPositive: false
+        is_checked: false
+        is_activable: true
+        is_positive: false
     }
 
     //Bouton registre
@@ -47,8 +49,8 @@ DMI_page {
 
         text: "Niveau de registre"
 
-        defaultX: log_button.defaultX + 2
-        defaultY: log_button.defaultY - 2 * fontSize
+        default_x: log_button.default_x + 2
+        default_y: log_button.default_y - 2 * font_size
     }
 
     DMI_button{
@@ -56,14 +58,14 @@ DMI_page {
         objectName: "log_button"
         text: "Complet"
 
-        defaultX: 50
-        defaultY: 260
-        defaultHeight: 50
-        defaultWidth: 111
+        default_x: 50
+        default_y: 260
+        default_height: 50
+        default_width: 111
 
-        isActivable: true
-        isPositive: false
-        isVisible: true
+        is_activable: true
+        is_positive: false
+        is_visible: true
     }
 
     //Combobox langue
@@ -73,10 +75,10 @@ DMI_page {
 
         text: "Langue"
 
-        defaultX: language_combo.defaultX + 2
-        defaultY: language_combo.defaultY - 2 * fontSize
+        default_x: language_combo.default_x + 2
+        default_y: language_combo.default_y - 2 * font_size
 
-        isDarkGrey: language_combo.elementsCount <= 1
+        is_dark_grey: language_combo.elementsCount <= 1
     }
 
     DMI_combobox{
@@ -84,14 +86,14 @@ DMI_page {
         objectName: "language_combo"
         elements: ["Français"]
 
-        defaultX: 223
-        defaultY: 260
-        defaultHeight: 50
-        defaultWidth: 111
+        default_x: 223
+        default_y: 260
+        default_height: 50
+        default_width: 111
 
-        isActivable: true
-        isPositive: false
-        isVisible: true
+        is_activable: true
+        is_positive: false
+        is_visible: true
     }
 
     //Combobox du choix du DMI
@@ -101,25 +103,25 @@ DMI_page {
 
         text: "Interface pupitre"
 
-        defaultX: dmi_combo.defaultX + 2
-        defaultY: dmi_combo.defaultY - 2 * fontSize
+        default_x: dmi_combo.default_x + 2
+        default_y: dmi_combo.default_y - 2 * font_size
 
-        isDarkGrey: dmi_combo.elementsCount <= 1
+        is_dark_grey: dmi_combo.elementsCount <= 1
     }
 
     DMI_combobox{
         id: dmi_combo
         objectName: "dmi_combo"
 
-        defaultX: 54
-        defaultY: 169
-        defaultWidth: 280
-        defaultHeight: 50
+        default_x: 54
+        default_y: 169
+        default_width: 280
+        default_height: 50
 
         elements: ["NaN"]
         amountElementsDisplayed: 2
 
-        isPositive: false
+        is_positive: false
     }
 
     //Checkbutton pour savoir si le pupitre léger est connecté à UE (ou à Renard)
@@ -127,15 +129,15 @@ DMI_page {
         id: renard_checkbutton
         objectName: "renard_checkbutton"
 
-        boxLenght: 20
-        defaultX: 55
-        defaultY: 104
+        box_length: 20
+        default_x: 55
+        default_y: 104
 
         text: "Connecté à Renard ?"
 
-        isChecked: false
-        isActivable: true
-        isPositive: false
+        is_checked: false
+        is_activable: true
+        is_positive: false
     }
 
     //Checkbutton pour savoir si Renard est connecté via la caméra (ou via un visuel direct)
@@ -143,15 +145,15 @@ DMI_page {
         id: camera_checkbutton
         objectName: "camera_checkbutton"
 
-        boxLenght: 20
-        defaultX: 335
-        defaultY: 104
+        box_length: 20
+        default_x: 335
+        default_y: 104
 
         text: "Connecté par une caméra ?"
 
-        isChecked: false
-        isActivable: true
-        isPositive: false
+        is_checked: false
+        is_activable: true
+        is_positive: false
     }
 
     //Combobox du pupitre utilisé
@@ -161,24 +163,24 @@ DMI_page {
 
         text: "Pupitre"
 
-        defaultX: command_board_combo.defaultX + 2
-        defaultY: command_board_combo.defaultY - 2 * fontSize
+        default_x: command_board_combo.default_x + 2
+        default_y: command_board_combo.default_y - 2 * font_size
 
-        isDarkGrey: command_board_combo.elementsCount <= 1
+        is_dark_grey: command_board_combo.elementsCount <= 1
     }
 
     DMI_combobox{
         id: command_board_combo
         objectName: "command_board_combo"
 
-        defaultX: 54
-        defaultY: 39
-        defaultWidth: 280
-        defaultHeight: 50
+        default_x: 54
+        default_y: 39
+        default_width: 280
+        default_height: 50
 
         elements: ["NaN"]
         amountElementsDisplayed: 2
 
-        isPositive: false
+        is_positive: false
     }
 }
