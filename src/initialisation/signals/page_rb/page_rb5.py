@@ -311,4 +311,46 @@ class PageRB5:
 
         return page_parameters
 
+    def set_values(self, data, translation_data):
+        # Change la valeur pour les écrans noirs
+        try:
+            self.page.findChild(QObject, "black_screens").setProperty("isChecked", data["EcransEteints"])
+        except KeyError:
+            logging.debug("Aucune données EcransEteints dans le fichier paramètres ouverts.\n")
+
+        # Inverse les données de traduction pour avoir un dictionnaire langue actuelle -> Français
+        # FIXME : les clés sont en upper(), trouver un moyen de correctement trouver l'élément
+        inverse_translation_data = dict([reversed(i) for i in translation_data.items()])
+
+        # Pour chaque catégorie d'écrans
+        for category_key in list(self.screen_settings.keys()):
+            # Pour chaque écrans de cette catégorie
+            for screen_key in list(self.screen_settings[category_key].keys()):
+                # Sauvegarde chaque donné au format : category.screen.data = value
+                try:
+                    screen_settings_key = inverse_translation_data[category_key] + "."
+                except KeyError:
+                    logging.debug("Traduction de " + category_key + " manquante.\n")
+                    screen_settings_key = category_key + "."
+                try:
+                    screen_settings_key += inverse_translation_data[screen_key] + "."
+                except KeyError:
+                    logging.debug("Traduction de " + screen_key + " manquante.\n")
+                    screen_settings_key += screen_key + "."
+
+                # Essaye de récupérer les donnés reliés à l'écran
+                try:
+                    if int(data[screen_settings_key + "IndexEcran"]) <= self.screen_count:
+                        self.screen_settings[category_key][screen_key][0] = int(data[screen_settings_key + "IndexEcran"])
+                        self.screen_settings[category_key][screen_key][1] = data[screen_settings_key + "PleinEcran"] == "True"
+                        self.screen_settings[category_key][screen_key][2][0] = int(data[screen_settings_key + "positionX"])
+                        self.screen_settings[category_key][screen_key][2][1] = int(data[screen_settings_key + "positionY"])
+                        self.screen_settings[category_key][screen_key][3][0] = int(data[screen_settings_key + "tailleX"])
+                        self.screen_settings[category_key][screen_key][3][1] = int(data[screen_settings_key + "tailleY"])
+                except KeyError:
+                    logging.debug("L'écran : " + screen_settings_key + " n'a pas de paramètres sauvegardés.\n")
+
+        # Met à jour la page visible de settings
+        self.change_visible_screen_list()
+
 
