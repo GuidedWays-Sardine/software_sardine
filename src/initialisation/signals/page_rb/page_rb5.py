@@ -73,7 +73,7 @@ class PageRB5:
             screen_dimensions.append([sg[2] - sg[0] + 1, sg[3] - sg[1] + 1])
             window = self.screen_index[screen_index].findChild(QObject, "screen_index")
             window.setProperty("text", str(screen_index + 1))
-            screen_list.append(str(index + 1))
+            screen_list.append(str(screen_index + 1))
 
         # Envoie liste des fenètre et de leurs dimensions à la graphique de la page*
         self.page.setProperty("screenList", screen_list)
