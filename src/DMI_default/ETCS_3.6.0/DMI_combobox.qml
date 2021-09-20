@@ -31,7 +31,7 @@ Item {
     readonly property int elements_count: combo.count //retient le nombre d'éléments sélectionables dans la combobox
     property int elements_displayed: 4      //définit le nombre d'éléments visibles dans la popup
     readonly property string selection_text: combo.displayText //retient le texte et l'index de la sélection actuelle et précédente
-    readonly property int selection_index: combo.currentIndex + 1   //FIXME : index commençant à 0
+    readonly property int selection_index: combo.currentIndex
     //FEATURE : enregistres l'élément précédent sélectionné
     property int font_size: 12
 
@@ -56,11 +56,11 @@ Item {
 
 
     //Fonction pour changer l'index de la combobox en fonction de l'index ou du texte de la sélection souhaité
-    function change_selection(new_selection){   //FIXME : index commençeant à 0
+    function change_selection(new_selection){
         // Si la nouvelle sélection est un int, change le currentIndex en fonction de l'index envoyé
         if(typeof new_selection === typeof root.font_size){
-            if(new_selection <= combo.count){
-                combo.currentIndex = new_selection - 1
+            if(new_selection < combo.count){
+                combo.currentIndex = new_selection
             }
         }
         // Si la nouvelle sélection est un string, cherche l'élément avec le même index

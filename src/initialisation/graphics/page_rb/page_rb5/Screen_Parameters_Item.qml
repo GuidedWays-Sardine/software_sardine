@@ -14,7 +14,7 @@ Item {
     onIs_activableChanged: { //fonction permettant de changer l'activabilité de l'écran si demandé
         //Cas où l'écran a été mis comme activable : change la sélection de l'écran à aucun et rend le screen non valide (tous lew widgets sont grisés et désactivés automatiquement)
         if(!root.is_activable){
-            screen_index_combo.change_selection(1)
+            screen_index_combo.change_selection(0)
             root.screenValid = false
         }
     }
@@ -24,10 +24,10 @@ Item {
     onInitialSettingsChanged: {
         //Si une sélection d'un écran spécifique a été donnée
         if(root.is_activable && initialSettings.length >= 1) {
-            screen_index_combo.change_selection(initialSettings[0] + 1)
+            screen_index_combo.change_selection(initialSettings[0])
 
             //Si un écran particulier a été sélectionné et que plus d'informations ont été données
-            if(screen_index_combo.selection_index > 1 && initialSettings.length >= 2) {
+            if(screen_index_combo.selection_index > 0 && initialSettings.length >= 2) {
                 fullscreen_on.is_checked = initialSettings[1]
 
                 //Si l'écran n'est pas en fullscreen et que des données ont été fournis pour la position et la taille de l'écran
@@ -40,7 +40,7 @@ Item {
             }
         }
         else {
-            screen_index_combo.change_selection(1)
+            screen_index_combo.change_selection(0)
         }
     }
 
@@ -59,7 +59,7 @@ Item {
     property int minimumHeight: 0
 
     //Valeur à récupérer (les dimensions, la position, l'écran sélectionné)
-    property int selectedScreen: screen_index_combo.selection_index
+    property int selectedScreen: screen_index_combo.selection_index + 1 //FIXME : voir pour l'index ici comment il fonctionne
     property bool isFullScreen: fullscreen_on.is_checked
     property int inputX: x_input.value
     property int inputY: y_input.value
@@ -138,11 +138,11 @@ Item {
             //cas si un écran a été sélectioné
             else {
                 //Si les valeurs pour l'écran sélectionné ont été rentrées et que la résolution de l'écran est suffisante
-                if(selection_index - 1 <= root.screenSize.length && root.screenSize[selection_index - 2].length >= 2 && root.screenSize[selection_index - 2][0] >= root.minimumWidth && root.screenSize[selection_index - 2][1] >= root.minimumHeight){
-                    x_input.maximum_value = root.screenSize[selection_index - 2][0] - root.minimumWidth
-                    y_input.maximum_value = root.screenSize[selection_index - 2][1] - root.minimumHeight
-                    width_input.maximum_value = root.screenSize[selection_index - 2][0]
-                    height_input.maximum_value = root.screenSize[selection_index - 2][1]
+                if(selection_index <= root.screenSize.length && root.screenSize[selection_index - 1].length >= 2 && root.screenSize[selection_index - 1][0] >= root.minimumWidth && root.screenSize[selection_index - 1][1] >= root.minimumHeight){
+                    x_input.maximum_value = root.screenSize[selection_index - 1][0] - root.minimumWidth
+                    y_input.maximum_value = root.screenSize[selection_index - 1][1] - root.minimumHeight
+                    width_input.maximum_value = root.screenSize[selection_index - 1][0]
+                    height_input.maximum_value = root.screenSize[selection_index - 1][1]
 
                     root.screenValid = true
                 }
@@ -211,7 +211,7 @@ Item {
         //permet de changer la hauteur maximale quand la position y a été changée
         onValue_changed: {
             if(root.screenValid){
-                width_input.maximum_value = root.screenSize[screen_index_combo.selection_index - 2][0] - x_input.value
+                width_input.maximum_value = root.screenSize[screen_index_combo.selection_index - 1][0] - x_input.value
             }
         }
         font_size: root.font_size
@@ -249,7 +249,7 @@ Item {
         //permet de changer la hauteur maximale quand la position y a été changée
         onValue_changed: {
             if(root.screenValid){
-                height_input.maximum_value = root.screenSize[screen_index_combo.selection_index - 2][1] - y_input.value
+                height_input.maximum_value = root.screenSize[screen_index_combo.selection_index - 1][1] - y_input.value
             }
         }
         font_size: root.font_size
