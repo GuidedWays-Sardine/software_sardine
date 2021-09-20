@@ -14,12 +14,16 @@ DMI_page {
         color: "transparent"
     }
 
-    DMI_checkbutton {
+    DMI_valueinput {
         default_x: 100
         default_y: 100
 
-        text: "button"
+        default_height: 40
+        default_width: 120
 
-        is_activable: true
+        maximum_value: 100
+
+        is_activable: false
+
     }
 }

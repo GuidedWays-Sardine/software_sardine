@@ -8,75 +8,15 @@ import QtQuick.Controls 2.15
 //https://doc.qt.io/qt-5/qtquickcontrols2-customize.html#customizing-stackview
 //Comment personaliser un stackview
 
+
 Item{
     id: root
-
 
     //Propriétés liés à la position et à la taille de l'objet
     property int default_width: 100          //dimensions du bouton quand la fenêtre fait du 640x480
     property int default_height: 40
     property int default_x: 0                //position du bouton pour les dimensions quand la fenêtre fait du 640x480
     property int default_y: 0
-
-    //Propriétés liés aux valeurs limites
-    property int minimumValue: 0
-    property int maximumValue: 1
-
-    //Propriétés liés à l'état du DMI_valueinput
-    property bool isMaxDefault: false       //définit si la valeur par défaut (dans le placeholder) est la valeur max (ou mini si mis sur false)
-    property int font_size: 12
-    property bool is_dark_grey: !is_activable  //est ce que le texte doit-être en gris foncé ?
-
-    // Propriété gardant la valeur actuelle et la précédente
-    readonly property int value: body.text != "" ? parseInt(body.text) : (isMaxDefault ? root.maximumValue : root.minimumValue)
-    property int old_value: root.isMaxDefault ? root.maximumValue : root.minimumValue
-
-
-    //Propriétés liés à l'état du bouton
-    property bool is_activable: true         //si le bouton peut être activée
-    property bool is_positive: false         //si le bouton doit-être visible en couche positive (sinon négatif)
-    property bool is_visible: true           //si le bouton est visible
-
-
-    //Différents signal handlers (à écrire en python)
-    signal value_changed()
-
-    //Fonction pour remettre la valeur par défaut dans le valueinput
-    function clear(){
-        // Vérifie si la valeur actuellement visible est différente que la valeur quand vidé, change la valeur et appelle le signal value_changed si c'est le cas
-        var changed = root.isMaxDefault ? root.value !== root.maximumValue : root.value !== root.minimumValue
-        body.text = ""
-        if(changed){
-            value_changed()
-            root.old_value = root.isMaxDefault ? root.maximumValue : root.minimumValue
-        }
-    }
-
-    function change_value(new_value){
-        //Si la valeur n'est pas valide (trop grand ou trop petite) la change
-        if(new_value < root.minimumValue){
-            new_value = root.minimumValue
-        }
-        else if(new_value > root.maximumValue){
-            new_value = root.maximumValue
-        }
-
-        // Vérifie si la nouvelle valeur change de l'ancienne
-        var changed = (root.value !== new_value)
-        body.text = new_value.toString()
-        if(changed){
-            value_changed()
-            root.old_value = new_value
-        }
-    }
-
-    //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
-    readonly property string dark_blue: "#031122"   //partie 5.2.1.3.3  Nr 6
-    readonly property string black: "#000000"       //partie 5.2.1.3.3  Nr 2
-    readonly property string grey: "#C3C3C3"        //partie 5.2.1.3.3  Nr 3
-    readonly property string dark_grey: "#969696"    //partie 5.2.1.3.3  Nr 5
-    readonly property string shadow: "#08182F"      //partie 5.2.1.3.3  Nr 7
-
 
     //permet à partir des valeurs de positions et dimensions par défauts de calculer
     readonly property real ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
@@ -86,65 +26,141 @@ Item{
     y: (root.default_y + 1) * root.ratio
     visible: root.is_visible
 
+    //Propriétés liés aux valeurs limites et la valeur actuellement sélectionnée
+    property int minimum_value: 0
+    property int maximum_value: 1
+    readonly property int value: body.text != "" ? parseInt(body.text) : (is_max_default ? root.maximum_value : root.minimum_value)   //Valeur actuelle
+    property int previous_value: root.is_max_default ? root.maximum_value : root.minimum_value    //Ancienne valeur ; nécessaire pour détecter le changement de valeur et appeler value_changed()
 
+    property int font_size: 12
+
+    //Propriétés liés à l'état du valueinput
+    property bool is_max_default: false      //définit si la valeur par défaut (dans le placeholder) est la valeur max (ou mini si mis sur false)
+    property bool is_dark_grey: !is_activable//est ce que le texte doit-être en gris foncé ?
+    property bool is_activable: true         //si le bouton peut être activée
+    property bool is_positive: false         //si le bouton doit-être visible en couche positive (sinon négatif)
+    property bool is_visible: true           //si le bouton est visible
+
+    //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
+    readonly property string dark_blue: "#031122"   //partie 5.2.1.3.3  Nr 6
+    readonly property string black: "#000000"       //partie 5.2.1.3.3  Nr 2
+    readonly property string grey: "#C3C3C3"        //partie 5.2.1.3.3  Nr 3
+    readonly property string dark_grey: "#969696"   //partie 5.2.1.3.3  Nr 5
+    readonly property string shadow: "#08182F"      //partie 5.2.1.3.3  Nr 7
+
+
+    //Différents signal handlers (à écrire en python)
+    signal value_changed()
+
+
+    //Fonction pour remettre la valeur par défaut dans le valueinput (maximum_calue si is_max_default est vrai sinon minimum_value)
+    function clear(){
+        // Vérifie si la valeur actuellement visible est différente que la valeur quand vidé, change la valeur et appelle le signal value_changed si c'est le cas
+        var changed = root.is_max_default ? root.value !== root.maximum_value : root.value !== root.minimum_value
+        body.text = ""
+        if(changed){
+            value_changed()
+            root.previous_value = root.is_max_default ? root.maximum_value : root.minimum_value
+        }
+    }
+
+    //Fonction permettant de changer la valeur du valueinput (de manière sécurisée)
+    function change_value(new_value){
+        //Si la valeur n'est pas valide (trop grand ou trop petite) la change
+        if(new_value < root.minimum_value){
+            new_value = root.minimum_value
+        }
+        else if(new_value > root.maximum_value){
+            new_value = root.maximum_value
+        }
+
+        // Vérifie si la nouvelle valeur change de l'ancienne
+        var changed = (root.value !== new_value)
+        body.text = new_value.toString()
+        if(changed){
+            value_changed()
+            root.previous_value = new_value
+        }
+    }
+
+
+    //Signal détectant quand la valeur minimale est changée
+    onMinimum_valueChanged: {
+        //cas où la valeur actuelle rentrée est inférieure à la nouvelle valeur minimale
+        if(body.text != "" && parseInt(body.text) < root.minimum_value){
+            body.text = root.minimum_value.toString()
+            value_changed()
+            root.previous_value = root.minimum_value
+        }
+        //cas où aucune valeur n'est entrée et que is_max_default faux
+        else if(body.text === "" && !root.is_max_default){
+            value_changed()
+            root.previous_value = root.minimum_value
+        }
+    }
+
+    //Signal détectant quand la valeur maximale est changée
+    onMaximum_valueChanged: {
+        //cas où la valeur actuelle rentrée est supériere à la nouvelle valeur maximale
+        if(body.text != "" && parseInt(body.text) > root.maximum_value){
+            body.text = root.maximum_value.toString()
+            value_changed()
+            root.previous_value = root.maximum_value
+        }
+        //cas où aucune valeur n'est entrée et que is_max_default vrai
+        else if(body.text === "" && root.ix_max_default) {
+            value_changed()
+            root.previous_value = root.maximum_value
+        }
+    }
+
+    //Zone d'entrée de texte
     TextField {
         id: body
 
-        echoMode: TextInput.Normal
-
+        anchors.fill: parent
 
         color: root.is_dark_grey ? root.dark_grey : (body.text != "" ? root.grey : root.dark_grey)
-        placeholderText: root.isMaxDefault ? root.maximumValue.toString() : root.minimumValue.toString()
-        placeholderTextColor: root.dark_grey
         font.pixelSize: root.font_size * root.ratio
-
-        anchors.fill: parent
         readOnly: !root.is_activable
+        echoMode: TextInput.Normal
 
+        placeholderText: root.is_max_default ? root.maximum_value.toString() : root.minimum_value.toString()
+        placeholderTextColor: root.dark_grey
+
+        //rectangle de fond
         background: Rectangle {
             anchors.fill: parent
             color: root.dark_blue
         }
 
+        //indique que seul des valeurs entières peuvent être entrées
         validator: IntValidator {
-            bottom: root.minimumValue
-            top: root.maximumValue
+            bottom: root.minimum_value
+            top: root.maximum_value
         }
 
+        //détecte quand le focus change (quand l'utilisateur valide son entrée) et vérifie si la valeur entrée rentre dans le validateur
         onFocusChanged: {
             if(body.text != "" && !body.focus){
-                if(parseInt(body.text) > root.maximumValue) {
-                    body.text = root.maximumValue.toString()
+                //cas où la valeur entrée est supérieur à la valeur maximale ou inférieur à la valeur minimale (remet la valeur dans les limites)
+                if(parseInt(body.text) > root.maximum_value) {
+                    body.text = root.maximum_value.toString()
                 }
-                else if (parseInt(body.text) < root.minimumValue) {
-                    body.text = root.minimumValue.toString()
+                else if (parseInt(body.text) < root.minimum_value) {
+                    body.text = root.minimum_value.toString()
                 }
 
-                if(parseInt(body.text) !== root.old_value){
+                //vérifie si la nouvelle valeur est différente de l'ancienne, si oui appelle le signal value_changed
+                if(parseInt(body.text) !== root.previous_value){
                     value_changed()
-                    root.old_value = parseInt(body.text)
+                    root.previous_value = parseInt(body.text)
                 }
             }
-            else if(!body.focus && ((root.isMaxDefault && root.old_value != root.maximumValue) || (!root.isMaxDefault && root.old_value != root.minimumValue))) {
+            else if(!body.focus && ((root.is_max_default && root.previous_value != root.maximum_value) || (!root.is_max_default && root.previous_value != root.minimum_value))) {
                 value_changed()
-                root.old_value = root.isMaxDefault ? root.maximumValue : root.minimumValue
+                root.previous_value = root.is_max_default ? root.maximum_value : root.minimum_value
             }
-        }
-    }
-
-    onMinimumValueChanged: {
-        if(body.text != "" && parseInt(body.text) < root.minimumValue){
-            body.text = root.minimumValue.toString()
-            value_changed()
-            root.old_value = root.minimumValue
-        }
-    }
-
-    onMaximumValueChanged: {
-        if(body.text != "" && parseInt(body.text) > root.maximumValue){
-            body.text = root.maximumValue.toString()
-            value_changed()
-            root.old_value = root.maximumValue
         }
     }
 

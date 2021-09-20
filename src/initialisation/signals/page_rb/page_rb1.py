@@ -61,7 +61,7 @@ class PageRB1:
             language_combobox = self.page.findChild(QObject, "language_combo")
             language_combobox.setProperty("elements", language_list)
             language_combobox.selection_changed.connect(lambda: self.on_language_change(application))
-            self.language = language_combobox.property("selection")
+            self.language = language_combobox.property("selection_text")
 
         # Essaye de récupérer le dictionaire Anglais -> Français afin de traduire les répertoires par défaut en anglais
         found_translation = False
@@ -119,7 +119,7 @@ class PageRB1:
         page_parameters = {}
 
         # Paramètre du pupitre
-        command_board = self.page.findChild(QObject, "command_board_combo").property("selection")
+        command_board = self.page.findChild(QObject, "command_board_combo").property("selection_text")
         try:
             command_board = translation_data[command_board.upper()].replace(" ", "_")
         except KeyError:
@@ -134,7 +134,7 @@ class PageRB1:
         page_parameters["Caméra"] = self.page.findChild(QObject, "camera_checkbutton").property("is_checked")
 
         # Paramètre choix du DMI
-        dmi_selection = self.page.findChild(QObject, "dmi_combo").property("selection")
+        dmi_selection = self.page.findChild(QObject, "dmi_combo").property("selection_text")
         try:
             dmi_selection = translation_data[dmi_selection.upper()].replace(" ", "_")
         except KeyError:
@@ -147,7 +147,7 @@ class PageRB1:
         page_parameters["Registre"] = self.log_type_converter[log_text]
 
         # Paramètre langue
-        page_parameters["Langue"] = self.page.findChild(QObject, "language_combo").property("selection")
+        page_parameters["Langue"] = self.page.findChild(QObject, "language_combo").property("selection_text")
 
         # Paramètre si PCC connecté
         page_parameters["PCC"] = self.page.findChild(QObject, "pcc_checkbutton").property("is_checked")
@@ -249,7 +249,7 @@ class PageRB1:
         # La combobox langue ne nécessite aucune traduction car les langes sont dans leur langue d'origine
         for combo in ["command_board_combo", "dmi_combo"]:
             widget = self.page.findChild(QObject, combo)
-            selection = widget.property("selection")
+            selection_text = widget.property("selection_text")
             new_list = []
 
             # Pour chaque combobox récupère chaque éléments et essaye de les traduire
@@ -264,9 +264,9 @@ class PageRB1:
             # Enfin, remet la nouvelle list dans la combobox et change l'index
             widget.setProperty("elements", new_list)
             try:
-                widget.change_selection(translation_data[selection.upper()])
+                widget.change_selection(translation_data[selection_text.upper()])
             except KeyError:
-                widget.change_selection(selection)
+                widget.change_selection(selection_text)
 
         # Pour le bouton registre, laissé à part car son fonctionnement est particulier
         keys = list(self.next_log_level.keys())
@@ -306,7 +306,7 @@ class PageRB1:
         application: `InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets"""
         # Récupère le dictionaire de traduction et change la langue de l'application d'initialisation et du DMI
-        new_language = self.page.findChild(QObject, "language_combo").property("selection")
+        new_language = self.page.findChild(QObject, "language_combo").property("selection_text")
         if application.language.upper() != new_language.upper():
             try:
                 translation_data = application.read_language_file(application.language, new_language)

@@ -27,7 +27,7 @@ Item {
             screen_index_combo.change_selection(initialSettings[0] + 1)
 
             //Si un écran particulier a été sélectionné et que plus d'informations ont été données
-            if(screen_index_combo.selectionIndex > 1 && initialSettings.length >= 2) {
+            if(screen_index_combo.selection_index > 1 && initialSettings.length >= 2) {
                 fullscreen_on.is_checked = initialSettings[1]
 
                 //Si l'écran n'est pas en fullscreen et que des données ont été fournis pour la position et la taille de l'écran
@@ -59,7 +59,7 @@ Item {
     property int minimumHeight: 0
 
     //Valeur à récupérer (les dimensions, la position, l'écran sélectionné)
-    property int selectedScreen: screen_index_combo.selectionIndex
+    property int selectedScreen: screen_index_combo.selection_index
     property bool isFullScreen: fullscreen_on.is_checked
     property int inputX: x_input.value
     property int inputY: y_input.value
@@ -116,7 +116,7 @@ Item {
         default_height: 30
 
         elements: root.screenList
-        amountElementsDisplayed: 3
+        elements_displayed: 3
         font_size: root.font_size
 
         is_positive: false
@@ -127,7 +127,7 @@ Item {
         onSelection_changed: {
 
             //cas si l'écran est passé à aucun
-            if(screen_index_combo.selection === screen_index_combo.elements[0]) {
+            if(screen_index_combo.selection_text === screen_index_combo.elements[0]) {
                 //décoche l'option fullscreen et remet à 0 les valeurs des input pour les dimensions de la fenêtre
                 fullscreen_on.is_checked = false
                 x_input.clear()
@@ -138,11 +138,11 @@ Item {
             //cas si un écran a été sélectioné
             else {
                 //Si les valeurs pour l'écran sélectionné ont été rentrées et que la résolution de l'écran est suffisante
-                if(selectionIndex - 1 <= root.screenSize.length && root.screenSize[selectionIndex - 2].length >= 2 && root.screenSize[selectionIndex - 2][0] >= root.minimumWidth && root.screenSize[selectionIndex - 2][1] >= root.minimumHeight){
-                    x_input.maximumValue = root.screenSize[selectionIndex - 2][0] - root.minimumWidth
-                    y_input.maximumValue = root.screenSize[selectionIndex - 2][1] - root.minimumHeight
-                    width_input.maximumValue = root.screenSize[selectionIndex - 2][0]
-                    height_input.maximumValue = root.screenSize[selectionIndex - 2][1]
+                if(selection_index - 1 <= root.screenSize.length && root.screenSize[selection_index - 2].length >= 2 && root.screenSize[selection_index - 2][0] >= root.minimumWidth && root.screenSize[selection_index - 2][1] >= root.minimumHeight){
+                    x_input.maximum_value = root.screenSize[selection_index - 2][0] - root.minimumWidth
+                    y_input.maximum_value = root.screenSize[selection_index - 2][1] - root.minimumHeight
+                    width_input.maximum_value = root.screenSize[selection_index - 2][0]
+                    height_input.maximum_value = root.screenSize[selection_index - 2][1]
 
                     root.screenValid = true
                 }
@@ -178,7 +178,7 @@ Item {
         }
 
         is_checked: false
-        is_activable: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0]
+        is_activable: root.screenValid && screen_index_combo.selection_text != screen_index_combo.elements[0]
         is_positive: false
         is_visible: root.screenName != ""
     }
@@ -194,7 +194,7 @@ Item {
         text: "x:"
         font_size: root.font_size
 
-        is_dark_grey: !root.screenValid || !(screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.is_checked)
+        is_dark_grey: !root.screenValid || !(screen_index_combo.selection_text != screen_index_combo.elements[0] && !fullscreen_on.is_checked)
         is_visible: root.screenName != ""
     }
 
@@ -207,17 +207,17 @@ Item {
         default_width: default_height * 2
         default_height: screen_index_combo.default_height - 1
 
-        minimumValue: 0
+        minimum_value: 0
         //permet de changer la hauteur maximale quand la position y a été changée
         onValue_changed: {
             if(root.screenValid){
-                width_input.maximumValue = root.screenSize[screen_index_combo.selectionIndex - 2][0] - x_input.value
+                width_input.maximum_value = root.screenSize[screen_index_combo.selection_index - 2][0] - x_input.value
             }
         }
         font_size: root.font_size
 
-        isMaxDefault: false
-        is_activable: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.is_checked
+        is_max_default: false
+        is_activable: root.screenValid && screen_index_combo.selection_text != screen_index_combo.elements[0] && !fullscreen_on.is_checked
         is_positive: false
         is_visible: root.screenName != ""
     }
@@ -232,7 +232,7 @@ Item {
         text: "y:"
         font_size: root.font_size
 
-        is_dark_grey: !root.screenValid || !(screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.is_checked)
+        is_dark_grey: !root.screenValid || !(screen_index_combo.selection_text != screen_index_combo.elements[0] && !fullscreen_on.is_checked)
         is_visible: root.screenName != ""
     }
 
@@ -245,17 +245,17 @@ Item {
         default_width: default_height * 2
         default_height: screen_index_combo.default_height - 1
 
-        minimumValue: 0
+        minimum_value: 0
         //permet de changer la hauteur maximale quand la position y a été changée
         onValue_changed: {
             if(root.screenValid){
-                height_input.maximumValue = root.screenSize[screen_index_combo.selectionIndex - 2][1] - y_input.value
+                height_input.maximum_value = root.screenSize[screen_index_combo.selection_index - 2][1] - y_input.value
             }
         }
         font_size: root.font_size
 
-        isMaxDefault: false
-        is_activable: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.is_checked
+        is_max_default: false
+        is_activable: root.screenValid && screen_index_combo.selection_text != screen_index_combo.elements[0] && !fullscreen_on.is_checked
         is_positive: false
         is_visible: root.screenName != ""
     }
@@ -271,7 +271,7 @@ Item {
         font_size: root.font_size
 
         is_visible: root.screenName != ""
-        is_dark_grey: !root.screenValid || !(screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.is_checked)
+        is_dark_grey: !root.screenValid || !(screen_index_combo.selection_text != screen_index_combo.elements[0] && !fullscreen_on.is_checked)
     }
 
     DMI_valueinput {
@@ -283,11 +283,11 @@ Item {
         default_width: default_height * 2
         default_height: screen_index_combo.default_height - 1
 
-        minimumValue: root.screenValid && screen_index_combo.selection !== screen_index_combo.elements[0] ? root.minimumHeight : 0
+        minimum_value: root.screenValid && screen_index_combo.selection_text !== screen_index_combo.elements[0] ? root.minimumHeight : 0
         font_size: root.font_size
 
-        isMaxDefault: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0]
-        is_activable: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.is_checked
+        is_max_default: root.screenValid && screen_index_combo.selection_text != screen_index_combo.elements[0]
+        is_activable: root.screenValid && screen_index_combo.selection_text != screen_index_combo.elements[0] && !fullscreen_on.is_checked
         is_positive: false
         is_visible: root.screenName != ""
     }
@@ -304,7 +304,7 @@ Item {
         text: "w:"
         font_size: root.font_size
 
-        is_dark_grey: !root.screenValid || !(screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.is_checked)
+        is_dark_grey: !root.screenValid || !(screen_index_combo.selection_text != screen_index_combo.elements[0] && !fullscreen_on.is_checked)
         is_visible: root.screenName != ""
     }
 
@@ -317,11 +317,11 @@ Item {
         default_width: default_height * 2
         default_height: screen_index_combo.default_height - 1
 
-        minimumValue: root.screenValid && screen_index_combo.selection !== screen_index_combo.elements[0] ? root.minimumWidth : 0
+        minimum_value: root.screenValid && screen_index_combo.selection_text !== screen_index_combo.elements[0] ? root.minimumWidth : 0
         font_size: root.font_size
 
-        isMaxDefault: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0]
-        is_activable: root.screenValid && screen_index_combo.selection != screen_index_combo.elements[0] && !fullscreen_on.is_checked
+        is_max_default: root.screenValid && screen_index_combo.selection_text != screen_index_combo.elements[0]
+        is_activable: root.screenValid && screen_index_combo.selection_text != screen_index_combo.elements[0] && !fullscreen_on.is_checked
         is_positive: false
         is_visible: root.screenName != ""
     }

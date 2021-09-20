@@ -78,7 +78,7 @@ DMI_page {
         default_x: language_combo.default_x + 2
         default_y: language_combo.default_y - 2 * font_size
 
-        is_dark_grey: language_combo.elementsCount <= 1
+        is_dark_grey: language_combo.elements_count <= 1
     }
 
     DMI_combobox{
@@ -106,7 +106,7 @@ DMI_page {
         default_x: dmi_combo.default_x + 2
         default_y: dmi_combo.default_y - 2 * font_size
 
-        is_dark_grey: dmi_combo.elementsCount <= 1
+        is_dark_grey: dmi_combo.elements_count <= 1
     }
 
     DMI_combobox{
@@ -119,7 +119,7 @@ DMI_page {
         default_height: 50
 
         elements: ["NaN"]
-        amountElementsDisplayed: 2
+        elements_displayed: 2
 
         is_positive: false
     }
@@ -166,7 +166,7 @@ DMI_page {
         default_x: command_board_combo.default_x + 2
         default_y: command_board_combo.default_y - 2 * font_size
 
-        is_dark_grey: command_board_combo.elementsCount <= 1
+        is_dark_grey: command_board_combo.elements_count <= 1
     }
 
     DMI_combobox{
@@ -179,7 +179,7 @@ DMI_page {
         default_height: 50
 
         elements: ["NaN"]
-        amountElementsDisplayed: 2
+        elements_displayed: 2
 
         is_positive: false
     }
