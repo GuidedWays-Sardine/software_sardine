@@ -124,7 +124,7 @@ Item {
         is_visible: root.screenName != ""
 
         //Signal handler pour griser les textes pour l'emplacement de l'écran et changer les valeurs/valeurs par défaut des DMI_valueinput
-        onSelection_changed: {
+        onSelection_textChanged: {
 
             //cas si l'écran est passé à aucun
             if(screen_index_combo.selection_text === screen_index_combo.elements[0]) {
@@ -170,7 +170,7 @@ Item {
         font_size: root.font_size
 
         //fonction permettant de vider les DMI_valueinput quand le mode fullscreen est activé
-        onIsCheckedChanged: {
+        onIs_checkedChanged: {
             x_input.clear()
             y_input.clear()
             width_input.clear()
