@@ -216,8 +216,8 @@ Item {
 
         //permet de changer la hauteur maximale quand la position y a été changée
         onValue_changed: {
-            if(root.screenValid){
-                width_input.maximum_value = root.screenSize[screen_index_combo.selection_index - 1][0] - x_input.value
+            if(root.screen_valid){
+                width_input.maximum_value = root.screen_size[screen_index_combo.selection_index - 1][0] - x_input.value
             }
         }
     }
