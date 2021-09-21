@@ -23,7 +23,7 @@ Item {
     }
 
     //Informations et fonctions sur l'écran affiché et fonction pour mettre à jour l'encadré de paramètres
-    property var initial_settings: [] //Format [screen_index, fullcreen_on, [x, y], [width, height]]
+    property var initial_settings: [] //Format [screen_index, fullscreen_on, [x, y], [width, height]]
     onInitial_settingsChanged: {
         //Si une sélection d'un écran spécifique a été donnée
         if(root.is_activable && initial_settings.length >= 1) {
@@ -89,7 +89,7 @@ Item {
 
     //Texte affichant l'utilisation de l'écran
     DMI_text{
-        id: initial_settings
+        id: screen_text
 
         default_x: body.default_x + 2 + root.font_size
         default_y: body.default_y + 2 + root.font_size
@@ -161,7 +161,7 @@ Item {
 
         box_length: 16
         default_x: 400
-        default_y: initial_settings.default_y - (box_length - root.font_size) * 0.5
+        default_y: screen_text.default_y - (box_length - root.font_size) * 0.5
 
         text: root.fullscreen_text
         font_size: root.font_size
