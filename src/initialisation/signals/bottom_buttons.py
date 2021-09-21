@@ -159,7 +159,7 @@ class BottomButtons:
 
                 # S'il existe, essaye de traduire le texte sur le bouton
                 try:
-                    widget.setProperty("text", translation_data[widget.property("text").upper()])
+                    widget.setProperty("text", translation_data[widget.property("text")])
                 # Si la clé n'existe pas c'est que le mot n'existe pas dans le dictionnaire ou qu'il est mal traduit.
                 except KeyError:
                     logging.debug("aucune traduction de : " + widget.property("text") + " n'existe pas.\n")

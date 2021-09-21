@@ -84,7 +84,7 @@ class PageRB1:
         if found_translation:
             for index in range(len(command_boards)):
                 try:
-                    command_boards[index] = translation_data[command_boards[index].upper()]
+                    command_boards[index] = translation_data[command_boards[index]]
                 except KeyError:
                     logging.debug("pas de traduction française pour : " + command_boards[index] + "\n")
         self.page.findChild(QObject, "command_board_combo").setProperty("elements", command_boards)
@@ -94,7 +94,7 @@ class PageRB1:
         if found_translation:
             for index in range(len(dmi_list)):
                 try:
-                    dmi_list[index] = translation_data[dmi_list[index].upper()]
+                    dmi_list[index] = translation_data[dmi_list[index]]
                 except KeyError:
                     logging.debug("pas de traduction française pour : " + dmi_list[index] + "\n")
         self.page.findChild(QObject, "dmi_combo").setProperty("elements", dmi_list)
@@ -123,7 +123,7 @@ class PageRB1:
         # Paramètre du pupitre
         command_board = self.page.findChild(QObject, "command_board_combo").property("selection_text")
         try:
-            command_board = translation_data[command_board.upper()].replace(" ", "_")
+            command_board = translation_data[command_board].replace(" ", "_")
         except KeyError:
             logging.debug("Traduction pour le pupitre non trouvée.\n")
             command_board = command_board.replace(" ", "_")
@@ -138,7 +138,7 @@ class PageRB1:
         # Paramètre choix du DMI
         dmi_selection = self.page.findChild(QObject, "dmi_combo").property("selection_text")
         try:
-            dmi_selection = translation_data[dmi_selection.upper()].replace(" ", "_")
+            dmi_selection = translation_data[dmi_selection].replace(" ", "_")
         except KeyError:
             logging.debug("traduction pour le dmi non trouvée.\n")
             dmi_selection = dmi_selection.replace(" ", "_")
@@ -170,7 +170,7 @@ class PageRB1:
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) /!\\ clés en majuscules"""
         # Paramètre du pupitre (quel pupitre sera utilisé)
         try:
-            command_board = data["Pupitre"].replace("_", " ").upper()
+            command_board = data["Pupitre"].replace("_", " ")
         except KeyError:
             logging.debug("Impossible de changer le paramètre: \"Pupitre\" manquant dans le fichier ouvert.\n")
         else:
@@ -196,7 +196,7 @@ class PageRB1:
 
         # Paramètre pour le DMI (savoir quelle Interface sera utilisée pour le pupitre
         try:
-            dmi = data["DMI"].replace("_", " ").upper()
+            dmi = data["DMI"].replace("_", " ")
         except KeyError:
             logging.debug("Impossible de changer le paramètre: \"Pupitre\" manquant dans le fichier ouvert.\n")
         else:
@@ -234,7 +234,7 @@ class PageRB1:
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) /!\\ clés en majuscules"""
         # Traduit le nom de la catégorie
         try:
-            self.current_button.setProperty("text", translation_data[self.current_button.property("text").upper()])
+            self.current_button.setProperty("text", translation_data[self.current_button.property("text")])
         except KeyError:
             logging.debug("Impossible de traduire le nom de la catégorie de la page_rb1.\n")
 
@@ -243,7 +243,7 @@ class PageRB1:
                      "renard_checkbutton", "camera_checkbutton", "pcc_checkbutton", "data_checkbutton"]:
             widget = self.page.findChild(QObject, text)
             try:
-                widget.setProperty("text", translation_data[widget.property("text").upper()])
+                widget.setProperty("text", translation_data[widget.property("text")])
             except KeyError:
                 logging.debug("Pas de traduction pour le widget : " + text + ", traduction sautée.\n")
 
@@ -257,7 +257,7 @@ class PageRB1:
             # Pour chaque combobox récupère chaque éléments et essaye de les traduire
             for element in widget.property("elements").toVariant():
                 try:
-                    new_list.append(translation_data[element.upper()])
+                    new_list.append(translation_data[element])
                 # Si la traduction n'existe pas, laisse un message de debug et remet l'élément dans sa langue d'origine
                 except KeyError:
                     logging.debug("Pas de traduction pour l'élément " + element + " du widget " + combo + ".\n")
@@ -266,7 +266,7 @@ class PageRB1:
             # Enfin, remet la nouvelle list dans la combobox et change l'index
             widget.setProperty("elements", new_list)
             try:
-                widget.change_selection(translation_data[selection_text.upper()])
+                widget.change_selection(translation_data[selection_text])
             except KeyError:
                 widget.change_selection(selection_text)
 
@@ -274,30 +274,31 @@ class PageRB1:
         keys = list(self.next_log_level.keys())
         try:
             for key in keys:
-                e = translation_data[key.upper()]
+                e = translation_data[key]
         # Si au moins une des clés n'a pas de traduction, ne traduit pas le registre
         except KeyError:
             logging.error("Au moins un des niveaux de registre n'a pas de traduction, bouton registre sauté.\n")
         else:
             # Modification du convertiseur de niveau de log + création du dictionaire bidirectionel
-            self.log_type_converter = {translation_data[keys[0].upper()]: self.log_type_converter[keys[0]],
-                                       translation_data[keys[1].upper()]: self.log_type_converter[keys[1]],
-                                       translation_data[keys[2].upper()]: self.log_type_converter[keys[2]],
-                                       translation_data[keys[3].upper()]: self.log_type_converter[keys[3]]
+            #OPTIMIZE : utiliser une for loop pour réduire
+            self.log_type_converter = {translation_data[keys[0]]: self.log_type_converter[keys[0]],
+                                       translation_data[keys[1]]: self.log_type_converter[keys[1]],
+                                       translation_data[keys[2]]: self.log_type_converter[keys[2]],
+                                       translation_data[keys[3]]: self.log_type_converter[keys[3]]
                                        }
             self.log_type_converter.update(dict([reversed(i) for i in self.log_type_converter.items()]))
 
             # Modification du changeur de niveau de log
             self.next_log_level = \
-                {translation_data[keys[0].upper()]: translation_data[self.next_log_level[keys[0]].upper()],
-                 translation_data[keys[1].upper()]: translation_data[self.next_log_level[keys[1]].upper()],
-                 translation_data[keys[2].upper()]: translation_data[self.next_log_level[keys[2]].upper()],
-                 translation_data[keys[3].upper()]: translation_data[self.next_log_level[keys[3]].upper()]
+                {translation_data[keys[0]]: translation_data[self.next_log_level[keys[0]]],
+                 translation_data[keys[1]]: translation_data[self.next_log_level[keys[1]]],
+                 translation_data[keys[2]]: translation_data[self.next_log_level[keys[2]]],
+                 translation_data[keys[3]]: translation_data[self.next_log_level[keys[3]]]
                  }
 
             # Change la langue du registre indiqué sur le bouton
             log_button = self.page.findChild(QObject, "log_button")
-            log_button.setProperty("text", translation_data[log_button.property("text").upper()])
+            log_button.setProperty("text", translation_data[log_button.property("text")])
 
     def on_language_change(self, application):
         """Fonction permettant de changer la langue de l'application d'initialisation.

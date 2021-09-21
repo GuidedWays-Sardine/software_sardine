@@ -212,7 +212,8 @@ class InitialisationWindow:
                 translations = line.rstrip('\n').split(";")
                 # Si la ligne est complète l'ajoute dans le dictionaire (clé = langue actuelle, valeur = traduction)
                 if len(translations) == len(language_list):
-                    translation_data[translations[current_index].upper()] = translations[new_index]
+                    #FEATURE : faire une classe pour rendre le dictionnaire case insensitive
+                    translation_data[translations[current_index]] = translations[new_index]
                 # S'il n'y a pas autant de traductions que de langue, cela signifie que la ligne est incomplète
                 else:
                     logging.debug("Certaines traductions manquantes sur la ligne suivante (langues attendus, mots) :" +

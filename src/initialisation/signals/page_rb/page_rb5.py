@@ -129,12 +129,15 @@ class PageRB5:
             page_rb1_data = application.visible_pages[0].get_values(application.read_language_file(application.language,
                                                                                                    "English"))
             try:
-                # Met à jours les valeurs nécessaires
-                self.screen_default["Simulateur SARDINE"]["Ligne virtuelle"][0] = not page_rb1_data["Caméra"]
-                self.screen_default["Simulateur SARDINE"]["Train caméra"][0] = page_rb1_data["Caméra"]
-                self.screen_default["Poste de Commande Centralisé (PCC)"]["TCO"][0] = page_rb1_data["PCC"]
+                category_list = list(self.screen_default.keys())
+                # Met à jours les valeurs nécessaires (self.screen_default[category][screen][0]
+                self.screen_default[category_list[0]][list(self.screen_default[category_list[0]].keys())[2]][0] \
+                    = not page_rb1_data["Caméra"]
+                self.screen_default[category_list[0]][list(self.screen_default[category_list[0]].keys())[3]][0] \
+                    = page_rb1_data["Caméra"]
+                self.screen_default[category_list[1]][list(self.screen_default[category_list[1]].keys())[0]][0] \
+                    = page_rb1_data["PCC"]
             except Exception as error:
-                #FIXME : ne prend pas la traduction en compte
                 logging.warning("Erreur lors de la mise à jour des paramètres par défaut des écrans.\n\t\t" +
                                 "Erreur de type : " + str(type(error)) + "\n\t\t" +
                                 "Avec comme message d\'erreur : " + error.args[0] + "\n\n\t\t" +
@@ -321,7 +324,7 @@ class PageRB5:
 
         # Inverse les données de traduction pour avoir un dictionnaire langue actuelle -> Français
         # FIXME : les clés sont en upper(), trouver un moyen de correctement trouver l'élément
-        inverse_translation_data = dict([reversed(i) for i in translation_data.items()])
+        translation_data = dict([reversed(i) for i in translation_data.items()])
 
         # Pour chaque catégorie d'écrans
         for category_key in list(self.screen_settings.keys()):
@@ -329,12 +332,12 @@ class PageRB5:
             for screen_key in list(self.screen_settings[category_key].keys()):
                 # Sauvegarde chaque donné au format : category.screen.data = value
                 try:
-                    screen_settings_key = inverse_translation_data[category_key] + "."
+                    screen_settings_key = translation_data[category_key] + "."
                 except KeyError:
                     logging.debug("Traduction de " + category_key + " manquante.\n")
                     screen_settings_key = category_key + "."
                 try:
-                    screen_settings_key += inverse_translation_data[screen_key] + "."
+                    screen_settings_key += translation_data[screen_key] + "."
                 except KeyError:
                     logging.debug("Traduction de " + screen_key + " manquante.\n")
                     screen_settings_key += screen_key + "."
@@ -357,13 +360,13 @@ class PageRB5:
     def change_language(self, translation_data):
         # Traduit le nom de la catégorie
         try:
-            self.current_button.setProperty("text", translation_data[self.current_button.property("text").upper()])
+            self.current_button.setProperty("text", translation_data[self.current_button.property("text")])
         except KeyError:
             logging.debug("Impossible de traduire le nom de la catégorie de la page_rb5.\n")
 
         # Change la traduction pour le texte Plein écran ? du DMI_checkbutton
         try:
-            self.page.setProperty("fullscreen_text", translation_data[self.page.property("fullscreen_text").upper()])
+            self.page.setProperty("fullscreen_text", translation_data[self.page.property("fullscreen_text")])
         except KeyError:
             logging.debug("Traduction manquante pour : " + self.page.property("fullscreen_text") + ".\n")
 
@@ -373,8 +376,8 @@ class PageRB5:
             for screen_index in list(self.screen_default[category_index].keys()):
                 try:
                     # Essaye de rajouter la version avec la clé traduite de l'écran
-                    self.screen_default[category_index][translation_data[screen_index.upper()]] = self.screen_default[category_index][screen_index]
-                    self.screen_settings[category_index][translation_data[screen_index.upper()]] = self.screen_settings[category_index][screen_index]
+                    self.screen_default[category_index][translation_data[screen_index]] = self.screen_default[category_index][screen_index]
+                    self.screen_settings[category_index][translation_data[screen_index]] = self.screen_settings[category_index][screen_index]
                 except KeyError:
                     # Récupère dans l'éventualité d'une traduction manquante
                     logging.debug("Traduction manquante pour l'écran : " + screen_index +
@@ -386,8 +389,8 @@ class PageRB5:
 
             try:
                 # Essaye de traduire le nom de la catégorie
-                self.screen_default[translation_data[category_index.upper()]] = self.screen_default[category_index]
-                self.screen_settings[translation_data[category_index.upper()]] = self.screen_settings[category_index]
+                self.screen_default[translation_data[category_index]] = self.screen_default[category_index]
+                self.screen_settings[translation_data[category_index]] = self.screen_settings[category_index]
             except KeyError:
                 # Récupère dans l'éventualité d'une traduction manquante
                 logging.debug("Traduction manquante pour la catégorie : " + category_index + ", traduction sautée.\n")
@@ -398,12 +401,12 @@ class PageRB5:
 
                 # Si la catégorie est la catégorie active, traduit la catégorie active
                 if self.category_active == category_index:
-                    self.category_active = translation_data[self.category_active.upper()]
+                    self.category_active = translation_data[self.category_active]
 
         # Traduit le texte devant le DMI_checkbutton pour savoir
         try:
             black_screens = self.page.findChild(QObject, "black_screens")
-            black_screens.setProperty("text", translation_data[black_screens.property("text").upper()])
+            black_screens.setProperty("text", translation_data[black_screens.property("text")])
         except KeyError:
             logging.debug("Traduction manquante pour : " + black_screens.property("text") + ", traduction sautée.\n")
 
