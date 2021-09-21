@@ -151,6 +151,7 @@ class PageRB5:
         self.change_visible_screen_list()
 
     def on_page_closed(self, application):
+        """Fonction appelée quand la page est fermée."""
         # Cache toutes les fenêtres d'index
         for screen_index in self.screen_index:
             screen_index.hide()
@@ -161,6 +162,7 @@ class PageRB5:
             self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
 
     def on_left_category_button_clicked(self):
+        """signal appelé quand le bouton de changement de catégorie est appuyé. Met à jour la catégorie et ses écrans"""
         # Récupère les valeurs actuellement sur l'écran
         old_screens_values = self.page.get_values().toVariant()
         for index in range(0, len(old_screens_values)):
@@ -186,6 +188,7 @@ class PageRB5:
             left_category_button.setProperty("is_activable", False)
 
     def on_right_category_button_clicked(self):
+        """signal appelé quand le bouton de changement de catégorie est appuyé. Met à jour la catégorie et ses écrans"""
         # Récupère les valeurs actuellement sur l'écran
         old_screens_values = self.page.get_values().toVariant()
         for index in range(0, len(old_screens_values)):
@@ -211,6 +214,8 @@ class PageRB5:
             right_category_button.setProperty("is_activable", False)
 
     def change_visible_screen_list(self):
+        """met à jour la liste d'écrans à rendre visible. A appeler dans le cas où la catégorie
+         ou la liste d'écrans sont changés ou quand des paramètres sont mis à jour en python"""
         # Essaye de récupérer le dictionnaire des écrans de la catégorie sélectionnée et récupère leurs clés
         category_screen_dict = self.screen_default[self.category_active]
         default_settings_dict = self.screen_settings[self.category_active]
@@ -259,6 +264,7 @@ class PageRB5:
             self.page.findChild(QObject, "right_screen_button").setProperty("is_visible", False)
 
     def on_left_screen_button_pressed(self):
+        """Signal appelé lorsque le bouton permettant de changer les écrans d'une catégorie visible."""
         # Récupère les valeurs actuellement sur l'écran
         old_screens_values = self.page.get_values().toVariant()
         for index in range(0, len(old_screens_values)):
@@ -269,6 +275,7 @@ class PageRB5:
         self.change_visible_screen_list()
 
     def on_right_screen_button_pressed(self):
+        """Signal appelé lorsque le bouton permettant de changer les écrans d'une catégorie visible."""
         # Récupère les valeurs actuellement sur l'écran
         old_screens_values = self.page.get_values().toVariant()
         for index in range(0, len(old_screens_values)):
@@ -279,6 +286,18 @@ class PageRB5:
         self.change_visible_screen_list()
 
     def get_values(self, translation_data):
+        """Récupère les paramètres de la page de paramètres page_rb5
+
+        Parameters
+        ----------
+        translation_data: `dict`
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive
+
+        Returns
+        -------
+        parameters : `dictionary`
+            un dictionaire de paramètres de la page de paramètres page_rb5
+        """
         # Initialise les paramètres récupérés et récupère le paramètre sur si les écrans sont éteins
         page_parameters = {"EcransEteints": self.page.findChild(QObject, "black_screens").property("is_checked")}
 
@@ -316,6 +335,14 @@ class PageRB5:
         return page_parameters
 
     def set_values(self, data, translation_data):
+        """A partir d'un dictionnaire de valeur, essaye de changer les settings des différentes pages
+
+        Parameters
+        ----------
+        data: `dict`
+            Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
+        translation_data: `dict`
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive"""
         # Change la valeur pour les écrans noirs
         try:
             self.page.findChild(QObject, "black_screens").setProperty("is_checked", data["EcransEteints"])
@@ -323,7 +350,6 @@ class PageRB5:
             logging.debug("Aucune données EcransEteints dans le fichier paramètres ouverts.\n")
 
         # Inverse les données de traduction pour avoir un dictionnaire langue actuelle -> Français
-        # FIXME : les clés sont en upper(), trouver un moyen de correctement trouver l'élément
         translation_data = dict([reversed(i) for i in translation_data.items()])
 
         # Pour chaque catégorie d'écrans
@@ -358,6 +384,12 @@ class PageRB5:
         self.change_visible_screen_list()
 
     def change_language(self, translation_data):
+        """Permet à partir d'un dictionaire de traduction, de traduire les textes de la page de paramètres
+
+        Parameters
+        ----------
+        translation_data: `dict`
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive"""
         # Traduit le nom de la catégorie
         try:
             self.current_button.setProperty("text", translation_data[self.current_button.property("text")])

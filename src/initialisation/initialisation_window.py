@@ -227,7 +227,7 @@ class InitialisationWindow:
         Parameters
         ----------
         translation_data: `dict`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) /!\\ clés en majuscules"""
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive"""
         initial_time = time.time()
         logging.info("Changement du choix de langue, mise à jour de l'application d'initialisation.\n")
 

@@ -112,12 +112,16 @@ class PageRB1:
     def get_values(self, translation_data):
         """Récupère les paramètres de la page de paramètres page_rb1
 
+        Parameters
+        ----------
+        translation_data: `dict`
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive
+
         Returns
         -------
         parameters : `dictionary`
             un dictionaire de paramètres de la page de paramètres page_rb1
-        translation_data: `dict`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) /!\\ clés en majuscules"""
+        """
         page_parameters = {}
 
         # Paramètre du pupitre
@@ -167,7 +171,7 @@ class PageRB1:
         data: `dict`
             Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
         translation_data: `dict`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) /!\\ clés en majuscules"""
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive"""
         # Paramètre du pupitre (quel pupitre sera utilisé)
         try:
             command_board = data["Pupitre"].replace("_", " ")
@@ -231,7 +235,7 @@ class PageRB1:
         Parameters
         ----------
         translation_data: `dict`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) /!\\ clés en majuscules"""
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive"""
         # Traduit le nom de la catégorie
         try:
             self.current_button.setProperty("text", translation_data[self.current_button.property("text")])
@@ -272,15 +276,8 @@ class PageRB1:
 
         # Pour le bouton registre, laissé à part car son fonctionnement est particulier
         keys = list(self.next_log_level.keys())
-        try:
-            for key in keys:
-                e = translation_data[key]
-        # Si au moins une des clés n'a pas de traduction, ne traduit pas le registre
-        except KeyError:
-            logging.error("Au moins un des niveaux de registre n'a pas de traduction, bouton registre sauté.\n")
-        else:
-            # Modification du convertiseur de niveau de log + création du dictionaire bidirectionel
-            #OPTIMIZE : utiliser une for loop pour réduire
+        if all(key in translation_data for key in keys):
+            # Si toutes les clés ont un traduction, traduit le log_type_converter et next_log_level
             self.log_type_converter = {translation_data[keys[0]]: self.log_type_converter[keys[0]],
                                        translation_data[keys[1]]: self.log_type_converter[keys[1]],
                                        translation_data[keys[2]]: self.log_type_converter[keys[2]],
@@ -295,6 +292,8 @@ class PageRB1:
                  translation_data[keys[2]]: translation_data[self.next_log_level[keys[2]]],
                  translation_data[keys[3]]: translation_data[self.next_log_level[keys[3]]]
                  }
+        else:
+            logging.warning("Au moins un des niveaux de registre n'a pas de traduction, bouton registre sauté.\n")
 
             # Change la langue du registre indiqué sur le bouton
             log_button = self.page.findChild(QObject, "log_button")
