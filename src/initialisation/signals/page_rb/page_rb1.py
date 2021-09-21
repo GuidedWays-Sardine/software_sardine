@@ -8,6 +8,7 @@ from PyQt5.QtCore import QObject
 class PageRB1:
 
     index = 1   # Attention dans les tableaux l'index comment à 0 donc index_tab = index - 1
+    name = "Général"
     page = None
     current_button = None
 
@@ -43,6 +44,7 @@ class PageRB1:
         self.index = index
         self.page = page
         self.current_button = current_button
+        self.current_button.setProperty("text", self.name)
 
         # Charge les langues disponibles pour le DMI
         language_list = None

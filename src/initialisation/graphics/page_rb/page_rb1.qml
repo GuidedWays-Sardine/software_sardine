@@ -9,7 +9,6 @@ DMI_page {
 
 
 
-
     //Checkbutton pour savoir si le pupitre léger est connecté à UE (ou à Renard)
     DMI_checkbutton {
         id: pcc_checkbutton

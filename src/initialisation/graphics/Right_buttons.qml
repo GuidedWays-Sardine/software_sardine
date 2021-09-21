@@ -1,18 +1,20 @@
 import QtQuick 2.0
+
 import "../../DMI_default/ETCS_3.6.0"
 
 
 Item {
     id: right_buttons
     objectName: "right_buttons"
+
     anchors.fill: parent
+
 
 
     //Bouton rb1
     DMI_button{
         id: rb1
         objectName: "rb1"
-        text: "Général"
 
         default_x: 580
         default_y: 15
@@ -28,7 +30,6 @@ Item {
     DMI_button{
         id: rb2
         objectName: "rb2"
-        text: "Train"
 
         default_x: 580
         default_y: 65
@@ -44,7 +45,6 @@ Item {
     DMI_button{
         id: rb3
         objectName: "rb3"
-        text: "Trajet"
 
         default_x: 580
         default_y: 115
@@ -60,7 +60,6 @@ Item {
     DMI_button{
         id: rb4
         objectName: "rb4"
-        text: "Ecrans"
 
         default_x: 580
         default_y: 165
@@ -76,7 +75,6 @@ Item {
     DMI_button{
         id: rb5
         objectName: "rb5"
-        text: ""
 
         default_x: 580
         default_y: 215
@@ -92,7 +90,6 @@ Item {
     DMI_button{
         id: rb6
         objectName: "rb6"
-        text: ""
 
         default_x: 580
         default_y: 265
@@ -108,7 +105,6 @@ Item {
     DMI_button{
         id: rb7
         objectName: "rb7"
-        text: ""
 
         default_x: 580
         default_y: 315
@@ -124,7 +120,6 @@ Item {
     DMI_button{
         id: rb8
         objectName: "rb8"
-        text: ""
 
         default_x: 580
         default_y: 365

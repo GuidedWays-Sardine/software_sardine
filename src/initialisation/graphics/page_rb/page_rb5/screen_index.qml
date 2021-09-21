@@ -7,6 +7,7 @@ import "../../../../DMI_Default/ETCS_3.6.0"
 
 Window {
     id: screen_window
+
     minimumWidth: 288
     minimumHeight: 162
     visible: true
@@ -20,11 +21,11 @@ Window {
      DMI_button{
         id: screen_index
         objectName: "screen_index"
-        text: index
-
-        font_size: 128
 
         anchors.fill: parent
+
+        text: index
+        font_size: 128
 
         is_activable: false
         is_positive: true

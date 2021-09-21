@@ -10,6 +10,7 @@ class PageRB5:
     """Class de la page de settings 5"""
 
     index = 5   # Attention dans les tableaux l'index comment à 0 donc index_tab = index - 1
+    name = "Écrans"
     page = None
     current_button = None
     screen_count = 0
@@ -46,7 +47,7 @@ class PageRB5:
         self.index = index
         self.page = page
         self.current_button = current_button
-        self.current_button.setProperty("text", "Écrans")
+        self.current_button.setProperty("text", self.name)
 
         # Récupère le nombre d'écrans présents
         self.screen_count = QDesktopWidget().screenCount()
@@ -72,8 +73,8 @@ class PageRB5:
             screen_list.append(str(screen_index + 1))
 
         # Envoie liste des fenètre et de leurs dimensions à la graphique de la page*
-        self.page.setProperty("screenList", screen_list)
-        self.page.setProperty("screenSize", screen_dimensions)
+        self.page.setProperty("screen_list", screen_list)
+        self.page.setProperty("screen_size", screen_dimensions)
 
         # Définit le fonctionnement de base des boutons supérieurs et inférieurs
         # Aucun des boutons ne sera fonctionnel et aucune page ne sera chargée
@@ -237,10 +238,10 @@ class PageRB5:
                 visible_screen_minimum_wh.append([0, 0])
 
         # Maintenant que toutes les valeurs ont été récupérés, les ajoutent à la partie graphique
-        self.page.setProperty("screenNames", visible_screen_names)
-        self.page.setProperty("screenActivable", visible_screen_activable)
-        self.page.setProperty("minimumWH", visible_screen_minimum_wh)
-        self.page.setProperty("initialSettings", visible_screen_default_settings)
+        self.page.setProperty("screen_names", visible_screen_names)
+        self.page.setProperty("screen_activable", visible_screen_activable)
+        self.page.setProperty("minimum_wh", visible_screen_minimum_wh)
+        self.page.setProperty("initial_settings", visible_screen_default_settings)
 
         # Rend visible et fonctionnel les boutons du bas pour changer de page d'écrans dans le cas
         if len(category_screen_list) > 4:
@@ -362,9 +363,9 @@ class PageRB5:
 
         # Change la traduction pour le texte Plein écran ? du DMI_checkbutton
         try:
-            self.page.setProperty("fullscreenText", translation_data[self.page.property("fullscreenText").upper()])
+            self.page.setProperty("fullscreen_text", translation_data[self.page.property("fullscreen_text").upper()])
         except KeyError:
-            logging.debug("Traduction manquante pour : " + self.page.property("fullscreenText") + ".\n")
+            logging.debug("Traduction manquante pour : " + self.page.property("fullscreen_text") + ".\n")
 
         # Pour chaque catégories
         for category_index in list(self.screen_default.keys()):
