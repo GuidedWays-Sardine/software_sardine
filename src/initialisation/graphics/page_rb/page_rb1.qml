@@ -9,32 +9,32 @@ DMI_page {
 
 
 
-    //Checkbutton pour savoir si le pupitre léger est connecté à UE (ou à Renard)
-    DMI_checkbutton {
-        id: pcc_checkbutton
-        objectName: "pcc_checkbutton"
-
-        box_length: 20
-        default_x: 55
-        default_y: 329
-
-        text: "Activation du PCC (Poste de Commande Centralisé) ?"
-
-        is_checked: false
-        is_activable: true
-        is_positive: false
-    }
-
     //Checkbutton pour savoir si l'utilisateur veut un retour direct des donnés (courbe de vitesses, ...)
     DMI_checkbutton {
-        id: data_checkbutton
-        objectName: "data_checkbutton"
+        id: data_check
+        objectName: "data_check"
 
         box_length: 20
         default_x: 55
         default_y: 369
 
         text: "Affichage en direct des données du train ?"
+
+        is_checked: false
+        is_activable: true
+        is_positive: false
+    }
+
+    //Checkbutton pour savoir si le pupitre léger est connecté à UE (ou à Renard)
+    DMI_checkbutton {
+        id: pcc_check
+        objectName: "pcc_check"
+
+        box_length: 20
+        default_x: 55
+        default_y: 329
+
+        text: "Activation du PCC (Poste de Commande Centralisé) ?"
 
         is_checked: false
         is_activable: true
@@ -57,7 +57,7 @@ DMI_page {
         objectName: "log_button"
         text: "Complet"
 
-        default_x: 50
+        default_x: 55
         default_y: 260
         default_height: 50
         default_width: 111
@@ -85,7 +85,7 @@ DMI_page {
         objectName: "language_combo"
         elements: ["Français"]
 
-        default_x: 223
+        default_x: 54 + 111 + 58 - 1
         default_y: 260
         default_height: 50
         default_width: 111
@@ -112,7 +112,7 @@ DMI_page {
         id: dmi_combo
         objectName: "dmi_combo"
 
-        default_x: 54
+        default_x: 55 - 1
         default_y: 169
         default_width: 280
         default_height: 50
@@ -125,8 +125,8 @@ DMI_page {
 
     //Checkbutton pour savoir si le pupitre léger est connecté à UE (ou à Renard)
     DMI_checkbutton {
-        id: renard_checkbutton
-        objectName: "renard_checkbutton"
+        id: renard_check
+        objectName: "renard_check"
 
         box_length: 20
         default_x: 55
@@ -141,8 +141,8 @@ DMI_page {
 
     //Checkbutton pour savoir si Renard est connecté via la caméra (ou via un visuel direct)
     DMI_checkbutton {
-        id: camera_checkbutton
-        objectName: "camera_checkbutton"
+        id: camera_check
+        objectName: "camera_check"
 
         box_length: 20
         default_x: 335
@@ -172,7 +172,7 @@ DMI_page {
         id: command_board_combo
         objectName: "command_board_combo"
 
-        default_x: 54
+        default_x: 55 - 1
         default_y: 39
         default_width: 280
         default_height: 50
