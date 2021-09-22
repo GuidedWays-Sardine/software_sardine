@@ -177,13 +177,13 @@ DMI_page{
 
     //checkbutton pour savoir si l'application doit éteindre les écrans qui ne sont pas utilisés
     DMI_checkbutton {
-        id: black_screens
-        objectName: "black_screens"
+        id: black_screens_check
+        objectName: "black_screens_check"
 
         default_x: 15
         default_y: 379
         box_length: 20
-        text: "Eteindre les écrans qui ne sont pas utilisés"
+        text: "Eteindre les écrans qui ne sont pas utilisés ?"
 
         is_activable: true
         is_positive: false

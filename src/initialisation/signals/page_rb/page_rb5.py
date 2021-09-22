@@ -299,7 +299,7 @@ class PageRB5:
             un dictionaire de paramètres de la page de paramètres page_rb5
         """
         # Initialise les paramètres récupérés et récupère le paramètre sur si les écrans sont éteins
-        page_parameters = {"EcransEteints": self.page.findChild(QObject, "black_screens").property("is_checked")}
+        page_parameters = {"EcransEteints": self.page.findChild(QObject, "black_screens_check").property("is_checked")}
 
         # Récupère les valeurs actuellement sur l'écran
         old_screens_values = self.page.get_values().toVariant()
@@ -345,7 +345,7 @@ class PageRB5:
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive"""
         # Change la valeur pour les écrans noirs
         try:
-            self.page.findChild(QObject, "black_screens").setProperty("is_checked", data["EcransEteints"])
+            self.page.findChild(QObject, "black_screens_check").setProperty("is_checked", data["EcransEteints"])
         except KeyError:
             logging.debug("Aucune données EcransEteints dans le fichier paramètres ouverts.\n")
 
@@ -437,10 +437,10 @@ class PageRB5:
 
         # Traduit le texte devant le DMI_checkbutton pour savoir
         try:
-            black_screens = self.page.findChild(QObject, "black_screens")
-            black_screens.setProperty("text", translation_data[black_screens.property("text")])
+            black_screens_check = self.page.findChild(QObject, "black_screens_check")
+            black_screens_check.setProperty("text", translation_data[black_screens_check.property("text")])
         except KeyError:
-            logging.debug("Traduction manquante pour : " + black_screens.property("text") + ", traduction sautée.\n")
+            logging.debug("Traduction manquante pour : " + black_screens_check.property("text") + ", traduction sautée.\n")
 
         # Remets à jour la page actuelle et le titre de la catégorie
         self.page.findChild(QObject, "category_title").setProperty("text", self.category_active)
