@@ -20,10 +20,10 @@ Item {
 
     //permet à partir des valeurs de positions et dimensions par défauts de calculer la position et la taille peu importe la dimension de la fenêtre
     readonly property real ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
-    width: (root.default_width - 2) * root.ratio
-    height: (root.default_height - 2) * root.ratio
     x: (root.default_x + 1) * root.ratio
     y: (root.default_y + 1) * root.ratio
+    width: (root.default_width - 2) * root.ratio
+    height: (root.default_height - 2) * root.ratio
 
     //Propriétés liés à l'image et au texte que l'utilisateur peut rajouter sur le bouton
     property string default_image: ""       //image à afficher en tout temps sur le bouton si image_activable et image_not_activable sont vides (peut rester vide)

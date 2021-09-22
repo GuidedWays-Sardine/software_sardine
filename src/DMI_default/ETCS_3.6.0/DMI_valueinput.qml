@@ -20,10 +20,10 @@ Item{
 
     //permet à partir des valeurs de positions et dimensions par défauts de calculer
     readonly property real ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
-    width: (root.default_width - 2) * root.ratio
-    height: (root.default_height - 2) * root.ratio
     x: (root.default_x + 1) * root.ratio
     y: (root.default_y + 1) * root.ratio
+    width: (root.default_width - 2) * root.ratio
+    height: (root.default_height - 2) * root.ratio
     visible: root.is_visible
 
     //Propriétés liés aux valeurs limites et la valeur actuellement sélectionnée
@@ -169,41 +169,49 @@ Item{
     //Rectangle pour l'ombre extérieure inférieure
     Rectangle {
         id: out_bottom_shadow
-        color: root.shadow
+
         width: root.width + 2 * root.ratio
         height: 2 * root.ratio
         anchors.horizontalCenter: body.horizontalCenter
         anchors.verticalCenter: body.bottom
+
+        color: root.shadow
     }
 
     //Rectangle pour l'ombre extérieure droite
     Rectangle {
         id: out_right_shadow
-        color: root.shadow
+
         width: 2 * root.ratio
         height: root.height + 2 * root.ratio
         anchors.right: out_bottom_shadow.right
         anchors.bottom: out_bottom_shadow.bottom
+
+        color: root.shadow
     }
 
     //Rectangle pour l'ombre extérieure supérieure
     Rectangle {
         id: out_top_shadow
-        color: root.black
+
         height: 2 * root.ratio
         anchors.top: out_right_shadow.top
         anchors.right: out_right_shadow.left
         anchors.left: out_bottom_shadow.left
+
+        color: root.black
     }
 
     //Rectangle pour l'ombre extérieure gauche
     Rectangle {
         id: out_left_shadow
-        color: root.black
+
         width: 2 * root.ratio
         anchors.top: out_top_shadow.top
         anchors.left: out_top_shadow.left
         anchors.bottom: out_bottom_shadow.top
+
+        color: root.black
     }
 
 
@@ -211,41 +219,49 @@ Item{
     //Rectangle pour l'ombre intérieure inférieure
     Rectangle {
         id: in_bottom_shadow
-        color: is_positive ? root.black : "transparent"
+
         height: 2 * root.ratio
         anchors.bottom: out_bottom_shadow.top
         anchors.left: out_left_shadow.right
         anchors.right: out_right_shadow.left
+
+        color: is_positive ? root.black : "transparent"
     }
 
     //Rectangle pour l'ombre intérieure droite
     Rectangle {
         id: in_right_shadow
-        color: is_positive ? root.black : "transparent"
+
         width: 2 * root.ratio
         anchors.right: out_right_shadow.left
         anchors.bottom: out_bottom_shadow.top
         anchors.top: out_top_shadow.bottom
+
+        color: is_positive ? root.black : "transparent"
     }
 
     //Rectangle pour l'ombre intérieure supérieure
     Rectangle {
         id: in_top_shadow
-        color: is_positive ? root.shadow : "transparent"
+
         height: 2 * root.ratio
         anchors.top: out_top_shadow.bottom
         anchors.left: out_left_shadow.right
         anchors.right: in_right_shadow.left
+
+        color: is_positive ? root.shadow : "transparent"
     }
 
     //Rectangle pour l'ombre intérieure gauche
     Rectangle {
         id: in_left_shadow
-        color: is_positive ? root.shadow : "transparent"
+
         width: 2 * root.ratio
         anchors.left: out_left_shadow.right
         anchors.top: out_top_shadow.bottom
         anchors.bottom: in_bottom_shadow.top
+
+        color: is_positive ? root.shadow : "transparent"
     }
 }
 

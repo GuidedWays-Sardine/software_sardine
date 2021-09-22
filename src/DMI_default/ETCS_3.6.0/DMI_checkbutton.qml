@@ -20,10 +20,10 @@ Item {
 
     //permet à partir des valeurs de positions et dimensions par défauts de calculer
     readonly property real ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
-    width: (root.box_length - 2) * root.ratio
-    height: (root.box_length - 2) * root.ratio
     x: (root.default_x + 1) * root.ratio
     y: (root.default_y + 1) * root.ratio
+    width: (root.box_length - 2) * root.ratio
+    height: (root.box_length - 2) * root.ratio
 
     //Propriétés liés à l'image et au texte que l'utilisateur peut rajouter sur le bouton
     property string text: ""                 //texte à afficher

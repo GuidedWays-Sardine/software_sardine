@@ -23,7 +23,7 @@ Item {
     }
 
     //Informations et fonctions sur l'écran affiché et fonction pour mettre à jour l'encadré de paramètres
-    property var initial_settings: [] //Format [screen_index, fullscreen_on, [x, y], [width, height]]
+    property var initial_settings: [] //Format [screen_index, fullscreen_on_check, [x, y], [width, height]]
     onInitial_settingsChanged: {
         //Si une sélection d'un écran spécifique a été donnée
         if(root.is_activable && initial_settings.length >= 1) {
@@ -31,7 +31,7 @@ Item {
 
             //Si un écran particulier a été sélectionné et que plus d'informations ont été données
             if(screen_index_combo.selection_index > 0 && initial_settings.length >= 2) {
-                fullscreen_on.is_checked = initial_settings[1]
+                fullscreen_on_check.is_checked = initial_settings[1]
 
                 //Si l'écran n'est pas en fullscreen et que des données ont été fournis pour la position et la taille de l'écran
                 if(!initial_settings[1] && initial_settings.length >= 4 && initial_settings[2].length >= 2 && initial_settings[3].length >= 2){
@@ -63,13 +63,13 @@ Item {
 
     //Valeur à récupérer (les dimensions, la position, l'écran sélectionné)
     property int selected_screen: screen_index_combo.selection_index
-    property bool is_fullscreen: fullscreen_on.is_checked
+    property bool is_fullscreen: fullscreen_on_check.is_checked
     property int input_x: x_input.value
     property int input_y: y_input.value
     property int input_width: width_input.value
     property int input_height: height_input.value
 
-    // propriétés permettant de mettre à jour les différents texts communs de la page (ici que le texte du fullscreen_on)
+    // propriétés permettant de mettre à jour les différents texts communs de la page (ici que le texte du fullscreen_on_check)
     property string fullscreen_text: ""
 
 
@@ -126,7 +126,7 @@ Item {
             //cas si l'écran est passé à aucun
             if(screen_index_combo.selection_text === screen_index_combo.elements[0]) {
                 //décoche l'option fullscreen et remet à 0 les valeurs des input pour les dimensions de la fenêtre
-                fullscreen_on.is_checked = false
+                fullscreen_on_check.is_checked = false
                 x_input.clear()
                 y_input.clear()
                 width_input.clear()
@@ -149,7 +149,7 @@ Item {
                 }
 
                 //Active la combobox plein écran si l'écran sélectionné est valide
-                fullscreen_on.is_checked = root.screen_valid
+                fullscreen_on_check.is_checked = root.screen_valid
             }
         }
     }
@@ -157,7 +157,7 @@ Item {
 
     //Checkbutton pour savoir si l'écran sera en fullscreen
     DMI_checkbutton {
-        id: fullscreen_on
+        id: fullscreen_on_check
 
         box_length: 16
         default_x: 400
@@ -192,7 +192,7 @@ Item {
         text: "x:"
         font_size: root.font_size
 
-        is_dark_grey: !root.screen_valid || !(screen_index_combo.selection_index !== 0 && !fullscreen_on.is_checked)
+        is_dark_grey: !root.screen_valid || !(screen_index_combo.selection_index !== 0 && !fullscreen_on_check.is_checked)
         is_visible: root.screen_name != ""
     }
 
@@ -209,7 +209,7 @@ Item {
         font_size: root.font_size
 
         is_max_default: false
-        is_activable: root.screen_valid && screen_index_combo.selection_index !== 0 && !fullscreen_on.is_checked
+        is_activable: root.screen_valid && screen_index_combo.selection_index !== 0 && !fullscreen_on_check.is_checked
         is_positive: false
         is_visible: root.screen_name != ""
 
@@ -232,7 +232,7 @@ Item {
         text: "y:"
         font_size: root.font_size
 
-        is_dark_grey: !root.screen_valid || !(screen_index_combo.selection_index !== 0 && !fullscreen_on.is_checked)
+        is_dark_grey: !root.screen_valid || !(screen_index_combo.selection_index !== 0 && !fullscreen_on_check.is_checked)
         is_visible: root.screen_name != ""
     }
 
@@ -249,7 +249,7 @@ Item {
         font_size: root.font_size
 
         is_max_default: false
-        is_activable: root.screen_valid && screen_index_combo.selection_index !== 0 && !fullscreen_on.is_checked
+        is_activable: root.screen_valid && screen_index_combo.selection_index !== 0 && !fullscreen_on_check.is_checked
         is_positive: false
         is_visible: root.screen_name != ""
 
@@ -274,7 +274,7 @@ Item {
         font_size: root.font_size
 
         is_visible: root.screen_name != ""
-        is_dark_grey: !root.screen_valid || !(screen_index_combo.selection_index !== 0 && !fullscreen_on.is_checked)
+        is_dark_grey: !root.screen_valid || !(screen_index_combo.selection_index !== 0 && !fullscreen_on_check.is_checked)
     }
 
     DMI_valueinput {
@@ -290,7 +290,7 @@ Item {
         font_size: root.font_size
 
         is_max_default: root.screen_valid && screen_index_combo.selection_index !== 0
-        is_activable: root.screen_valid && screen_index_combo.selection_index !== 0 && !fullscreen_on.is_checked
+        is_activable: root.screen_valid && screen_index_combo.selection_index !== 0 && !fullscreen_on_check.is_checked
         is_positive: false
         is_visible: root.screen_name != ""
     }
@@ -305,7 +305,7 @@ Item {
         text: "w:"
         font_size: root.font_size
 
-        is_dark_grey: !root.screen_valid || !(screen_index_combo.selection_index !== 0 && !fullscreen_on.is_checked)
+        is_dark_grey: !root.screen_valid || !(screen_index_combo.selection_index !== 0 && !fullscreen_on_check.is_checked)
         is_visible: root.screen_name != ""
     }
 
@@ -322,7 +322,7 @@ Item {
         font_size: root.font_size
 
         is_max_default: root.screen_valid && screen_index_combo.selection_index !== 0
-        is_activable: root.screen_valid && screen_index_combo.selection_index !== 0 && !fullscreen_on.is_checked
+        is_activable: root.screen_valid && screen_index_combo.selection_index !== 0 && !fullscreen_on_check.is_checked
         is_positive: false
         is_visible: root.screen_name != ""
     }

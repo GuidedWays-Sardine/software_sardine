@@ -20,10 +20,10 @@ Item {
 
     //permet à partir des valeurs de positions et dimensions par défauts de calculer le ratio à appliquer aux dimensions
     readonly property real ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
-    width: (root.default_width - 2) * root.ratio
-    height: (root.default_height - 2) * root.ratio
     x: (root.default_x + 1) * root.ratio
     y: (root.default_y + 1) * root.ratio
+    width: (root.default_width - 2) * root.ratio
+    height: (root.default_height - 2) * root.ratio
     visible: is_visible
 
     //Propriétés liés aux donnés de la combobox
@@ -89,10 +89,10 @@ Item {
         indicator: Canvas {
             id: canvas
 
-            height: 8 * root.ratio
-            width: 12 * root.ratio
             x: root.width - width - body.rightPadding
             y: body.topPadding + (body.availableHeight - height) / 2
+            width: 12 * root.ratio
+            height: 8 * root.ratio
 
 
             //Permet d'ouvrir le popup quand la combobox est sélectionné et appelle le signal handler
@@ -152,8 +152,8 @@ Item {
         popup: Popup {
             id: popup
 
-            y: (root.default_height - 2) * root.ratio
             x: (root.is_positive ? 4 : 2) * root.ratio
+            y: (root.default_height - 2) * root.ratio
             width: root.width - (is_positive ? 6 : 2) * root.ratio
             implicitHeight: ((body.count < root.elements_displayed ? body.height*body.count : body.height * root.elements_displayed) + (root.is_positive ? 6 : 8) * root.ratio) * (root.is_activable && body.count > 1)
             padding: 1 * root.ratio
@@ -219,42 +219,50 @@ Item {
     //Rectangle pour l'ombre extérieure supérieure
     Rectangle {
         id: out_top_shadow
-        color: root.black
+
         width: root.width
         height: 2 * root.ratio
         anchors.verticalCenter: body.top
         anchors.left: body.left
         anchors.leftMargin: - 1 * root.ratio
+
+        color: root.black
     }
 
     //Rectangle pour l'ombre extérieure droite
     Rectangle {
         id: out_right_shadow
-        color: root.shadow
+
         width: 2 * root.ratio
         height: combo.popup.visible && is_activable && combo.count > 1 ? combo.height*((combo.count < root.elements_displayed ? combo.count : root.elements_displayed) + 1) + 10 * root.ratio : combo.height
         anchors.top: out_top_shadow.top
         anchors.left: out_top_shadow.right
+
+        color: root.shadow
     }
 
     //Rectangle pour l'ombre extérieure gauche
     Rectangle {
         id: out_left_shadow
-        color: root.black
+
         width: 2 * root.ratio
         anchors.top: out_top_shadow.top
         anchors.left: out_top_shadow.left
         anchors.bottom: out_bottom_shadow.top
+
+        color: root.black
     }
 
     //Rectangle pour l'ombre extérieure inférieure
     Rectangle {
         id: out_bottom_shadow
-        color: root.shadow
+
         height: 2 * root.ratio
         anchors.right: out_right_shadow.right
         anchors.bottom: out_right_shadow.bottom
         anchors.left: out_top_shadow.left
+
+        color: root.shadow
     }
 
 
@@ -262,40 +270,48 @@ Item {
     //Rectangle pour l'ombre extérieure inférieure
     Rectangle {
         id: in_bottom_shadow
-        color: root.is_positive ? root.black : "transparent"
+
         height: 2 * root.ratio
         anchors.bottom: out_bottom_shadow.top
         anchors.left: out_left_shadow.right
         anchors.right: out_right_shadow.left
+
+        color: root.is_positive ? root.black : "transparent"
     }
 
     //Rectangle pour l'ombre extérieure droite
     Rectangle {
         id: in_right_shadow
-        color: root.is_positive ? root.black : "transparent"
+
         width: 2 * root.ratio
         anchors.right: out_right_shadow.left
         anchors.bottom: out_bottom_shadow.top
         anchors.top: out_top_shadow.bottom
+
+        color: root.is_positive ? root.black : "transparent"
     }
 
     //Rectangle pour l'ombre extérieure supérieure
     Rectangle {
         id: in_top_shadow
-        color: root.is_positive ? root.shadow : "transparent"
+
         height: 2 * root.ratio
         anchors.top: out_top_shadow.bottom
         anchors.left: out_left_shadow.right
         anchors.right: in_right_shadow.left
+
+        color: root.is_positive ? root.shadow : "transparent"
     }
 
     //Rectangle pour l'ombre extérieure gauche
     Rectangle {
         id: in_left_shadow
-        color: root.is_positive ? root.shadow : "transparent"
+
         width: 2 * root.ratio
         anchors.left: out_left_shadow.right
         anchors.top: out_top_shadow.bottom
         anchors.bottom: in_bottom_shadow.top
+
+        color: root.is_positive ? root.shadow : "transparent"
     }
 }
