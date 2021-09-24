@@ -86,7 +86,7 @@ class BottomButtons:
             application.launch_simulator = True
             application.app.quit()
 
-    def on_open_clicked(self, application):
+    def on_open_clicked(self, application, default_file=""):
         """Fonction appelée lorsque le bouton ouvrir est cliqué.
         Permet l'ouverture d'un fichier texte et la récupération de ses paramètres.
 
@@ -94,12 +94,19 @@ class BottomButtons:
         ----------
         application: `InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets
+        default_file: `string`
+            fichier à ouvrir, s'il est vide, la fenêtre d'ouverture de fichier apparaitra
         """
-        # Ouvre la fenêtre d'ouverture de fichier
-        file_path = QFileDialog.getOpenFileName(caption="Ouvrir un fichier de configuration",
-                                                directory="../settings/general_settings",
-                                                filter="Fichiers de configuration Sardine (*.settings)")
-        if file_path[0] != '':
+        # Ouvre la fenêtre d'ouverture de fichier si default_file est vide, sinon utilise default_file comme chemin
+        if default_file == "":
+            file_path = QFileDialog.getOpenFileName(caption="Ouvrir un fichier de configuration",
+                                                    directory="../settings/general_settings",
+                                                    filter="Fichiers de configuration Sardine (*.settings)")
+        else:
+            file_path = [default_file]
+
+        # Si un fichier a bien été sélectionné
+        if file_path[0] != "":
             # Change le préfixe du registre pour indiquer que les données de l'applications d'initialisation sont changées
             log.change_log_prefix("[Changement des données]")
 

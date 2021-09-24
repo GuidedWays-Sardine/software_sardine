@@ -69,6 +69,13 @@ class InitialisationWindow:
         self.bottom_buttons = bb.BottomButtons(self)
         self.right_buttons = rb.RightButtons(self)
 
+        # Charge le fichier de paramètres défault.settings s'il existe
+        if os.path.isfile("../settings/general_settings/default.settings"):
+            logging.info("Chargement des paramètres du fichier default.settings.\n")
+            self.bottom_buttons.on_open_clicked(self, "../settings/general_settings/default.settings")
+        else:
+            logging.info("Aucun fichier paramètres default.settings.\n")
+
         # Indique le temps de chargement de l'application
         logging.info("Application d'initialisation chargée en " +
                      str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n\n")
