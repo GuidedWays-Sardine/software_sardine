@@ -5,6 +5,8 @@ import time
 from PyQt5.QtCore import QObject
 from PyQt5.QtWidgets import QFileDialog
 
+import log.log as log
+
 
 class BottomButtons:
     """Classe s'occupant du chargement et du fonctionnement des boutons inférieurs de l'application d'initialisation"""
@@ -46,6 +48,7 @@ class BottomButtons:
         application: `InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets
         """
+        logging.info("Fermeture de la page de paramètres page_rb" + str(application.active_settings_page) + ".\n\n")
         application.app.quit()
 
     def on_launch_clicked(self, application):
@@ -54,9 +57,31 @@ class BottomButtons:
         Parameters
         ----------
         application: `InitialisationWindow`
-            L'instance source de l'application d'initialisation, pour les widgets"""
+            L'instance source de l'application d'initialisation, pour les widgets
+        """
         # Vérifie que toutes les pages accessibles sont complètes
         if application.is_fully_loaded == application.is_completed:
+            # Si au moins une page a été correctement chargée
+            if application.active_settings_page != -1:
+                # Appelle la fonction de fermeture de page de la page actuelle active et change le préfix du registre
+                if application.is_fully_loaded[application.active_settings_page - 1] and \
+                        "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
+                    # Si c'est le cas, appelle la fonction de fermeture de la page
+                    try:
+                        application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
+                    except Exception as error:
+                        logging.error("La fonction on_page_closed de la page " + str(application.active_settings_page)
+                                      + " contient une erreur\n\t\t" +
+                                      "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                                      "Avec comme message d\'erreur : " + error.args[0] + "\n\n\t\t" +
+                                      "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                else:
+                    logging.debug("Aucune fonction on_page_closed page " + str(application.active_settings_page) + "\n")
+
+                # Indique que la page a été fermée et change le préfix
+                logging.info("Fermeture de la page de paramètres page_rb" + str(application.active_settings_page) + ".\n\n")
+                log.change_log_prefix("[Récupération des données]")
+
             # Indique que le simulateur va être lancée et ferme l'application
             application.launch_simulator = True
             application.app.quit()
@@ -75,6 +100,9 @@ class BottomButtons:
                                                 directory="../settings/general_settings",
                                                 filter="Fichiers de configuration Sardine (*.settings)")
         if file_path[0] != '':
+            # Change le préfixe du registre pour indiquer que les données de l'applications d'initialisation sont changées
+            log.change_log_prefix("[Changement des données]")
+
             # Récupère les donnés du fichier text et mets à jour les différentes pages de paramètres
             try:
                 data = {}
@@ -104,6 +132,9 @@ class BottomButtons:
                 else:
                     logging.warning(file_path[0] + " n'a aucune donné ou n'est pas dans un format compatible.\n")
 
+            # Remet le préfixe de registre de la page active
+            log.change_log_prefix("[page_rb" + str(application.active_settings_page) + "]")
+
     def on_save_clicked(self, application):
         """Fonction appelée lorsque le bouton sauvegarder est cliqué.
         Permet la sauvegarde d'un fichier avec les settings.
@@ -118,6 +149,9 @@ class BottomButtons:
                                                 directory="../settings/general_settings",
                                                 filter="Fichiers de configuration Sardine (*.settings)")
         if file_path[0] != '':
+            # Change le préfixe du registre pour indiquer que les données de l'applications d'initialisation sont sauvegardées
+            log.change_log_prefix("[Sauvegarde des données]")
+
             # Récupère les donnés des différentes pages de paramètres et les écrit dans le fichier
             data = application.get_values()
             try:
@@ -139,6 +173,9 @@ class BottomButtons:
                 # Dans le cas où aucune donnée n'a été récupérée, le signale dans les logs
                 if len(data) == 0:
                     logging.warning("Aucune valeur récupérée, le fichier créé sera vide.\n")
+
+            # Remet le préfixe de registre de la page active
+            log.change_log_prefix("[page_rb" + str(application.active_settings_page) + "]")
 
     def change_language(self, application, translation_data):
         """Permet à partir d'un dictionnaire de traduction de traduire le textes des 4 boutons inférieurs.

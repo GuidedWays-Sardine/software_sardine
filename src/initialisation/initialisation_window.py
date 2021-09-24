@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QObject
 from PyQt5.QtQml import QQmlApplicationEngine
 
+import log.log as log
 from initialisation.signals import right_buttons as rb
 from initialisation.signals import bottom_buttons as bb
 
@@ -31,7 +32,7 @@ class InitialisationWindow:
     language = "Français"
 
     # Variable stockant l'index de la fenêtre de paramètres actuellement chargée
-    active_settings_page = -1
+    active_settings_page = -1       #Stocke la page de paramètres active de 1 à 8
 
     # Variable stockant si le simulateur va être lancé
     launch_simulator = False
@@ -47,7 +48,8 @@ class InitialisationWindow:
             Soulevé quand le fichier .qml de la fenêtre d'initialisation a une erreur de syntaxe et n'est pas lisible
         """
         initial_time = time.time()
-        logging.info("Début du chargement de l'application d'intialisation\n\n")
+        log.change_log_prefix("[Initialisation]")
+        logging.info("Début du chargement de l'application d'intialisation.\n\n")
 
         # Lance l'application et cherche pour le fichier QML avec tous les éléments de la fenêtre d'initialisation
         self.app = QApplication(sys.argv)
@@ -67,9 +69,31 @@ class InitialisationWindow:
         self.bottom_buttons = bb.BottomButtons(self)
         self.right_buttons = rb.RightButtons(self)
 
-        # Lance l'application
+        # Indique le temps de chargement de l'application
         logging.info("Application d'initialisation chargée en " +
                      str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n\n")
+
+        # Charge la logique de la première page de paramètres
+        if self.active_settings_page != -1:
+            # Dans le cas ou au moins une page a été chargée entièrement, change le préfix et appelle son ouverture
+            log.change_log_prefix("[page_rb" + str(self.active_settings_page) + "]")
+            logging.info("Ouverture de la page de paramètres page_rb" + str(self.active_settings_page) + ".\n")
+
+            if self.is_fully_loaded[self.active_settings_page - 1] and \
+                    "on_page_opened" in dir(self.visible_pages[self.active_settings_page - 1]):
+                # Si c'est le cas, appelle la fonction d'ouverture de la page
+                try:
+                    self.visible_pages[self.active_settings_page - 1].on_page_opened(self)
+                except Exception as error:
+                    logging.error("La fonction on_page_opened de la page " + str(self.active_settings_page) +
+                                  " contient une erreur.\n\t\t" +
+                                  "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                                  "Avec comme message d\'erreur : " + error.args[0] + "\n\n\t\t" +
+                                  "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+            else:
+                logging.debug("Aucune fonction on_page_opened page " + str(self.active_settings_page) + "\n")
+
+        # Lance l'application
         self.win.show()
         self.app.exec()
 
@@ -171,8 +195,8 @@ class InitialisationWindow:
                 logging.warning("La page " + str(page.index) + " n'a pas de fonction set_values.\n")
 
             # Indique le nombre de pages dont les paramètres on été changés
-            logging.info("Paramètres changés sur " + str(count) + " pages en " +
-                         str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n\n")
+        logging.info("Paramètres changés sur " + str(count) + " pages en " +
+                     str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n\n")
 
     def read_language_file(self, current_language, new_language):
         """Fonction permettant de lire le fichier de traduction et d'en resortir un dictionnaire de traduction

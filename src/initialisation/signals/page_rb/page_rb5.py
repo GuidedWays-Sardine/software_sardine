@@ -55,7 +55,7 @@ class PageRB5:
         # Récupère le nombre d'écrans présents
         self.screen_count = QDesktopWidget().screenCount()
         self.screen_index = [None] * self.screen_count
-        logging.info("[page_rb5] : " + str(self.screen_count) + " écrans détectés.\n")
+        logging.info(str(self.screen_count) + " écrans détectés.\n")
 
         # Charge autant de fenêtres d'index d'écrans qu'il y a d'écrans
         for screen_index in range(0, self.screen_count):
