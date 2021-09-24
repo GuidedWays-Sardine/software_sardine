@@ -1,11 +1,11 @@
 import logging
-import log.log as log
 import traceback
 
+import log.log as log
 import initialisation.initialisation_window as ini
 
 
-VERSION = "1.0.2"
+VERSION = "1.0.3"
 INITIAL_LOGGING = logging.DEBUG
 
 
@@ -25,7 +25,8 @@ def main():
             parameters = app.get_values()
             del app
         else:
-            logging.info("l\'application d'initialisation a été fermée sans donner suite")
+            log.change_log_prefix()
+            logging.info("l\'application d'initialisation a été fermée sans donner suite.\n")
             exit(0)
     # Récupère une potentielle erreur fatale et la charge
     except Exception as error:
@@ -35,7 +36,8 @@ def main():
                       ''.join(traceback.format_tb(error.__traceback__)).replace('\n', '\n\t\t') + "\n")
         exit(-1)
 
-    # Change le niveau de log à celui précisé par l'utilisateur
+    # Change le niveau de log à celui précisé par l'utilisateur et enlève tout préfixe
+    log.change_log_prefix()
     logging.info("Lancement du simulateur\n\n\n")
     try:
         logging.getLogger().setLevel(parameters["Registre"])

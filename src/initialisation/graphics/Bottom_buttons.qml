@@ -1,25 +1,31 @@
 import QtQuick 2.0
+
 import "../../DMI_default/ETCS_3.6.0"
+
 
 Item {
     id: bottom_buttons
     objectName: "bottom_buttons"
+
     anchors.fill: parent
+
+
 
     //Bouton quitter
     DMI_button{
         id: quit
         objectName: "quit"
+
+        default_x: 0
+        default_y: 415
+        default_height: 50
+        default_width: 120
+
         text: "Quitter"
 
-        defaultX: 0
-        defaultY: 415
-        defaultHeight: 50
-        defaultWidth: 120
-
-        isActivable: true
-        isPositive: true
-        isVisible: true
+        is_activable: true
+        is_positive: true
+        is_visible: true
     }
 
 
@@ -27,47 +33,50 @@ Item {
     DMI_button{
         id: open
         objectName: "open"
+
+        default_x: 280
+        default_y: 415
+        default_height: 50
+        default_width: 120
+
         text: "Ouvrir"
 
-        defaultX: 280
-        defaultY: 415
-        defaultHeight: 50
-        defaultWidth: 120
-
-        isActivable: true
-        isPositive: true
-        isVisible: true
+        is_activable: true
+        is_positive: true
+        is_visible: true
     }
 
     //Bouton sauvegarder
     DMI_button{
         id: save
         objectName: "save"
+
+        default_x: 400
+        default_y: 415
+        default_height: 50
+        default_width: 120
+
         text: "Sauvegarder"
 
-        defaultX: 400
-        defaultY: 415
-        defaultHeight: 50
-        defaultWidth: 120
-
-        isActivable: true
-        isPositive: true
-        isVisible: true
+        is_activable: true
+        is_positive: true
+        is_visible: true
     }
 
     //Bouton lancer
     DMI_button{
         id: launch
         objectName: "launch"
+
+        default_x: 520
+        default_y: 415
+        default_height: 50
+        default_width: 120
+
         text: "Lancer"
 
-        defaultX: 520
-        defaultY: 415
-        defaultHeight: 50
-        defaultWidth: 120
-
-        isActivable: true
-        isPositive: true
-        isVisible: true
+        is_activable: true
+        is_positive: true
+        is_visible: true
     }
 }
