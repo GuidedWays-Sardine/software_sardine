@@ -68,7 +68,8 @@ class BottomButtons:
         Parameters
         ----------
         application: `InitialisationWindow`
-            L'instance source de l'application d'initialisation, pour les widgets"""
+            L'instance source de l'application d'initialisation, pour les widgets
+        """
         # Ouvre la fenêtre d'ouverture de fichier
         file_path = QFileDialog.getOpenFileName(caption="Ouvrir un fichier de configuration",
                                                 directory="../settings/general_settings",
@@ -110,7 +111,8 @@ class BottomButtons:
         Parameters
         ----------
         application: `InitialisationWindow`
-            L'instance source de l'application d'initialisation, pour les widgets"""
+            L'instance source de l'application d'initialisation, pour les widgets
+        """
         # Ouvre la fenêtre de sauvegarde et enregegistre le fichier si un nom a été donné
         file_path = QFileDialog.getSaveFileName(caption="Sauvegarder un fichier de configuration",
                                                 directory="../settings/general_settings",

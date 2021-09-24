@@ -79,7 +79,8 @@ class InitialisationWindow:
         Returns
         -------
         parameters : `dictionary`
-            un dictionaire de paramètres avec tous les paramètres du simulateur"""
+            un dictionaire de paramètres avec tous les paramètres du simulateur
+        """
         initial_time = time.time()
         logging.info("Tentative de récupération des paramètres.\n")
         parameters = {}
@@ -227,7 +228,8 @@ class InitialisationWindow:
         Parameters
         ----------
         translation_data: `dict`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive"""
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive
+        """
         initial_time = time.time()
         logging.info("Changement du choix de langue, mise à jour de l'application d'initialisation.\n")
 

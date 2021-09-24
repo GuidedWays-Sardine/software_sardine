@@ -6,8 +6,10 @@ from PyQt5.QtCore import QObject
 
 
 class PageRB1:
+    """Classe pour la page de paramètres 1"""
 
-    index = 1   # Attention dans les tableaux l'index comment à 0 donc index_tab = index - 1
+    # variables nécessaire au bon fonctionnement de la page
+    index = 1   # Attention dans les tableaux l'index commence à 0
     name = "Général"
     page = None
     current_button = None
@@ -39,8 +41,9 @@ class PageRB1:
         index: `int`
             index de la page (1 pour le bouton d'en haut -> 8 pour le bouton d'en bas
         current_button: `QObject`
-            Le bouton auquel sera relié la page (généralement d'id : page_rb + index)"""
-        # Change les valeurs initiales de la page
+            Le bouton auquel sera relié la page (généralement d'id : page_rb + index)
+        """
+        # Stocke les informations nécessaires au fonctionnement de la page
         self.index = index
         self.page = page
         self.current_button = current_button
@@ -171,7 +174,8 @@ class PageRB1:
         data: `dict`
             Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
         translation_data: `dict`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive"""
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive
+        """
         # Paramètre du pupitre (quel pupitre sera utilisé)
         try:
             command_board = data["Pupitre"].replace("_", " ")
@@ -235,7 +239,8 @@ class PageRB1:
         Parameters
         ----------
         translation_data: `dict`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive"""
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitiv
+        """
         # Traduit le nom de la catégorie
         try:
             self.current_button.setProperty("text", translation_data[self.current_button.property("text")])
@@ -306,7 +311,8 @@ class PageRB1:
         Parameters
         ----------
         application: `InitialisationWindow`
-            L'instance source de l'application d'initialisation, pour les widgets"""
+            L'instance source de l'application d'initialisation, pour les widgets
+        """
         # Récupère le dictionaire de traduction et change la langue de l'application d'initialisation et du DMI
         new_language = self.page.findChild(QObject, "language_combo").property("selection_text")
         if application.language.upper() != new_language.upper():
@@ -326,7 +332,8 @@ class PageRB1:
 
     def on_renard_selected(self):
         """Fonction appelée lorsque le checkbutton renard_check est sélectioné.
-        Permet d'activer ou de désactiver le checkbutton pour la caméra"""
+        Permet d'activer ou de désactiver le checkbutton pour la caméra.
+        """
         # Récupère si le checkbutton de renard est activé ainsi que le checkbutton caméra
         connected = self.page.findChild(QObject, "renard_check").property("is_checked")
         camera_check = self.page.findChild(QObject, "camera_check")
@@ -341,6 +348,7 @@ class PageRB1:
 
     def on_log_button_clicked(self):
         """Fonction appelée lorsque le bouton log_button est cliqué.
-        Permet de changer le niveau de registre affiché sur le bouton (et récupéré)"""
+        Permet de changer le niveau de registre affiché sur le bouton (et récupéré)
+        """
         log_button = self.page.findChild(QObject, "log_button")
         log_button.setProperty("text", self.next_log_level[log_button.property("text")])
