@@ -24,7 +24,7 @@ Connecté par une caméra ?; Connected to a camera ?
 Interface pupitre;Command board interface
 ETCS 3.6.0;ETCS 3.6.0
 
-Niveau de Registre;Log level
+Niveau de registre;Log level
 Complet;Complete
 Suffisant;Sufficient
 Minimal;Minimal
@@ -34,4 +34,22 @@ Langue;Language
 
 Activation du PCC (Poste de Commande Centralisé) ?;Activation of CCS (Centralised Control Station) ?
 Affichage en direct des données du train ?;Live display of train's data ?
+
+#page_rb5
+Écrans;Screens
+
+Plein écran ?;Fullscreen ?
+Eteindre les écrans qui ne sont pas utilisés ?;Turn off the screens that aren't used ?
+
+Simulateur SARDINE;SARDINE simulator
+DMI central;Central DMI
+DMI gauche;Left DMI
+Ligne virtuelle;Virtual line
+Train caméra;Camera train
+
+Poste de Commande Centralisé (PCC);Centralised Control Station (CCS)
+Tableau de Contrôle Optique (TCO);Optical Control Panel (OCP)
+
+Visualisation des données;Data visualisation
+Courbes;Graphs
 

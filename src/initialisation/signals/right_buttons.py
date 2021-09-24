@@ -6,6 +6,8 @@ import time
 from PyQt5.QtQml import QQmlApplicationEngine
 from PyQt5.QtCore import QObject
 
+import log.log as log
+
 
 class RightButtons:
     """Classe s'occupant du chargement et du fonctionnement des boutons de droite de l'application d'initialisation"""
@@ -55,10 +57,10 @@ class RightButtons:
                           + "Veuillez lire les warnings ci-dessus pour comprendre la cause du problème et le régler.\n")
             save_button = application.win.findChild(QObject, "sauvegarder")
             if save_button is not None:
-                save_button.setProperty("isVisible", False)
+                save_button.setProperty("is_visible", False)
             open_button = application.win.findChild(QObject, "ouvrir")
             if open_button is not None:
-                open_button.setProperty("isVisible", False)
+                open_button.setProperty("is_visible", False)
 
     def initialise_page(self, application, engine, index, page_path, current_button):
         """Fonction permettant d'initialiser une des pages de l'application d'initialisation lié à un bouton de droite.
@@ -85,7 +87,7 @@ class RightButtons:
         # Si la page est chargée, alors elle existe et elle est ajoutée
         if engine.rootObjects():
             # Définit le bouton comme activable
-            current_button.setProperty("isActivable", True)
+            current_button.setProperty("is_activable", True)
 
             # Si c'est la première page existante, la charge
             if application.visible_pages == [None] * 8:
@@ -102,8 +104,8 @@ class RightButtons:
             return True
         else:
             # Sinon définit le bouton comme non activable et en négatif et enlève le potentiel texte
-            current_button.setProperty("isPositive", False)
-            current_button.setProperty("isActivable", False)
+            current_button.setProperty("is_positive", False)
+            current_button.setProperty("is_activable", False)
             current_button.setProperty("text", "")
 
             # Si le fichier existe mais n'a pas été ouvert, cela veut dire qu'il y a une erreur dans le fichier
@@ -154,7 +156,7 @@ class RightButtons:
 
                 # Indique que la page a entièrement été chargée (partie visuelle et signals)
                 application.is_fully_loaded[index - 1] = True
-                current_button.setProperty("isPositive", True)
+                current_button.setProperty("is_positive", True)
                 return True
             except Exception as error:
                 # Permet de rattraper une erreur si le code est incorrect où qu'il ne suit pas la documentation
@@ -162,13 +164,13 @@ class RightButtons:
                                 "Erreur de type : " + str(type(error)) + "\n\t\t" +
                                 "Avec comme message d\'erreur : " + error.args[0] +
                                 "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-                current_button.setProperty("isPositive", False)
+                current_button.setProperty("is_positive", False)
                 return False
         else:
             # Sinon pas de signals handlers associé, le précise dans les logs
             logging.warning("La page " + str(index) + " n\'a aucun fichier signals associé.\n\t\t" +
                             "La page sera visible mais ne sera pas fonctionnelle.\n")
-            current_button.setProperty("isPositive", False)
+            current_button.setProperty("is_positive", False)
             return False
 
     def on_new_page_selected(self, application, engine, new_index):
@@ -186,34 +188,41 @@ class RightButtons:
         """
         # Vérifie que la page que l'on veut charger n'est pas celle qui est déjà chargée
         if new_index != application.active_settings_page:
-            if application.is_fully_loaded[application.active_settings_page - 1]:
-                # Vérifie si la page que l'on va décharger a un protocole de déchargement spécifique
-                if "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
-                    try:
-                        application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
-                    except Exception as error:
-                        logging.error("La fonction on_page_closed de la page " + str(application.active_settings_page)
-                                      + " contient une erreur\n\t\t" +
-                                      "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                                      "Avec comme message d\'erreur : " + error.args[0] + "\n\n\t\t" +
-                                      "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-                else:
-                    logging.debug("Aucune fonction on_page_closed page " + str(application.active_settings_page) + "\n")
+            # Vérifie si la page que l'on va décharger a un protocole de déchargement spécifique
+            if application.is_fully_loaded[application.active_settings_page - 1] and \
+                    "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
+                # Si c'est le cas, appelle la fonction de fermeture de la page
+                try:
+                    application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
+                except Exception as error:
+                    logging.error("La fonction on_page_closed de la page " + str(application.active_settings_page)
+                                  + " contient une erreur\n\t\t" +
+                                  "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                                  "Avec comme message d\'erreur : " + error.args[0] + "\n\n\t\t" +
+                                  "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+            else:
+                logging.debug("Aucune fonction on_page_closed page " + str(application.active_settings_page) + "\n")
+
+            # Indique que l'on sort de l'ancienne page, change le préfixe et indique que l'on rentre dans la nouvelle page
+            logging.info("Fermeture de la page de paramètres page_rb" + str(application.active_settings_page) + ".\n\n")
+            log.change_log_prefix("[page_rb" + str(new_index) + "]")
+            logging.info("Ouverture de la page de paramètres page_rb" + str(new_index) + ".\n")
 
             # Charge le graphique de la nouvelle page et indique à l'application l'index de la nouvelle page chargée
             self.pages_stackview.set_active_page(engine.rootObjects()[0])
             application.active_settings_page = new_index
 
-            if application.is_fully_loaded[application.active_settings_page - 1]:
-                # Vérifie si la page que l'on charge  a un protocole de chargement particulier
-                if "on_page_opened" in dir(application.visible_pages[application.active_settings_page - 1]):
-                    try:
-                        application.visible_pages[application.active_settings_page - 1].on_page_opened(application)
-                    except Exception as error:
-                        logging.error("La fonction on_page_opened de la page " + str(application.active_settings_page) +
-                                      " contient une erreur.\n\t\t" +
-                                      "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                                      "Avec comme message d\'erreur : " + error.args[0] + "\n\n\t\t" +
-                                      "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-                else:
-                    logging.debug("Aucune fonction on_page_opened page " + str(application.active_settings_page) + "\n")
+            # Vérifie si la page que l'on charge  a un protocole de chargement particulier
+            if application.is_fully_loaded[application.active_settings_page - 1] and \
+                    "on_page_opened" in dir(application.visible_pages[application.active_settings_page - 1]):
+                # Si c'est le cas, appelle la fonction d'ouverture de la page
+                try:
+                    application.visible_pages[application.active_settings_page - 1].on_page_opened(application)
+                except Exception as error:
+                    logging.error("La fonction on_page_opened de la page " + str(application.active_settings_page) +
+                                  " contient une erreur.\n\t\t" +
+                                  "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                                  "Avec comme message d\'erreur : " + error.args[0] + "\n\n\t\t" +
+                                  "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+            else:
+                logging.debug("Aucune fonction on_page_opened page " + str(application.active_settings_page) + "\n")
