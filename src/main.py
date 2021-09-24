@@ -5,7 +5,7 @@ import log.log as log
 import initialisation.initialisation_window as ini
 
 
-VERSION = "1.0.2"
+VERSION = "1.0.3"
 INITIAL_LOGGING = logging.DEBUG
 
 
