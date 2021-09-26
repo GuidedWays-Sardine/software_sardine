@@ -104,6 +104,9 @@ class InitialisationWindow:
         self.win.show()
         self.app.exec()
 
+        # Quand l'application est fermée, cache la fenêtre de l'application d'initialisation et ses fenêtres annexes
+        self.win.hide()
+
     def get_values(self):
         """Récupère les paramètres des différentes pages de paramètres en appelant chaque fonction get_values()
 
