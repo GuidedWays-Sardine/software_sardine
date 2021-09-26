@@ -52,14 +52,14 @@ class PageRB1:
         # Charge les langues disponibles pour le DMI
         language_list = None
         try:
-            file = open("../settings/language_settings/translation.settings", "r", encoding='utf-8-sig')
+            file = open("../settings/language_settings/initialisation.lang", "r", encoding='utf-8-sig')
         # Récupère les exceptions dans le cas où le fichier de traduction n'existe pas ou est mal placé
         except (FileNotFoundError, OSError):
-            logging.warning("Impossible d'ouvrir le fichier settings/language_settings/translation.settings\n\t\t" +
+            logging.warning("Impossible d'ouvrir le fichier settings/language_settings/initialisation.lang\n\t\t" +
                             "Assurez vous que celui-ci existe. Le Français sera choisis par défaut\n")
         # Sinon lit la première ligne pour récupérer la liste des langues
         else:
-            # Récupère la liste des langues (ligne 1 du fichier translation.settings)
+            # Récupère la liste des langues (ligne 1 du fichier initialisation.lang)
             language_list = file.readline().rstrip('\n').split(";")
 
             # Met la liste des langues dans la combobox et connecte une fonction pour changer la langue
