@@ -6,7 +6,7 @@ import QtQuick.Controls 2.15
 Pane {
     id: root
 
-    anchors.fill: parent
+    //anchors.fill: parent
 
     //Définit les bordures à 0
     topPadding: 0
