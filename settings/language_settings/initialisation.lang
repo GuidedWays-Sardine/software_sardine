@@ -22,7 +22,7 @@ Connecté à Renard ?;Connected to Renard ?
 Connecté par une caméra ?; Connected to a camera ?
 
 Interface pupitre;Command board interface
-ETCS 3.6.0;ETCS 3.6.0
+ETCS;ETCS
 
 Niveau de registre;Log level
 Complet;Complete

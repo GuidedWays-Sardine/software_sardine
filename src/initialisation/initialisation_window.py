@@ -230,7 +230,7 @@ class InitialisationWindow:
         translation_data = {}
 
         # Ouvre le fichier et récupère la liste des langues
-        file = open("../settings/language_settings/translation.settings", "r", encoding='utf-8-sig')
+        file = open("../settings/language_settings/initialisation.lang", "r", encoding='utf-8-sig')
         language_list = file.readline().upper().rstrip('\n').split(";")
 
         # Récupère les index des langues
