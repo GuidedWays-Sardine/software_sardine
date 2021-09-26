@@ -6,7 +6,7 @@ import "page_rb5"
 import "../../../DMI_default/ETCS"
 
 
-DMI_page{
+Item {
     id: page_rb5
     objectName: "page_rb5"
 
