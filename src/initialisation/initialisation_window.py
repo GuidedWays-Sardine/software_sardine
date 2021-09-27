@@ -65,7 +65,6 @@ class InitialisationWindow:
 
         # Si le fichier qml a été compris, récupère la fenêtre et initialise les différents boutons et pages
         self.win = self.engine.rootObjects()[0]
-        self.win.visibilityChanged.connect(lambda: self.app.quit())
         self.bottom_buttons = bb.BottomButtons(self)
         self.right_buttons = rb.RightButtons(self)
 
