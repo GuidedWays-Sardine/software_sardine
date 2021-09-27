@@ -13,7 +13,7 @@ Window {
     visible: true
     color: "#031122"
     title: qsTr("Driver Machine Interface")
-    flags: Qt.FramelessWindowHint | Qt.Window
+    flags: Qt.FramelessWindowHint | Qt.Window | Qt.WindowStaysOnTopHint
 
     //stackview pour contenir les différentes zones du Driver Machine Interface (voir section 6.1.1.1)
     DMI_stackview{
