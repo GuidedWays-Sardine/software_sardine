@@ -11,6 +11,7 @@ class PageRB1:
     # variables nécessaire au bon fonctionnement de la page
     index = 1   # Attention dans les tableaux l'index commence à 0
     name = "Général"
+    engine = None
     page = None
     current_button = None
 
@@ -29,7 +30,7 @@ class PageRB1:
     log_type_converter.update(dict([reversed(i) for i in log_type_converter.items()]))
     # Permet de faire un dictionaire bi-directionel
 
-    def __init__(self, application, page, index, current_button):
+    def __init__(self, application, engine, index, current_button):
         """Fonction d'initialisation de la page de paramtètres 1 (page paramètres général)
 
         Parameters
@@ -45,7 +46,8 @@ class PageRB1:
         """
         # Stocke les informations nécessaires au fonctionnement de la page
         self.index = index
-        self.page = page
+        self.engine = engine
+        self.page = engine.rootObjects()[0]
         self.current_button = current_button
         self.current_button.setProperty("text", self.name)
 
@@ -109,8 +111,9 @@ class PageRB1:
 
         # Rend le bouton registre fonctionel (quand cliqué, indique le registre suivant)
         self.page.findChild(QObject, "log_button").clicked.connect(self.on_log_button_clicked)
+
         # Définit la page comme validée (toutes les valeurs par défaut suffisent)
-        application.is_completed[0] = True
+        application.is_completed_by_default[self.index - 1] = "is_page_valid" not in dir(self)
 
     def get_values(self, translation_data):
         """Récupère les paramètres de la page de paramètres page_rb1

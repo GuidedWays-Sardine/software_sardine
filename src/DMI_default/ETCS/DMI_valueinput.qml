@@ -141,7 +141,7 @@ Item{
         }
 
         //détecte quand le focus change (quand l'utilisateur valide son entrée) et vérifie si la valeur entrée rentre dans le validateur
-        onFocusChanged: {
+        onFocusChanged: { //FIXME : pas appelé directement quand focus perdu
             if(body.text != "" && !body.focus){
                 //cas où la valeur entrée est supérieur à la valeur maximale ou inférieur à la valeur minimale (remet la valeur dans les limites)
                 if(parseInt(body.text) > root.maximum_value) {

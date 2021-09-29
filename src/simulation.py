@@ -81,5 +81,3 @@ class Simulation:
             raise ModuleNotFoundError("Aucun des modules de simulations n'a pu être chargé correctement.\n\n")
 
         self.app.exec()
-
-        print('fin')

@@ -12,6 +12,7 @@ class PageRB5:
     # variables nécessaire au bon fonctionnement de la page
     index = 5   # Attention dans les tableaux l'index commence à 0
     name = "Écrans"
+    engine = None
     page = None
     current_button = None
     screen_count = 0
@@ -32,7 +33,7 @@ class PageRB5:
     category_active = ""
     screen_list_active = 0
 
-    def __init__(self, application, page, index, current_button):
+    def __init__(self, application, engine, index, current_button):
         """Fonction d'initialisation de la page de paramtètres 1 (page paramètres général)
 
         Parameters
@@ -48,7 +49,8 @@ class PageRB5:
         """
         # Stocke les informations nécessaires au fonctionnement de la page
         self.index = index
-        self.page = page
+        self.engine = engine
+        self.page = engine.rootObjects()[0]
         self.current_button = current_button
         self.current_button.setProperty("text", self.name)
 
@@ -114,8 +116,8 @@ class PageRB5:
             self.page.findChild(QObject, "category_title").setProperty("text", "Aucun écran à paramétrer")
             raise NameError("Aucun écran à paramétrer. Le dictionnaire \"screen_default\" est vide.")
 
-        # Définit la page comme complète
-        application.is_completed[4] = True
+        # Définit la page comme complète si aucune fonction is_page_valid() détectée
+        application.is_completed_by_default[self.index - 1] = "is_page_valid" not in dir(self)
 
     def get_values(self, translation_data):
         """Récupère les paramètres de la page de paramètres page_rb5
@@ -327,7 +329,7 @@ class PageRB5:
 
         # récupère les valeurs des écrans actuels et les sauvegarde
         old_screens_values = self.page.get_values().toVariant()
-        for index in range(0, len(old_screens_values)):
+        for index in range(4 * self.screen_index, 4 * self.screen_index + len(old_screens_values)):
             self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
 
     def on_left_category_button_clicked(self):
