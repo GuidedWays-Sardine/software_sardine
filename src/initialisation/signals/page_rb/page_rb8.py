@@ -122,15 +122,21 @@ class PageRB8:
         if application.visible_pages[0] is not None and not isinstance(application.visible_pages[0], type(self.engine)):
             # camera_check pour ligne virtuelle ou train caméra
             application.visible_pages[0].page.findChild(QObject, "camera_check").value_changed.connect(lambda: self.on_camera_train_checked(application))
+            self.on_camera_train_checked(application)
 
             # pcc_check pour TCO et toute autre fenêtre nécessaire au fonctionnement du PCC
             application.visible_pages[0].page.findChild(QObject, "pcc_check").value_changed.connect(lambda: self.on_pcc_checked(application))
+            self.on_pcc_checked(application)
 
             # data_check pour l'affichage des données en direct
             application.visible_pages[0].page.findChild(QObject, "data_check").value_changed.connect(lambda: self.on_data_checked(application))
+            self.on_data_checked(application)
         else:
             logging.warning("Certains paramétrages d'écrans dépendent du bon fonctionnement de la page_rb1." +
                             "Ceux-ci ne peucent pas se charger correctement.\n")
+
+        # Définit la page comme validée (toutes les valeurs par défaut suffisent)
+        application.is_completed_by_default[self.index - 1] = "is_page_valid" not in dir(self)
 
     def on_camera_train_checked(self, application):
         """Signal appelé lorsque le checkbutton camera_check est coché ou décoché.
