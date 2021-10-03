@@ -290,32 +290,6 @@ class PageRB5:
         for screen_index in self.screen_index:
             screen_index.show()
 
-        # Vérifie que tous les écrans peuvent être sélectionnés
-        if application.visible_pages[0] is not None \
-                and not isinstance(application.visible_pages[0], type(application.engine)) \
-                and "get_values" in dir(application.visible_pages[0]):
-            # Récupère les données actuelles de la page de paramètres page_rb1
-            page_rb1_data = application.visible_pages[0].get_values(application.read_language_file(application.language,
-                                                                                                   "English"))
-            try:
-                category_list = list(self.screen_default.keys())
-                # Met à jours les valeurs nécessaires (self.screen_default[category][screen][0]
-                self.screen_default[category_list[0]][list(self.screen_default[category_list[0]].keys())[2]][0] \
-                    = not page_rb1_data["Caméra"]
-                self.screen_default[category_list[0]][list(self.screen_default[category_list[0]].keys())[3]][0] \
-                    = page_rb1_data["Caméra"]
-                self.screen_default[category_list[1]][list(self.screen_default[category_list[1]].keys())[0]][0] \
-                    = page_rb1_data["PCC"]
-            except Exception as error:
-                logging.warning("Erreur lors de la mise à jour des paramètres par défaut des écrans.\n\t\t" +
-                                "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                                "Avec comme message d\'erreur : " + error.args[0] + "\n\n\t\t" +
-                                "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-        else:
-            # Si la page_rb1 n'est pas complètement chargée, laisse un message d'erreur
-            logging.warning("La page_rb1 n'a pas été chargée complètement." +
-                            " L'utilisation par défaut du simulateur sera prise en compte.\n")
-
         # Remets à jour la page actuelle
         self.change_visible_screen_list()
 
@@ -328,9 +302,9 @@ class PageRB5:
             screen_index.hide()
 
         # récupère les valeurs des écrans actuels et les sauvegarde
-        old_screens_values = self.page.get_values().toVariant()
-        for index in range(4 * self.screen_index, 4 * self.screen_index + len(old_screens_values)):
-            self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
+        screens_values = self.page.get_values().toVariant()
+        for index in range(0, len(screens_values)):
+            self.screen_settings[self.category_active][screens_values[index][0]] = screens_values[index][1]
 
     def on_left_category_button_clicked(self):
         """Signal appelé quand le bouton pour passer à la catégorie de paramétraghes d'écran de gauche est cliqué.
