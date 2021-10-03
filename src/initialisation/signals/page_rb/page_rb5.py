@@ -24,9 +24,9 @@ class PageRB5:
                                              "Ligne virtuelle": [True, 1080, 720],
                                              "Train caméra":    [False, 640, 480]
                                              },
-                      "Poste de Commande Centralisé (PCC)": {"Tableau de Contrôle Optique (TCO)":   [True, 640, 480]
+                      "Poste de Commande Centralisé (PCC)": {"Tableau de Contrôle Optique (TCO)":   [False, 640, 480]
                                                              },
-                      "Visualisation des données": {"Courbes": [True, 0, 0]
+                      "Visualisation des données": {"Courbes": [False, 0, 0]
                                                     }
                       }
     screen_settings = {}
@@ -116,8 +116,88 @@ class PageRB5:
             self.page.findChild(QObject, "category_title").setProperty("text", "Aucun écran à paramétrer")
             raise NameError("Aucun écran à paramétrer. Le dictionnaire \"screen_default\" est vide.")
 
-        # Définit la page comme complète si aucune fonction is_page_valid() détectée
-        application.is_completed_by_default[self.index - 1] = "is_page_valid" not in dir(self)
+        # connecte les différents boutons des autres pages à la paramétrabilité de certaines fenêtres
+
+        # Commence par les éléments de la page 1
+        if application.visible_pages[0] is not None and not isinstance(application.visible_pages[0], type(self.engine)):
+            # camera_check pour ligne virtuelle ou train caméra
+            application.visible_pages[0].page.findChild(QObject, "camera_check").value_changed.connect(lambda: self.on_camera_train_checked(application))
+
+            # pcc_check pour TCO et toute autre fenêtre nécessaire au fonctionnement du PCC
+            application.visible_pages[0].page.findChild(QObject, "pcc_check").value_changed.connect(lambda: self.on_pcc_checked(application))
+
+            # data_check pour l'affichage des données en direct
+            application.visible_pages[0].page.findChild(QObject, "data_check").value_changed.connect(lambda: self.on_data_checked(application))
+        else:
+            logging.warning("Certains paramétrages d'écrans dépendent du bon fonctionnement de la page_rb1." +
+                            "Ceux-ci ne peucent pas se charger correctement.\n")
+
+    def on_camera_train_checked(self, application):
+        """Signal appelé lorsque le checkbutton camera_check est coché ou décoché.
+        Permet de mettre à jour la paramétrabilité des fenêtres Train caméra et ligne virtuelle
+
+        Parameters
+        ----------
+        application: `InitialisationWindow`
+            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+        """
+        # Récupère si le checkbutton est activé, le nom de la catégorie et des écrans à modifier
+        is_checked = application.visible_pages[0].page.findChild(QObject, "camera_check").property("is_checked")
+        category = list(self.screen_default.keys())[0]
+        screen_virtual_line = list(self.screen_default[category].keys())[2]
+        screen_camera_train = list(self.screen_default[category].keys())[3]
+
+        # Change la paramétrabilité des écrans souhaités
+        self.screen_default[category][screen_virtual_line][0] = not is_checked
+        self.screen_default[category][screen_camera_train][0] = is_checked
+
+        # Réinitialise les paramètres de ces écrans s'ils ne sont plus paramétrables
+        if not self.screen_default[category][screen_virtual_line][0]:
+            self.screen_settings[category][screen_virtual_line] = [0, False, [0, 0], [0, 0]]
+        else:
+            self.screen_settings[category][screen_camera_train] = [0, False, [0, 0], [0, 0]]
+
+    def on_pcc_checked(self, application):
+        """Signal appelé lorsque le checkbutton camera_check est coché ou décoché.
+        Permet de mettre à jour la paramétrabilité des fenêtres TCO du PCC
+
+        Parameters
+        ----------
+        application: `InitialisationWindow`
+            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+        """
+        # Récupère si le checkbutton est activé, le nom de la catégorie et des écrans à modifier
+        is_checked = application.visible_pages[0].page.findChild(QObject, "pcc_check").property("is_checked")
+        category = list(self.screen_default.keys())[1]
+        screen_tco = list(self.screen_default[category].keys())[0]
+
+        # Change la paramétrabilité des écrans souhaités
+        self.screen_default[category][screen_tco][0] = is_checked
+
+        # Réinitialise les paramètres de ces écrans s'ils ne sont plus paramétrables
+        if not self.screen_default[category][screen_tco][0]:
+            self.screen_settings[category][screen_tco] = [0, False, [0, 0], [0, 0]]
+
+    def on_data_checked(self, application):
+        """Signal appelé lorsque le checkbutton camera_check est coché ou décoché.
+        Permet de mettre à jour la paramétrabilité des fenêtres des courbes de paramètres en direct
+
+        Parameters
+        ----------
+        application: `InitialisationWindow`
+            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+        """
+        # Récupère si le checkbutton est activé, le nom de la catégorie et des écrans à modifier
+        is_checked = application.visible_pages[0].page.findChild(QObject, "data_check").property("is_checked")
+        category = list(self.screen_default.keys())[2]
+        screen_data = list(self.screen_default[category].keys())[0]
+
+        # Change la paramétrabilité des écrans souhaités
+        self.screen_default[category][screen_data][0] = is_checked
+
+        # Réinitialise les paramètres de ces écrans s'ils ne sont plus paramétrables
+        if not self.screen_default[category][screen_data][0]:
+            self.screen_settings[category][screen_data] = [0, False, [0, 0], [0, 0]]
 
     def get_values(self, translation_data):
         """Récupère les paramètres de la page de paramètres page_rb5
@@ -285,6 +365,11 @@ class PageRB5:
     def on_page_opened(self, application):
         """Fonction appelée lorsque la page de paramètres 5 est chargée.
         Permet d'afficher les fenêtre d'index et actualise les paramètres des écrans visibles
+
+        Parameters
+        ----------
+        application: `InitialisationWindow`
+            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
         # Rend visible tous les écrans d'index
         for screen_index in self.screen_index:
@@ -296,6 +381,11 @@ class PageRB5:
     def on_page_closed(self, application):
         """Fonction appelée quand la page de paramètres 5 est fermée.
         Permet de cacher les différentes fenêtres d'index
+
+        Parameters
+        ----------
+        application: `InitialisationWindow`
+            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
         # Cache toutes les fenêtres d'index
         for screen_index in self.screen_index:
