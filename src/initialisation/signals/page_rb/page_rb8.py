@@ -6,11 +6,11 @@ from PyQt5.QtQml import QQmlApplicationEngine
 from PyQt5.QtCore import QObject
 
 
-class PageRB5:
-    """classe pour la page de paramètres 5"""
+class PageRB8:
+    """classe pour la page de paramètres 8"""
 
     # variables nécessaire au bon fonctionnement de la page
-    index = 5   # Attention dans les tableaux l'index commence à 0
+    index = 8   # Attention dans les tableaux l'index commence à 0
     name = "Écrans"
     engine = None
     page = None
@@ -61,7 +61,7 @@ class PageRB5:
 
         # Charge autant de fenêtres d'index d'écrans qu'il y a d'écrans
         for screen_index in range(0, self.screen_count):
-            application.engine.load('initialisation/graphics/page_rb/page_rb5/screen_index.qml')
+            application.engine.load('initialisation/graphics/page_rb/page_rb8/screen_index.qml')
             self.screen_index[screen_index] = application.engine.rootObjects()[len(application.engine.rootObjects()) - 1]
             self.screen_index[screen_index].hide()
 
@@ -200,7 +200,7 @@ class PageRB5:
             self.screen_settings[category][screen_data] = [0, False, [0, 0], [0, 0]]
 
     def get_values(self, translation_data):
-        """Récupère les paramètres de la page de paramètres page_rb5
+        """Récupère les paramètres de la page de paramètres page_rb8
 
         Parameters
         ----------
@@ -210,7 +210,7 @@ class PageRB5:
         Returns
         -------
         parameters : `dictionary`
-            un dictionaire de paramètres de la page de paramètres page_rb5
+            un dictionaire de paramètres de la page de paramètres page_rb8
         """
         # Initialise les paramètres récupérés et récupère le paramètre sur si les écrans sont éteins
         page_parameters = {"EcransEteints": self.page.findChild(QObject, "black_screens_check").property("is_checked")}
@@ -249,7 +249,7 @@ class PageRB5:
         return page_parameters
 
     def set_values(self, data, translation_data):
-        """A partir d'un dictionnaire de valeur, essaye de changer les settings des différentes pages
+        """A partir d'un dictionnaire de valeur, essaye de changer les settings de la page de paramètres 8
 
         Parameters
         ----------
@@ -310,7 +310,7 @@ class PageRB5:
         try:
             self.current_button.setProperty("text", translation_data[self.current_button.property("text")])
         except KeyError:
-            logging.debug("Impossible de traduire le nom de la catégorie de la page_rb5.\n")
+            logging.debug("Impossible de traduire le nom de la catégorie de la page_rb8.\n")
 
         # Change la traduction pour le texte Plein écran ? du DMI_checkbutton
         try:
@@ -363,7 +363,7 @@ class PageRB5:
         self.change_visible_screen_list()
 
     def on_page_opened(self, application):
-        """Fonction appelée lorsque la page de paramètres 5 est chargée.
+        """Fonction appelée lorsque la page de paramètres 8 est chargée.
         Permet d'afficher les fenêtre d'index et actualise les paramètres des écrans visibles
 
         Parameters
@@ -379,7 +379,7 @@ class PageRB5:
         self.change_visible_screen_list()
 
     def on_page_closed(self, application):
-        """Fonction appelée quand la page de paramètres 5 est fermée.
+        """Fonction appelée quand la page de paramètres 8 est fermée.
         Permet de cacher les différentes fenêtres d'index
 
         Parameters

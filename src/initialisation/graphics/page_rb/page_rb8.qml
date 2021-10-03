@@ -2,13 +2,13 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 
-import "page_rb5"
+import "page_rb8"
 import "../../../DMI_default/ETCS"
 
 
 Item {
-    id: page_rb5
-    objectName: "page_rb5"
+    id: page_rb8
+    objectName: "page_rb8"
 
     //Propriété pour avoir la liste des écrans et leurs dimensions
     property var screen_list: ["Aucun"]
@@ -115,64 +115,64 @@ Item {
         id: screen4
         index: 4
 
-        screen_list: page_rb5.screen_list
-        screen_size: page_rb5.screen_size
+        screen_list: page_rb8.screen_list
+        screen_size: page_rb8.screen_size
 
         screen_name: screen_names.length >= index ? screen_names[index - 1].toString() : ""
-        initial_settings: page_rb5.initial_settings.length >= index ? page_rb5.initial_settings[index - 1] : []
-        minimum_width: page_rb5.screen_names.length >= index && page_rb5.minimum_wh.length >= index && page_rb5.minimum_wh[index - 1].length >= 2 ? page_rb5.minimum_wh[index - 1][0] : 0
-        minimum_height: page_rb5.screen_names.length >= index && page_rb5.minimum_wh.length >= index && page_rb5.minimum_wh[index - 1].length >= 2 ? page_rb5.minimum_wh[index - 1][1] : 0
-        fullscreen_text: page_rb5.fullscreen_text
+        initial_settings: page_rb8.initial_settings.length >= index ? page_rb8.initial_settings[index - 1] : []
+        minimum_width: page_rb8.screen_names.length >= index && page_rb8.minimum_wh.length >= index && page_rb8.minimum_wh[index - 1].length >= 2 ? page_rb8.minimum_wh[index - 1][0] : 0
+        minimum_height: page_rb8.screen_names.length >= index && page_rb8.minimum_wh.length >= index && page_rb8.minimum_wh[index - 1].length >= 2 ? page_rb8.minimum_wh[index - 1][1] : 0
+        fullscreen_text: page_rb8.fullscreen_text
 
-        is_activable: page_rb5.screen_activable.length >= index && page_rb5.screen_name != "" ? page_rb5.screen_activable[index - 1] : false
+        is_activable: page_rb8.screen_activable.length >= index && page_rb8.screen_name != "" ? page_rb8.screen_activable[index - 1] : false
     }
 
     Screen_Parameters_Item {
         id: screen3
         index: 3
 
-        screen_list: page_rb5.screen_list
-        screen_size: page_rb5.screen_size
+        screen_list: page_rb8.screen_list
+        screen_size: page_rb8.screen_size
 
         screen_name: screen_names.length >= index ? screen_names[index - 1].toString() : ""
-        initial_settings: page_rb5.initial_settings.length >= index ? page_rb5.initial_settings[index - 1] : []
-        minimum_width: page_rb5.screen_names.length >= index && page_rb5.minimum_wh.length >= index && page_rb5.minimum_wh[index - 1].length >= 2 ? page_rb5.minimum_wh[index - 1][0] : 0
-        minimum_height: page_rb5.screen_names.length >= index && page_rb5.minimum_wh.length >= index && page_rb5.minimum_wh[index - 1].length >= 2 ? page_rb5.minimum_wh[index - 1][1] : 0
-        fullscreen_text: page_rb5.fullscreen_text
+        initial_settings: page_rb8.initial_settings.length >= index ? page_rb8.initial_settings[index - 1] : []
+        minimum_width: page_rb8.screen_names.length >= index && page_rb8.minimum_wh.length >= index && page_rb8.minimum_wh[index - 1].length >= 2 ? page_rb8.minimum_wh[index - 1][0] : 0
+        minimum_height: page_rb8.screen_names.length >= index && page_rb8.minimum_wh.length >= index && page_rb8.minimum_wh[index - 1].length >= 2 ? page_rb8.minimum_wh[index - 1][1] : 0
+        fullscreen_text: page_rb8.fullscreen_text
 
-        is_activable: page_rb5.screen_activable.length >= index ? page_rb5.screen_activable[index - 1] : false
+        is_activable: page_rb8.screen_activable.length >= index ? page_rb8.screen_activable[index - 1] : false
     }
 
     Screen_Parameters_Item {
         id: screen2
         index: 2
 
-        screen_list: page_rb5.screen_list
-        screen_size: page_rb5.screen_size
+        screen_list: page_rb8.screen_list
+        screen_size: page_rb8.screen_size
 
-        screen_name: page_rb5.screen_names.length >= index ? page_rb5.screen_names[index - 1].toString() : ""
-        initial_settings: page_rb5.initial_settings.length >= index ? page_rb5.initial_settings[index - 1] : []
-        minimum_width: page_rb5.screen_names.length >= index && page_rb5.minimum_wh.length >= index && page_rb5.minimum_wh[index - 1].length >= 2 ? page_rb5.minimum_wh[index - 1][0] : 0
-        minimum_height: page_rb5.screen_names.length >= index && page_rb5.minimum_wh.length >= index && page_rb5.minimum_wh[index - 1].length >= 2 ? page_rb5.minimum_wh[index - 1][1] : 0
-        fullscreen_text: page_rb5.fullscreen_text
+        screen_name: page_rb8.screen_names.length >= index ? page_rb8.screen_names[index - 1].toString() : ""
+        initial_settings: page_rb8.initial_settings.length >= index ? page_rb8.initial_settings[index - 1] : []
+        minimum_width: page_rb8.screen_names.length >= index && page_rb8.minimum_wh.length >= index && page_rb8.minimum_wh[index - 1].length >= 2 ? page_rb8.minimum_wh[index - 1][0] : 0
+        minimum_height: page_rb8.screen_names.length >= index && page_rb8.minimum_wh.length >= index && page_rb8.minimum_wh[index - 1].length >= 2 ? page_rb8.minimum_wh[index - 1][1] : 0
+        fullscreen_text: page_rb8.fullscreen_text
 
-        is_activable: page_rb5.screen_activable.length >= index && page_rb5.screen_name != "" ? page_rb5.screen_activable[index - 1] : false
+        is_activable: page_rb8.screen_activable.length >= index && page_rb8.screen_name != "" ? page_rb8.screen_activable[index - 1] : false
     }
 
     Screen_Parameters_Item {
         id: screen1
         index: 1
 
-        screen_list: page_rb5.screen_list
-        screen_size: page_rb5.screen_size
+        screen_list: page_rb8.screen_list
+        screen_size: page_rb8.screen_size
 
-        screen_name: page_rb5.screen_names.length >= index ? page_rb5.screen_names[index - 1].toString() : ""
-        initial_settings: page_rb5.initial_settings.length >= index ? page_rb5.initial_settings[index - 1] : []
-        minimum_width: page_rb5.screen_names.length >= index && page_rb5.minimum_wh.length >= index && page_rb5.minimum_wh[index - 1].length >= 2 ? page_rb5.minimum_wh[index - 1][0] : 0
-        minimum_height: page_rb5.screen_names.length >= index && page_rb5.minimum_wh.length >= index && page_rb5.minimum_wh[index - 1].length >= 2 ? page_rb5.minimum_wh[index - 1][1] : 0
-        fullscreen_text: page_rb5.fullscreen_text
+        screen_name: page_rb8.screen_names.length >= index ? page_rb8.screen_names[index - 1].toString() : ""
+        initial_settings: page_rb8.initial_settings.length >= index ? page_rb8.initial_settings[index - 1] : []
+        minimum_width: page_rb8.screen_names.length >= index && page_rb8.minimum_wh.length >= index && page_rb8.minimum_wh[index - 1].length >= 2 ? page_rb8.minimum_wh[index - 1][0] : 0
+        minimum_height: page_rb8.screen_names.length >= index && page_rb8.minimum_wh.length >= index && page_rb8.minimum_wh[index - 1].length >= 2 ? page_rb8.minimum_wh[index - 1][1] : 0
+        fullscreen_text: page_rb8.fullscreen_text
 
-        is_activable: page_rb5.screen_activable.length >= index && page_rb5.screen_name != "" ? page_rb5.screen_activable[index - 1] : false
+        is_activable: page_rb8.screen_activable.length >= index && page_rb8.screen_name != "" ? page_rb8.screen_activable[index - 1] : false
     }
 
     //checkbutton pour savoir si l'application doit éteindre les écrans qui ne sont pas utilisés
