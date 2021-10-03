@@ -94,16 +94,3 @@ class DriverMachineInterface:
         # Montre la fenêtre générale du DMI
         # Lance l'application et cherche pour le fichier QML avec tous les éléments de la fenêtre d'initialisation
         self.dmi_window.show()
-
-
-# TODO : fonction pour fermer les fenêtres
-
-if __name__ == "__main__":
-    log.initialise('../log/', "1.0.3", logging.DEBUG)
-    DMI = DriverMachineInterface({"EcransEteints": True,
-                                  "SARDINE simulator.Central DMI.IndexEcran": 2,
-                                  "SARDINE simulator.Central DMI.PleinEcran": False,
-                                  "SARDINE simulator.Central DMI.positionX": 240,
-                                  "SARDINE simulator.Central DMI.positionY": 0,
-                                  "SARDINE simulator.Central DMI.tailleX": 1440,
-                                  "SARDINE simulator.Central DMI.tailleY": 1080})
