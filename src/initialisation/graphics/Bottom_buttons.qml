@@ -1,6 +1,6 @@
 import QtQuick 2.0
 
-import "../../DMI_default/ETCS_3.6.0"
+import "../../DMI_default/ETCS"
 
 
 Item {

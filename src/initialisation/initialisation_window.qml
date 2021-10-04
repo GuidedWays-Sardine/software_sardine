@@ -1,7 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
-import "../DMI_default/ETCS_3.6.0"
+import "../DMI_default/ETCS"
 import "graphics"
 import "graphics/page_rb"
 
@@ -12,8 +12,6 @@ Window {
     visible: true
     color: "#031122"
     title: qsTr("Initialisation Sardine")
-    //flags: Qt.FramelessWindowHint | Qt.Window
-    //FIXME : trouver une façons d'avoir une fenètre sans bordure mais avec les fonctions de "snap" et "resize"
 
     //affiche les différentes pages de settings de l'application d'initialisation
     DMI_stackview{

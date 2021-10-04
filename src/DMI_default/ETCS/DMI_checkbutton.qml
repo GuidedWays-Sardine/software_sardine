@@ -31,6 +31,7 @@ Item {
 
     //Propriétés liés à l'état de la combobox
     property bool is_checked: false          //si le bouton est activé
+    onIs_checkedChanged : value_changed()
     property bool is_activable: true         //si le bouton peut être activée
     property bool is_dark_grey: !is_activable//est ce que le texte doit-être en gris foncé ?
     property bool is_positive: false         //si le bouton doit-être visible en couche positive (sinon négatif)
@@ -45,11 +46,12 @@ Item {
     readonly property string shadow: "#08182F"      //partie 5.2.1.3.3  Nr 7
 
     //Chemin d'accès vers les icones utiles pour le check_button
-    readonly property string icon_path : "../../../assets/DMI_icons/ETCS_3.6.0/"
+    readonly property string icon_path : "../../../assets/DMI_symbols/ETCS/"
 
 
     //Différents signal handlers (à écrire en python)
     signal clicked()                         //détecte quand le bouton est cliqué (après que l'état ait été changé)
+    signal value_changed()                   //détecte quand la valeur a été changée
 
 
 

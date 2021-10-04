@@ -3,9 +3,10 @@ import traceback
 
 import log.log as log
 import initialisation.initialisation_window as ini
+import simulation
 
 
-VERSION = "1.0.3"
+VERSION = "1.1.0"
 INITIAL_LOGGING = logging.DEBUG
 
 
@@ -47,8 +48,7 @@ def main():
 
     # Lance le simulateur et en ressort que si une erreur fatale est détecté ou que le simulateur est fermé
     try:
-        # TODO : faire l'application simulateur
-        print("lancement simulateur")
+        application = simulation.Simulation(parameters)
     except Exception as error:
         logging.fatal('Erreur fatale lors du fonctionnement du simulateur\n\t\t' +
                       'Erreur de type : ' + str(type(error)) + '\n\t\t' +

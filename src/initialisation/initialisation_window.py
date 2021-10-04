@@ -26,7 +26,7 @@ class InitialisationWindow:
     # Stocke si la page est chargée et si elle est complète (pour lancer le simulateur
     visible_pages = [None] * 8     # Stocke les pages que l'utilisateur peut afficher
     is_fully_loaded = [False] * 8  # Stocke directement l'instance de la classe
-    is_completed = [False] * 8     # Détecte si la page est complété (égale à self.visible_pages si tout est complété)
+    is_completed_by_default = [False] * 8     # Détecte si la page est complété (égale à self.visible_pages si tout est complété)
 
     # Variable stockant la langue actuelle de l'application d'initialisation
     language = "Français"
@@ -65,7 +65,7 @@ class InitialisationWindow:
 
         # Si le fichier qml a été compris, récupère la fenêtre et initialise les différents boutons et pages
         self.win = self.engine.rootObjects()[0]
-        self.win.visibilityChanged.connect(lambda: self.app.quit())
+        self.win.visibilityChanged.connect(lambda: self.app.quit()) # FIXME : ferme l'application quand celle-ci est mise en plein écran
         self.bottom_buttons = bb.BottomButtons(self)
         self.right_buttons = rb.RightButtons(self)
 
@@ -103,6 +103,9 @@ class InitialisationWindow:
         # Lance l'application
         self.win.show()
         self.app.exec()
+
+        # Quand l'application est fermée, cache la fenêtre de l'application d'initialisation et ses fenêtres annexes
+        self.win.hide()
 
     def get_values(self):
         """Récupère les paramètres des différentes pages de paramètres en appelant chaque fonction get_values()
@@ -230,7 +233,7 @@ class InitialisationWindow:
         translation_data = {}
 
         # Ouvre le fichier et récupère la liste des langues
-        file = open("../settings/language_settings/translation.settings", "r", encoding='utf-8-sig')
+        file = open("../settings/language_settings/initialisation.lang", "r", encoding='utf-8-sig')
         language_list = file.readline().upper().rstrip('\n').split(";")
 
         # Récupère les index des langues
