@@ -47,7 +47,7 @@ Item {
     readonly property string shadow: "#08182F"      //partie 5.2.1.3.3  Nr 7
 
     //Chemin d'accès vers les icones utiles pour le check_button
-    readonly property string icon_path : "../../../assets/DMI_icons/ETCS_3.6.0/"
+    readonly property string icon_path : "../../../assets/DMI_symbols/ETCS/"
 
 
     //Différents signal handlers (à écrire en python)
@@ -204,8 +204,8 @@ Item {
 
         //Détecte quand la zone (le bouton) commence à être appuyée
         onPressed: {
+            forceActiveFocus()
             if(is_activable){
-                forceActiveFocus()
                 root.click_start()
             }
         }

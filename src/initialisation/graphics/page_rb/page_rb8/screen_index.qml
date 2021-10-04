@@ -2,7 +2,7 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 
-import "../../../../DMI_Default/ETCS_3.6.0"
+import "../../../../DMI_Default/ETCS"
 
 
 Window {
@@ -12,7 +12,7 @@ Window {
     minimumHeight: 162
     visible: true
     color: "#031122"
-    flags: Qt.FramelessWindowHint | Qt.Window
+    flags: Qt.FramelessWindowHint | Qt.Window | Qt.WindowStaysOnTopHint
 
     //Propriétés à définir lors de l'initialisation
     property int index: -1

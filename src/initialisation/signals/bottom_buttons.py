@@ -60,7 +60,44 @@ class BottomButtons:
             L'instance source de l'application d'initialisation, pour les widgets
         """
         # Vérifie que toutes les pages accessibles sont complètes
-        if application.is_fully_loaded == application.is_completed:
+        is_completed = application.is_completed_by_default == application.is_fully_loaded
+
+        # Dans le cas où toutes les pages ne sont pas complétés par défaut
+        if not is_completed:
+            # Vérifie chaque page nécessitant une vérification de validité
+            is_completed = True
+            # Les pages sont vérifiés en décomptant pour qu'en cas de plusieurs pages non complétées, charger la première
+            for index in range(8, 0, -1):
+                # Si la page a été chargée entièrement mais qu'elle n'est pas valide par défaut
+                if application.is_completed_by_default[index - 1] is not application.is_fully_loaded[index - 1]:
+                    # Si la page a une fonction is_page_valid, permettant de vérifier sa validité
+                    if "is_page_valid" in dir(application.visible_pages[index - 1]):
+                        try:
+                            if not application.visible_pages[index - 1].is_page_valid(application):
+                                is_completed = False
+                                application.right_buttons.on_new_page_selected(application,
+                                                                               application.visible_pages[index - 1].engine,
+                                                                               index)
+                        except Exception as error:
+                            # Si une erreur a été détectée, l'enregistre, et définit l'application comme non complétée
+                            logging.warning('Erreur lors de la validation de la page de paramètres : ' + str(index) +
+                                            '\n\t\tErreur de type : ' + str(type(error)) + '\n\t\t' +
+                                            'Avec comme message d\'erreur : ' + error.args[0] + '\n\n\t\t' +
+                                            ''.join(traceback.format_tb(error.__traceback__)).replace('\n', '\n\t\t') + "\n")
+                            is_completed = False
+                            application.right_buttons.on_new_page_selected(application,
+                                                                           application.visible_pages[index - 1].engine,
+                                                                           index)
+                    else:
+                        # Sinon laisse la page comme complétée (pour pouvoir lancer la simulation)
+                        # laisse une erreur et charge la page
+                        logging.error("page de paramètres page_rb" + str(index) + " notée comme non valide par défaut" +
+                                      " mais sans aucune fonction is_page_valid().")
+                        application.right_buttons.on_new_page_selected(application, application.visible_pages[index - 1].engine,
+                                                                       index)
+
+        # Vérifie que toutes les pages accessibles sont complètes
+        if is_completed:
             # Si au moins une page a été correctement chargée
             if application.active_settings_page != -1:
                 # Appelle la fonction de fermeture de page de la page actuelle active et change le préfix du registre
