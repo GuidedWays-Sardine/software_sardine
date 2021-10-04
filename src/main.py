@@ -6,7 +6,7 @@ import initialisation.initialisation_window as ini
 import simulation
 
 
-VERSION = "1.0.3"
+VERSION = "1.1.0"
 INITIAL_LOGGING = logging.DEBUG
 
 
