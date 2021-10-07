@@ -20,10 +20,10 @@ Item {
 
     //permet à partir des valeurs de positions et dimensions par défauts de calculer
     readonly property real ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
-    x: (root.default_x + 1) * root.ratio
-    y: (root.default_y + 1) * root.ratio
-    width: (root.box_length - 2) * root.ratio
-    height: (root.box_length - 2) * root.ratio
+    x: root.default_x * root.ratio
+    y: root.default_y * root.ratio
+    width: root.box_length * root.ratio
+    height: root.box_length * root.ratio
 
     //Propriétés liés à l'image et au texte que l'utilisateur peut rajouter sur le bouton
     property string text: ""                 //texte à afficher
@@ -101,7 +101,15 @@ Item {
     Image {
         id: image
 
-        anchors.fill: parent
+        anchors.bottom: body.bottom
+        anchors.bottomMargin: (1 + root.is_positive) * root.ratio
+        anchors.right: body.right
+        anchors.rightMargin: (1 + root.is_positive) * root.ratio
+        anchors.top: body.top
+        anchors.topMargin: (1 + root.is_positive) * root.ratio
+        anchors.left: body.left
+        anchors.leftMargin: (1 + root.is_positive) * root.ratio
+
 
         source: root.is_checked ? root.symbols_path + (root.is_dark_grey ? "Navigation/NA_12.bmp" : "Navigation/NA_11.bmp") : ""
     }
@@ -112,10 +120,10 @@ Item {
     Rectangle {
         id: out_bottom_shadow
 
-        width: root.width + 2 * root.ratio
-        height: 2 * root.ratio
-        anchors.horizontalCenter: body.horizontalCenter
-        anchors.verticalCenter: body.bottom
+        height: 1 * root.ratio
+        anchors.right: body.right
+        anchors.bottom: body.bottom
+        anchors.left: body.left
 
         color: !is_activable || !(box_area.pressed || text_area.pressed) ? root.shadow : "transparent"
     }
@@ -124,10 +132,10 @@ Item {
     Rectangle {
         id: out_right_shadow
 
-        width: 2 * root.ratio
-        height: root.height + 2 * root.ratio
-        anchors.right: out_bottom_shadow.right
-        anchors.bottom: out_bottom_shadow.bottom
+        width: 1 * root.ratio
+        anchors.right: body.right
+        anchors.bottom: body.bottom
+        anchors.top: body.top
 
         color: !is_activable || !(box_area.pressed || text_area.pressed) ? root.shadow : "transparent"
     }
@@ -136,10 +144,10 @@ Item {
     Rectangle {
         id: out_top_shadow
 
-        height: 2 * root.ratio
-        anchors.top: out_right_shadow.top
+        height: 1 * root.ratio
+        anchors.top: body.top
+        anchors.left: body.left
         anchors.right: out_right_shadow.left
-        anchors.left: out_bottom_shadow.left
 
         color: !is_activable || !(box_area.pressed || text_area.pressed) ? root.black : "transparent"
     }
@@ -148,9 +156,9 @@ Item {
     Rectangle {
         id: out_left_shadow
 
-        width: 2 * root.ratio
-        anchors.top: out_top_shadow.top
-        anchors.left: out_top_shadow.left
+        width: 1 * root.ratio
+        anchors.top: body.top
+        anchors.left: body.left
         anchors.bottom: out_bottom_shadow.top
 
         color: !is_activable || !(box_area.pressed || text_area.pressed) ? root.black : "transparent"
@@ -162,7 +170,7 @@ Item {
     Rectangle {
         id: in_bottom_shadow
 
-        height: 2 * root.ratio
+        height: 1 * root.ratio
         anchors.bottom: out_bottom_shadow.top
         anchors.left: out_left_shadow.right
         anchors.right: out_right_shadow.left
@@ -174,7 +182,7 @@ Item {
     Rectangle {
         id: in_right_shadow
 
-        width: 2 * root.ratio
+        width: 1 * root.ratio
         anchors.right: out_right_shadow.left
         anchors.bottom: out_bottom_shadow.top
         anchors.top: out_top_shadow.bottom
@@ -186,7 +194,7 @@ Item {
     Rectangle {
         id: in_top_shadow
 
-        height: 2 * root.ratio
+        height: 1 * root.ratio
         anchors.top: out_top_shadow.bottom
         anchors.left: out_left_shadow.right
         anchors.right: in_right_shadow.left
@@ -198,7 +206,7 @@ Item {
     Rectangle {
         id: in_left_shadow
 
-        width: 2 * root.ratio
+        width: 1 * root.ratio
         anchors.left: out_left_shadow.right
         anchors.top: out_top_shadow.bottom
         anchors.bottom: in_bottom_shadow.top
