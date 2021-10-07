@@ -46,7 +46,7 @@ Item {
     readonly property string shadow: "#08182F"      //partie 5.2.1.3.3  Nr 7
 
     //Chemin d'accès vers les icones utiles pour le check_button
-    readonly property string icon_path : "../../../assets/DMI_symbols/ETCS/"
+    readonly property string symbols_path : "../../../assets/DMI_symbols/ETCS/"
 
 
     //Différents signal handlers (à écrire en python)
@@ -103,7 +103,7 @@ Item {
 
         anchors.fill: parent
 
-        source: root.is_checked ? root.icon_path + (root.is_dark_grey ? "Navigation/NA_12.bmp" : "Navigation/NA_11.bmp") : ""
+        source: root.is_checked ? root.symbols_path + (root.is_dark_grey ? "Navigation/NA_12.bmp" : "Navigation/NA_11.bmp") : ""
     }
 
 
