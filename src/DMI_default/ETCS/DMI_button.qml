@@ -1,5 +1,8 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQml 2.15
+//import QtMultimedia 5.15
+//FIXME : librairie non trouvée, impossible de trouver le son approprié
 
 
 //https://doc.qt.io/qt-5/qtqml-documents-definetypes.html
@@ -47,7 +50,8 @@ Item {
     readonly property string shadow: "#08182F"      //partie 5.2.1.3.3  Nr 7
 
     //Chemin d'accès vers les icones utiles pour le check_button
-    readonly property string icon_path : "../../../assets/DMI_symbols/ETCS/"
+    readonly property string symbols_path : "../../../assets/DMI_symbols/ETCS/"
+    readonly property string sounds_path: "../../../assets/DMI_sounds/ETCS/"
 
 
     //Différents signal handlers (à écrire en python)
@@ -56,6 +60,9 @@ Item {
     signal click_end()                      //détecte quand l'utilisateur relache le bouton (similaire à .clicked())
 
 
+
+    //Variable stockant le mode de fonctionnement du bouton ("UP", "DOWN", "DELAY")
+    property string button_type: "UP"
 
     //Rectangle pour la couleur du fond du bouton
     Rectangle{
@@ -76,7 +83,7 @@ Item {
         anchors.top: body.top
         anchors.left: body.left
 
-        source: (root.image_activable != "" || root.image_not_activable != "") ? root.icon_path + (root.is_activable ? image_activable : image_not_activable) : root.icon_path + root.default_image
+        source: (root.image_activable != "" || root.image_not_activable != "") ? root.symbols_path + (root.is_activable ? image_activable : image_not_activable) : root.symbols_path + root.default_image
     }
 
     //Texte visible sur le bouton
@@ -93,6 +100,9 @@ Item {
     }
 
 
+    //Variable stockant si  le bouton est dans l'état appuyé (et donc si les bordures doivent êtres cachées
+    property bool button_pressed: false
+
     //Ombre extérieure
     //Rectangle pour l'ombre extérieure inférieure
     Rectangle {
@@ -103,7 +113,7 @@ Item {
         anchors.horizontalCenter: body.horizontalCenter
         anchors.verticalCenter: body.bottom
 
-        color: !is_activable || !area.pressed ? root.shadow : "transparent"
+        color: !root.button_pressed ? root.shadow : "transparent"
     }
 
     //Rectangle pour l'ombre extérieure droite
@@ -115,7 +125,7 @@ Item {
         anchors.right: out_bottom_shadow.right
         anchors.bottom: out_bottom_shadow.bottom
 
-        color: !is_activable || !area.pressed ? root.shadow : "transparent"
+        color: !root.button_pressed ? root.shadow : "transparent"
     }
 
     //Rectangle pour l'ombre extérieure supérieure
@@ -127,7 +137,7 @@ Item {
         anchors.right: out_right_shadow.left
         anchors.left: out_bottom_shadow.left
 
-        color: !is_activable || !area.pressed ? root.black : "transparent"
+        color: !root.button_pressed ? root.black : "transparent"
     }
 
     //Rectangle pour l'ombre extérieure gauche
@@ -139,7 +149,7 @@ Item {
         anchors.left: out_top_shadow.left
         anchors.bottom: out_bottom_shadow.top
 
-        color: !is_activable || !area.pressed ? root.black : "transparent"
+        color: !root.button_pressed ? root.black : "transparent"
     }
 
 
@@ -153,7 +163,7 @@ Item {
         anchors.left: out_left_shadow.right
         anchors.right: out_right_shadow.left
 
-        color: is_positive && !(area.pressed && is_activable) ? root.black : "transparent"
+        color: is_positive && !root.button_pressed ? root.black : "transparent"
     }
 
     //Rectangle pour l'ombre intérieure droite
@@ -165,7 +175,7 @@ Item {
         anchors.bottom: out_bottom_shadow.top
         anchors.top: out_top_shadow.bottom
 
-        color: is_positive && !(area.pressed && is_activable) ? root.black : "transparent"
+        color: is_positive && !root.button_pressed ? root.black : "transparent"
     }
 
     //Rectangle pour l'ombre intérieure supérieure
@@ -177,7 +187,7 @@ Item {
         anchors.left: out_left_shadow.right
         anchors.right: in_right_shadow.left
 
-        color: is_positive && !(area.pressed && is_activable) ? root.shadow : "transparent"
+        color: is_positive && !root.button_pressed ? root.shadow : "transparent"
     }
 
     //Rectangle pour l'ombre intérieure gauche
@@ -189,7 +199,60 @@ Item {
         anchors.top: out_top_shadow.bottom
         anchors.bottom: in_bottom_shadow.top
 
-        color: is_positive && !(area.pressed && is_activable) ? root.shadow : "transparent"
+        color: is_positive && !root.button_pressed ? root.shadow : "transparent"
+    }
+
+
+    //Timer utile pour le fonctionnement des différents mode sdes boutons
+    Timer {
+        id: timer
+
+        interval: 1500
+        repeat: false
+
+        onTriggered: {
+            if(root.button_type.toUpperCase() == "DOWN") {
+                //Si le bouton est en état pressé
+                if(root.button_pressed) {
+                    //Indique l'état du bouton comme non pressé, et appelle la fonction clicked
+                    root.button_pressed = false
+                    area.repeat_count = area.repeat_count + 1
+                    root.clicked()
+
+                    //Si le bouton en est à son premier appui, relance un timer de 1.470s sinon relance un timer de 270s
+                    if(area.repeat_count <=1) {
+                        timer.interval = 1470
+                        timer.restart()
+                    }
+                    else {
+                        timer.interval = 270
+                        timer.restart()
+                    }
+                }
+                //Si le bouton n'était pas pressé
+                else {
+                    //Se met en état pressé, joue le son et lance une pression pendant 30ms
+                    root.button_pressed = true
+                    //FIXME : jouer le son du bouton cliqué
+                    timer.interval = 30
+                    timer.restart()
+                }
+            }
+            else if(root.button_type.toUpperCase() == "DELAY") {
+                //Incrément de 1 la répétition, inverse la visibilité de la préssabilité du bouton
+                area.repeat_count = area.repeat_count + 1
+                root.button_pressed = !(area.repeat_count % 2)
+
+                //Recommence le timer si celui-ci a été appelé moins de 8 fois, sinon joue le son du clique
+                if(area.repeat_count < 8) {
+                    timer.restart()
+                }
+                else {
+                    //FIXME : jouer le son du bouton cliqué
+                    console.log("pour combler")
+                }
+            }
+        }
     }
 
 
@@ -197,25 +260,163 @@ Item {
     MouseArea{
         id: area
 
+        //Propriété privée permettant à la zone de savoir le nombre de cycles "presses->enabled" pour les boutons down et delay
+        property int repeat_count: 0
+
         anchors.fill: parent
 
         hoverEnabled: false
 
 
-        //Détecte quand la zone (le bouton) commence à être appuyée
+        //Détecte quand la zone (le bouton) commence à être appuyé
         onPressed: {
+            //force le focus sur ce bouton pour qu'il soit prioritaire
             forceActiveFocus()
-            if(is_activable){
-                root.click_start()
+
+            //Vérifie que le bouton est activable
+            if(root.is_activable) {
+                //Cas du bouton de type Delay
+                if(root.button_type.toUpperCase() == "DELAY"){
+                    //remet à 0 le compteur de répétition, indique que le bouton est pressé, appel le signal et joue le clique du bouton
+                    area.repeat_count = 0
+                    root.button_pressed = true
+                    root.click_start()
+
+                    //Lance le timer (de 250ms)
+                    timer.interval = 250
+                    timer.restart()
+                }
+                //Cas du bouton de type down
+                else if(root.button_type.toUpperCase() == "DOWN"){
+                    //remet à 0 le compteur de répétition, indique que le bouton est pressé, appel le signal et joue le clique du bouton
+                    area.repeat_count = 0
+                    root.button_pressed = true
+                    root.click_start()
+                    //FIXME : jouer le son du bouton cliqué
+
+                    //Lance le premier timer (de 30ms)
+                    timer.interval = 30
+                    timer.restart()
+                }
+                //Cas si le bouton est de type "UP" (par défaut)
+                else {
+                    //remet à 0 le compteur de répétition, indique que le bouton est pressé, appel le signal et joue le clique du bouton
+                    area.repeat_count = 0
+                    root.button_pressed = true
+                    root.click_start()
+                    //FIXME : jouer le son du bouton cliqué
+                }
             }
         }
 
         //Détecte quand la zone (le bouton) est relachée
         onReleased: {
-            if(is_activable){
-                root.click_end()
-                root.clicked()
+            if(root.is_activable){
+                //Cas si la souris rerentre sur le bouton
+                if(containsMouse){
+                    //Cas du bouton de type Delay
+                    if(root.button_type.toUpperCase() == "DELAY"){
+                        //Le bouton n'est pas pressé et le timer désactivé
+                        root.button_pressed = false
+                        timer.stop()
+
+                        //Si les 8 cycles ont été réalisés, considère le clique
+                        if(area.repeat_count === 8) {
+                            root.clicked()
+                            root.click_end()
+                        }
+                    }
+                    //Cas du bouton de type down
+                    else if(root.button_type.toUpperCase() == "DOWN"){
+                        //Seul le clik_end() est enregistré, arrête le timer
+                        root.button_pressed = false
+                        root.click_end()
+                        timer.stop()
+                    }
+                    //Cas si le bouton est de type "UP" (par défaut)
+                    else {
+                        //Le clique est enregistré, aucun timer à arréter
+                        root.button_pressed = false
+                        root.clicked()
+                        root.click_end()
+                    }
+                }
+                //Cas où la souris resort du bouton
+                else {
+                    //Cas du bouton de type Delay
+                    if(root.button_type.toUpperCase() == "DELAY"){
+                        //Le bouton n'est pas pressé, aucun timer a arrété
+                        root.button_pressed = false
+                    }
+                    //Cas du bouton de type down
+                    else if(root.button_type.toUpperCase() == "DOWN"){
+                        //Le bouton n'est pas pressé, arrête tous les timer
+                        root.button_pressed = false
+                        timer.stop()
+                    }
+                    //Cas si le bouton est de type "UP" (par défaut)
+                    else {
+                        //Le bouton n'est pas pressé, aucun timer à arréter
+                        root.button_pressed = false
+                    }
+                }
+            }
+        }
+
+        //Fonction qui détecte lorsque l'utilisateur sort ou rentre sa souris du bouton alors qu'il clique dessus
+        onContainsMouseChanged: {
+            //Si le bouton est activable
+            if(root.is_activable){
+                //Cas si la souris rerentre sur le bouton
+                if(area.containsMouse){
+                    //Cas du bouton de type Delay
+                    if(root.button_type.toUpperCase() == "DELAY"){
+                        //Remet le bouton comme pressé et recommence les 8 cycles de 250ms
+                        root.button_pressed = true
+                        timer.interval = 250
+                        timer.restart()
+                    }
+                    //Cas du bouton de type down
+                    else if(root.button_type.toUpperCase() == "DOWN"){
+                        //Si le délai de 1500ms n'est pas passé, le recommence, sinon passe directement à la répétition
+                        timer.interval = 270 + 1200 * (area.repeat_count <= 1)
+                        timer.restart()
+                    }
+                    //Cas si le bouton est de type "UP" (par défaut)
+                    else {
+                        //Indique visuellement le bouton comme pressé
+                        root.button_pressed = true
+                    }
+                }
+                //Cas où la souris resort du bouton
+                else {
+                    //Cas du bouton de type Delay
+                    if(root.button_type.toUpperCase() == "DELAY"){
+                        //Le bouton n'est pas pressé, arrête le timer, réinitialise le compteur de répétition
+                        root.button_pressed = false
+                        timer.stop()
+                        area.repeat_count = 0
+                    }
+                    //Cas du bouton de type down
+                    else if(root.button_type.toUpperCase() == "DOWN"){
+                        //Indique le bouton comme visuellement non pressé et arrête le timer
+                        root.button_pressed = false
+                        timer.stop()
+                    }
+                    //Cas si le bouton est de type "UP" (par défaut)
+                    else {
+                        //Indique visuellement le bouton comme non pressé
+                        root.button_pressed = false
+                    }
+                }
             }
         }
     }
+
+    //Son à jouer lorsque le bouton est cliqué
+    //SoundEffect {
+    //    id: click_sound
+    //    source: sounds_path + "click.wav"
+    //}
+
 }
