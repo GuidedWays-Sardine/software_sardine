@@ -78,13 +78,13 @@ Item {
         id: image
 
         anchors.bottom: body.bottom
-        anchors.bottomMargin: (1 + root.isPositive) * root.ratio
+        anchors.bottomMargin: (1 + root.is_positive) * root.ratio
         anchors.right: body.right
-        anchors.rightMargin: (1 + root.isPositive) * root.ratio
+        anchors.rightMargin: (1 + root.is_positive) * root.ratio
         anchors.top: body.top
-        anchors.topMargin: (1 + root.isPositive) * root.ratio
+        anchors.topMargin: (1 + root.is_positive) * root.ratio
         anchors.left: body.left
-        anchors.leftMargin: (1 + root.isPositive) * root.ratio
+        anchors.leftMargin: (1 + root.is_positive) * root.ratio
 
         source: (root.image_activable != "" || root.image_not_activable != "") ? root.symbols_path + (root.is_activable ? image_activable : image_not_activable) : root.symbols_path + root.default_image
     }
