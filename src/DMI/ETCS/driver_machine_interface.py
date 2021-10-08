@@ -4,8 +4,8 @@ import logging
 import traceback
 import time
 
-from PyQt5.QtWidgets import QApplication, QDesktopWidget, QMainWindow
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QDesktopWidget, QMainWindow
+from PyQt5.QtCore import Qt, QObject
 from PyQt5.QtQml import QQmlApplicationEngine
 
 import log.log as log
@@ -15,9 +15,11 @@ class DriverMachineInterface:
     """Classe contenant tous les éléments pour le DMI"""
 
     # Eléments utiles à la fenêtre et les QWidgets contenus sur celle-ci
-    engine = None
     black_screens = None
+    engine = None
     dmi_window = None
+
+    pages = {}
 
     def __init__(self, simulation, data):
         initial_time = time.time()
@@ -54,7 +56,49 @@ class DriverMachineInterface:
         self.dmi_window.hide()
         self.dmi_window.visibilityChanged.connect(lambda: simulation.app.quit())
 
-        # TODO fonction pour initialiser de façon secure tous les DMI stackviewx
+        # Recherche la liste des fichiers et dossiers présents dans le dossier DMI/ETCS/graphics
+        folders = os.listdir("DMI/ETCS/graphics")
+
+        # Pour chaque sections graphiques du DMI ayant un dossier associé (A à G dans DMI/ETCS/graphics)
+        for folder in ["A", "B", "C", "D", "E", "F", "G"]:
+            # Initialise la liste des éléments graphiques disponibles
+            self.pages[folder] = {}
+
+            # Si le dossier existe bien, regarde chaque fichiers présents à l'intérieur de celui-ci
+            if folder in folders:
+                files = os.listdir("DMI/ETCS/graphics/" + folder)
+                for file in (f for f in files if f.endswith(".qml")):   # S'assure que les fichiers son bien en .qml
+                    engine = QQmlApplicationEngine()
+                    page_path = "DMI/ETCS/graphics/" + folder + file    # Par rapport au main.py
+                    engine.load(page_path)                              # permet d'essayer de charger la page
+
+                    # Si la page a été correctement chargée
+                    if engine.rootObjects():
+                        # Si c'est le premier élément de la section correctement chargé, le rend visible
+                        if len(self.pages[folder]) == 0:
+                            # Récupère le DMI_stackview (attention objectName en minuscule) et change la page active
+                            section = self.dmi_window.findChild(QObject, folder.lower())
+                            section.set_active_page(engine.rootObjects()[0])
+
+                        # Dans tous les cas, rajoute la page dans le dictionaire (pour la trouver dans le futur
+                        self.pages[folder][file] = engine
+
+                        # TODO : appeler l'initialisation des signaux similairement à celle présente dans right_buttons
+                        # Chaque initialisation doit prendre la simulation, la DMI (self) et l'engine de sa page
+                        # Ne pas oublier la structure de récupération d'exceptions
+                        # si initialisation fonctionnelle, écraser self.page[folder][file]
+
+                    # Dans le cas où la page n'est pas valide laisse un warning
+                    logging.debug("La page : " + file + " du dossier" + folder + " contient des erreurs.\n")
+
+                # Vérifie qu'au moins un fichier graphique a été correctement chargé
+                if len(self.pages[folder]) == 0:
+                    logging.warning("Aucun fichier graphique correctement chargé dans" + folder +
+                                    ". La section restera vide.\n")
+
+            # Dans le cas où le fichier n'existe pas
+            else:
+                logging.warning("Aucun dossier graphique : " + folder + ". La section restera vide.\n")
 
         # Récupère les données reliées à la taille et la position de l'écran du DMI central
         central_dmi_key = "SARDINE simulator.Central DMI."
