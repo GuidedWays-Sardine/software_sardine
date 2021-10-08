@@ -95,7 +95,7 @@ class InitialisationWindow:
                     logging.error("La fonction on_page_opened de la page " + str(self.active_settings_page) +
                                   " contient une erreur.\n\t\t" +
                                   "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                                  "Avec comme message d\'erreur : " + error.args[0] + "\n\n\t\t" +
+                                  "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
                                   "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
             else:
                 logging.debug("Aucune fonction on_page_opened page " + str(self.active_settings_page) + "\n")
@@ -128,7 +128,7 @@ class InitialisationWindow:
             logging.error("Erreur lors de la récupération du dictionaire de traduction dans get_values. " +
                           "Certains arguments ne pourront pas être enregistrés." +
                           "\n\t\tErreur de type : " + str(type(error)) +
-                          "\n\t\tAvec comme message d'erreur : " + error.args[0] + "\n\n\t\t" +
+                          "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
                           "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
 
         # Pour chaque page ayant une partie logique fonctionnelle :
@@ -142,7 +142,7 @@ class InitialisationWindow:
                     # Permet de rattraper une potentielle erreur dans la fonction get_values()
                     logging.warning("Erreur lors de la récupération des paramètres pour la page : " + str(page.index) +
                                     "\n\t\tErreur de type : " + str(type(error)) +
-                                    "\n\t\tAvec comme message d'erreur : " + error.args[0] + "\n\n\t\t" +
+                                    "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
                                     "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
             else:
                 logging.warning("La page " + str(page.index) + " n'a pas de fonction get_values.\n")
@@ -184,7 +184,7 @@ class InitialisationWindow:
                 logging.error("Erreur lors de la récupération du dictionaire de traduction. " +
                               "Certains arguments ne pourront pas être changés." +
                               "\n\t\tErreur de type : " + str(type(error)) +
-                              "\n\t\tAvec comme message d'erreur : " + error.args[0] + "\n\n\t\t" +
+                              "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
                               "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
 
         # Pour chaque page ayant une partie logique fonctionnelle :
@@ -199,7 +199,7 @@ class InitialisationWindow:
                     # Permet de rattraper une potentielle erreur dans la fonction get_values()
                     logging.warning("Erreur lors du changement des paramètres pour la page : " + str(page.index) +
                                     "\n\t\tErreur de type : " + str(type(error)) +
-                                    "\n\t\tAvec comme message d'erreur : " + error.args[0] + "\n\n\t\t" +
+                                    "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
                                     "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
             else:
                 logging.warning("La page " + str(page.index) + " n'a pas de fonction set_values.\n")
@@ -280,7 +280,7 @@ class InitialisationWindow:
                     # Permet de rattraper une potentielle erreur dans la fonction get_values()
                     logging.warning("Erreur lors du changement de langue pour la page : " + str(page.index) +
                                     "\n\t\tErreur de type : " + str(type(error)) +
-                                    "\n\t\tAvec comme message d'erreur : " + error.args[0] + "\n\n\t\t" +
+                                    "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
                                     "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
             else:
                 logging.warning("La page " + str(page.index) + " n'a pas de fonction change_language.\n")

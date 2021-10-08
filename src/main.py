@@ -33,7 +33,7 @@ def main():
     except Exception as error:
         logging.fatal('Erreur fatale lors du chargement de l\'application d\'initialisation simulateur\n\t\t' +
                       'Erreur de type : ' + str(type(error)) + '\n\t\t' +
-                      'Avec comme message d\'erreur : ' + error.args[0] + '\n\n\t\t' +
+                      'Avec comme message d\'erreur : ' + str(error.args) + '\n\n\t\t' +
                       ''.join(traceback.format_tb(error.__traceback__)).replace('\n', '\n\t\t') + "\n")
         exit(-1)
 
@@ -52,7 +52,7 @@ def main():
     except Exception as error:
         logging.fatal('Erreur fatale lors du fonctionnement du simulateur\n\t\t' +
                       'Erreur de type : ' + str(type(error)) + '\n\t\t' +
-                      'Avec comme message d\'erreur : ' + error.args[0] + '\n\n\t\t' +
+                      'Avec comme message d\'erreur : ' + str(error.args) + '\n\n\t\t' +
                       ''.join(traceback.format_tb(error.__traceback__)).replace('\n', '\n\t\t') + "\n")
         exit(-1)
 

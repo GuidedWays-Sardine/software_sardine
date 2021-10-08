@@ -34,7 +34,7 @@ class BottomButtons:
         except Exception as error:
             logging.warning('Problème lors du chargement du signal du bouton sauvegarder ou ouvrir.\n\t' +
                             'Erreur de type : ' + str(type(error)) + '\n\t\t' +
-                            'Avec comme message d\'erreur : ' + error.args[0] + '\n\n\t\t' +
+                            'Avec comme message d\'erreur : ' + str(error.args) + '\n\n\t\t' +
                             ''.join(traceback.format_tb(error.__traceback__)).replace('\n', '\n\t\t') + '\n')
 
         logging.info("Boutons inférieurs chargés en " +
@@ -82,7 +82,7 @@ class BottomButtons:
                             # Si une erreur a été détectée, l'enregistre, et définit l'application comme non complétée
                             logging.warning('Erreur lors de la validation de la page de paramètres : ' + str(index) +
                                             '\n\t\tErreur de type : ' + str(type(error)) + '\n\t\t' +
-                                            'Avec comme message d\'erreur : ' + error.args[0] + '\n\n\t\t' +
+                                            'Avec comme message d\'erreur : ' + str(error.args) + '\n\n\t\t' +
                                             ''.join(traceback.format_tb(error.__traceback__)).replace('\n', '\n\t\t') + "\n")
                             is_completed = False
                             application.right_buttons.on_new_page_selected(application,
@@ -110,7 +110,7 @@ class BottomButtons:
                         logging.error("La fonction on_page_closed de la page " + str(application.active_settings_page)
                                       + " contient une erreur\n\t\t" +
                                       "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                                      "Avec comme message d\'erreur : " + error.args[0] + "\n\n\t\t" +
+                                      "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
                                       "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
                 else:
                     logging.debug("Aucune fonction on_page_closed page " + str(application.active_settings_page) + "\n")
