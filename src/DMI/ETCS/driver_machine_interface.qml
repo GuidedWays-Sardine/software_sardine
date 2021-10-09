@@ -2,8 +2,6 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import "../../DMI_default/ETCS"
-import "graphics/A"
-import "graphics/B"
 
 
 Window {
