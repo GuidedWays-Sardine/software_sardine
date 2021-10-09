@@ -203,7 +203,7 @@ Item {
         default_x: body.default_x + 378 + 2*46 - default_width * 4 - 8 * root.font_size
         default_y: screen_index_combo.default_y
         default_width: default_height * 2
-        default_height: screen_index_combo.default_height - 1
+        default_height: screen_index_combo.default_height
 
         minimum_value: 0
         font_size: root.font_size
@@ -243,7 +243,7 @@ Item {
         default_x: body.default_x + 378 + 2*46 - default_width * 3 - 6 * root.font_size
         default_y: screen_index_combo.default_y
         default_width: default_height * 2
-        default_height: screen_index_combo.default_height - 1
+        default_height: screen_index_combo.default_height
 
         minimum_value: 0
         font_size: root.font_size
@@ -284,7 +284,7 @@ Item {
         default_x: body.default_x + 378 + 2*46 - default_width
         default_y: screen_index_combo.default_y
         default_width: default_height * 2
-        default_height: screen_index_combo.default_height - 1
+        default_height: screen_index_combo.default_height
 
         minimum_value: root.screen_valid && screen_index_combo.selection_index !== 0 ? root.minimum_height : 0
         font_size: root.font_size
@@ -316,7 +316,7 @@ Item {
         default_x: body.default_x + 378 + 2*46 - default_width * 2 - 2 * root.font_size
         default_y: screen_index_combo.default_y
         default_width: default_height * 2
-        default_height: screen_index_combo.default_height - 1
+        default_height: screen_index_combo.default_height
 
         minimum_value: root.screen_valid && screen_index_combo.selection_index !== 0 ? root.minimum_width : 0
         font_size: root.font_size
