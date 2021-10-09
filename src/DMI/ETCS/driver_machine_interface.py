@@ -61,16 +61,21 @@ class DriverMachineInterface:
 
         # Pour chaque sections graphiques du DMI ayant un dossier associé (A à G dans DMI/ETCS/graphics)
         for folder in ["A", "B", "C", "D", "E", "F", "G"]:
-            # Initialise la liste des éléments graphiques disponibles
+            # Initialise la liste des éléments graphiques disponibles et change le préfixe de la page
+            log.change_log_prefix("[Initialisation DMI ETCS ; section " + folder + "]")
             self.pages[folder] = {}
 
             # Si le dossier existe bien, regarde chaque fichiers présents à l'intérieur de celui-ci
             if folder in folders:
                 files = os.listdir("DMI/ETCS/graphics/" + folder)
                 for file in (f for f in files if f.endswith(".qml")):   # S'assure que les fichiers son bien en .qml
+                    initial_page_time = time.time()
+                    logging.info("tentative de chargement de la page" + file + ".\n")
                     engine = QQmlApplicationEngine()
-                    page_path = "DMI/ETCS/graphics/" + folder + file    # Par rapport au main.py
-                    engine.load(page_path)                              # permet d'essayer de charger la page
+                    engine.load("DMI/ETCS/graphics/" + folder + file)    # Par rapport au main.py
+
+                    # Enlève l'extension .qml pour une meilleure utilisation du fichier
+                    file = file.replace(".qml", "")
 
                     # Si la page a été correctement chargée
                     if engine.rootObjects():
@@ -83,13 +88,27 @@ class DriverMachineInterface:
                         # Dans tous les cas, rajoute la page dans le dictionaire (pour la trouver dans le futur
                         self.pages[folder][file] = engine
 
-                        # TODO : appeler l'initialisation des signaux similairement à celle présente dans right_buttons
-                        # Chaque initialisation doit prendre la simulation, la DMI (self) et l'engine de sa page
-                        # Ne pas oublier la structure de récupération d'exceptions
-                        # si initialisation fonctionnelle, écraser self.page[folder][file]
-
-                    # Dans le cas où la page n'est pas valide laisse un warning
-                    logging.debug("La page : " + file + " du dossier" + folder + " contient des erreurs.\n")
+                        # Vérifie si la page a des signals handlers associés (en recherchant un ficher .py associé)
+                        if os.path.isfile("DMI/ETCS/" + folder + "/" + file + ".py"):
+                            # Si c'est le cas, initialise les signals handlers et le stock
+                            try:
+                                # Import localement le fichier de la page
+                                # Appelle le constructeur de la page pour affilier tous les signals aux widgets
+                                exec("from DMI.ETCS.signals." + folder + " import " + file +  "as" + file + "\n" +
+                                     "self.pages[\"" + folder + "\"][\"" + file + "\"] = ") #TODO : trouver la méthode pour le code
+                            except Exception as error:
+                                # Permet de rattraper une erreur si le code est incorrect où qu'il ne suit pas la documentation
+                                logging.warning("Erreur lors du chargement des signaux de la page : " + file + ".\n\t\t" +
+                                                "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                                                "Avec comme message d\'erreur : " + str(error.args) +
+                                                "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                        else:
+                            # Sinon pas de signals handlers associé, le précise dans les logs
+                            logging.warning("La page " + file + " n\'a aucun fichier signals associé.\n\t\t" +
+                                            "La page sera visible mais ne sera pas fonctionnelle.\n")
+                    else:
+                        # Dans le cas où la page n'est pas valide laisse un warning
+                        logging.debug("La page : " + file + " du dossier" + folder + " contient des erreurs.\n")
 
                 # Vérifie qu'au moins un fichier graphique a été correctement chargé
                 if len(self.pages[folder]) == 0:
@@ -99,6 +118,9 @@ class DriverMachineInterface:
             # Dans le cas où le fichier n'existe pas
             else:
                 logging.warning("Aucun dossier graphique : " + folder + ". La section restera vide.\n")
+
+        # Rechange le préfix du registre
+        log.change_log_prefix("[Initialisation DMI ETCS]")
 
         # Récupère les données reliées à la taille et la position de l'écran du DMI central
         central_dmi_key = "SARDINE simulator.Central DMI."

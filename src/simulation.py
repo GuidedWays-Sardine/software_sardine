@@ -75,7 +75,8 @@ class Simulation:
             else:
                 logging.error("Impossible d'éxécuter le module : " + type(component) + " qui n'a pas de fonction run().\n")
 
-        # FEATURE : lancer la boucle de dynamique du train
+        # FEATURE : lancer la boucle de dynamique du train sur un thread
+        # FEATURE : lancer la bboucle de l'EVC (ETCS) sur un thread
 
         # Vérifie qu'au moins un module graphique c'est lancé
         if not any_launched:
