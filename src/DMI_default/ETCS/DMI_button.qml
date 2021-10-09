@@ -57,7 +57,7 @@ Item {
     //Différents signal handlers (à écrire en python)
     signal clicked()                        //détecte quand le bouton est cliqué
     signal click_start()                    //détecte quand l'utilisateur commence à appuyer sur le bouton
-    signal click_end()                      //détecte quand l'utilisateur relache le bouton (similaire à .clicked())
+    signal click_end()                      //détecte quand l'utilisateur relache le bouton (même si le clic n'est pas valide)
 
 
 
@@ -269,6 +269,7 @@ Item {
         anchors.fill: parent
 
         hoverEnabled: false
+        enabled: root.is_activable
 
 
         //Détecte quand la zone (le bouton) commence à être appuyé
@@ -276,142 +277,69 @@ Item {
             //force le focus sur ce bouton pour qu'il soit prioritaire
             forceActiveFocus()
 
-            //Vérifie que le bouton est activable
-            if(root.is_activable) {
+            //Remet à 0 le compteur de répétition, indique que le bouton est pressé en cachant les bordures et en appelant le signal adéquat
+            area.repeat_count = 0
+            root.button_pressed = true
+            root.click_start
+
+            //Cas du bouton de type Delay (lance le premier timer de 250ms)
+            if(root.button_type.toUpperCase() == "DELAY") {
+                timer.interval = 250
+                timer.restart()
+            }
+            //Cas du bouton de type Down (joue le son du clic et lance un timer de 30ms
+            else if(root.button_type.toUpperCase() == "DOWN"){
+                //FIXME : jouer le son du bouton cliqué
+                timer.interval = 30
+                timer.restart()
+            }
+            //Cas du bouton de type "UP" ou bouton invalide (joue le son du clic)
+            else {
+                //FIXME : jouer le son du bouton cliqué
+                console.log("à réparer")
+            }
+        }
+
+        //Détecte quand la zone (le bouton) est relaché
+        onReleased: {
+            //Appelle le signal clicked dans le cas où le bouton est relaché sur la zone, et qu'il est de type UP ou de type Delay avec les 8 ycles de 250ms terminés
+            if(root.button_pressed && ((root.button_type.toUpperCase() !== "DOWN" && root.button_type.toUpperCase() !== "DELAY") || (root.button_type === "DELAY" && area.repeat_count === 8))) {
+                root.clicked()
+            }
+
+            //Remet les bordures visibles et arrête tous les timers et Appelle le signal click_end (appelé même quand le clic n'est pas valide)
+            root.click_end()
+            root.button_pressed = false
+            timer.stop()
+        }
+
+        //Fonction qui détecte lorsque l'utilisateur sort ou rentre sa souris du bouton alors qu'il clique dessus
+        onContainsMouseChanged: {
+            if(area.containsMouse){
                 //Cas du bouton de type Delay
                 if(root.button_type.toUpperCase() == "DELAY"){
-                    //remet à 0 le compteur de répétition, indique que le bouton est pressé, appel le signal et joue le clique du bouton
-                    area.repeat_count = 0
+                    //Remet le bouton comme pressé et recommence les 8 cycles de 250ms
                     root.button_pressed = true
-                    root.click_start()
-
-                    //Lance le timer (de 250ms)
                     timer.interval = 250
                     timer.restart()
                 }
                 //Cas du bouton de type down
                 else if(root.button_type.toUpperCase() == "DOWN"){
-                    //remet à 0 le compteur de répétition, indique que le bouton est pressé, appel le signal et joue le clique du bouton
-                    area.repeat_count = 0
-                    root.button_pressed = true
-                    root.click_start()
-                    //FIXME : jouer le son du bouton cliqué
-
-                    //Lance le premier timer (de 30ms)
-                    timer.interval = 30
+                    //Si le délai de 1500ms n'est pas passé, le recommence, sinon passe directement à la répétition
+                    timer.interval = 270 + 1200 * (area.repeat_count <= 1)
                     timer.restart()
                 }
                 //Cas si le bouton est de type "UP" (par défaut)
                 else {
-                    //remet à 0 le compteur de répétition, indique que le bouton est pressé, appel le signal et joue le clique du bouton
-                    area.repeat_count = 0
+                    //Indique visuellement le bouton comme pressé
                     root.button_pressed = true
-                    root.click_start()
-                    //FIXME : jouer le son du bouton cliqué
                 }
             }
-        }
-
-        //Détecte quand la zone (le bouton) est relachée
-        onReleased: {
-            if(root.is_activable){
-                //Cas si la souris rerentre sur le bouton
-                if(containsMouse){
-                    //Cas du bouton de type Delay
-                    if(root.button_type.toUpperCase() == "DELAY"){
-                        //Le bouton n'est pas pressé et le timer désactivé
-                        root.button_pressed = false
-                        timer.stop()
-
-                        //Si les 8 cycles ont été réalisés, considère le clique
-                        if(area.repeat_count === 8) {
-                            root.clicked()
-                            root.click_end()
-                        }
-                    }
-                    //Cas du bouton de type down
-                    else if(root.button_type.toUpperCase() == "DOWN"){
-                        //Seul le clik_end() est enregistré, arrête le timer
-                        root.button_pressed = false
-                        root.click_end()
-                        timer.stop()
-                    }
-                    //Cas si le bouton est de type "UP" (par défaut)
-                    else {
-                        //Le clique est enregistré, aucun timer à arréter
-                        root.button_pressed = false
-                        root.clicked()
-                        root.click_end()
-                    }
-                }
-                //Cas où la souris resort du bouton
-                else {
-                    //Cas du bouton de type Delay
-                    if(root.button_type.toUpperCase() == "DELAY"){
-                        //Le bouton n'est pas pressé, aucun timer a arrété
-                        root.button_pressed = false
-                    }
-                    //Cas du bouton de type down
-                    else if(root.button_type.toUpperCase() == "DOWN"){
-                        //Le bouton n'est pas pressé, arrête tous les timer
-                        root.button_pressed = false
-                        timer.stop()
-                    }
-                    //Cas si le bouton est de type "UP" (par défaut)
-                    else {
-                        //Le bouton n'est pas pressé, aucun timer à arréter
-                        root.button_pressed = false
-                    }
-                }
-            }
-        }
-
-        //Fonction qui détecte lorsque l'utilisateur sort ou rentre sa souris du bouton alors qu'il clique dessus
-        onContainsMouseChanged: {
-            //Si le bouton est activable
-            if(root.is_activable){
-                //Cas si la souris rerentre sur le bouton
-                if(area.containsMouse){
-                    //Cas du bouton de type Delay
-                    if(root.button_type.toUpperCase() == "DELAY"){
-                        //Remet le bouton comme pressé et recommence les 8 cycles de 250ms
-                        root.button_pressed = true
-                        timer.interval = 250
-                        timer.restart()
-                    }
-                    //Cas du bouton de type down
-                    else if(root.button_type.toUpperCase() == "DOWN"){
-                        //Si le délai de 1500ms n'est pas passé, le recommence, sinon passe directement à la répétition
-                        timer.interval = 270 + 1200 * (area.repeat_count <= 1)
-                        timer.restart()
-                    }
-                    //Cas si le bouton est de type "UP" (par défaut)
-                    else {
-                        //Indique visuellement le bouton comme pressé
-                        root.button_pressed = true
-                    }
-                }
-                //Cas où la souris resort du bouton
-                else {
-                    //Cas du bouton de type Delay
-                    if(root.button_type.toUpperCase() == "DELAY"){
-                        //Le bouton n'est pas pressé, arrête le timer, réinitialise le compteur de répétition
-                        root.button_pressed = false
-                        timer.stop()
-                        area.repeat_count = 0
-                    }
-                    //Cas du bouton de type down
-                    else if(root.button_type.toUpperCase() == "DOWN"){
-                        //Indique le bouton comme visuellement non pressé et arrête le timer
-                        root.button_pressed = false
-                        timer.stop()
-                    }
-                    //Cas si le bouton est de type "UP" (par défaut)
-                    else {
-                        //Indique visuellement le bouton comme non pressé
-                        root.button_pressed = false
-                    }
-                }
+            //Sinon rend les bordures visibles, arrête tous les timers et remet le compteur de répétitions à 0 si le bouton est de type delay
+            else {
+                root.button_pressed = false
+                timer.stop()
+                area.repeat_count = area.repeat_count * (root.button_type.toUpperCase() !== "DELAY") //cette condition retoune 0 si le bouton de type delay, sinon repeat_count
             }
         }
     }
