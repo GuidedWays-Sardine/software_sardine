@@ -23,9 +23,9 @@ Item {
 
     //Propriétés liées à la vitesse maximale du speeddial
     property int max_speed: 400                 //vitesse maximale du matériel roulant (utile pour déduire le t ype de cadran)
-    readonly property int speed_dial_index: 3   //index correspondant à la vitesse maximal affichable (0:140/1:180/2:250/3:400)
+    property int speed_dial_index: 3   //index correspondant à la vitesse maximal affichable (0:140/1:180/2:250/3:400)
     onMax_speedChanged: {                       //fonction qui calcule automatiquement max_speed_dial quand max_speed est changé
-        max_speed_dial:  (max_speed >= 140) + (max_speed >= 180) + (max_speed >= 250)
+        root.speed_dial_index = (max_speed >= 140) + (max_speed >= 180) + (max_speed >= 250)
     }
 
     // Propriétés liées au format du speeddial
