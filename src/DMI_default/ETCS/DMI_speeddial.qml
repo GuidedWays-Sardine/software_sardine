@@ -46,9 +46,7 @@ Item {
 
 
     //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
-    readonly property string dark_blue : "#031122"  //partie 5.2.1.3.3  Nr 6
     readonly property string grey: "#C3C3C3"        //partie 5.2.1.3.3  Nr 3
-    readonly property string dark_grey: "#969696"   //partie 5.2.1.3.3  Nr 5
 
 
 
@@ -81,7 +79,7 @@ Item {
 
                 antialiasing: true
                 color: root.grey
-                width: root.ratio * (root.speed_dial_index !== 3
+                width: root.ratio * ((root.speed_dial_index % 4) !== 3
                                      ?         //cas des jauges 140/180/250 km/h
                                      (index % 2 == 1 ? root.default_short_line_length : root.default_long_line_length)
                                      :         //cas de la jauge 400 km/h
@@ -93,7 +91,7 @@ Item {
 
     // Ci-dessous les marqueurs avec le texte
     Repeater {
-        model: root.speed_values[root.speed_dial_index].length
+        model: root.speed_values[(root.speed_dial_index % 4)].length
 
         Item {
             //propriétés
@@ -108,7 +106,7 @@ Item {
             width: root.default_radius * root.ratio
 
             transformOrigin: Item.Left                  //cas général             cas (pour le 250km/h) où la dernière graduation n'a pas de valeurs
-            rotation: 270 - root.start_angle + index * (((2 * root.start_angle) - root.separation_angle * (root.speed_dial_index === 2))/(root.speed_values[root.speed_dial_index].length - 1))
+            rotation: 270 - root.start_angle + index * (((2 * root.start_angle) - root.separation_angle * ((root.speed_dial_index % 4) === 2))/(root.speed_values[(root.speed_dial_index % 4)].length - 1))
 
 
             //Texte contenant la valeur de la vitesse
@@ -120,11 +118,11 @@ Item {
                 anchors.rightMargin: (root.default_long_line_length + 2) * root.ratio
 
 
-                text: root.speed_values[root.speed_dial_index][index]
+                text: root.speed_values[(root.speed_dial_index % 4)][index]
                 font.pointSize: root.font_size * root.ratio
                 font.family: "Verdana"
                 color: root.grey
-                rotation: 360 - (270 - root.start_angle + index * ((2 * root.start_angle) - root.separation_angle * (root.speed_dial_index === 2))/(root.speed_values[root.speed_dial_index].length - 1)) // Annulation de la rotation pour avoir un texte vertical
+                rotation: 360 - (270 - root.start_angle + index * ((2 * root.start_angle) - root.separation_angle * ((root.speed_dial_index % 4) === 2))/(root.speed_values[(root.speed_dial_index % 4)].length - 1)) // Annulation de la rotation pour avoir un texte vertical
             }
         }
     }
