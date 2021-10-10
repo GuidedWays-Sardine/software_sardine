@@ -80,7 +80,7 @@ class PageRB1:
             logging.warning("Erreur lors de la récupération du dictionaire de traduction dans l'initialisation. " +
                             "Certains éléments de la page seront par défaut en anglais." +
                             "\n\t\tErreur de type : " + str(type(error)) +
-                            "\n\t\tAvec comme message d'erreur : " + error.args[0] + "\n\n\t\t" +
+                            "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
                             "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
 
         # Charge les pupitres, les traduits en Français et les remets dans la combobox
@@ -325,7 +325,7 @@ class PageRB1:
                 # Rattrape une potentielle erreur lors de la création du dictionaire de traduction
                 logging.warning("Erreur lors de la récupération du dictionaire de traduction"
                                 "\n\t\tErreur de type : " + str(type(error)) +
-                                "\n\t\tAvec comme message d'erreur : " + error.args[0] + "\n\n\t\t" +
+                                "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
                                 "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
             else:
                 application.change_language(translation_data)

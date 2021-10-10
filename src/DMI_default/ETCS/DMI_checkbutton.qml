@@ -1,5 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+//import QtMultimedia 5.15
+//FIXME : librairie non trouvée, impossible de trouver le son approprié
 
 
 //https://doc.qt.io/qt-5/qtqml-documents-definetypes.html
@@ -20,10 +22,10 @@ Item {
 
     //permet à partir des valeurs de positions et dimensions par défauts de calculer
     readonly property real ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
-    x: (root.default_x + 1) * root.ratio
-    y: (root.default_y + 1) * root.ratio
-    width: (root.box_length - 2) * root.ratio
-    height: (root.box_length - 2) * root.ratio
+    x: root.default_x * root.ratio
+    y: root.default_y * root.ratio
+    width: root.box_length * root.ratio
+    height: root.box_length * root.ratio
 
     //Propriétés liés à l'image et au texte que l'utilisateur peut rajouter sur le bouton
     property string text: ""                 //texte à afficher
@@ -46,11 +48,13 @@ Item {
     readonly property string shadow: "#08182F"      //partie 5.2.1.3.3  Nr 7
 
     //Chemin d'accès vers les icones utiles pour le check_button
-    readonly property string icon_path : "../../../assets/DMI_symbols/ETCS/"
+    readonly property string symbols_path : "../../../assets/DMI_symbols/ETCS/"
 
 
     //Différents signal handlers (à écrire en python)
     signal clicked()                         //détecte quand le bouton est cliqué (après que l'état ait été changé)
+    signal click_start()                     //détecte quand l'utilisateur commence à appuyer sur le checkbutton
+    signal click_end()                       //détecte quand l'utilisateur relache le chekbutton (même si le clic n'est pas valide)
     signal value_changed()                   //détecte quand la valeur a été changée
 
 
@@ -78,7 +82,7 @@ Item {
 
         //Permet d'afficher le texte
         Text{
-            id: button_text
+            id: checkbutton_text
 
             anchors.verticalCenter: text_rectangle.verticalCenter
 
@@ -92,8 +96,8 @@ Item {
         TextMetrics {
             id: text_metrics
 
-            font: button_text.font
-            text: button_text.text
+            font: checkbutton_text.font
+            text: checkbutton_text.text
         }
     }
 
@@ -101,59 +105,69 @@ Item {
     Image {
         id: image
 
-        anchors.fill: parent
+        anchors.bottom: body.bottom
+        anchors.bottomMargin: (1 + root.is_positive) * root.ratio
+        anchors.right: body.right
+        anchors.rightMargin: (1 + root.is_positive) * root.ratio
+        anchors.top: body.top
+        anchors.topMargin: (1 + root.is_positive) * root.ratio
+        anchors.left: body.left
+        anchors.leftMargin: (1 + root.is_positive) * root.ratio
 
-        source: root.is_checked ? root.icon_path + (root.is_dark_grey ? "Navigation/NA_12.bmp" : "Navigation/NA_11.bmp") : ""
+
+        source: root.is_checked ? root.symbols_path + (root.is_dark_grey ? "Navigation/NA_12.bmp" : "Navigation/NA_11.bmp") : ""
     }
 
+    //Variable stockant si  le bouton est dans l'état appuyé (et donc si les bordures doivent êtres cachées
+    property bool checkbutton_pressed: false
 
     //Ombre extérieure
     //Rectangle pour l'ombre extérieure inférieure
     Rectangle {
         id: out_bottom_shadow
 
-        width: root.width + 2 * root.ratio
-        height: 2 * root.ratio
-        anchors.horizontalCenter: body.horizontalCenter
-        anchors.verticalCenter: body.bottom
+        height: 1 * root.ratio
+        anchors.right: body.right
+        anchors.bottom: body.bottom
+        anchors.left: body.left
 
-        color: !is_activable || !(box_area.pressed || text_area.pressed) ? root.shadow : "transparent"
+        color: !root.checkbutton_pressed ? root.shadow : "transparent"
     }
 
     //Rectangle pour l'ombre extérieure droite
     Rectangle {
         id: out_right_shadow
 
-        width: 2 * root.ratio
-        height: root.height + 2 * root.ratio
-        anchors.right: out_bottom_shadow.right
-        anchors.bottom: out_bottom_shadow.bottom
+        width: 1 * root.ratio
+        anchors.right: body.right
+        anchors.bottom: body.bottom
+        anchors.top: body.top
 
-        color: !is_activable || !(box_area.pressed || text_area.pressed) ? root.shadow : "transparent"
+        color: !root.checkbutton_pressed ? root.shadow : "transparent"
     }
 
     //Rectangle pour l'ombre extérieure supérieure
     Rectangle {
         id: out_top_shadow
 
-        height: 2 * root.ratio
-        anchors.top: out_right_shadow.top
+        height: 1 * root.ratio
+        anchors.top: body.top
+        anchors.left: body.left
         anchors.right: out_right_shadow.left
-        anchors.left: out_bottom_shadow.left
 
-        color: !is_activable || !(box_area.pressed || text_area.pressed) ? root.black : "transparent"
+        color: !root.checkbutton_pressed ? root.black : "transparent"
     }
 
     //Rectangle pour l'ombre extérieure gauche
     Rectangle {
         id: out_left_shadow
 
-        width: 2 * root.ratio
-        anchors.top: out_top_shadow.top
-        anchors.left: out_top_shadow.left
+        width: 1 * root.ratio
+        anchors.top: body.top
+        anchors.left: body.left
         anchors.bottom: out_bottom_shadow.top
 
-        color: !is_activable || !(box_area.pressed || text_area.pressed) ? root.black : "transparent"
+        color: !root.checkbutton_pressed ? root.black : "transparent"
     }
 
 
@@ -162,86 +176,93 @@ Item {
     Rectangle {
         id: in_bottom_shadow
 
-        height: 2 * root.ratio
+        height: 1 * root.ratio
         anchors.bottom: out_bottom_shadow.top
         anchors.left: out_left_shadow.right
         anchors.right: out_right_shadow.left
 
-        color: is_positive && !((box_area.pressed || text_area.pressed) && is_activable) ? root.black : "transparent"
+        color: is_positive && !root.checkbutton_pressed ? root.black : "transparent"
     }
 
     //Rectangle pour l'ombre intérieure droite
     Rectangle {
         id: in_right_shadow
 
-        width: 2 * root.ratio
+        width: 1 * root.ratio
         anchors.right: out_right_shadow.left
         anchors.bottom: out_bottom_shadow.top
         anchors.top: out_top_shadow.bottom
 
-        color: is_positive && !((box_area.pressed || text_area.pressed) && is_activable) ? root.black : "transparent"
+        color: is_positive && !root.checkbutton_pressed ? root.black : "transparent"
     }
 
     //Rectangle pour l'ombre intérieure supérieure
     Rectangle {
         id: in_top_shadow
 
-        height: 2 * root.ratio
+        height: 1 * root.ratio
         anchors.top: out_top_shadow.bottom
         anchors.left: out_left_shadow.right
         anchors.right: in_right_shadow.left
 
-        color: is_positive && !((box_area.pressed || text_area.pressed) && is_activable) ? root.shadow : "transparent"
+        color: is_positive && !root.checkbutton_pressed ? root.shadow : "transparent"
     }
 
     //Rectangle pour l'ombre intérieure gauche
     Rectangle {
         id: in_left_shadow
 
-        width: 2 * root.ratio
+        width: 1 * root.ratio
         anchors.left: out_left_shadow.right
         anchors.top: out_top_shadow.bottom
         anchors.bottom: in_bottom_shadow.top
 
-        color: is_positive && !((box_area.pressed || text_area.pressed) && is_activable) ? root.shadow : "transparent"
+        color: is_positive && !root.checkbutton_pressed ? root.shadow : "transparent"
     }
 
-
-    //Zone de détection de souris pour la boite (utile pour détecter les cliques)
     MouseArea{
-        id: box_area
+        id: area
 
-        anchors.fill: parent
-
+        anchors.top: body.top
+        anchors.left: body.left
+        anchors.bottom: body.bottom
+        anchors.right: text_rectangle.right
+        
         hoverEnabled: false
-
-
-        //Détecte quand la zone de la case du checkbutton est relaché
-        onReleased: {
+        enabled: root.is_activable
+        
+        
+        //Détecte quand le checkbutton commence à être pressé pour cacher les bordures de celui-ci s'il est activable
+        onPressed: {
+            //Récupère le focus, indique que le checkbutton est pressé et appelle le signal associé
             forceActiveFocus()
-            if(is_activable){
+            root.checkbutton_pressed = true
+            root.click_start()
+            //FIXME : jouer le so du bouton cliqué
+        }
+
+        onReleased: {
+            //Si le clic est valide (fait sur la zone) change l'état du checkbutton et appelle le signal clicked
+            if(root.checkbutton_pressed){
                 root.is_checked = !root.is_checked
                 root.clicked()
             }
+
+            //remet les bordures appelle le signal du clic arrété
+            root.checkbutton_pressed = false
+            root.click_end()
+        }
+
+        onContainsMouseChanged: {
+            //Si le curseur sort de la zone, rend visible les bordures sinon les caches
+            root.checkbutton_pressed = area.containsMouse
         }
     }
 
-    //Zone de détection de souris pour le texte (utile pour détecter les cliques)
-    MouseArea{
-        id: text_area
+    //Son à jouer lorsque le checkbutton est cliqué
+    //SoundEffect {
+    //    id: click_sound
+    //    source: sounds_path + "click.wav"
+    //}
 
-        anchors.fill: text_rectangle
-
-        hoverEnabled: false
-
-
-        //Détecte quand la zone du texte du checkbutton est relaché
-        onReleased: {
-            forceActiveFocus()
-            if(is_activable){
-                root.is_checked = !root.is_checked
-                root.clicked()
-            }
-        }
-    }
 }

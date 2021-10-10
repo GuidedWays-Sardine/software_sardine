@@ -162,7 +162,7 @@ class RightButtons:
                 # Permet de rattraper une erreur si le code est incorrect où qu'il ne suit pas la documentation
                 logging.warning("Erreur lors du chargement des signaux de la page : " + page_path + ".\n\t\t" +
                                 "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                                "Avec comme message d\'erreur : " + error.args[0] +
+                                "Avec comme message d\'erreur : " + str(error.args) +
                                 "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
                 current_button.setProperty("is_positive", False)
                 return False
@@ -198,7 +198,7 @@ class RightButtons:
                     logging.error("La fonction on_page_closed de la page " + str(application.active_settings_page)
                                   + " contient une erreur\n\t\t" +
                                   "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                                  "Avec comme message d\'erreur : " + error.args[0] + "\n\n\t\t" +
+                                  "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
                                   "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
             else:
                 logging.debug("Aucune fonction on_page_closed page " + str(application.active_settings_page) + "\n")
@@ -222,7 +222,7 @@ class RightButtons:
                     logging.error("La fonction on_page_opened de la page " + str(application.active_settings_page) +
                                   " contient une erreur.\n\t\t" +
                                   "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                                  "Avec comme message d\'erreur : " + error.args[0] + "\n\n\t\t" +
+                                  "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
                                   "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
             else:
                 logging.debug("Aucune fonction on_page_opened page " + str(application.active_settings_page) + "\n")

@@ -46,14 +46,15 @@ class Simulation:
                 log.change_log_prefix("[initialisation simulation]")
                 logging.error("Impossible de charger le DMI : ETCS (mode secours). Aucun DMI ne sera chargé.\n\t\t" +
                               'Erreur de type : ' + str(type(error)) + '\n\t\t' +
-                              'Avec comme message d\'erreur : ' + error.args[0] + '\n\n\t\t' +
+                              'Avec comme message d\'erreur : ' + str(error.args) + '\n\n\t\t' +
                               ''.join(traceback.format_tb(error.__traceback__)).replace('\n', '\n\t\t') + "\n")
         except Exception as error:
             # Si une erreur est survenur lors du chargement du DMI, ne charge pas de DMI
             log.change_log_prefix("[initialisation simulation]")
+            print(data["DMI"])
             logging.error("Impossible de charger le DMI : " + data["DMI"] + ". Aucun DMI ne sera chargé.\n\t\t" +
                           'Erreur de type : ' + str(type(error)) + '\n\t\t' +
-                          'Avec comme message d\'erreur : ' + error.args[0] + '\n\n\t\t' +
+                          'Avec comme message d\'erreur : ' + str(error.args) + '\n\n\t\t' +
                           ''.join(traceback.format_tb(error.__traceback__)).replace('\n', '\n\t\t') + "\n")
 
         # FEATURE : initialiser le PCC ici d'une façon similaire au DMI
@@ -74,7 +75,8 @@ class Simulation:
             else:
                 logging.error("Impossible d'éxécuter le module : " + type(component) + " qui n'a pas de fonction run().\n")
 
-        # FEATURE : lancer la boucle de dynamique du train
+        # FEATURE : lancer la boucle de dynamique du train sur un thread
+        # FEATURE : lancer la bboucle de l'EVC (ETCS) sur un thread
 
         # Vérifie qu'au moins un module graphique c'est lancé
         if not any_launched:
