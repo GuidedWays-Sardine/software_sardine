@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.15
 import QtQuick.Controls 2.15
 import "../../../../DMI_default/ETCS"
 
@@ -8,7 +8,12 @@ Item {
     objectName: "root"
 
 
-    //Bouton délimitant le conrtour de la zone
+    //Propriétés lié à l'état de la jauge de vitesse
+    property int max_speed: 350
+    property int speed: 0
+
+
+    //Bouton délimitant le contour de la zone
     DMI_button {
         id: body
 
@@ -23,15 +28,21 @@ Item {
 
 
     DMI_speeddial {
-        id: speeddial
+        id: dial
         objectName: "speeddial"
 
-        max_speed: 170
+        max_speed: root.max_speed
 
-        default_x: 54
-        default_y: 15
-
+        default_x: body.default_x
+        default_y: body.default_y
     }
 
+    DMI_speedpointer {
+        id: pointer
 
+        default_x: body.default_x + body.default_width * 0.5
+        default_y: body.default_y + body.default_height * 0.5
+
+        max_speed: root.max_speed
+    }
 }
