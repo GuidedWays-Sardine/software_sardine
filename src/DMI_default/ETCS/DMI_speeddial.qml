@@ -46,7 +46,7 @@ Item {
 
 
     //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
-    readonly property string grey: "#C3C3C3"        //partie 5.2.1.3.3  Nr 3
+    readonly property string white: "#FFFFFF"        //partie 5.2.1.3.3  Nr 1
 
 
 
@@ -78,7 +78,7 @@ Item {
                 anchors.right: parent.right
 
                 antialiasing: true
-                color: root.grey
+                color: root.white
                 width: root.ratio * ((root.speed_dial_index % 4) !== 3
                                      ?         //cas des jauges 140/180/250 km/h
                                      (index % 2 == 1 ? root.default_short_line_length : root.default_long_line_length)
@@ -121,7 +121,7 @@ Item {
                 text: root.speed_values[(root.speed_dial_index % 4)][index]
                 font.pointSize: root.font_size * root.ratio
                 font.family: "Verdana"
-                color: root.grey
+                color: root.white
                 rotation: 360 - (270 - root.start_angle + index * ((2 * root.start_angle) - root.separation_angle * ((root.speed_dial_index % 4) === 2))/(root.speed_values[(root.speed_dial_index % 4)].length - 1)) // Annulation de la rotation pour avoir un texte vertical
             }
         }
