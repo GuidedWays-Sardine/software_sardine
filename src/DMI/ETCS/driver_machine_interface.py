@@ -59,6 +59,8 @@ class DriverMachineInterface:
         # Recherche la liste des fichiers et dossiers présents dans le dossier DMI/ETCS/graphics
         folders = os.listdir("DMI/ETCS/graphics")
 
+        #FIXME : diviser en deux fonctions
+
         # Pour chaque sections graphiques du DMI ayant un dossier associé (A à G dans DMI/ETCS/graphics)
         for folder in ["A", "B", "C", "D", "E", "F", "G"]:
             # Initialise la liste des éléments graphiques disponibles et change le préfixe de la page
@@ -68,14 +70,12 @@ class DriverMachineInterface:
             # Si le dossier existe bien, regarde chaque fichiers présents à l'intérieur de celui-ci
             if folder in folders:
                 files = os.listdir("DMI/ETCS/graphics/" + folder)
-                for file in (f for f in files if f.endswith(".qml")):   # S'assure que les fichiers son bien en .qml
-                    initial_page_time = time.time()
-                    logging.info("tentative de chargement de la page" + file + ".\n")
+                # Récupère tous les fichiers en .qml et enlève l'extension (rerajoutée si nécessaire)
+                for file in (f.replace(".qml", "") for f in files if f.endswith(".qml")):
+                    page_time = time.time()
+                    logging.info("tentative de chargement du fichier : " + file + ".qml.\n")
                     engine = QQmlApplicationEngine()
-                    engine.load("DMI/ETCS/graphics/" + folder + file)    # Par rapport au main.py
-
-                    # Enlève l'extension .qml pour une meilleure utilisation du fichier
-                    file = file.replace(".qml", "")
+                    engine.load("DMI/ETCS/graphics/" + folder + "/" + file + ".qml")    # Par rapport au main.py
 
                     # Si la page a été correctement chargée
                     if engine.rootObjects():
@@ -94,30 +94,41 @@ class DriverMachineInterface:
                             try:
                                 # Import localement le fichier de la page
                                 # Appelle le constructeur de la page pour affilier tous les signals aux widgets
-                                exec("from DMI.ETCS.signals." + folder + " import " + file +  "as" + file + "\n" +
-                                     "self.pages[\"" + folder + "\"][\"" + file + "\"] = ") #TODO : trouver la méthode pour le code
+                                exec("from DMI.ETCS.signals." + folder + " import " + file + "as" + file + "\n" +
+                                     "self.pages[\"" + folder + "\"][\"" + file + "\"] = " + file + "(simulation, self)")
                             except Exception as error:
-                                # Permet de rattraper une erreur si le code est incorrect où qu'il ne suit pas la documentation
+                                # Permet de rattraper une erreur si le code est incorrect
                                 logging.warning("Erreur lors du chargement des signaux de la page : " + file + ".\n\t\t" +
                                                 "Erreur de type : " + str(type(error)) + "\n\t\t" +
                                                 "Avec comme message d\'erreur : " + str(error.args) +
                                                 "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+
+                                # Indique le temps de chargement partiel (graphic uniquement) de la page
+                                logging.info("Page : " + file + " chargée partiellement (graphic uniquement) en " +
+                                             str("{:.2f}".format((time.time() - page_time) * 1000)) + " millisecondes.\n\n")
+                            else:
+                                # Indique le temps de chargement complet de la page
+                                logging.info("Page : " + file + " chargée complètement (graphic et logic) en " +
+                                             str("{:.2f}".format((time.time() - page_time) * 1000)) + " millisecondes.\n\n")
                         else:
                             # Sinon pas de signals handlers associé, le précise dans les logs
-                            logging.warning("La page " + file + " n\'a aucun fichier signals associé.\n\t\t" +
+                            logging.warning("La page " + file + " n\'a aucun fichier signals associé." +
                                             "La page sera visible mais ne sera pas fonctionnelle.\n")
+
+                            # Indique le temps de chargement partiel (graphic uniquement) de la page
+                            logging.info("Page : " + file + " chargée partiellement (graphic uniquement) en " +
+                                         str("{:.2f}".format((time.time() - page_time) * 1000)) + " millisecondes.\n\n")
                     else:
                         # Dans le cas où la page n'est pas valide laisse un warning
-                        logging.debug("La page : " + file + " du dossier" + folder + " contient des erreurs.\n")
+                        logging.warning("La page : " + file + ", du dossier : " + folder + ", contient des erreurs.\n\n")
 
                 # Vérifie qu'au moins un fichier graphique a été correctement chargé
                 if len(self.pages[folder]) == 0:
-                    logging.warning("Aucun fichier graphique correctement chargé dans" + folder +
-                                    ". La section restera vide.\n")
+                    logging.error("Aucun fichier graphique correctement chargé dans" + folder + ". La section restera vide.\n")
 
             # Dans le cas où le fichier n'existe pas
             else:
-                logging.warning("Aucun dossier graphique : " + folder + ". La section restera vide.\n")
+                logging.error("Aucun dossier graphique : " + folder + ". La section restera vide.\n")
 
         # Rechange le préfix du registre
         log.change_log_prefix("[Initialisation DMI ETCS]")
