@@ -9,8 +9,8 @@ Item {
 
 
     //Propriétés lié à l'état de la jauge de vitesse
-    property int max_speed: 350
-    property int speed: 0
+    property double max_speed: 200
+    property double speed: 0
 
 
     //Bouton délimitant le contour de la zone
@@ -44,5 +44,6 @@ Item {
         default_y: body.default_y + body.default_height * 0.5
 
         max_speed: root.max_speed
+        speed: root.speed
     }
 }
