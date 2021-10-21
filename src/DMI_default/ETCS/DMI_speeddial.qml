@@ -113,17 +113,33 @@ Item {
             rotation: 270 - root.start_angle + index * (((2 * root.start_angle) - root.separation_angle * ((root.speed_dial_index % 4) === 2))/(root.speed_values[(root.speed_dial_index % 4)].length - 1))
 
 
+            //Permet de connaitre la taille du texte afin de pouvoir placer une MouseArea dessus pour pouvoir sélectioner l'option en cliquant sur le text
+            TextMetrics {
+                id: speed_metrics
+
+                readonly property double w: speed_metrics.tightBoundingRect.width
+                readonly property double h: speed_metrics.tightBoundingRect.height
+                readonly property double offset: (Math.tan(Math.PI / 2 + 2 * Math.PI * speeds.rotation / 360) < w/h && Math.tan(Math.PI / 2 + 2 * Math.PI * speeds.rotation / 360) > -w/h)
+                                                 ?
+                                                 Math.sqrt(h*h + w*w)/2 - Math.sqrt(h*h + h*h * Math.tan(2 * Math.PI * (90 + speeds.rotation) / 360) * Math.tan(2 * Math.PI * (90 + speeds.rotation) / 360))/2
+                                                 :
+                                                 Math.sqrt(h*h + w*w)/2 - Math.sqrt(w*w + w*w * Math.tan(2 * Math.PI * speeds.rotation / 360.0) * Math.tan(2 * Math.PI * speeds.rotation / 360.0))/2
+
+                font: speed.font
+                text: speed.text
+            }
+
             //Texte contenant la valeur de la vitesse
             Text {
                 id: speed
 
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
-                anchors.rightMargin: (root.default_long_line_length + 2) * root.ratio
+                anchors.rightMargin: (root.default_long_line_length + 2) * root.ratio - speed_metrics.offset
 
 
                 text: root.speed_values[(root.speed_dial_index % 4)][index]
-                font.pointSize: root.font_size * root.ratio
+                font.pointSize: (root.font_size - 2) * root.ratio
                 font.family: "Verdana"
                 font.weight: Font.DemiBold
                 color: root.white
