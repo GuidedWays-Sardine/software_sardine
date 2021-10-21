@@ -38,6 +38,10 @@ Item {
     property int default_long_line_length: 25   //longueur du trais long
     property int font_size: 12                  //taille de la police de charactère
 
+    //propriété lié à la visibilité du speeddial
+    property bool is_visible: true
+    visible: is_visible
+
     // Propriété contenant la liste de toutes les valeurs à afficher selon le type
     readonly property var speed_values: [[0, 20, 40, 60, 80, 100, 120, 140],
                                          [0, 20, 40, 60, 80, 100, 120, 140, 160, 180],
