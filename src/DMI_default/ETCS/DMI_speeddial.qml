@@ -23,10 +23,8 @@ Item {
 
     //Propriétés liées à la vitesse maximale du speeddial
     property int max_speed: 400                 //vitesse maximale du matériel roulant (utile pour déduire le t ype de cadran)
-    property int speed_dial_index: 3   //index correspondant à la vitesse maximal affichable (0:140/1:180/2:250/3:400)
-    onMax_speedChanged: {                       //fonction qui calcule automatiquement max_speed_dial quand max_speed est changé
-        root.speed_dial_index = (max_speed >= 140) + (max_speed >= 180) + (max_speed >= 250)
-    }
+    readonly property int speed_dial_index: (max_speed >= 140) + (max_speed >= 180) + (max_speed >= 250)   //index correspondant à la vitesse maximal affichable (0:140/1:180/2:250/3:400)
+                                            //Permet à partir de la vitesse max de savoir le type de speeddial à montrer
 
     // Propriétés liées au format du speeddial
     property double start_angle: 144            //angle de début
@@ -83,7 +81,7 @@ Item {
 
                 antialiasing: true
                 color: root.white
-                width: root.ratio * ((root.speed_dial_index % 4) !== 3
+                width: root.ratio * (root.speed_dial_index !== 3
                                      ?         //cas des jauges 140/180/250 km/h
                                      (index % 2 == 1 ? root.default_short_line_length : root.default_long_line_length)
                                      :         //cas de la jauge 400 km/h
@@ -95,7 +93,7 @@ Item {
 
     // Ci-dessous les marqueurs avec le texte
     Repeater {
-        model: root.speed_values[(root.speed_dial_index % 4)].length
+        model: root.speed_values[root.speed_dial_index].length
 
         Item {
             //propriétés
@@ -110,7 +108,7 @@ Item {
             width: root.default_radius * root.ratio
 
             transformOrigin: Item.Left                  //cas général             cas (pour le 250km/h) où la dernière graduation n'a pas de valeurs
-            rotation: 270 - root.start_angle + index * (((2 * root.start_angle) - root.separation_angle * ((root.speed_dial_index % 4) === 2))/(root.speed_values[(root.speed_dial_index % 4)].length - 1))
+            rotation: 270 - root.start_angle + index * (((2 * root.start_angle) - root.separation_angle * (root.speed_dial_index === 2))/(root.speed_values[root.speed_dial_index].length - 1))
 
 
             //Permet de connaitre la taille du texte afin de pouvoir placer une MouseArea dessus pour pouvoir sélectioner l'option en cliquant sur le text
@@ -138,7 +136,7 @@ Item {
                 anchors.rightMargin: (root.default_long_line_length + 2) * root.ratio - speed_metrics.offset
 
 
-                text: root.speed_values[(root.speed_dial_index % 4)][index]
+                text: root.speed_values[root.speed_dial_index][index]
                 font.pointSize: (root.font_size - 2) * root.ratio
                 font.family: "Verdana"
                 font.weight: Font.DemiBold
