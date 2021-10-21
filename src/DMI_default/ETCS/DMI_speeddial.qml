@@ -125,8 +125,9 @@ Item {
                 text: root.speed_values[(root.speed_dial_index % 4)][index]
                 font.pointSize: root.font_size * root.ratio
                 font.family: "Verdana"
+                font.weight: Font.DemiBold
                 color: root.white
-                rotation: 360 - (270 - root.start_angle + index * ((2 * root.start_angle) - root.separation_angle * ((root.speed_dial_index % 4) === 2))/(root.speed_values[(root.speed_dial_index % 4)].length - 1)) // Annulation de la rotation pour avoir un texte vertical
+                rotation: - speeds.rotation //pour annuler la rotation du texte
             }
         }
     }
