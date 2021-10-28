@@ -3,6 +3,7 @@ import sys
 import logging
 import traceback
 import time
+import threading
 
 from PyQt5.QtWidgets import QDesktopWidget, QMainWindow
 from PyQt5.QtCore import Qt, QObject
@@ -169,6 +170,31 @@ class DriverMachineInterface:
             for screen in self.black_screens:
                 screen.show()
 
+        logic = threading.Thread(target=self.update)
+        logic.start()
+
         # Montre la fenêtre générale du DMI
         # Lance l'application et cherche pour le fichier QML avec tous les éléments de la fenêtre d'initialisation
         self.dmi_window.show()
+
+    def update(self):
+        # Pour chacune des sections
+        print("demaré")
+        for folder in ["A", "B", "C", "D", "E", "F", "G"]:
+            # Pour chacunes des pages de chaque sections
+            files = list(self.pages[folder].keys())
+            for file in files:
+                # Si la page a correctement été chargée et que la page a une fonction update
+                if self.pages[folder][file] is not None and \
+                        not isinstance(self.pages[folder][file], type(self.engine)) and\
+                        "update" in dir(self.pages[folder][file]):
+                    # Essaye d'appeler la fonction update (et attrape les erreurs s'il y a une erreur
+                    try:
+                        self.pages[folder][file].update()
+                    except Exception as error:
+                        logging.warning("Erreur lors de la mise à jour de la page" + folder + "." + file + " du DMI.\n\t\t" +
+                                        "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                                        "Avec comme message d\'erreur : " + str(error.args) +
+                                        "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                else :
+                    logging.debug("Aucune fonction update pour la section" + folder + "." + file + " du DMI.\n")
