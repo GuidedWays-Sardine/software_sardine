@@ -89,13 +89,14 @@ class DriverMachineInterface:
                         self.pages[folder][file] = engine
 
                         # Vérifie si la page a des signals handlers associés (en recherchant un ficher .py associé)
-                        if os.path.isfile("DMI/ETCS/" + folder + "/" + file + ".py"):
+                        if os.path.isfile("DMI/ETCS/signals/" + folder + "/" + file + ".py"):
                             # Si c'est le cas, initialise les signals handlers et le stock
                             try:
                                 # Import localement le fichier de la page
                                 # Appelle le constructeur de la page pour affilier tous les signals aux widgets
-                                exec("from DMI.ETCS.signals." + folder + " import " + file + "as" + file + "\n" +
-                                     "self.pages[\"" + folder + "\"][\"" + file + "\"] = " + file + "(simulation, self)")
+                                exec("from DMI.ETCS.signals." + folder + " import " + file + " as " + file + "\n" +
+                                     "self.pages[\"" + folder + "\"][\"" + file + "\"] = " +
+                                     file + "." + file + "(simulation, engine, folder, file)")
                             except Exception as error:
                                 # Permet de rattraper une erreur si le code est incorrect
                                 logging.warning("Erreur lors du chargement des signaux de la page : " + file + ".\n\t\t" +
