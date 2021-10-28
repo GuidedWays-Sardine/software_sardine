@@ -9,7 +9,7 @@ Item {
     id: root
 
     //Propriétés liés à la position et à la taille de l'objet
-    property int radius: 125                    //Rayon du DMI_speeddial
+    property int radius: 125                      //Rayon du DMI_speeddial
     property int default_x: 300                   //position du bouton pour les dimensions minimales de la fenêtre (640*480)
     property int default_y: 300
     anchors.fill: parent
@@ -19,19 +19,28 @@ Item {
     onRatioChanged: {pointer.requestPaint()}
 
     //Propriétés liées à la vitesse maximale du speeddial
-    property int max_speed: 400                 //vitesse maximale du matériel roulant (utile pour déduire le t ype de cadran)
-    property int speed_dial_index: 3   //index correspondant à la vitesse maximal affichable (0:140/1:180/2:250/3:400)
-    onMax_speedChanged: {                       //fonction qui calcule automatiquement max_speed_dial quand max_speed est changé
-        root.speed_dial_index = (max_speed >= 140) + (max_speed >= 180) + (max_speed >= 250)
-    }
+    property double speed: 0
+    property int max_speed: 400                 //vitesse maximale du matériel roulant (utile pour déduire le type de cadran)
+    readonly property int speed_dial_index: (max_speed > 140) + (max_speed > 180) + (max_speed > 250)
+
 
     // Propriétés liées au format du speeddial
     property double start_angle: 144            //angle de début
     property int font_size: 18
 
-    //propriétés sur l'état du pointeur (vitesse et couleur)
-    property string speed_status: "normal"
-    property double speed: 0
+    //propriétés pour la couleur du pointeur
+    property double permitted_speed: 0
+    onPermitted_speedChanged: {pointer.requestPaint()}
+    property double target_speed: -1
+    onTarget_speedChanged: {pointer.requestPaint()}
+    property double release_speed: 0
+    onRelease_speedChanged: {pointer.requestPaint()}
+    property string operating_mode: "FS"
+    onOperating_modeChanged: {pointer.requestPaint()}
+    property string speed_monitoring:  "CSM"
+    onSpeed_monitoringChanged: {pointer.requestPaint()}
+    property string status_information: "NoS"
+    onStatus_informationChanged: {pointer.requestPaint()}
 
 
     //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
@@ -79,18 +88,45 @@ Item {
             ctx.lineTo((root.default_x) * root.ratio, (root.default_y - 4.5) * root.ratio)
 
             ctx.closePath()
-            switch(root.speed_status.toUpperCase()){
-            case "INTS":
-                ctx.fillStyle = root.red
-                break
-            case "WAS":
-                ctx.fillStyle = root.orange
-                break
-            case "OVS":
-                ctx.fillStyle = root.yellow
-                break
-            default:
-                ctx.fillStyle = root.grey
+            switch(root.status_information.toUpperCase()){
+                case "INTS":
+                    if(root.speed >= root.permitted_speed){
+                        ctx.fillStyle = root.red
+                    }
+                    else if (root.speed < root.permitted_speed && root.speed >= root.target_speed) {
+                        ctx.fillStyle = root.yellow
+                    }
+                    else {
+                        ctx.fillStyle = root.grey
+                    }
+                    break
+                case "WAS":
+                    ctx.fillStyle = root.orange
+                    break
+                case "OVS":
+                    ctx.fillStyle = root.yellow
+                    break
+                case "INDS":
+                    if(root.speed < root.release_speed || (root.operating_mode.toUpperCase() !== "LS" && root.speed <= root.permitted_speed && root.speed >= root.target_speed)) {
+                        ctx.fillStyle = root.yellow
+                    }
+                    else {
+                        ctx.fillStyle = root.grey
+                    }
+                    break
+                case "NOS":
+                    if(root.target_speed >= 0 && root.speed >= root.target_speed && root.speed <= root.permitted_speed) {
+                        ctx.fillStyle = root.white
+                    }
+                    else if(root.target_speed >= 0 && root.speed > root.permitted_speed) {
+                        ctx.fillStyle = root.red
+                    }
+                    else {
+                        ctx.fillStyle = root.grey
+                    }
+                    break
+                default:
+                    ctx.fillStyle = root.grey
             }
             ctx.fill()
         }
@@ -104,7 +140,10 @@ Item {
         y: (root.default_y - root.font_size * 0.5 - 2) * root.ratio
 
         text: Math.round(root.speed) % 10
-        color: root.speed_status.toUpperCase() === "INTS" ? root.white : root.black
+        color: (root.status_information.toUpperCase() === "INTS" ||
+                root.operating_mode.toUpperCase() == "TR" ||
+                root.status_information.toUpperCase() === "ALLS" && root.speed > root.permitted_speed)
+                ? root.white : root.black
         font.pixelSize: root.font_size * root.ratio
         font.family: "Verdana"
         font.bold: true
@@ -118,7 +157,10 @@ Item {
 
         //Rien ne sera montré si la valeur arrondis n'est pas d'au moins 10
         text: Math.round(root.speed) >= 10 ? ((root.speed - root.speed % 10) % 100)/10 : ""
-        color: root.speed_status.toUpperCase() === "INTS" ? root.white : root.black
+        color: (root.status_information.toUpperCase() === "INTS" ||
+                root.operating_mode.toUpperCase() == "TR" ||
+                root.status_information.toUpperCase() === "ALLS" && root.speed > root.permitted_speed)
+                ? root.white : root.black
         font.pixelSize: root.font_size * root.ratio
         font.family: "Verdana"
         font.bold: true
@@ -132,7 +174,10 @@ Item {
 
         //Rien ne sera montré si la valeur arrondis n'est pas d'au moins 100
         text: Math.round(root.speed) >= 100 ? ((root.speed - root.speed % 100) % 1000)/100 : ""
-        color: root.speed_status.toUpperCase() === "INTS" ? root.white : root.black
+        color: (root.status_information.toUpperCase() === "INTS" ||
+                root.operating_mode.toUpperCase() == "TR" ||
+                root.status_information.toUpperCase() === "ALLS" && root.speed > root.permitted_speed)
+                ? root.white : root.black
         font.pixelSize: root.font_size * root.ratio
         font.family: "Verdana"
         font.bold: true
