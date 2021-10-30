@@ -23,17 +23,17 @@ def initialise(path, version, log_level):
         Le chemin vers le fichier log par rapport au fichier source
     version : `string`
         La version du programme
-    log_level : `int`
-        Le niveau de logging (log.ERROR, log.WARNING, log.DEBUG, log.NOTSET)
+    log_level : `Level`
+        Le niveau de logging (Level.WARNING, Level.INFO, Level.DEBUG, Level.NOTSET)
     """
     # Vérifie si un fichier log a déjà été créé, si oui, change le niveau de logging sinon le crée
     if logging.getLogger().hasHandlers():
-        logging.getLogger().setLevel(log_level)
-        logging.warning("tentative de création d'un nouveau fichier log.\n")
+        logging.getLogger().setLevel(log_level.value)
+        logging.warning("Fichier de registre pour cette simulation déjà existant. Aucun besoin d'en créer un nouveau.\n")
         return
 
     # Si aucun log n'est demandé, définit le niveau de log comme "aucun" et retourne
-    if log_level is logging.NOTSET:
+    if log_level is Level.NOTSET:
         logging.basicConfig(level=logging.NOTSET)
         return
 
@@ -47,7 +47,7 @@ def initialise(path, version, log_level):
     file_name = file_name.replace(':', ';')
 
     # Crée le fichier log avec les informations envoyées
-    logging.basicConfig(level=log_level,
+    logging.basicConfig(level=log_level.value,
                         filename=file_name,
                         datefmt="%H:%M:%S",
                         format="%(asctime)s - %(levelname)s - %(message)s")
@@ -60,14 +60,23 @@ def change_log_prefix(prefix=""):
     ----------
     prefix: `string`
         Le nouveau préfix à mettre en plus de l'heure et du niveau du registre
+
+    Raises
+    ------
+    FileNotFoundError
+        Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
     """
-    #Récupère le handler à modifier
+    # Vérifie qu'un fichier registre existe bien sinon jette l'erreur FileNotFoundError
+    if logging.getLogger().hasHandlers():
+        raise FileNotFoundError("Aucun fichier de registre existant pour cette simulation")
+
+    # Récupère le handler (fichier registre) à modifier
     handler = logging.getLogger().handlers[0]
 
     # Si le préfixe est vide, l'ajoute, sinon remet le logging par défaut
     if prefix != "":
         handler.setFormatter(logging.Formatter(datefmt="%H:%M:%S",
-                                               fmt="%(asctime)s - " + str(prefix) + " - %(levelname)s - %(message)s"))
+                                               fmt="%(asctime)s - [" + str(prefix) + "] - %(levelname)s - %(message)s"))
     else:
         handler.setFormatter(logging.Formatter(datefmt="%H:%M:%S",
                                                fmt="%(asctime)s - %(levelname)s - %(message)s"))
