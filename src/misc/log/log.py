@@ -38,13 +38,13 @@ def initialise(path, version, log_level):
         return
 
     # Rajoute un / à la fin du chemin s'il a été oublié
-    if path[len(path) - 1] != "/":
-        path += "/"
+    if path[len(path) - 1] != "/" or "\\":
+        path += "\\"
+    path.replace("/", "\\")
 
     # Prend la date et crée le nom du fichier log
     now = str(datetime.now()).split(".", 1)[0]
-    file_name = path + "sardine " + version + " " + now + ".log"
-    file_name = file_name.replace(':', ';')
+    file_name = path + ("sardine " + version + " " + now + ".log").replace(':', ';')
 
     # Crée le fichier log avec les informations envoyées
     logging.basicConfig(level=log_level.value,
@@ -78,7 +78,7 @@ def change_log_prefix(prefix=""):
         Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
     """
     # Vérifie qu'un fichier registre existe bien sinon jette l'erreur FileNotFoundError
-    if logging.getLogger().hasHandlers():
+    if not logging.getLogger().hasHandlers():
         raise FileNotFoundError("Aucun fichier de registre existant pour cette simulation")
 
     # Récupère le handler (fichier registre) à modifier
@@ -111,7 +111,7 @@ def log(log_level, message, prefix=None):
         Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
     """
     # Vérifie qu'un fichier registre existe bien sinon jette l'erreur FileNotFoundError
-    if logging.getLogger().hasHandlers():
+    if not logging.getLogger().hasHandlers():
         raise FileNotFoundError("Aucun fichier de registre existant pour cette simulation")
 
     # Vérifie si un préfix temporaire a été envoyé et si oui change le préfix utilisé
