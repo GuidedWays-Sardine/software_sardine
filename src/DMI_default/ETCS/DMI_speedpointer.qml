@@ -104,7 +104,7 @@ Item {
                     ctx.fillStyle = root.orange
                     break
                 case "OVS":
-                    ctx.fillStyle = root.yellow
+                    ctx.fillStyle = root.orange
                     break
                 case "INDS":
                     if(root.speed < root.release_speed || (root.operating_mode.toUpperCase() !== "LS" && root.speed <= root.permitted_speed && root.speed >= root.target_speed)) {
