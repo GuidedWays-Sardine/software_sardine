@@ -53,6 +53,17 @@ def initialise(path, version, log_level):
                         format="%(asctime)s - %(levelname)s - %(message)s")
 
 
+def change_log_level(log_level):
+    """Permet de changer le niveau de registre
+
+    Parameters
+    ----------
+    log_level: `Level`
+        nouveau niveau de registre
+    """
+    logging.getLogger().setLevel(log_level.value)
+
+
 def change_log_prefix(prefix=""):
     """Permet à l'utilisateur de changer le préfix devant chaque message de registre pour mieux indiquer leur provenance
     
