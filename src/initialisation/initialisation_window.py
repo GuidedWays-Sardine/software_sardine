@@ -1,16 +1,21 @@
 import os.path
 import sys
-import logging
 import traceback
 import time
 
+
+# Librairies d'interfaces graphiques
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QObject
 from PyQt5.QtQml import QQmlApplicationEngine
 
-import log.log as log
-from initialisation.signals import right_buttons as rb
-from initialisation.signals import bottom_buttons as bb
+
+# Librairies SARDINE
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src\\")[0]
+sys.path.append(os.path.dirname(PROJECT_DIR))
+import src.misc.log.log as log
+from src.initialisation.signals import right_buttons as rb
+from src.initialisation.signals import bottom_buttons as bb
 
 
 class InitialisationWindow:
@@ -287,3 +292,17 @@ class InitialisationWindow:
 
         logging.info("La langue du simulateur (et de l'application d'initialisation) a été changée en " +
                      str("{:.2f}".format((time.time() - initial_time) * 1000)) + " millisecondes.\n\n")
+
+
+def main():
+    log.initialise(PROJECT_DIR + "log", "1.1.0", log.Level.DEBUG)
+
+    #Lance l'application d'initialisation
+    application = InitialisationWindow()
+
+    if application.launch_simulator:
+        log.info(str(application.get_values()), prefix="Données Collectées")
+
+
+if __name__ == "__main__":
+    main()
