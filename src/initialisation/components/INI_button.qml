@@ -60,10 +60,10 @@ Item {
     //Rectangle pour la couleur du fond du bouton
     Rectangle{
         id: body
-        color: root.dark_blue
+
         anchors.fill: parent
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.verticalCenter: parent.verticalCenter
+
+        color: root.dark_blue
     }
 
     //Image visible sur le bouton
