@@ -16,6 +16,7 @@ Item {
     property double target_speed: 0
     property double release_speed: 0
     property double permitted_speed: 0
+    property double brake_speed: 0
     property string operating_mode: "FS"
     property string speed_monitoring:  "CSM"
     property string status_information: "NoS"
@@ -61,4 +62,23 @@ Item {
         permitted_speed: root.permitted_speed
         speed: root.speed
     }
+
+    DMI_circularspeedgauge {
+        id: gauge
+
+        default_x: body.default_x + body.default_width * 0.5
+        default_y: body.default_y + body.default_height * 0.5
+
+        operating_mode: root.operating_mode
+        speed_monitoring: root.speed_monitoring
+        status_information: root.status_information
+
+        max_speed: root.max_speed
+        release_speed: root.release_speed
+        target_speed: root.target_speed
+        permitted_speed: root.permitted_speed
+        brake_speed: root.brake_speed
+        speed: root.speed
+    }
+
 }
