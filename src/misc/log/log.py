@@ -1,5 +1,17 @@
+"""Module dérivé du module logging permettant de créer des fichiers de registres adapté à la simulation de SARDINE"""
 import logging
+from enum import Enum
 from datetime import datetime
+
+
+class Level(Enum):
+    """Classe contenant les différents niveaux de logs (permet une indépendance du module)"""
+    NOTSET = logging.NOTSET
+    DEBUG = logging.DEBUG
+    INFO = logging.INFO
+    WARNING = logging.WARNING
+    ERROR = logging.ERROR
+    CRITICAL = logging.CRITICAL
 
 
 def initialise(path, version, log_level):
