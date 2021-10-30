@@ -54,8 +54,6 @@ Item {
 
     //Différents signal handlers (à écrire en python)
     signal clicked()                        //détecte quand le bouton est cliqué
-    signal click_start()                    //détecte quand l'utilisateur commence à appuyer sur le bouton
-    signal click_end()                      //détecte quand l'utilisateur relache le bouton (même si le clic n'est pas valide)
 
 
 
@@ -213,29 +211,23 @@ Item {
 
         //Détecte quand la zone (le bouton) commence à être appuyé
         onPressed: {
-            //force le focus sur ce bouton pour qu'il soit prioritaire
+            //force le focus sur ce bouton pour qu'il soit prioritaire et indique que le bouton est cliqué
             forceActiveFocus()
-
-            //indique que le bouton est pressé et lance le clic
             root.button_pressed = true
-            root.click_start()
         }
 
         //Détecte quand la zone (le bouton) est relaché
         onReleased: {
-            //Appelle le signal clicked dans le cas où le bouton est relaché sur la zone, et qu'il est de type UP ou de type Delay avec les 8 ycles de 250ms terminés
+            //Appelle le signal clicked dans le cas où le bouton est relaché sur la zone et indique qu'il n'est plus appuyé
             if(root.button_pressed) {
                 root.clicked()
+                root.button_pressed = false
             }
-
-            //Remet les bordures visibles et arrête tous les timers et Appelle le signal click_end (appelé même quand le clic n'est pas valide)
-            root.click_end()
-            root.button_pressed = false
         }
 
         //Fonction qui détecte lorsque l'utilisateur sort ou rentre sa souris du bouton alors qu'il clique dessus
         onContainsMouseChanged: {
-            root.button_pressed = containsMouse
+            root.button_pressed = area.containsMouse
         }
     }
 }
