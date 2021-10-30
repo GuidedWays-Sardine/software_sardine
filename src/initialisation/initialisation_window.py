@@ -1,3 +1,4 @@
+# Librairies par défaut
 import os.path
 import sys
 import traceback
@@ -53,43 +54,44 @@ class InitialisationWindow:
             Soulevé quand le fichier .qml de la fenêtre d'initialisation a une erreur de syntaxe et n'est pas lisible
         """
         initial_time = time.time()
-        log.change_log_prefix("[Initialisation]")
-        logging.info("Début du chargement de l'application d'intialisation.\n\n")
+        log.change_log_prefix("Initialisation")
+        log.info("Début du chargement de l'application d'intialisation.\n\n")
 
         # Lance l'application et cherche pour le fichier QML avec tous les éléments de la fenêtre d'initialisation
         self.app = QApplication(sys.argv)
         self.app.setQuitOnLastWindowClosed(True)
         self.engine = QQmlApplicationEngine()
-        self.engine.load('initialisation/initialisation_window.qml')
+        self.engine.load(PROJECT_DIR + "src/initialisation/initialisation_window.qml")
 
         # Vérifie si le fichier qml de la fenêtre a bien été ouvert et compris, sinon jête une erreur
-        if not self.engine.rootObjects() and not os.path.isfile("initialisation/initialisation_window.qml"):
+        if not self.engine.rootObjects() and not os.path.isfile(PROJECT_DIR + "src/initialisation/initialisation_window.qml"):
             raise FileNotFoundError("Le fichier .qml pour la fenêtre d\'initialisation n\'a pas été trouvé.")
-        elif not self.engine.rootObjects() and os.path.isfile("initialisation/initialisation_window.qml"):
+        elif not self.engine.rootObjects() and os.path.isfile(PROJECT_DIR + "src/initialisation/initialisation_window.qml"):
             raise SyntaxError("Le fichier .qml pour la fenêtre d\'initialisation contient des erreurs.")
 
         # Si le fichier qml a été compris, récupère la fenêtre et initialise les différents boutons et pages
         self.win = self.engine.rootObjects()[0]
-        self.win.visibilityChanged.connect(lambda: self.app.quit()) # FIXME : ferme l'application quand celle-ci est mise en plein écran
+        #self.win.aboutToQuit()
+        #self.win.visibilityChanged.connect(lambda: self.app.quit()) # FIXME : ferme l'application quand celle-ci est mise en plein écran
         self.bottom_buttons = bb.BottomButtons(self)
         self.right_buttons = rb.RightButtons(self)
 
         # Charge le fichier de paramètres défault.settings s'il existe
-        if os.path.isfile("../settings/general_settings/default.settings"):
-            logging.info("Chargement des paramètres du fichier default.settings.\n")
-            self.bottom_buttons.on_open_clicked(self, "../settings/general_settings/default.settings")
+        if os.path.isfile(PROJECT_DIR + "settings/general_settings/default.settings"):
+            log.info("Chargement des paramètres du fichier default.settings.\n")
+            self.bottom_buttons.on_open_clicked(self, PROJECT_DIR + "settings/general_settings/default.settings") #FIXME : à améliorer
         else:
-            logging.info("Aucun fichier paramètres default.settings.\n")
+            log.info("Aucun fichier paramètres default.settings. Tous les éléments par défaut seront pris\n")
 
         # Indique le temps de chargement de l'application
-        logging.info("Application d'initialisation chargée en " +
-                     str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n\n")
+        log.info("Application d'initialisation chargée en " +
+                 str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n\n")
 
         # Charge la logique de la première page de paramètres
         if self.active_settings_page != -1:
             # Dans le cas ou au moins une page a été chargée entièrement, change le préfix et appelle son ouverture
-            log.change_log_prefix("[page_rb" + str(self.active_settings_page) + "]")
-            logging.info("Ouverture de la page de paramètres page_rb" + str(self.active_settings_page) + ".\n")
+            log.change_log_prefix("page_rb" + str(self.active_settings_page))
+            log.info("Ouverture de la page de paramètres page_rb" + str(self.active_settings_page) + ".\n")
 
             if self.is_fully_loaded[self.active_settings_page - 1] and \
                     "on_page_opened" in dir(self.visible_pages[self.active_settings_page - 1]):
@@ -97,13 +99,13 @@ class InitialisationWindow:
                 try:
                     self.visible_pages[self.active_settings_page - 1].on_page_opened(self)
                 except Exception as error:
-                    logging.error("La fonction on_page_opened de la page " + str(self.active_settings_page) +
-                                  " contient une erreur.\n\t\t" +
-                                  "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                                  "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
-                                  "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                    log.error("La fonction on_page_opened de la page " + str(self.active_settings_page) +
+                              " contient une erreur.\n\t\t" +
+                              "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                              "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
+                              "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
             else:
-                logging.debug("Aucune fonction on_page_opened page " + str(self.active_settings_page) + "\n")
+                log.debug("Aucune fonction on_page_opened page " + str(self.active_settings_page) + "\n")
 
         # Lance l'application
         self.win.show()
@@ -121,20 +123,20 @@ class InitialisationWindow:
             un dictionaire de paramètres avec tous les paramètres du simulateur
         """
         initial_time = time.time()
-        logging.info("Tentative de récupération des paramètres.\n")
-        parameters = {}
+        log.info("Tentative de récupération des paramètres.\n")
+        parameters = {}     # OPTIMIZE: changer pour un dictionnaire de paramètres
 
         # Récupère la traduction anglaise car certains paramètres (exemple : chemins de fichiers) sont en anglais
-        translation_data = {}
+        translation_data = {}   # OPTIMIZE: passer pour un dictionnaire de paramètres
         try:
             translation_data = self.read_language_file(self.language, "English")
         except Exception as error:
             # Rattrape une potentielle erreur lors de la création du dictionaire de traduction
-            logging.error("Erreur lors de la récupération du dictionaire de traduction dans get_values. " +
-                          "Certains arguments ne pourront pas être enregistrés." +
-                          "\n\t\tErreur de type : " + str(type(error)) +
-                          "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
-                          "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+            log.error("Erreur lors de la récupération du dictionaire de traduction dans get_values. " +
+                      "Certains arguments ne pourront pas être enregistrés." +
+                      "\n\t\tErreur de type : " + str(type(error)) +
+                      "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
+                      "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
 
         # Pour chaque page ayant une partie logique fonctionnelle :
         for page in (x for x in self.visible_pages if x is not None and not isinstance(x, type(self.engine))):
@@ -145,16 +147,16 @@ class InitialisationWindow:
                     parameters.update(page.get_values(translation_data))
                 except Exception as error:
                     # Permet de rattraper une potentielle erreur dans la fonction get_values()
-                    logging.warning("Erreur lors de la récupération des paramètres pour la page : " + str(page.index) +
-                                    "\n\t\tErreur de type : " + str(type(error)) +
-                                    "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
-                                    "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                    log.warning("Erreur lors de la récupération des paramètres pour la page : " + str(page.index) +
+                                "\n\t\tErreur de type : " + str(type(error)) +
+                                "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
+                                "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
             else:
-                logging.warning("La page " + str(page.index) + " n'a pas de fonction get_values.\n")
+                log.warning("La page " + str(page.index) + " n'a pas de fonction get_values.\n")
 
         # Retourne le dictionnaire complété grâce aux différentes valeurs des get_values() de chaques pagesee
-        logging.info("Récupération de " + str(len(parameters)) + " paramètres sur l'application d'initialisation en " +
-                     str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n\n")
+        log.info("Récupération de " + str(len(parameters)) + " paramètres sur l'application d'initialisation en " +
+                 str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n\n")
         return parameters
 
     def set_values(self, data):
@@ -166,7 +168,7 @@ class InitialisationWindow:
             Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
         """
         initial_time = time.time()
-        logging.info("Tentative de changement des paramètres.\n")
+        log.info("Tentative de changement des paramètres.\n")
         count = 0
         translation_data = {}
 
@@ -180,17 +182,17 @@ class InitialisationWindow:
                     language_combo.change_selection(data["Langue"])
             # Si le paramètre "Langue" n'apparait pas, laisse juste un message de debug
             except KeyError:
-                logging.debug("Impossible de changer la langue du simulateur car : \"Langue\" est manquant.\n")
+                log.debug("Impossible de changer la langue du simulateur car : \"Langue\" est manquant.\n")
             # Dans tous les cas récupère un dictionaire avec la langue actuelle (ou changée juste avant)
             try:
                 translation_data = self.read_language_file("English", self.language)
             except Exception as error:
                 # Rattrape une potentielle erreur lors de la création du dictionaire de traduction
-                logging.error("Erreur lors de la récupération du dictionaire de traduction. " +
-                              "Certains arguments ne pourront pas être changés." +
-                              "\n\t\tErreur de type : " + str(type(error)) +
-                              "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
-                              "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                log.error("Erreur lors de la récupération du dictionaire de traduction. " +
+                          "Certains arguments ne pourront pas être changés." +
+                          "\n\t\tErreur de type : " + str(type(error)) +
+                          "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
+                          "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
 
         # Pour chaque page ayant une partie logique fonctionnelle :
         for page in (x for x in self.visible_pages if x is not None and not isinstance(x, type(self.engine))):
@@ -202,18 +204,18 @@ class InitialisationWindow:
                     count += 1
                 except Exception as error:
                     # Permet de rattraper une potentielle erreur dans la fonction get_values()
-                    logging.warning("Erreur lors du changement des paramètres pour la page : " + str(page.index) +
-                                    "\n\t\tErreur de type : " + str(type(error)) +
-                                    "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
-                                    "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                    log.warning("Erreur lors du changement des paramètres pour la page : " + str(page.index) +
+                                "\n\t\tErreur de type : " + str(type(error)) +
+                                "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
+                                "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
             else:
-                logging.warning("La page " + str(page.index) + " n'a pas de fonction set_values.\n")
+                log.warning("La page " + str(page.index) + " n'a pas de fonction set_values.\n")
 
             # Indique le nombre de pages dont les paramètres on été changés
-        logging.info("Paramètres changés sur " + str(count) + " pages en " +
-                     str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n\n")
+        log.info("Paramètres changés sur " + str(count) + " pages en " +
+                 str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n\n")
 
-    def read_language_file(self, current_language, new_language):
+    def read_language_file(self, current_language, new_language):   # FIXME : bouger dans le Misc settings dictionnary
         """Fonction permettant de lire le fichier de traduction et d'en resortir un dictionnaire de traduction
 
         Parameters
@@ -238,7 +240,7 @@ class InitialisationWindow:
         translation_data = {}
 
         # Ouvre le fichier et récupère la liste des langues
-        file = open("../settings/language_settings/initialisation.lang", "r", encoding='utf-8-sig')
+        file = open(PROJECT_DIR + "settings/language_settings/initialisation.lang", "r", encoding='utf-8-sig')
         language_list = file.readline().upper().rstrip('\n').split(";")
 
         # Récupère les index des langues
@@ -256,8 +258,8 @@ class InitialisationWindow:
                     translation_data[translations[current_index]] = translations[new_index]
                 # S'il n'y a pas autant de traductions que de langue, cela signifie que la ligne est incomplète
                 else:
-                    logging.debug("Certaines traductions manquantes sur la ligne suivante (langues attendus, mots) :" +
-                                  "\n\t\t" + ";".join(language_list) + "\n\t\t" + line)
+                    log.debug("Certaines traductions manquantes sur la ligne suivante (langues attendus, mots) :" +
+                              "\n\t\t" + ";".join(language_list) + "\n\t\t" + line)
         file.close()
         return translation_data
 
@@ -270,7 +272,7 @@ class InitialisationWindow:
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive
         """
         initial_time = time.time()
-        logging.info("Changement du choix de langue, mise à jour de l'application d'initialisation.\n")
+        log.info("Changement du choix de langue, mise à jour de l'application d'initialisation.\n")
 
         # Appel de la fonction set_languages pour les boutons du bas
         self.bottom_buttons.change_language(self, translation_data)
@@ -283,15 +285,15 @@ class InitialisationWindow:
                     page.change_language(translation_data)
                 except Exception as error:
                     # Permet de rattraper une potentielle erreur dans la fonction get_values()
-                    logging.warning("Erreur lors du changement de langue pour la page : " + str(page.index) +
-                                    "\n\t\tErreur de type : " + str(type(error)) +
-                                    "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
-                                    "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                    log.warning("Erreur lors du changement de langue pour la page : " + str(page.index) +
+                                "\n\t\tErreur de type : " + str(type(error)) +
+                                "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
+                                "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
             else:
-                logging.warning("La page " + str(page.index) + " n'a pas de fonction change_language.\n")
+                log.warning("La page " + str(page.index) + " n'a pas de fonction change_language.\n")
 
-        logging.info("La langue du simulateur (et de l'application d'initialisation) a été changée en " +
-                     str("{:.2f}".format((time.time() - initial_time) * 1000)) + " millisecondes.\n\n")
+        log.info("La langue du simulateur (et de l'application d'initialisation) a été changée en " +
+                 str("{:.2f}".format((time.time() - initial_time) * 1000)) + " millisecondes.\n\n")
 
 
 def main():
