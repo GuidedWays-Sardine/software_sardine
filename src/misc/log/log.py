@@ -81,3 +81,126 @@ def change_log_prefix(prefix=""):
         handler.setFormatter(logging.Formatter(datefmt="%H:%M:%S",
                                                fmt="%(asctime)s - %(levelname)s - %(message)s"))
 
+
+def log(log_level, message, prefix=None):
+    """Permet de laisser un message de niveau log_level dans le fichier registre
+
+    Parameters
+    ----------
+    log_level: `Level`
+        Le niveau de registre du message (élément de la classe Level)
+    message: `string`
+        Le message à afficher dans le registre
+    prefix: `string`
+        Le préfix temporaire à afficher
+
+    Raises
+    ------
+    FileNotFoundError
+        Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
+    """
+    # Vérifie qu'un fichier registre existe bien sinon jette l'erreur FileNotFoundError
+    if logging.getLogger().hasHandlers():
+        raise FileNotFoundError("Aucun fichier de registre existant pour cette simulation")
+
+    # Vérifie si un préfix temporaire a été envoyé et si oui change le préfix utilisé
+    format = logging.getLogger().handlers[0].formatter._fmt
+    if prefix is not None:
+        change_log_prefix(prefix)
+
+    # Laisse le message dans le fichier de registre de niveau debug
+    logging.log(log_level.value, message)
+
+    # Si le préfix a été changé temporairement
+    if prefix is not None:
+        logging.getLogger().handlers[0].setFormatter(logging.Formatter(datefmt="%H:%M:%S", fmt=format))
+
+
+def debug(message, prefix=None):
+    """Permet de laisser un message de niveau DEBUG dans le fichier registre
+
+    Parameters
+    ----------
+    message: `string`
+        Le message à afficher dans le registre
+    prefix: `string`
+        Le préfix temporaire à afficher
+
+    Raises
+    ------
+    FileNotFoundError
+        Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
+    """
+    log(Level.DEBUG, message, prefix)
+
+
+def info(message, prefix=None):
+    """Permet de laisser un message de niveau INFO dans le fichier registre
+
+    Parameters
+    ----------
+    message: `string`
+        Le message à afficher dans le registre
+    prefix: `string`
+        Le préfix temporaire à afficher
+
+    Raises
+    ------
+    FileNotFoundError
+        Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
+    """
+    log(Level.INFO, message, prefix)
+
+
+def warning(message, prefix=None):
+    """Permet de laisser un message de niveau WARNING dans le fichier registre
+
+    Parameters
+    ----------
+    message: `string`
+        Le message à afficher dans le registre
+    prefix: `string`
+        Le préfix temporaire à afficher
+
+    Raises
+    ------
+    FileNotFoundError
+        Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
+    """
+    log(Level.WARNING, message, prefix)
+
+
+def error(message, prefix=None):
+    """Permet de laisser un message de niveau ERROR dans le fichier registre
+
+    Parameters
+    ----------
+    message: `string`
+        Le message à afficher dans le registre
+    prefix: `string`
+        Le préfix temporaire à afficher
+
+    Raises
+    ------
+    FileNotFoundError
+        Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
+    """
+    log(Level.ERROR, message, prefix)
+
+
+def critical(message, prefix=None):
+    """Permet de laisser un message de niveau CRITICAL dans le fichier registre
+
+    Parameters
+    ----------
+    message: `string`
+        Le message à afficher dans le registre
+    prefix: `string`
+        Le préfix temporaire à afficher
+
+    Raises
+    ------
+    FileNotFoundError
+        Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
+    """
+    log(Level.CRITICAL, message, prefix)
