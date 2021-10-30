@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.3
 import QtQml 2.15
 //import QtMultimedia 5.15
 //FIXME : librairie non trouvée, impossible de trouver le son approprié
@@ -85,6 +86,7 @@ Item {
         anchors.topMargin: (1 + root.is_positive) * root.ratio
         anchors.left: body.left
         anchors.leftMargin: (1 + root.is_positive) * root.ratio
+        fillMode: Image.PreserveAspectFit
 
         source: (root.image_activable != "" || root.image_not_activable != "") ? root.symbols_path + (root.is_activable ? image_activable : image_not_activable) : root.symbols_path + root.default_image
     }
