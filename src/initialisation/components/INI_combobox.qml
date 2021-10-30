@@ -45,7 +45,7 @@ Item {
     readonly property string dark_blue : "#031122"  //partie 5.2.1.3.3  Nr 6
     readonly property string black: "#000000"       //partie 5.2.1.3.3  Nr 2
     readonly property string grey: "#C3C3C3"        //partie 5.2.1.3.3  Nr 3
-    readonly property string dark_grey: "#969696"   //partie 5.2.1.3.3  Nr 5
+    readonly property string dark_grey: "#555555"   //partie 5.2.1.3.3  Nr 5
     readonly property string shadow: "#08182F"      //partie 5.2.1.3.3  Nr 7
 
 
