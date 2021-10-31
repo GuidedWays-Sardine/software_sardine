@@ -3,7 +3,7 @@ import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 
 import "page_rb8"
-import "../../../DMI_default/ETCS"
+import "../../components"
 
 
 Item {
@@ -61,7 +61,7 @@ Item {
 
 
     //Flèche de droite pour naviguer à gauche sur les catégories d'écrans
-    DMI_button {
+    INI_button {
         id: left_category_button
         objectName: "left_category_button"
 
@@ -78,7 +78,7 @@ Item {
     }
 
     //Encadré permettant d'afficher le nom de la catégorie d'écrans
-    DMI_button {
+    INI_button {
         id: category_title
         objectName: "category_title"
 
@@ -95,7 +95,7 @@ Item {
     }
 
     //Flèche de droite pour naviguer à droite sur les catégories d'écran
-    DMI_button {
+    INI_button {
         id: right_category_button
         objectName: "right_category_button"
 
@@ -176,7 +176,7 @@ Item {
     }
 
     //checkbutton pour savoir si l'application doit éteindre les écrans qui ne sont pas utilisés
-    DMI_checkbutton {
+    INI_checkbutton {
         id: black_screens_check
         objectName: "black_screens_check"
 
@@ -191,7 +191,7 @@ Item {
     }
 
     //Flèche de droite pour naviguer sur la liste des écrans d'une même catégorie
-    DMI_button {
+    INI_button {
         id: left_screen_button
         objectName: "left_screen_button"
 
@@ -209,7 +209,7 @@ Item {
     }
 
     //Flèche de droite pour naviguer sur la liste des écrans d'une même catégorie
-    DMI_button {
+    INI_button {
         id: right_screen_button
         objectName: "right_screen_button"
 

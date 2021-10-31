@@ -1,6 +1,6 @@
 import QtQuick 2.0
 
-import "../../DMI_default/ETCS"
+import "../components"
 
 
 Item {
@@ -12,7 +12,7 @@ Item {
 
 
     //Bouton rb1
-    DMI_button{
+    INI_button{
         id: rb1
         objectName: "rb1"
 
@@ -27,7 +27,7 @@ Item {
     }
 
     //Bouton rb2
-    DMI_button{
+    INI_button{
         id: rb2
         objectName: "rb2"
 
@@ -42,7 +42,7 @@ Item {
     }
 
     //Bouton rb3
-    DMI_button{
+    INI_button{
         id: rb3
         objectName: "rb3"
 
@@ -57,7 +57,7 @@ Item {
     }
 
     //Bouton rb4
-    DMI_button{
+    INI_button{
         id: rb4
         objectName: "rb4"
 
@@ -72,7 +72,7 @@ Item {
     }
 
     //Bouton rb5
-    DMI_button{
+    INI_button{
         id: rb5
         objectName: "rb5"
 
@@ -87,7 +87,7 @@ Item {
     }
 
     //Bouton rb6
-    DMI_button{
+    INI_button{
         id: rb6
         objectName: "rb6"
 
@@ -102,7 +102,7 @@ Item {
     }
 
     //Bouton rb7
-    DMI_button{
+    INI_button{
         id: rb7
         objectName: "rb7"
 
@@ -117,7 +117,7 @@ Item {
     }
 
     //Bouton rb8
-    DMI_button{
+    INI_button{
         id: rb8
         objectName: "rb8"
 

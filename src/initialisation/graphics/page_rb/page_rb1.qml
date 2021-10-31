@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.15
-import "../../../DMI_default/ETCS"
+import "../../components"
 
 
 Item {
@@ -10,7 +10,7 @@ Item {
 
 
     //Checkbutton pour savoir si l'utilisateur veut un retour direct des donnés (courbe de vitesses, ...)
-    DMI_checkbutton {
+    INI_checkbutton {
         id: data_check
         objectName: "data_check"
 
@@ -26,7 +26,7 @@ Item {
     }
 
     //Checkbutton pour savoir si le pupitre léger est connecté à UE (ou à Renard)
-    DMI_checkbutton {
+    INI_checkbutton {
         id: pcc_check
         objectName: "pcc_check"
 
@@ -42,7 +42,7 @@ Item {
     }
 
     //Bouton registre
-    DMI_text {
+    INI_text {
         id: log_text
         objectName: "log_text"
 
@@ -52,7 +52,7 @@ Item {
         default_y: log_button.default_y - 2 * font_size
     }
 
-    DMI_button{
+    INI_button{
         id: log_button
         objectName: "log_button"
         text: "Complet"
@@ -68,7 +68,7 @@ Item {
     }
 
     //Combobox langue
-    DMI_text {
+    INI_text {
         objectName: "language_text"
         id: language_text
 
@@ -80,7 +80,7 @@ Item {
         is_dark_grey: language_combo.elements_count <= 1
     }
 
-    DMI_combobox{
+    INI_combobox{
         id: language_combo
         objectName: "language_combo"
         elements: ["Français"]
@@ -95,8 +95,8 @@ Item {
         is_visible: true
     }
 
-    //Combobox du choix du DMI
-    DMI_text {
+    //Combobox du choix du dmi
+    INI_text {
         id: dmi_text
         objectName: "dmi_text"
 
@@ -108,7 +108,7 @@ Item {
         is_dark_grey: dmi_combo.elements_count <= 1
     }
 
-    DMI_combobox{
+    INI_combobox{
         id: dmi_combo
         objectName: "dmi_combo"
 
@@ -124,7 +124,7 @@ Item {
     }
 
     //Checkbutton pour savoir si le pupitre léger est connecté à UE (ou à Renard)
-    DMI_checkbutton {
+    INI_checkbutton {
         id: renard_check
         objectName: "renard_check"
 
@@ -140,7 +140,7 @@ Item {
     }
 
     //Checkbutton pour savoir si Renard est connecté via la caméra (ou via un visuel direct)
-    DMI_checkbutton {
+    INI_checkbutton {
         id: camera_check
         objectName: "camera_check"
 
@@ -156,7 +156,7 @@ Item {
     }
 
     //Combobox du pupitre utilisé
-    DMI_text {
+    INI_text {
         id: command_board_text
         objectName: "command_board_text"
 
@@ -168,7 +168,7 @@ Item {
         is_dark_grey: command_board_combo.elements_count <= 1
     }
 
-    DMI_combobox{
+    INI_combobox{
         id: command_board_combo
         objectName: "command_board_combo"
 
