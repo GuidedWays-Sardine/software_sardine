@@ -5,7 +5,7 @@ import traceback
 import time
 
 
-# Librairies d'interfaces graphiques
+# Librairies graphiques
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QObject
 from PyQt5.QtQml import QQmlApplicationEngine
@@ -61,12 +61,12 @@ class InitialisationWindow:
         self.app = QApplication(sys.argv)
         self.app.setQuitOnLastWindowClosed(True)
         self.engine = QQmlApplicationEngine()
-        self.engine.load(PROJECT_DIR + "src/initialisation/initialisation_window.qml")
+        self.engine.load(PROJECT_DIR + "src\\initialisation\\initialisation_window.qml")
 
         # Vérifie si le fichier qml de la fenêtre a bien été ouvert et compris, sinon jête une erreur
-        if not self.engine.rootObjects() and not os.path.isfile(PROJECT_DIR + "src/initialisation/initialisation_window.qml"):
+        if not self.engine.rootObjects() and not os.path.isfile(PROJECT_DIR + "src\\initialisation\\initialisation_window.qml"):
             raise FileNotFoundError("Le fichier .qml pour la fenêtre d\'initialisation n\'a pas été trouvé.")
-        elif not self.engine.rootObjects() and os.path.isfile(PROJECT_DIR + "src/initialisation/initialisation_window.qml"):
+        elif not self.engine.rootObjects() and os.path.isfile(PROJECT_DIR + "src\\initialisation\\initialisation_window.qml"):
             raise SyntaxError("Le fichier .qml pour la fenêtre d\'initialisation contient des erreurs.")
 
         # Si le fichier qml a été compris, récupère la fenêtre et initialise les différents boutons et pages
@@ -77,9 +77,10 @@ class InitialisationWindow:
         self.right_buttons = rb.RightButtons(self)
 
         # Charge le fichier de paramètres défault.settings s'il existe
-        if os.path.isfile(PROJECT_DIR + "settings/general_settings/default.settings"):
+        # FEATURE:  ajouter un paramètre de la position et de la taille de la fenêtre
+        if os.path.isfile(PROJECT_DIR + "settings\\general_settings\\default.settings"):
             log.info("Chargement des paramètres du fichier default.settings.\n")
-            self.bottom_buttons.on_open_clicked(self, PROJECT_DIR + "settings/general_settings/default.settings") #FIXME : à améliorer
+            self.bottom_buttons.on_open_clicked(self, PROJECT_DIR + "settings\\general_settings\\default.settings") #FIXME : à améliorer
         else:
             log.info("Aucun fichier paramètres default.settings. Tous les éléments par défaut seront pris\n")
 
@@ -240,7 +241,7 @@ class InitialisationWindow:
         translation_data = {}
 
         # Ouvre le fichier et récupère la liste des langues
-        file = open(PROJECT_DIR + "settings/language_settings/initialisation.lang", "r", encoding='utf-8-sig')
+        file = open(PROJECT_DIR + "settings\\language_settings\\initialisation.lang", "r", encoding='utf-8-sig')
         language_list = file.readline().upper().rstrip('\n').split(";")
 
         # Récupère les index des langues
