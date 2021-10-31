@@ -59,7 +59,7 @@ class InitialisationWindow:
 
         # Lance l'application et cherche pour le fichier QML avec tous les éléments de la fenêtre d'initialisation
         self.app = QApplication(sys.argv)
-        self.app.setQuitOnLastWindowClosed(True)
+        #self.app.setQuitOnLastWindowClosed(True)
         self.engine = QQmlApplicationEngine()
         self.engine.load(PROJECT_DIR + "src\\initialisation\\initialisation_window.qml")
 
@@ -108,8 +108,9 @@ class InitialisationWindow:
             else:
                 log.debug("Aucune fonction on_page_opened page " + str(self.active_settings_page) + "\n")
 
-        # Lance l'application
+        # Montre la fenêtre principale, indique que l'application doit se quitter quand celle-ci est fermée et Lance l'application
         self.win.show()
+        self.win.closed.connect(lambda: self.app.quit())
         self.app.exec()
 
         # Quand l'application est fermée, cache la fenêtre de l'application d'initialisation et ses fenêtres annexes

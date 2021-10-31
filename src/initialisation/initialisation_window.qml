@@ -13,6 +13,16 @@ Window {
     color: "#031122"
     title: "Initialisation Sardine"
 
+
+    //Signal utilisé pour détecter quand le fenêtre est fermée et quitter l'application
+    signal closed()
+
+    onVisibilityChanged: {
+        if(!window.visible) {
+            closed()
+        }
+    }
+
     //affiche les différentes pages de settings de l'application d'initialisation
     INI_stackview{
         id: settings_pages
