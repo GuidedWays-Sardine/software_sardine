@@ -1,6 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import "../../../../DMI_default/ETCS"
+import "../../components"
 
 
 Item {
@@ -23,7 +23,7 @@ Item {
 
 
     //Bouton délimitant le contour de la zone
-    DMI_button {
+    ETCS_button {
         id: body
 
         default_x: 54
@@ -36,7 +36,7 @@ Item {
     }
 
 
-    DMI_speeddial {
+    ETCS_speeddial {
         id: dial
         objectName: "speeddial"
 
@@ -46,7 +46,7 @@ Item {
         default_y: body.default_y
     }
 
-    DMI_speedpointer {
+    ETCS_speedpointer {
         id: pointer
 
         default_x: body.default_x + body.default_width * 0.5
@@ -63,7 +63,7 @@ Item {
         speed: root.speed
     }
 
-    DMI_circularspeedgauge {
+    ETCS_circularspeedgauge {
         id: gauge
 
         default_x: body.default_x + body.default_width * 0.5
@@ -80,5 +80,4 @@ Item {
         brake_speed: root.brake_speed
         speed: root.speed
     }
-
 }
