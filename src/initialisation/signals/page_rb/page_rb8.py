@@ -1,9 +1,18 @@
-import logging
-import traceback
+# Librairies par défaut
+import os
+import sys
 
+
+# Librairies graphiques
 from PyQt5.QtWidgets import QDesktopWidget
 from PyQt5.QtQml import QQmlApplicationEngine
 from PyQt5.QtCore import QObject
+
+
+# Librairies SARDINE
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src\\")[0]
+sys.path.append(os.path.dirname(PROJECT_DIR))
+import src.misc.log.log as log
 
 
 class PageRB8:
@@ -57,11 +66,11 @@ class PageRB8:
         # Récupère le nombre d'écrans présents
         self.screen_count = QDesktopWidget().screenCount()
         self.screen_index = [None] * self.screen_count
-        logging.info(str(self.screen_count) + " écrans détectés.\n")
+        log.info(str(self.screen_count) + " écrans détectés.\n")
 
         # Charge autant de fenêtres d'index d'écrans qu'il y a d'écrans
         for screen_index in range(0, self.screen_count):
-            application.engine.load('initialisation/graphics/page_rb/page_rb8/screen_index.qml')
+            application.engine.load(PROJECT_DIR + "src\\initialisation\\graphics\\page_rb\\page_rb8\\screen_index.qml")
             self.screen_index[screen_index] = application.engine.rootObjects()[len(application.engine.rootObjects()) - 1]
             self.screen_index[screen_index].hide()
 
@@ -132,8 +141,8 @@ class PageRB8:
             application.visible_pages[0].page.findChild(QObject, "data_check").value_changed.connect(lambda: self.on_data_checked(application))
             self.on_data_checked(application)
         else:
-            logging.warning("Certains paramétrages d'écrans dépendent du bon fonctionnement de la page_rb1." +
-                            "Ceux-ci ne peucent pas se charger correctement.\n")
+            log.warning("Certains paramétrages d'écrans dépendent du bon fonctionnement de la page_rb1." +
+                        "Ceux-ci ne peucent pas se charger correctement.\n")
 
         # Définit la page comme validée (toutes les valeurs par défaut suffisent)
         application.is_completed_by_default[self.index - 1] = "is_page_valid" not in dir(self)
@@ -205,7 +214,7 @@ class PageRB8:
         if not self.screen_default[category][screen_data][0]:
             self.screen_settings[category][screen_data] = [0, False, [0, 0], [0, 0]]
 
-    def get_values(self, translation_data):
+    def get_values(self, translation_data): # TODO : à optimiser avec les différents dictionnaires personalisés
         """Récupère les paramètres de la page de paramètres page_rb8
 
         Parameters
@@ -234,12 +243,12 @@ class PageRB8:
                 try:
                     screen_settings_key = translation_data[category_key] + "."
                 except KeyError:
-                    logging.debug("Traduction de " + category_key + " manquante.\n")
+                    log.debug("Traduction de " + category_key + " manquante.\n")
                     screen_settings_key = category_key + "."
                 try:
                     screen_settings_key += translation_data[screen_key] + "."
                 except KeyError:
-                    logging.debug("Traduction de " + screen_key + " manquante.\n")
+                    log.debug("Traduction de " + screen_key + " manquante.\n")
                     screen_settings_key += screen_key + "."
 
                 # Récupère les paramètres de l'écran et les sauvegardes (dépend de si l'écran est sélectionable ou non
@@ -268,7 +277,7 @@ class PageRB8:
         try:
             self.page.findChild(QObject, "black_screens_check").setProperty("is_checked", data["EcransEteints"])
         except KeyError:
-            logging.debug("Aucune données EcransEteints dans le fichier paramètres ouverts.\n")
+            log.debug("Aucune données EcransEteints dans le fichier paramètres ouverts.\n")
 
         # Inverse les données de traduction pour avoir un dictionnaire langue actuelle -> Français
         translation_data = dict([reversed(i) for i in translation_data.items()])
@@ -281,12 +290,12 @@ class PageRB8:
                 try:
                     screen_settings_key = translation_data[category_key] + "."
                 except KeyError:
-                    logging.debug("Traduction de " + category_key + " manquante.\n")
+                    log.debug("Traduction de " + category_key + " manquante.\n")
                     screen_settings_key = category_key + "."
                 try:
                     screen_settings_key += translation_data[screen_key] + "."
                 except KeyError:
-                    logging.debug("Traduction de " + screen_key + " manquante.\n")
+                    log.debug("Traduction de " + screen_key + " manquante.\n")
                     screen_settings_key += screen_key + "."
 
                 # Essaye de récupérer les donnés reliés à l'écran
@@ -299,12 +308,12 @@ class PageRB8:
                         self.screen_settings[category_key][screen_key][3][0] = int(data[screen_settings_key + "tailleX"])
                         self.screen_settings[category_key][screen_key][3][1] = int(data[screen_settings_key + "tailleY"])
                 except KeyError:
-                    logging.debug("L'écran : " + screen_settings_key + " n'a pas de paramètres sauvegardés.\n")
+                    log.debug("L'écran : " + screen_settings_key + " n'a pas de paramètres sauvegardés.\n")
 
         # Met à jour la page visible de settings
         self.change_visible_screen_list()
 
-    def change_language(self, translation_data):
+    def change_language(self, translation_data):    # TODO : améliorer avec le dictionnaire de traduction
         """Permet à partir d'un dictionaire de traduction, de traduire les textes de la page de paramètres
 
         Parameters
@@ -316,13 +325,13 @@ class PageRB8:
         try:
             self.current_button.setProperty("text", translation_data[self.current_button.property("text")])
         except KeyError:
-            logging.debug("Impossible de traduire le nom de la catégorie de la page_rb8.\n")
+            log.debug("Impossible de traduire le nom de la catégorie de la page_rb8.\n")
 
         # Change la traduction pour le texte Plein écran ? du DMI_checkbutton
         try:
             self.page.setProperty("fullscreen_text", translation_data[self.page.property("fullscreen_text")])
         except KeyError:
-            logging.debug("Traduction manquante pour : " + self.page.property("fullscreen_text") + ".\n")
+            log.debug("Traduction manquante pour : " + self.page.property("fullscreen_text") + ".\n")
 
         # Pour chaque catégories
         for category_index in list(self.screen_default.keys()):
@@ -334,7 +343,7 @@ class PageRB8:
                     self.screen_settings[category_index][translation_data[screen_index]] = self.screen_settings[category_index][screen_index]
                 except KeyError:
                     # Récupère dans l'éventualité d'une traduction manquante
-                    logging.debug("Traduction manquante pour l'écran : " + screen_index +
+                    log.debug("Traduction manquante pour l'écran : " + screen_index +
                                   " de la catégorie : " + category_index + ", traduction sautée.\n")
                 else:
                     # Si les écrans traduites ont été rajoutés avec succès enlève les versions non traduites
@@ -347,7 +356,7 @@ class PageRB8:
                 self.screen_settings[translation_data[category_index]] = self.screen_settings[category_index]
             except KeyError:
                 # Récupère dans l'éventualité d'une traduction manquante
-                logging.debug("Traduction manquante pour la catégorie : " + category_index + ", traduction sautée.\n")
+                log.debug("Traduction manquante pour la catégorie : " + category_index + ", traduction sautée.\n")
             else:
                 # Si les catégories traduites ont été rajoutés avec succès enlève les versions non traduites
                 self.screen_default.pop(category_index)
@@ -362,7 +371,7 @@ class PageRB8:
             black_screens_check = self.page.findChild(QObject, "black_screens_check")
             black_screens_check.setProperty("text", translation_data[black_screens_check.property("text")])
         except KeyError:
-            logging.debug("Traduction manquante pour : " + black_screens_check.property("text") + ", traduction sautée.\n")
+            log.debug("Traduction manquante pour : " + black_screens_check.property("text") + ", traduction sautée.\n")
 
         # Remets à jour la page actuelle et le titre de la catégorie
         self.page.findChild(QObject, "category_title").setProperty("text", self.category_active)
@@ -513,7 +522,7 @@ class PageRB8:
                 visible_screen_minimum_wh.append([int(screen_data[1]), int(screen_data[2])])
             else:
                 # Si les valeurs ne sont pas présentes, laisse un message d'erreur et rajoute des valeurs par défaut
-                logging.warning("Les caractéristiques de " + category_screen_list[index] + " ne sont pas bonnes.\n")
+                log.warning("Les caractéristiques de " + category_screen_list[index] + " ne sont pas bonnes.\n")
                 visible_screen_activable.append(False)
                 visible_screen_minimum_wh.append([0, 0])
 

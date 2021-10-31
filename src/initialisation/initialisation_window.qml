@@ -1,7 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
-import "../DMI_default/ETCS"
+import "components"
 import "graphics"
 import "graphics/page_rb"
 
@@ -11,10 +11,20 @@ Window {
     minimumHeight: 480
     visible: true
     color: "#031122"
-    title: qsTr("Initialisation Sardine")
+    title: "Initialisation Sardine"
+
+
+    //Signal utilisé pour détecter quand le fenêtre est fermée et quitter l'application
+    signal closed()
+
+    onVisibilityChanged: {
+        if(!window.visible) {
+            closed()
+        }
+    }
 
     //affiche les différentes pages de settings de l'application d'initialisation
-    DMI_stackview{
+    INI_stackview{
         id: settings_pages
         objectName: "settings_pages"
     }

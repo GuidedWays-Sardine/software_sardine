@@ -1,9 +1,17 @@
-import logging
+# Librairies par défaut
 import os
+import sys
 import traceback
 
+
+# Librairies graphiques
 from PyQt5.QtCore import QObject
 
+
+#Librairies SARDINE
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
+sys.path.append(os.path.dirname(PROJECT_DIR))
+import src.misc.log.log as log
 
 class PageRB1:
     """Classe pour la page de paramètres 1"""
@@ -22,10 +30,10 @@ class PageRB1:
                       "Aucun": "Complet"
                       }
 
-    log_type_converter = {"Aucun": logging.NOTSET,
-                          "Minimal": logging.ERROR,
-                          "Suffisant": logging.INFO,
-                          "Complet": logging.DEBUG
+    log_type_converter = {"Aucun": log.Level.NOTSET,
+                          "Minimal": log.Level.WARNING,
+                          "Suffisant": log.Level.INFO,
+                          "Complet": log.Level.DEBUG
                           }
     log_type_converter.update(dict([reversed(i) for i in log_type_converter.items()]))
     # Permet de faire un dictionaire bi-directionel
@@ -54,11 +62,12 @@ class PageRB1:
         # Charge les langues disponibles pour le DMI
         language_list = None
         try:
-            file = open("../settings/language_settings/initialisation.lang", "r", encoding='utf-8-sig')
+            file = open(PROJECT_DIR + "settings\\language_settings\\initialisation.lang", "r", encoding='utf-8-sig')
         # Récupère les exceptions dans le cas où le fichier de traduction n'existe pas ou est mal placé
         except (FileNotFoundError, OSError):
-            logging.warning("Impossible d'ouvrir le fichier settings/language_settings/initialisation.lang\n\t\t" +
-                            "Assurez vous que celui-ci existe. Le Français sera choisis par défaut\n")
+            log.warning("Impossible d'ouvrir le fichier" +
+                        PROJECT_DIR + "settings\\language_settings\\initialisation.lang\n\t\t" +
+                        "Assurez vous que celui-ci existe. Le Français sera choisis par défaut\n")
         # Sinon lit la première ligne pour récupérer la liste des langues
         else:
             # Récupère la liste des langues (ligne 1 du fichier initialisation.lang)
@@ -73,35 +82,36 @@ class PageRB1:
         # Essaye de récupérer le dictionaire Anglais -> Français afin de traduire les répertoires par défaut en anglais
         found_translation = False
         try:
-            translation_data = application.read_language_file("English", "Français")
+            translation_data = application.read_language_file("English", "Français")    # OPTIMIZE: faire un dictionaire de traduction
             found_translation = True
         except Exception as error:
             # Rattrape une potentielle erreur lors de la création du dictionaire de traduction
-            logging.warning("Erreur lors de la récupération du dictionaire de traduction dans l'initialisation. " +
-                            "Certains éléments de la page seront par défaut en anglais." +
-                            "\n\t\tErreur de type : " + str(type(error)) +
-                            "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
-                            "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+            log.warning("Erreur lors de la récupération du dictionaire de traduction dans l'initialisation. " +
+                        "Certains éléments de la page seront par défaut en anglais." +
+                        "\n\t\tErreur de type : " + str(type(error)) +
+                        "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
+                        "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
 
-        # Charge les pupitres, les traduits en Français et les remets dans la combobox
-        command_boards = [f.replace("_", " ") for f in os.listdir("command_board")
-                          if os.path.isdir(os.path.join('command_board', f))]
+        # Charge tous les dossiers dans src.train.command_board et les indiques comme pupitre sélectionables
+        command_boards = [f.replace("_", " ") for f in os.listdir(PROJECT_DIR + "src\\train\\command_board")
+                          if os.path.isdir(os.path.join(PROJECT_DIR + "src\\train\\command_board", f))]
         if found_translation:
             for index in range(len(command_boards)):
                 try:
                     command_boards[index] = translation_data[command_boards[index]]
                 except KeyError:
-                    logging.debug("pas de traduction française pour : " + command_boards[index] + "\n")
+                    log.debug("pas de traduction française pour : " + command_boards[index] + "\n")
         self.page.findChild(QObject, "command_board_combo").setProperty("elements", command_boards)
 
-        # Charge les DMI, les traduits en Français et les remets dans la combobox (similairement aux pupitres)
-        dmi_list = [f.replace("_", " ") for f in os.listdir("DMI") if os.path.isdir(os.path.join('DMI', f))]
+        # Cherche tous les Dossiers dans DMI et les ajoutent au comme DMI sélectionable
+        dmi_list = [f.replace("_", " ") for f in os.listdir(PROJECT_DIR + "src\\train\\DMI")
+                    if os.path.isdir(os.path.join(PROJECT_DIR + "src\\train\\DMI", f))]
         if found_translation:
             for index in range(len(dmi_list)):
                 try:
                     dmi_list[index] = translation_data[dmi_list[index]]
                 except KeyError:
-                    logging.debug("pas de traduction française pour : " + dmi_list[index] + "\n")
+                    log.debug("pas de traduction française pour : " + dmi_list[index] + "\n")
         self.page.findChild(QObject, "dmi_combo").setProperty("elements", dmi_list)
 
         # Rend le checkbutton renard et le checkbutton caméra fonctionnel
@@ -135,7 +145,7 @@ class PageRB1:
         try:
             command_board = translation_data[command_board].replace(" ", "_")
         except KeyError:
-            logging.debug("Traduction pour le pupitre non trouvée.\n")
+            log.debug("Traduction pour le pupitre non trouvée.\n")
             command_board = command_board.replace(" ", "_")
         page_parameters["Pupitre"] = command_board
 
@@ -150,7 +160,7 @@ class PageRB1:
         try:
             dmi_selection = translation_data[dmi_selection].replace(" ", "_")
         except KeyError:
-            logging.debug("traduction pour le dmi non trouvée.\n")
+            log.debug("traduction pour le dmi non trouvée.\n")
             dmi_selection = dmi_selection.replace(" ", "_")
         page_parameters["DMI"] = dmi_selection
 
@@ -169,7 +179,7 @@ class PageRB1:
 
         return page_parameters
 
-    def set_values(self, data, translation_data):
+    def set_values(self, data, translation_data):   #TODO : Simplifier avec le parameter dict
         """A partir d'un dictionnaire de valeur, essaye de changer les settings des différentes pages
 
         Parameters
@@ -183,60 +193,60 @@ class PageRB1:
         try:
             command_board = data["Pupitre"].replace("_", " ")
         except KeyError:
-            logging.debug("Impossible de changer le paramètre: \"Pupitre\" manquant dans le fichier ouvert.\n")
+            log.debug("Impossible de changer le paramètre: \"Pupitre\" manquant dans le fichier ouvert.\n")
         else:
             try:
                 self.page.findChild(QObject, "command_board_combo").change_selection(translation_data[command_board])
             except KeyError:
-                logging.debug("La traduction du paramètre: \"Pupitre\" : " + data["Pupitre"] + " est manquate.\n\t\t" +
-                              "Il est possible que le pupitre ne soit pas changé pour celui du fichier ouvert.\n")
+                log.debug("La traduction du paramètre: \"Pupitre\" : " + data["Pupitre"] + " est manquate.\n\t\t" +
+                          "Il est possible que le pupitre ne soit pas changé pour celui du fichier ouvert.\n")
                 self.page.findChild(QObject, "command_board_combo").change_selection(command_board)
 
         # Paramètre pour Renard (savoir si le pupitre est connecté à Renard)
         try:
             self.page.findChild(QObject, "renard_check").setProperty("is_checked", data["Renard"] == "True")
         except KeyError:
-            logging.debug("Impossible de changer le paramètre : \"Renard\" manquant dans le fichier ouvert.\n")
+            log.debug("Impossible de changer le paramètre : \"Renard\" manquant dans le fichier ouvert.\n")
 
         # Paramètre pour la caméra (savoir si elle est connecté ou si on a un visu direct sur Renard)
         try:
             self.page.findChild(QObject, "camera_check").setProperty("is_checked", data["Caméra"] == "True")
         except KeyError:
-            logging.debug("Impossible de changer le paramètre : \"Caméra\" manquant dans le fichier ouvert.\n")
+            log.debug("Impossible de changer le paramètre : \"Caméra\" manquant dans le fichier ouvert.\n")
         self.on_renard_selected()
 
         # Paramètre pour le DMI (savoir quelle Interface sera utilisée pour le pupitre
         try:
             dmi = data["DMI"].replace("_", " ")
         except KeyError:
-            logging.debug("Impossible de changer le paramètre: \"Pupitre\" manquant dans le fichier ouvert.\n")
+            log.debug("Impossible de changer le paramètre: \"Pupitre\" manquant dans le fichier ouvert.\n")
         else:
             try:
                 self.page.findChild(QObject, "dmi_combo").change_selection(translation_data[dmi])
             except KeyError:
-                logging.debug("La traduction du paramètre : \"DMI\" : " + data["DMI"] + " est manquante.\n\t\t" +
-                              "Il est possible que le DMI ne soit pas changé pour celui du fichier ouvert.\n")
+                log.debug("La traduction du paramètre : \"DMI\" : " + data["DMI"] + " est manquante.\n\t\t" +
+                          "Il est possible que le DMI ne soit pas changé pour celui du fichier ouvert.\n")
                 self.page.findChild(QObject, "dmi_combo").change_selection(dmi)
 
         # Paramètre niveau de registre (pour suivre les potentiels bugs lors de la simulation)
         try:
             self.page.findChild(QObject, "log_button").setProperty("text", self.log_type_converter[int(data["Registre"])])
         except KeyError:
-            logging.debug("Impossible de changer le paramètre : \"Registre\" manquant dans le fichier ouvert.\n")
+            log.debug("Impossible de changer le paramètre : \"Registre\" manquant dans le fichier ouvert.\n")
 
         # Paramètre pour le PCC (savoir s'il sera activé)
         try:
             self.page.findChild(QObject, "pcc_check").setProperty("is_checked", data["PCC"] == "True")
         except KeyError:
-            logging.debug("Impossible de changer le paramètre : \"PCC\" manquant dans le fichier ouvert.\n")
+            log.debug("Impossible de changer le paramètre : \"PCC\" manquant dans le fichier ouvert.\n")
 
         # Paramètre pour l'affichage des données en direct (genre vitesse, ...)
         try:
             self.page.findChild(QObject, "data_check").setProperty("is_checked", data["DonnéesDirect"] == "True")
         except KeyError:
-            logging.debug("Impossible de changer le paramètre : \"DonnéesDirect\" manquant dans le fichier ouvert.\n")
+            log.debug("Impossible de changer le paramètre : \"DonnéesDirect\" manquant dans le fichier ouvert.\n")
 
-    def change_language(self, translation_data):
+    def change_language(self, translation_data):    # TODO : simplifier avec le translation dict
         """Permet à partir d'un dictionaire de traduction, de traduire les textes de la page de paramètres
 
         Parameters
@@ -248,7 +258,7 @@ class PageRB1:
         try:
             self.current_button.setProperty("text", translation_data[self.current_button.property("text")])
         except KeyError:
-            logging.debug("Impossible de traduire le nom de la catégorie de la page_rb1.\n")
+            log.debug("Impossible de traduire le nom de la catégorie de la page_rb1.\n")
 
         # Essaye de traduire chaque textes au dessus des widgets et check_button
         for text in ["command_board_text", "dmi_text", "log_text", "language_text",
@@ -257,7 +267,7 @@ class PageRB1:
             try:
                 widget.setProperty("text", translation_data[widget.property("text")])
             except KeyError:
-                logging.debug("Pas de traduction pour le widget : " + text + ", traduction sautée.\n")
+                log.debug("Pas de traduction pour le widget : " + text + ", traduction sautée.\n")
 
         # Pour les combobox du pupitre et du DMI, essaye de traduire chaque éléments, et remet l'index sélectioné
         # La combobox langue ne nécessite aucune traduction car les langes sont dans leur langue d'origine
@@ -272,7 +282,7 @@ class PageRB1:
                     new_list.append(translation_data[element])
                 # Si la traduction n'existe pas, laisse un message de debug et remet l'élément dans sa langue d'origine
                 except KeyError:
-                    logging.debug("Pas de traduction pour l'élément " + element + " du widget " + combo + ".\n")
+                    log.debug("Pas de traduction pour l'élément " + element + " du widget " + combo + ".\n")
                     new_list.append(element)
 
             # Enfin, remet la nouvelle list dans la combobox et change l'index
@@ -301,7 +311,7 @@ class PageRB1:
                  translation_data[keys[3]]: translation_data[self.next_log_level[keys[3]]]
                  }
         else:
-            logging.warning("Au moins un des niveaux de registre n'a pas de traduction, bouton registre sauté.\n")
+            log.warning("Au moins un des niveaux de registre n'a pas de traduction, bouton registre sauté.\n")
 
             # Change la langue du registre indiqué sur le bouton
             log_button = self.page.findChild(QObject, "log_button")
@@ -323,7 +333,7 @@ class PageRB1:
                 translation_data = application.read_language_file(application.language, new_language)
             except Exception as error:
                 # Rattrape une potentielle erreur lors de la création du dictionaire de traduction
-                logging.warning("Erreur lors de la récupération du dictionaire de traduction"
+                log.warning("Erreur lors de la récupération du dictionaire de traduction"
                                 "\n\t\tErreur de type : " + str(type(error)) +
                                 "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
                                 "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
