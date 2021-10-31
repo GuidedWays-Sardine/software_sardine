@@ -1,6 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import "../../../../DMI_default/ETCS"
+import "../../components"
 
 
 Item {
@@ -10,7 +10,7 @@ Item {
     property bool emergency_brake: false
     property string ertms_level: ""
 
-    DMI_button {
+    ETCS_button {
         id: ertms_level_button
         objectName: "ertms_level_button"
 
@@ -25,7 +25,7 @@ Item {
         is_positive: false
     }
 
-    DMI_button {
+    ETCS_button {
         id: emergency_brake_button
         objectName: "emergency_brake_button"
 
