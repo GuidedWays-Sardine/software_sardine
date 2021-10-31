@@ -51,8 +51,8 @@ Item {
     readonly property string shadow: "#08182F"      //partie 5.2.1.3.3  Nr 7
 
     //Chemin d'accès vers les icones utiles pour le check_button
-    readonly property string symbols_path : "../../../assets/DMI_symbols/ETCS/"
-    readonly property string sounds_path: "../../../assets/DMI_sounds/ETCS/"
+    readonly property string symbols_path : "../assets/DMI_symbols/"
+    readonly property string sounds_path: "../assets/DMI_sounds/"
 
 
     //Différents signal handlers (à écrire en python)
