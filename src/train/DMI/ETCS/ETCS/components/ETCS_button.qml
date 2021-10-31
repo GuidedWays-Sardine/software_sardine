@@ -57,9 +57,6 @@ Item {
 
     //Différents signal handlers (à écrire en python)
     signal clicked()                        //détecte quand le bouton est cliqué
-    signal click_start()                    //détecte quand l'utilisateur commence à appuyer sur le bouton
-    signal click_end()                      //détecte quand l'utilisateur relache le bouton (même si le clic n'est pas valide)
-
 
 
     //Variable stockant le mode de fonctionnement du bouton ("UP", "DOWN", "DELAY")
@@ -279,10 +276,9 @@ Item {
             //force le focus sur ce bouton pour qu'il soit prioritaire
             forceActiveFocus()
 
-            //Remet à 0 le compteur de répétition, indique que le bouton est pressé en cachant les bordures et en appelant le signal adéquat
+            //Remet à 0 le compteur de répétition, indique que le bouton est pressé en cachant les bordures
             area.repeat_count = 0
             root.button_pressed = true
-            root.click_start
 
             //Cas du bouton de type Delay (lance le premier timer de 250ms)
             if(root.button_type.toUpperCase() == "DELAY") {
@@ -309,8 +305,7 @@ Item {
                 root.clicked()
             }
 
-            //Remet les bordures visibles et arrête tous les timers et Appelle le signal click_end (appelé même quand le clic n'est pas valide)
-            root.click_end()
+            //Remet les bordures visibles et arrête tous les timers
             root.button_pressed = false
             timer.stop()
         }
