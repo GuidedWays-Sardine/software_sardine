@@ -19,6 +19,7 @@ class Simulation:
     # Elements utiles à toutes les GUIs (fenêtres graphiques or ligne)
     app = None
     components = []
+    running = True
 
     def __init__(self, data):
 
