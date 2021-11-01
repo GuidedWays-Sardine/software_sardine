@@ -189,6 +189,21 @@ class PageRB1:
         translation_data: `dict`
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive
         """
+        #FIXME : corriger ça pour que ça marche
+
+        # Si la combobox pour choisir la langue existe (page_rb1 chargée), alors change la langue dans cette combobox
+        # La langue de l'application d'initialisation sera changée automatiquement
+        if self.visible_pages[0] is not None and not isinstance(self.visible_pages[0], type(self.engine)):
+            language_combo = self.visible_pages[0].page.findChild(QObject, "language_combo")
+            try:
+                # Si la langue est différente essaye de changer la langue du simulateur
+                if language_combo.property("text") != data["Langue"]:
+                    language_combo.change_selection(data["Langue"])
+            # Si le paramètre "Langue" n'apparait pas, laisse juste un message de debug
+            except KeyError:
+                log.debug("Impossible de changer la langue du simulateur car : \"Langue\" est manquant.\n")
+            # Dans tous les cas récupère un dictionaire avec la langue actuelle (ou changée juste avant)
+
         # Paramètre du pupitre (quel pupitre sera utilisé)
         try:
             command_board = data["Pupitre"].replace("_", " ")
@@ -326,22 +341,9 @@ class PageRB1:
         application: `InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets
         """
-        # Récupère le dictionaire de traduction et change la langue de l'application d'initialisation et du DMI
-        new_language = self.page.findChild(QObject, "language_combo").property("selection_text")
-        if application.language.upper() != new_language.upper():
-            try:
-                translation_data = application.read_language_file(application.language, new_language)
-            except Exception as error:
-                # Rattrape une potentielle erreur lors de la création du dictionaire de traduction
-                log.warning("Erreur lors de la récupération du dictionaire de traduction"
-                                "\n\t\tErreur de type : " + str(type(error)) +
-                                "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
-                                "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-            else:
-                application.change_language(translation_data)
+        # Appelle la fonction de changement de langue de l'application avec la nouvelle langue sélectionnée
+        application.change_language(self.page.findChild(QObject, "language_combo").property("selection_text"))
 
-        # Définit la nouvelle langue comme celle sélectionée
-        application.language = new_language
 
     def on_renard_selected(self):
         """Fonction appelée lorsque le checkbutton renard_check est sélectioné.
