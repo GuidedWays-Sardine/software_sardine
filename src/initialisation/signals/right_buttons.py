@@ -156,11 +156,6 @@ class RightButtons:
                 exec("from src.initialisation.signals.page_rb import page_rb" + str(index) + " as rb" + str(index) + "\n" +
                      "application.visible_pages[index - 1] = " + "(rb" + str(index) + ".PageRB" + str(index) +
                      "(application, engine, index, current_button))")
-
-                # Indique que la page a entièrement été chargée (partie visuelle et signals)
-                application.is_fully_loaded[index - 1] = True
-                current_button.setProperty("is_positive", True)
-                return True
             except Exception as error:
                 # Permet de rattraper une erreur si le code est incorrect où qu'il ne suit pas la documentation
                 log.warning("Erreur lors du chargement des signaux de la page : " + page_path + ".\n\t\t" +
@@ -169,12 +164,41 @@ class RightButtons:
                             "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
                 current_button.setProperty("is_positive", False)
                 return False
+            else:
+                # Vérifie (ou l'indique) si des fonctions manquent
+                self.are_page_functions_there(application.visible_pages[index - 1])
+
+                # Indique que la page a entièrement été chargée (partie visuelle et signals)
+                application.is_fully_loaded[index - 1] = True
+                current_button.setProperty("is_positive", True)
+                return True
         else:
             # Sinon pas de signals handlers associé, le précise dans les logs
             log.warning("La page " + str(index) + " n\'a aucun fichier signals associé.\n\t\t" +
                         "La page sera visible mais ne sera pas fonctionnelle.\n")
             current_button.setProperty("is_positive", False)
             return False
+
+    def are_page_functions_there(self, page):
+        """Permet, à partir d'une page de paramètres correctement chargée, d'indiquer si toutes les fonctions
+        potentiellement nécessaires au fonctionnement de celle-ci sont présentes.
+
+        Parameters
+        ----------
+        page: `PageRBX`
+            page à vérifier (celle-ci doit être de type PageRBX)
+        """
+        # Dans l'ordre : get_values, set_values, change_language, on_page_opened, on_page_closed
+        if "get_values" not in dir(page):
+            log.warning("Aucune fonction \"get_values\", pour la PageRB " + str(page.index) + ".\n")
+        if "set_values" not in dir(page):
+            log.warning("Aucune fonction \"set_values\", pour la PageRB " + str(page.index) + ".\n")
+        if "change_language" not in dir(page):
+            log.warning("Aucune fonction \"change_language\", pour la PageRB " + str(page.index) + ".\n")
+        if "on_page_opened" not in dir(page):
+            log.debug("Aucune fonction \"on_page_opened\", pour la PageRB " + str(page.index) + ".\n")
+        if "on_page_closed" not in dir(page):
+            log.warning("Aucune fonction \"on_page_closed\", pour la PageRB " + str(page.index) + ".\n")
 
     def on_new_page_selected(self, application, engine, new_index):
         """Fonction permettant le changement de la page de paramètres active lorsqu'un bouton rb est cliqué
