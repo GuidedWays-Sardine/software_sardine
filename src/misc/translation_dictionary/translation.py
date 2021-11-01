@@ -23,6 +23,17 @@ class TranslationDictionnary(dict):
             return key
 
     def create_translation(self, file_path, current_language, new_language):
+        """Méthode permettant d'ouvrir un fichier de traduction et de rajouter les traductions
+
+        Parameters
+        ----------
+        file_path: `str`
+            chemin d'accès vers le fichier de traductions à ouvrir et lire
+        current_language: `str`
+            la langue actuelle de ce qui doit être tradui
+        new_language: `str`
+            la langue dans laquelle il faut récupérer les traductions
+        """
         try:
             # essaye d'ouvrir le fichier avec les traductions
             file = open(file_path, "r", encoding="itf-8-sig")
