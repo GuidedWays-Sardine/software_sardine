@@ -59,7 +59,6 @@ class InitialisationWindow:
 
         # Lance l'application et cherche pour le fichier QML avec tous les éléments de la fenêtre d'initialisation
         self.app = QApplication(sys.argv)
-        #self.app.setQuitOnLastWindowClosed(True)
         self.engine = QQmlApplicationEngine()
         self.engine.load(PROJECT_DIR + "src\\initialisation\\initialisation_window.qml")
 
@@ -71,8 +70,6 @@ class InitialisationWindow:
 
         # Si le fichier qml a été compris, récupère la fenêtre et initialise les différents boutons et pages
         self.win = self.engine.rootObjects()[0]
-        #self.win.aboutToQuit()
-        #self.win.visibilityChanged.connect(lambda: self.app.quit()) # FIXME : ferme l'application quand celle-ci est mise en plein écran
         self.bottom_buttons = bb.BottomButtons(self)
         self.right_buttons = rb.RightButtons(self)
 
@@ -310,3 +307,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+#313
