@@ -192,8 +192,7 @@ class RightButtons:
         # Vérifie que la page que l'on veut charger n'est pas celle qui est déjà chargée
         if new_index != application.active_settings_page:
             # Vérifie si la page que l'on va décharger a un protocole de déchargement spécifique
-            if application.is_fully_loaded[application.active_settings_page - 1] and \
-                    "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
+            if "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
                 # Si c'est le cas, appelle la fonction de fermeture de la page
                 try:
                     application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
@@ -203,12 +202,10 @@ class RightButtons:
                               "Erreur de type : " + str(type(error)) + "\n\t\t" +
                               "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
                               "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-            else:
-                log.debug("Aucune fonction on_page_closed page " + str(application.active_settings_page) + "\n")
 
             # Indique que l'on sort de l'ancienne page, change le préfixe et indique que l'on rentre dans la nouvelle page
             log.info("Fermeture de la page de paramètres page_rb" + str(application.active_settings_page) + ".\n\n")
-            log.change_log_prefix("[page_rb" + str(new_index) + "]")
+            log.change_log_prefix("page_rb" + str(new_index))
             log.info("Ouverture de la page de paramètres page_rb" + str(new_index) + ".\n")
 
             # Charge le graphique de la nouvelle page et indique à l'application l'index de la nouvelle page chargée
@@ -216,8 +213,7 @@ class RightButtons:
             application.active_settings_page = new_index
 
             # Vérifie si la page que l'on charge  a un protocole de chargement particulier
-            if application.is_fully_loaded[application.active_settings_page - 1] and \
-                    "on_page_opened" in dir(application.visible_pages[application.active_settings_page - 1]):
+            if "on_page_opened" in dir(application.visible_pages[application.active_settings_page - 1]):
                 # Si c'est le cas, appelle la fonction d'ouverture de la page
                 try:
                     application.visible_pages[application.active_settings_page - 1].on_page_opened(application)
@@ -227,5 +223,3 @@ class RightButtons:
                               "Erreur de type : " + str(type(error)) + "\n\t\t" +
                               "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
                               "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-            else:
-                log.debug("Aucune fonction on_page_opened page " + str(application.active_settings_page) + "\n")
