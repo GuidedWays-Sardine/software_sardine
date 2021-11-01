@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import QFileDialog
 # Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src\\")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
+import src.misc.settings_dictionary.settings as sd
 import src.misc.log.log as log
 
 
@@ -59,7 +60,7 @@ class BottomButtons:
         log.info("Fermeture de la page de paramètres page_rb" + str(application.active_settings_page) + ".\n\n")
         application.app.quit()
 
-    def on_launch_clicked(self, application):
+    def on_launch_clicked(self, application):   # OPTIMIZE: trouver un moyen de vérification plus compact
         """Ferme la fenêtre d'initialisation et indique au programme de récupérer les données entrées
 
         Parameters
@@ -108,31 +109,28 @@ class BottomButtons:
         # Vérifie que toutes les pages accessibles sont complètes
         if is_completed:
             # Si au moins une page a été correctement chargée
-            if application.active_settings_page != -1:
-                # Appelle la fonction de fermeture de page de la page actuelle active et change le préfix du registre
-                if application.is_fully_loaded[application.active_settings_page - 1] and \
-                        "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
-                    # Si c'est le cas, appelle la fonction de fermeture de la page
-                    try:
-                        application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
-                    except Exception as error:
-                        log.error("La fonction on_page_closed de la page " + str(application.active_settings_page) +
-                                  " contient une erreur\n\t\t" +
-                                  "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                                  "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
-                                  "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-                else:
-                    log.debug("Aucune fonction on_page_closed page " + str(application.active_settings_page) + "\n")
+            if application.active_settings_page is not None\
+                    and "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
+                # Appelle la fonction de fermeture de page de la page actuelle si celle-ci existe
+                try:
+                    application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
+                except Exception as error:
+                    log.error("La fonction on_page_closed de la page " + str(application.active_settings_page) +
+                              " contient une erreur\n\t\t" +
+                              "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                              "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
+                              "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
 
                 # Indique que la page a été fermée et change le préfix
                 log.info("Fermeture de la page de paramètres page_rb" + str(application.active_settings_page) + ".\n\n")
-                log.change_log_prefix("Récupération des données")
 
-            # Indique que le simulateur va être lancée et ferme l'application
+
+            # Indique que le simulateur va être lancée et ferme l'application (les données seront alors récupérées
+            log.change_log_prefix("Récupération des données")
             application.launch_simulator = True
             application.app.quit()
 
-    def on_open_clicked(self, application, default_file=""):
+    def on_open_clicked(self, application):
         """Fonction appelée lorsque le bouton ouvrir est cliqué.
         Permet l'ouverture d'un fichier texte et la récupération de ses paramètres.
 
@@ -140,50 +138,21 @@ class BottomButtons:
         ----------
         application: `InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets
-        default_file: `string`
-            fichier à ouvrir, s'il est vide, la fenêtre d'ouverture de fichier apparaitra
         """
-        # Ouvre la fenêtre d'ouverture de fichier si default_file est vide, sinon utilise default_file comme chemin
-        if default_file == "":
-            file_path = QFileDialog.getOpenFileName(caption="Ouvrir un fichier de configuration",
-                                                    directory=PROJECT_DIR + "settings\\general_settings",
-                                                    filter="Fichiers de configuration Sardine (*.settings)")
-        else:
-            file_path = [default_file]
+        # Ouvre la fenêtre d'ouverture de fichier pour sélectionner le fichier à ouvrir
+        file_path = QFileDialog.getOpenFileName(caption="Ouvrir un fichier de configuration",
+                                                directory=PROJECT_DIR + "settings\\general_settings",
+                                                filter="Fichiers de configuration Sardine (*.settings)")
 
         # Si un fichier a bien été sélectionné
-        if file_path[0] != "":      # OPTIMIZE bouger dans la classe de settingsdictionnary
+        if file_path[0] != "":
             # Change le préfixe du registre pour indiquer que les données de l'applications d'initialisation sont changées
             log.change_log_prefix("Changement des données")
 
-            # Récupère les donnés du fichier text et mets à jour les différentes pages de paramètres
-            try:
-                data = {}
-
-                # Essaye d'ouvrir le fichier envoyer, et jette une erreur si le fichier n'exsite pas
-                file = open(file_path[0], "r", encoding='utf-8-sig')
-
-                # Lit chaque ligne du fichier
-                for line in file:
-                    # Si la ligne ne contient pas le délimiteur (ici ;) l'indique dans les logs
-                    if ";" not in line:
-                        log.debug("Ligne sautée. Délimiteur : \";\" manquant dans la ligne : " + line + '\n')
-                    else:
-                        line = line.rstrip('\n').split(";")
-                        data[line[0]] = line[1]
-
-                # Ferme le fichier et retourne le dictionnaire avec les valeurs récupérées
-                file.close()
-            except FileNotFoundError:
-                log.error("Le fichier ouvert n'existe plus. Aucun paramètre ne sera modifié.\n")
-            except OSError:
-                log.error("Le fichier n'a pas pu être ouvert. Assurez vous qu'il ne soit pas déjà ouvert.\n")
-            else:
-                # Si le dictionnaire de donnés n'a aucune valeur, un message d'erreur est levé sur le fichier
-                if len(data) != 0:
-                    application.set_values(data)
-                else:
-                    log.warning(file_path[0] + " n'a aucune donné ou n'est pas dans un format compatible.\n")
+            #Récupère les données dans le fichier sélectionné et les envoies à set_values
+            data = sd.SettingsDictionnary()
+            data.open(file_path[0])
+            application.set_values(data)
 
             # Remet le préfixe de registre de la page active
             log.change_log_prefix("page_rb" + str(application.active_settings_page) + "")
@@ -201,31 +170,16 @@ class BottomButtons:
         file_path = QFileDialog.getSaveFileName(caption="Sauvegarder un fichier de configuration",
                                                 directory=PROJECT_DIR + "settings\\general_settings",
                                                 filter="Fichiers de configuration Sardine (*.settings)")
-        if file_path[0] != "":  # OPTIMIZE passer dans la classe settings dict
+
+        # Si un fichier a bien été sélectionné
+        if file_path[0] != "":
             # Change le préfixe du registre pour indiquer que les données de l'applications d'initialisation sont sauvegardées
             log.change_log_prefix("Sauvegarde des données")
 
-            # Récupère les donnés des différentes pages de paramètres et les écrit dans le fichier
-            data = application.get_values()
-            try:
-                # Essaye d'ouvrir le fichier envoyer, et jette une erreur si le fichier n'exsite pas
-                file = open(file_path[0], "w", encoding="utf-8-sig")
-
-                # Récupère chaque clé/valeur du dictionnaire
-                for key in data.keys():
-                    # Ecrit une ligne contenant la clé et la valeur séparé par le délimiteur (ici ;)
-                    file.write(str(key) + ";" + str(data[key]) + "\n")
-
-                # Ferme le fichier
-                file.close()
-
-            # Exception soulevée dans le cas où le fichier ne peut pas être créé ou modifié
-            except OSError:
-                log.error("Vous n'avez pas les droit d'enregistrer un fichier dans cet emplacement.\n")
-            else:
-                # Dans le cas où aucune donnée n'a été récupérée, le signale dans les logs
-                if len(data) == 0:
-                    log.warning("Aucune valeur récupérée, le fichier créé sera vide.\n")
+            # Récupère les paramètres de l'application d'initialisation, les stockes et les enregistres dans le fichier
+            data = sd.SettingsDictionnary()
+            data.update(application.get_values())
+            data.save(file_path[0])
 
             # Remet le préfixe de registre de la page active
             log.change_log_prefix("page_rb" + str(application.active_settings_page))
@@ -237,19 +191,11 @@ class BottomButtons:
         ----------
         application: `InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets
-        translation_data: `dict`
-            dictionaire contenant en clé les mots de la langue actuelle et en valeurs, leurs traductions
+        translation_data: `TranslationDictionary`
+            dictionaire contenant les traductions
         """
-        # Liste les id de chaque boutons pour simplifier la structure
-        buttons_id = ["quit", "launch", "open", "save"]
-
         # Pour chaque boutons : récupère le texte, prend sa traduction dans translation_data et change son texte
-        for id in buttons_id:
-            # Récupère le bouton et vérifie s'il a bien été récupéré
-            widget = application.win.findChild(QObject, id)
-            # Récupère le bouton et vérifie s'il a bien été récupéré et essaye de traduire son texte
-            try:
-                application.win.findChild(QObject, id).setProperty("text", translation_data[widget.property("text")])
-            # Si la clé n'existe pas c'est que le mot n'existe pas dans le dictionnaire ou qu'il est mal traduit.
-            except KeyError:
-                log.debug("aucune traduction de : " + widget.property("text") + " n'existe pas.\n")
+        for button_id in ["quit", "launch", "open", "save"]:
+            # Récupère le bouton associé à l'id et change son texte
+            button = application.win.findChild(QObject, button_id)
+            button.setProperty("text", translation_data[button.property("text")])
