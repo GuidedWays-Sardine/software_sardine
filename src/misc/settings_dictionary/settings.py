@@ -102,7 +102,7 @@ class SettingsDictionnary(dict):
 
                 # Regarde s'il peut être convertir en bool?
                 if line[1] == "True" or line[1] == "False":
-                    line[1] = True if line[1] == "True" else False
+                    self[line[0]] = True if line[1] == "True" else False
                     continue
 
                 # regarde s'il peut être convertit en int ou en float
@@ -112,10 +112,10 @@ class SettingsDictionnary(dict):
                     pass
                 else:
                     if line[1].is_integer():
-                        line[1] = int(line[1])
-
-                # Ajouter la nouvelle valeur au dictionnaire
-                self[line[0]] = line[1]
+                        self[line[0]] = int(line[1])
+                    else:
+                        self[line[0]] = int(line[1])
+                    continue
 
         file.close()
 
