@@ -1,6 +1,7 @@
 #Librairies par défaut
 import sys
 import os
+import traceback
 
 
 # Librairies SARDINE
@@ -36,10 +37,14 @@ class TranslationDictionnary(dict):
         """
         try:
             # essaye d'ouvrir le fichier avec les traductions
-            file = open(file_path, "r", encoding="itf-8-sig")
-        except Exception:
+            file = open(file_path, "r", encoding="utf-8-sig")
+        except Exception as error:
             # Cas où le fichier ouvert n'est pas accessible
-            log.warning("Impossible d'ouvrir le fichier de traduction : " + str(file_path) + "\n")
+            log.warning("Impossible d'ouvrir le fichier de traduction : " + str(file_path) +
+                        "\n\t\tErreur de type : " + str(type(error)) +
+                        "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
+                        "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
+                        prefix="dictionaire de traduction")
             return
 
         current_index, new_index = None, None
@@ -57,6 +62,9 @@ class TranslationDictionnary(dict):
         # Récupère la longueur actuelle
         current_length = len(self)
 
+        # Ajoute la traduction de la langue actuelle
+        self[current_language] = new_language
+
         # our chacune des lignes contenant des traductions (saute les lignes vides et avec des commentaires)
         for line in (l for l in file if l != "\n" and l[0] != "#"):
             # récupère toutes les traductions présentes sur la ligne
@@ -68,9 +76,11 @@ class TranslationDictionnary(dict):
             else:
                 # S'il n'y a pas autant de traductions que de langue, cela signifie que la ligne est incomplète
                 log.debug("Certaines traductions manquantes sur la ligne suivante (langues attendus, mots) :" +
-                          "\n\t\t" + ";".join(language_list) + "\n\t\t" + line)
+                          "\n\t\t" + ";".join(language_list) + "\n\t\t" + line,
+                          prefix="dictionaire de traduction")
 
         file.close()
 
         # Indique en debug le nombre d'éléments récupérées
-        log.debug(str(current_length - len(self)) + " éléments récupérés dans :\n\t\t" + str(file_path) + "\n")
+        log.debug(str(len(self) - current_length) + " éléments récupérés dans :\n\t\t" + str(file_path) + "\n",
+                          prefix="dictionaire de traduction")
