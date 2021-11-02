@@ -119,10 +119,10 @@ class RightButtons:
                             "Assurez-vous que celui-ci ne contient pas d'erreurs.\n\n")
             # Sinon c'est qu'il n'existe pas où qu'il est mal placé
             else:
-                log.warning("le chargement de la page " + str(index) +
-                            " relié au bouton rb" + str(index) + " est impossible.\n\t\t" +
-                            "Le fichier " + page_path + " n'existe pas.\n\t\t" +
-                            "Assurez-vous que le fichier source est au bon endroit ou créez le\n\n")
+                log.debug("le chargement de la page " + str(index) +
+                          " relié au bouton rb" + str(index) + " est impossible.\n\t\t" +
+                          "Le fichier " + page_path + " n'existe pas.\n\t\t" +
+                          "Assurez-vous que le fichier source est au bon endroit ou créez le\n\n")
             return False
 
     def initialise_signals(self, application, engine, index, page_path, current_button):
@@ -196,9 +196,9 @@ class RightButtons:
         if "change_language" not in dir(page):
             log.warning("Aucune fonction \"change_language\", pour la PageRB " + str(page.index) + ".\n")
         if "on_page_opened" not in dir(page):
-            log.debug("Aucune fonction \"on_page_opened\", pour la PageRB " + str(page.index) + ".\n")
+            log.debug("Aucune fonction \"on_page_opened\", pour la PageRB" + str(page.index) + ".\n")
         if "on_page_closed" not in dir(page):
-            log.warning("Aucune fonction \"on_page_closed\", pour la PageRB " + str(page.index) + ".\n")
+            log.debug("Aucune fonction \"on_page_closed\", pour la PageRB" + str(page.index) + ".\n")
 
     def on_new_page_selected(self, application, engine, new_index):
         """Fonction permettant le changement de la page de paramètres active lorsqu'un bouton rb est cliqué
