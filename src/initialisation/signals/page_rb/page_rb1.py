@@ -11,6 +11,8 @@ from PyQt5.QtCore import QObject
 #Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
+import src.misc.settings_dictionary.settings as sd
+import src.misc.translation_dictionary.translation as td
 import src.misc.log.log as log
 
 class PageRB1:
@@ -54,20 +56,18 @@ class PageRB1:
         """
         # Stocke les informations nécessaires au fonctionnement de la page
         self.index = index
-        self.engine = engine
-        self.page = engine.rootObjects()[0]
-        self.current_button = current_button
         self.current_button.setProperty("text", self.name)
+        self.current_button = current_button
+        self.page = engine.rootObjects()[0]
+        self.engine = engine
 
-        # Charge les langues disponibles pour le DMI
-        language_list = None
         try:
+            # Essaye de charger la combobox langue
             file = open(PROJECT_DIR + "settings\\language_settings\\initialisation.lang", "r", encoding='utf-8-sig')
-        # Récupère les exceptions dans le cas où le fichier de traduction n'existe pas ou est mal placé
         except (FileNotFoundError, OSError):
-            log.warning("Impossible d'ouvrir le fichier" +
-                        PROJECT_DIR + "settings\\language_settings\\initialisation.lang\n\t\t" +
-                        "Assurez vous que celui-ci existe. Le Français sera choisis par défaut\n")
+            # Ne change charge pas  la combobox langues dans le cas ou le combobox n'est pas chargé
+            log.warning("Le fichier de traduction de langue n'existe pas. assurez vous qu'il existe :\n\t\t" +
+                        PROJECT_DIR + "settings\\language_settings\\initialisation.lang\n")
         # Sinon lit la première ligne pour récupérer la liste des langues
         else:
             # Récupère la liste des langues (ligne 1 du fichier initialisation.lang)
@@ -77,41 +77,24 @@ class PageRB1:
             language_combobox = self.page.findChild(QObject, "language_combo")
             language_combobox.setProperty("elements", language_list)
             language_combobox.selection_changed.connect(lambda: self.on_language_change(application))
-            self.language = language_combobox.property("selection_text")
 
-        # Essaye de récupérer le dictionaire Anglais -> Français afin de traduire les répertoires par défaut en anglais
-        found_translation = False
-        try:
-            translation_data = application.read_language_file("English", "Français")    # OPTIMIZE: faire un dictionaire de traduction
-            found_translation = True
-        except Exception as error:
-            # Rattrape une potentielle erreur lors de la création du dictionaire de traduction
-            log.warning("Erreur lors de la récupération du dictionaire de traduction dans l'initialisation. " +
-                        "Certains éléments de la page seront par défaut en anglais." +
-                        "\n\t\tErreur de type : " + str(type(error)) +
-                        "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
-                        "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+            # Si le premier language n'est pas le Français, traduit l'application
+            if language_combobox.property("selection_text").lower() != application.language.lower():
+                application.change_language(language_combobox.property("selection_text"))
+
+        # Essaye de récupérer le dictionaire Anglais -> langue principale afin de traduire les répertoires par défaut en anglais
+        t_data = td.TranslationDictionnary()
+        t_data.create_translation(PROJECT_DIR + "settings\\language_settings\\initialisation.lang",
+                                  "English", application.language)
 
         # Charge tous les dossiers dans src.train.command_board et les indiques comme pupitre sélectionables
-        command_boards = [f.replace("_", " ") for f in os.listdir(PROJECT_DIR + "src\\train\\command_board")
-                          if os.path.isdir(os.path.join(PROJECT_DIR + "src\\train\\command_board", f))]
-        if found_translation:
-            for index in range(len(command_boards)):
-                try:
-                    command_boards[index] = translation_data[command_boards[index]]
-                except KeyError:
-                    log.debug("pas de traduction française pour : " + command_boards[index] + "\n")
+        command_boards = [t_data[f.replace("_", " ")] for f in os.listdir(PROJECT_DIR + "src\\train\\command_board")
+                          if os.path.isdir(os.path.join(PROJECT_DIR + "src\\train\\DMI", f))]
         self.page.findChild(QObject, "command_board_combo").setProperty("elements", command_boards)
 
-        # Cherche tous les Dossiers dans DMI et les ajoutent au comme DMI sélectionable
-        dmi_list = [f.replace("_", " ") for f in os.listdir(PROJECT_DIR + "src\\train\\DMI")
+        # Charge tous les DMI présents dans src.train.DMI et les indiques comme DMI sélectionables
+        dmi_list = [t_data[f.replace("_", " ")] for f in os.listdir(PROJECT_DIR + "src\\train\\DMI")
                     if os.path.isdir(os.path.join(PROJECT_DIR + "src\\train\\DMI", f))]
-        if found_translation:
-            for index in range(len(dmi_list)):
-                try:
-                    dmi_list[index] = translation_data[dmi_list[index]]
-                except KeyError:
-                    log.debug("pas de traduction française pour : " + dmi_list[index] + "\n")
         self.page.findChild(QObject, "dmi_combo").setProperty("elements", dmi_list)
 
         # Rend le checkbutton renard et le checkbutton caméra fonctionnel
