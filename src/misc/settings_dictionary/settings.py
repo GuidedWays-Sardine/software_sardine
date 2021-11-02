@@ -1,6 +1,7 @@
 # Librairies par défaut
 import sys
 import os
+import traceback
 
 
 # Librairies graphiques
@@ -51,10 +52,14 @@ class SettingsDictionnary(dict):
         """
         try:
             # Essaye de créer (ou d'écraser) le fichier avec les paramètres actuels
-            file = open(file_path, "w", encoding="utf-_-sig")
-        except Exception:
+            file = open(file_path, "w", encoding="utf-8-sig")
+        except Exception as error:
             # Cas où le fichier ouvert n'est pas accessible
-            log.warning("Impossible d'enregistrer le fichier :\n\t\t" + str(file_path + "\n"))
+            log.warning("Impossible d'enregistrer le fichier :\n\t\t" + str(file_path + "\n") +
+                        "\n\t\tErreur de type : " + str(type(error)) +
+                        "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
+                        "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
+                        prefix="dictionaire de données")
         else:
             for key in self.keys():
                 file.write(str(key) + ";" + str(self[key]) + "\n")
@@ -73,9 +78,13 @@ class SettingsDictionnary(dict):
         try:
             # Essaye d'ouvrir le fichier avec les paramètres
             file = open(file_path, "r", encoding="utf-8-sig")
-        except Exception:
+        except Exception as error:
             # Cas où le fichier ouvert n'existe pas ou qu'il n'est pas accessible
-            log.warning("Impossible d'ouvrir le fichier :\n\t\t" + str(file_path) + "\n")
+            log.warning("Impossible d'ouvrir le fichier :\n\t\t" + str(file_path) + "\n" +
+                        "\n\t\tErreur de type : " + str(type(error)) +
+                        "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
+                        "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
+                          prefix="dictionaire de données")
             return
 
         # Récupère la longueur actuelle
@@ -85,7 +94,8 @@ class SettingsDictionnary(dict):
         for line in file:
             # Si la ligne ne contient pas le délimiteur (ici ;) l'indique dans les logs et saute la ligne
             if ";" not in line:
-                log.debug("Ligne sautée. Délimiteur \";\" manquant dans la ligne :\n\t\t" + line + '\n')
+                log.debug("Ligne sautée. Délimiteur \";\" manquant dans la ligne :\n\t\t" + line + '\n',
+                          prefix="dictionaire de données")
             else:
                 # Récupère les deux éléments de la ligne
                 line = line.rstrip('\n').split(";")
@@ -109,5 +119,6 @@ class SettingsDictionnary(dict):
 
         file.close()
 
-        # Indique en debug le nombre d'éléments récupérées
-        log.debug(str(current_length - len(self)) + " éléments récupérés dans :\n\t\t" + str(file_path) + "\n")
+        # Indique en debug le nombre d'éléments récupérés
+        log.debug(str(len(self) - current_length) + " éléments récupérés dans :\n\t\t" + str(file_path) + "\n",
+                  prefix="dictionaire de traduction")
