@@ -1,6 +1,10 @@
-#Librairies par défaut
+# Librairies par défaut
 import sys
 import os
+
+
+# Librairies graphiques
+from PyQt5.QtCore import QObject
 
 
 # Librairies SARDINE
@@ -17,6 +21,26 @@ class SettingsDictionnary(dict):
 
     def __getitem__(self, key):
         return super(SettingsDictionnary, self).__getitem__(key.lower())
+
+    def update_parameter(self, page, widget_id, property, key):
+        """Structure pour mettre à jour une propriété.
+
+        Parameters
+        ----------
+        page: `QObject`
+            la page contenant le composant
+        widget_id: `string`
+            l'id du composant qui doit être mis à jour
+        property: `string`
+            le nom de la propriété  à mettre à jour
+        key: `Any`
+            la clé vers la nouvelle valeur
+        """
+        try:
+            page.findChild(QObject, widget_id).setProperty(property, self[key])
+        except KeyError:
+            log.debug("Impossible de changer le paramètre : " + property + " du composant" + widget_id + ".\n\t\t" +
+                      "Pas de valeurs pour le paramètre : " + key + " dans le fichier ouvert.\n")
 
     def save(self, file_path):
         """Méthode permettant de sauvegarder les paramètres dans un fichier
