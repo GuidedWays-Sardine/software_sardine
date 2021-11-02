@@ -163,6 +163,18 @@ class InitialisationWindow:
         data: `dict`
             Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
         """
+        # Si la combobox pour choisir la langue existe (page_rb1 chargée), alors change la langue dans cette combobox
+        # La langue de l'application d'initialisation sera changée automatiquement
+        if self.visible_pages[0] is not None and not isinstance(self.visible_pages[0], type(self.engine)):
+            language_combo = self.visible_pages[0].page.findChild(QObject, "language_combo")
+            try:
+                # Si la langue est différente essaye de changer la langue du simulateur
+                if language_combo.property("text") != data["Langue"]:
+                    language_combo.change_selection(data["Langue"])
+            except KeyError:
+                # Si le paramètre "Langue" n'apparait pas, laisse juste un message de debug
+                log.debug("Impossible de changer la langue du simulateur car : \"Langue\" est manquant.\n")
+
         initial_time = time.time()
         log.info("Tentative de changement des paramètres.\n")
         count = 0
