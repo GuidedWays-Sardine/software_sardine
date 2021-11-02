@@ -12,6 +12,8 @@ from PyQt5.QtCore import QObject
 # Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src\\")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
+import src.misc.settings_dictionary.settings as sd
+import src.misc.translation_dictionary.translation as td
 import src.misc.log.log as log
 
 
@@ -91,7 +93,7 @@ class PageRB8:
 
         # Définit le fonctionnement de base des boutons supérieurs et inférieurs
         # Aucun des boutons ne sera fonctionnel et aucune page ne sera chargée
-        if len(self.screen_default.keys()) != 0:
+        if self.screen_default.keys():
             # Rend le texte supérieur en gris claire
             self.page.findChild(QObject, "category_title").setProperty("is_dark_grey", False)
 
@@ -142,7 +144,7 @@ class PageRB8:
             self.on_data_checked(application)
         else:
             log.warning("Certains paramétrages d'écrans dépendent du bon fonctionnement de la page_rb1." +
-                        "Ceux-ci ne peucent pas se charger correctement.\n")
+                        "Ceux-ci ne peuvent pas se charger correctement.\n")
 
         # Définit la page comme validée (toutes les valeurs par défaut suffisent)
         application.is_completed_by_default[self.index - 1] = "is_page_valid" not in dir(self)
@@ -214,13 +216,13 @@ class PageRB8:
         if not self.screen_default[category][screen_data][0]:
             self.screen_settings[category][screen_data] = [0, False, [0, 0], [0, 0]]
 
-    def get_values(self, translation_data): # TODO : à optimiser avec les différents dictionnaires personalisés
+    def get_values(self, translation_data):
         """Récupère les paramètres de la page de paramètres page_rb8
 
         Parameters
         ----------
         translation_data: `dict`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) 
 
         Returns
         -------
@@ -228,7 +230,8 @@ class PageRB8:
             un dictionaire de paramètres de la page de paramètres page_rb8
         """
         # Initialise les paramètres récupérés et récupère le paramètre sur si les écrans sont éteins
-        page_parameters = {"EcransEteints": self.page.findChild(QObject, "black_screens_check").property("is_checked")}
+        page_parameters = sd.SettingsDictionnary()
+        page_parameters["EcranEteints"] = self.page.findChild(QObject, "black_screens_check").property("is_checked")
 
         # Récupère les valeurs actuellement sur l'écran
         old_screens_values = self.page.get_values().toVariant()
@@ -239,19 +242,8 @@ class PageRB8:
         for category_key in list(self.screen_settings.keys()):
             # Pour chaque écrans de cette catégorie
             for screen_key in list(self.screen_settings[category_key].keys()):
-                # Sauvegarde chaque donné au format : category.screen.data = value
-                try:
-                    screen_settings_key = translation_data[category_key] + "."
-                except KeyError:
-                    log.debug("Traduction de " + category_key + " manquante.\n")
-                    screen_settings_key = category_key + "."
-                try:
-                    screen_settings_key += translation_data[screen_key] + "."
-                except KeyError:
-                    log.debug("Traduction de " + screen_key + " manquante.\n")
-                    screen_settings_key += screen_key + "."
-
                 # Récupère les paramètres de l'écran et les sauvegardes (dépend de si l'écran est sélectionable ou non
+                screen_settings_key = translation_data[category_key] + "." + translation_data[screen_key] + "."
                 is_activable = self.screen_default[category_key][screen_key][0]
                 screen_settings_values = self.screen_settings[category_key][screen_key]
                 page_parameters[screen_settings_key + "IndexEcran"] = screen_settings_values[0] if is_activable else 0
@@ -271,42 +263,32 @@ class PageRB8:
         data: `dict`
             Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
         translation_data: `dict`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) 
         """
         # Change la valeur pour les écrans noirs
-        try:
-            self.page.findChild(QObject, "black_screens_check").setProperty("is_checked", data["EcransEteints"])
-        except KeyError:
-            log.debug("Aucune données EcransEteints dans le fichier paramètres ouverts.\n")
+        data.update_parameter(self.page, "black_screens_check", "is_checked", "EcransEteints")
 
         # Inverse les données de traduction pour avoir un dictionnaire langue actuelle -> Français
-        translation_data = dict([reversed(i) for i in translation_data.items()])
+        invert_translation = td.TranslationDictionnary()
+        invert_translation.create_translation(PROJECT_DIR + "settings\\language_settings\\initialisation.lang",
+                                              translation_data["English"], "English")
 
         # Pour chaque catégorie d'écrans
         for category_key in list(self.screen_settings.keys()):
             # Pour chaque écrans de cette catégorie
             for screen_key in list(self.screen_settings[category_key].keys()):
-                # Sauvegarde chaque donné au format : category.screen.data = value
-                try:
-                    screen_settings_key = translation_data[category_key] + "."
-                except KeyError:
-                    log.debug("Traduction de " + category_key + " manquante.\n")
-                    screen_settings_key = category_key + "."
-                try:
-                    screen_settings_key += translation_data[screen_key] + "."
-                except KeyError:
-                    log.debug("Traduction de " + screen_key + " manquante.\n")
-                    screen_settings_key += screen_key + "."
+                # Crée pour chaque écran la clé avec laquelle l'information serait sauvegardée
+                screen_settings_key = invert_translation[category_key] + "." + invert_translation[screen_key] + "."
 
-                # Essaye de récupérer les donnés reliés à l'écran
+                # Essaye de récupérer les donnés reliées à l'écran
                 try:
                     if int(data[screen_settings_key + "IndexEcran"]) <= self.screen_count:
-                        self.screen_settings[category_key][screen_key][0] = int(data[screen_settings_key + "IndexEcran"])
-                        self.screen_settings[category_key][screen_key][1] = data[screen_settings_key + "PleinEcran"] == "True"
-                        self.screen_settings[category_key][screen_key][2][0] = int(data[screen_settings_key + "positionX"])
-                        self.screen_settings[category_key][screen_key][2][1] = int(data[screen_settings_key + "positionY"])
-                        self.screen_settings[category_key][screen_key][3][0] = int(data[screen_settings_key + "tailleX"])
-                        self.screen_settings[category_key][screen_key][3][1] = int(data[screen_settings_key + "tailleY"])
+                        self.screen_settings[category_key][screen_key][0] = data[screen_settings_key + "IndexEcran"]
+                        self.screen_settings[category_key][screen_key][1] = data[screen_settings_key + "PleinEcran"]
+                        self.screen_settings[category_key][screen_key][2][0] = data[screen_settings_key + "positionX"]
+                        self.screen_settings[category_key][screen_key][2][1] = data[screen_settings_key + "positionY"]
+                        self.screen_settings[category_key][screen_key][3][0] = data[screen_settings_key + "tailleX"]
+                        self.screen_settings[category_key][screen_key][3][1] = data[screen_settings_key + "tailleY"]
                 except KeyError:
                     log.debug("L'écran : " + screen_settings_key + " n'a pas de paramètres sauvegardés.\n")
 
@@ -319,59 +301,43 @@ class PageRB8:
         Parameters
         ----------
         translation_data: `dict`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) 
         """
         # Traduit le nom de la catégorie
-        try:
-            self.current_button.setProperty("text", translation_data[self.current_button.property("text")])
-        except KeyError:
-            log.debug("Impossible de traduire le nom de la catégorie de la page_rb8.\n")
+        self.current_button.setProperty("text", translation_data[self.current_button.property("text")])
 
         # Change la traduction pour le texte Plein écran ? du DMI_checkbutton
-        try:
-            self.page.setProperty("fullscreen_text", translation_data[self.page.property("fullscreen_text")])
-        except KeyError:
-            log.debug("Traduction manquante pour : " + self.page.property("fullscreen_text") + ".\n")
+        self.page.setProperty("fullscreen_text", translation_data[self.page.property("fullscreen_text")])
 
         # Pour chaque catégories
-        for category_index in list(self.screen_default.keys()):
+        for category_key in list(self.screen_default.keys()):
             # Pour chaque écrans de chaques catégories
-            for screen_index in list(self.screen_default[category_index].keys()):
-                try:
-                    # Essaye de rajouter la version avec la clé traduite de l'écran
-                    self.screen_default[category_index][translation_data[screen_index]] = self.screen_default[category_index][screen_index]
-                    self.screen_settings[category_index][translation_data[screen_index]] = self.screen_settings[category_index][screen_index]
-                except KeyError:
-                    # Récupère dans l'éventualité d'une traduction manquante
-                    log.debug("Traduction manquante pour l'écran : " + screen_index +
-                                  " de la catégorie : " + category_index + ", traduction sautée.\n")
-                else:
-                    # Si les écrans traduites ont été rajoutés avec succès enlève les versions non traduites
-                    self.screen_default[category_index].pop(screen_index)
-                    self.screen_settings[category_index].pop(screen_index)
+            for screen_key in list(self.screen_default[category_key].keys()):
+                # Traduit la clé d'écran pour le dictionaire de paramètres choisis et de paramètres par défaut
+                self.screen_default[category_key][translation_data[screen_key]] = self.screen_default[category_key][screen_key]
+                self.screen_settings[category_key][translation_data[screen_key]] = self.screen_settings[category_key][screen_key]
 
-            try:
-                # Essaye de traduire le nom de la catégorie
-                self.screen_default[translation_data[category_index]] = self.screen_default[category_index]
-                self.screen_settings[translation_data[category_index]] = self.screen_settings[category_index]
-            except KeyError:
-                # Récupère dans l'éventualité d'une traduction manquante
-                log.debug("Traduction manquante pour la catégorie : " + category_index + ", traduction sautée.\n")
-            else:
-                # Si les catégories traduites ont été rajoutés avec succès enlève les versions non traduites
-                self.screen_default.pop(category_index)
-                self.screen_settings.pop(category_index)
+                # Si la clé d'écran a été traduite avec succès, enlève la version non traduite
+                if screen_key != translation_data[screen_key]:
+                    self.screen_default[category_key].pop(screen_key)
+                    self.screen_settings[category_key].pop(screen_key)
 
-                # Si la catégorie est la catégorie active, traduit la catégorie active
-                if self.category_active == category_index:
-                    self.category_active = translation_data[self.category_active]
+            # Traduit la clé de catégorie pour le dictionaire de paramètres choisis et de paramètres par défaut
+            self.screen_default[translation_data[category_key]] = self.screen_default[category_key]
+            self.screen_settings[translation_data[category_key]] = self.screen_settings[category_key]
+
+            # Si la clé de la catégorie a été traduite avec succès, enlève la version non traduite
+            if category_key != translation_data[category_key]:
+                self.screen_default.pop(category_key)
+                self.screen_settings.pop(category_key)
+
+            # Si la catégorie est la catégorie active, traduit la catégorie active
+            if self.category_active == category_key:
+                self.category_active = translation_data[self.category_active]
 
         # Traduit le texte devant le DMI_checkbutton pour savoir
-        try:
-            black_screens_check = self.page.findChild(QObject, "black_screens_check")
-            black_screens_check.setProperty("text", translation_data[black_screens_check.property("text")])
-        except KeyError:
-            log.debug("Traduction manquante pour : " + black_screens_check.property("text") + ", traduction sautée.\n")
+        black_screens_check = self.page.findChild(QObject, "black_screens_check")
+        black_screens_check.setProperty("text", translation_data[black_screens_check.property("text")])
 
         # Remets à jour la page actuelle et le titre de la catégorie
         self.page.findChild(QObject, "category_title").setProperty("text", self.category_active)
