@@ -70,8 +70,8 @@ Item {
         default_width: 46
         default_height: 40
 
-        image_activable: "Navigation/NA_18.bmp"
-        image_not_activable: "Navigation/NA_19.bmp"
+        image_activable: "grey_left_arrow.bmp"
+        image_not_activable: "dark_grey_left_arrow.bmp"
 
         is_activable: false
         is_positive: true
@@ -104,8 +104,8 @@ Item {
         default_width: 46
         default_height: 40
 
-        image_activable: "Navigation/NA_17.bmp"
-        image_not_activable: "Navigation/NA_18.2.bmp"
+        image_activable: "grey_right_arrow.bmp"
+        image_not_activable: "dark_grey_right_arrow.bmp"
 
         is_activable: false
         is_positive: true
@@ -200,8 +200,8 @@ Item {
         default_width: 46
         default_height: 40
 
-        image_activable: "Navigation/NA_18.bmp"
-        image_not_activable: "Navigation/NA_19.bmp"
+        image_activable: "grey_left_arrow.bmp"
+        image_not_activable: "dark_grey_left_arrow.bmp"
 
         is_activable: false
         is_positive: true
@@ -218,8 +218,8 @@ Item {
         default_width: 46
         default_height: 40
 
-        image_activable: "Navigation/NA_17.bmp"
-        image_not_activable: "Navigation/NA_18.2.bmp"
+        image_activable: "grey_right_arrow.bmp"
+        image_not_activable: "dark_grey_right_arrow.bmp"
 
         is_activable: false
         is_positive: true
