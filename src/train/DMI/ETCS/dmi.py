@@ -191,7 +191,6 @@ class DriverMachineInterface:
 
     def update(self):
         # Pour chacune des sections
-        print("demaré")
         for folder in ["A", "B", "C", "D", "E", "F", "G"]:
             # Pour chacunes des pages de chaque sections
             files = list(self.pages[folder].keys())
