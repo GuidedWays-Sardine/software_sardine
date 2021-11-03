@@ -68,67 +68,46 @@ class BottomButtons:
         application: `InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets
         """
-        # Vérifie que toutes les pages accessibles sont complètes
-        is_completed = application.is_completed_by_default == application.is_fully_loaded
+        try:
+            # Vérifie si toutes les pages sont complètes et stocke les pages qui ne sont pas complétées
+            non_completed_pages = list(i for i in range(0, 8)
+                                       if application.is_completed_by_default[i] != application.is_fully_loaded[i]
+                                       and not application.visible_pages[i].is_page_valid())
+        except Exception as error:
+            # Si une erreur a été détectée dans une des fonction de validation, l'indique et ne complète pas l'initialisation
+            log.warning("Erreur lors de la validation d'une des pages de paramètres : "
+                        "\n\t\tErreur de type : " + str(type(error)) + "\n\t\t" +
+                        "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
+                        "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+        else:
+            # Dans le cas où toutes les pages ont été vérifiées avec succès
+            if not non_completed_pages:
+                # Dans le cas où aucune page est incomplète (et donc que toutes les pages sont complètes)
+                if "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
+                    try:
+                        # Appelle la fonction de fermeture de page (si celle-ci existe)
+                        application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
+                    except Exception as error:
+                        # Si la fonction de fermeture de page contient une erreur, l'indique
+                        log.error("La fonction on_page_closed de la page " + str(application.active_settings_page) +
+                                  " contient une erreur\n\t\t" +
+                                  "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                                  "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
+                                  "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
 
-        # Dans le cas où toutes les pages ne sont pas complétés par défaut
-        if not is_completed:
-            # Vérifie chaque page nécessitant une vérification de validité
-            is_completed = True
-            # Les pages sont vérifiés en décomptant pour qu'en cas de plusieurs pages non complétées, charger la première
-            for index in range(8, 0, -1):
-                # Si la page a été chargée entièrement mais qu'elle n'est pas valide par défaut
-                if application.is_completed_by_default[index - 1] is not application.is_fully_loaded[index - 1]:
-                    # Si la page a une fonction is_page_valid, permettant de vérifier sa validité
-                    if "is_page_valid" in dir(application.visible_pages[index - 1]):
-                        try:
-                            if not application.visible_pages[index - 1].is_page_valid(application):
-                                is_completed = False
-                                application.right_buttons.on_new_page_selected(application,
-                                                                               application.visible_pages[index - 1].engine,
-                                                                               index)
-                        except Exception as error:
-                            # Si une erreur a été détectée, l'enregistre, et définit l'application comme non complétée
-                            log.warning("Erreur lors de la validation de la page de paramètres : " + str(index) +
-                                        "\n\t\tErreur de type : " + str(type(error)) + "\n\t\t" +
-                                        "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
-                                        "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-                            is_completed = False
-                            application.right_buttons.on_new_page_selected(application,
-                                                                           application.visible_pages[index - 1].engine,
-                                                                           index)
-                    else:
-                        # Sinon laisse la page comme complétée (pour pouvoir lancer la simulation)
-                        # laisse une erreur et charge la page
-                        log.error("page de paramètres page_rb" + str(index) + " notée comme non valide par défaut" +
-                                  " mais sans aucune fonction is_page_valid().")
-                        application.right_buttons.on_new_page_selected(application,
-                                                                       application.visible_pages[index - 1].engine,
-                                                                       index)
+                # Indique que le simulateur va être lancée et ferme l'application (les données seront alors récupérées
+                log.change_log_prefix("Récupération des données")
+                application.launch_simulator = True
+                application.app.quit()
+            else:
+                # Si toutes les pages ne sont pas complétées, indique en niveau debug les pages qui ne le sont pas
+                for index in non_completed_pages:
+                    log.debug("Page de paramètres " + str(index + 1) + " n'est pas complète.\n")
 
-        # Vérifie que toutes les pages accessibles sont complètes
-        if is_completed:
-            # Si au moins une page a été correctement chargée
-            if application.active_settings_page is not None\
-                    and "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
-                # Appelle la fonction de fermeture de page de la page actuelle si celle-ci existe
-                try:
-                    application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
-                except Exception as error:
-                    log.error("La fonction on_page_closed de la page " + str(application.active_settings_page) +
-                              " contient une erreur\n\t\t" +
-                              "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                              "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
-                              "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-
-                # Indique que la page a été fermée et change le préfix
-                log.info("Fermeture de la page de paramètres page_rb" + str(application.active_settings_page) + ".\n\n")
-
-
-            # Indique que le simulateur va être lancée et ferme l'application (les données seront alors récupérées
-            log.change_log_prefix("Récupération des données")
-            application.launch_simulator = True
-            application.app.quit()
+                # Et change la page de paramètres active sur la première page non complète
+                application.right_buttons.on_new_page_selected(application,
+                                                               application.visible_pages[non_completed_pages[0]].engine,
+                                                               non_completed_pages[0] + 1)
 
     def on_open_clicked(self, application):
         """Fonction appelée lorsque le bouton ouvrir est cliqué.
