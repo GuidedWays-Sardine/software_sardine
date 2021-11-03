@@ -84,7 +84,7 @@ class SettingsDictionnary(dict):
                         "\n\t\tErreur de type : " + str(type(error)) +
                         "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
                         "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
-                          prefix="dictionaire de données")
+                        prefix="dictionaire de données")
             return
 
         # Récupère la longueur actuelle
@@ -98,7 +98,7 @@ class SettingsDictionnary(dict):
                           prefix="dictionaire de données")
             else:
                 # Récupère les deux éléments de la ligne
-                line = line.rstrip('\n').split(";")
+                line = list(map(str.strip, line.rstrip('\n').split(";")))
 
                 # Regarde s'il peut être convertir en bool?
                 if line[1] == "True" or line[1] == "False":
