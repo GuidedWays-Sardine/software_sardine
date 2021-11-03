@@ -30,16 +30,7 @@ class PageRB8:
     screen_index = []
 
     # Informations par défauts des écrans {"nom écran": [sera utilisé ?, longuer minimum, hauteur minimum]}
-    screen_default = {"Simulateur SARDINE": {"DMI central":     [True, 640, 480],
-                                             "DMI gauche":      [True, 640, 480],
-                                             "Ligne virtuelle": [True, 1080, 720],
-                                             "Train caméra":    [False, 640, 480]
-                                             },
-                      "Poste de Commande Centralisé (PCC)": {"Tableau de Contrôle Optique (TCO)":   [False, 640, 480]
-                                                             },
-                      "Visualisation des données": {"Courbes": [False, 0, 0]
-                                                    }
-                      }
+    screen_default = {}
     screen_settings = {}
     category_active = ""
     screen_list_active = 0
@@ -91,9 +82,35 @@ class PageRB8:
         self.page.setProperty("screen_list", screen_list)
         self.page.setProperty("screen_size", screen_dimensions)
 
+        # Charge la traduction pour le nom des fichiers et des catégories (Anglais -> langue actuelle)
+        translation_data = td.TranslationDictionnary()
+        translation_data.create_translation(PROJECT_DIR + "settings\\language_settings\\initialisation.lang",
+                                            "English", application.language)
+
+        # Pour chacun des fichiers dans le répertoire de paramètres d'écrans
+        for file_path in (f for f in os.listdir(PROJECT_DIR + "settings\\screen_settings") if f.endswith(".screens")):
+            # Ouvre le fichier, et crée un dictionaire vide pour les écrans dans le fichier
+            file = open(PROJECT_DIR + "settings\\screen_settings\\" + file_path, "r", encoding="utf-8-sig")
+            screens_default = {}
+            screens_settings = {}
+
+            # Pour chacune des lignes contenant des informations
+            for line in (l for l in file.readlines() if l != "\n" and l[0] != "#"):
+                # Rajoute les paramètres par défaut et crée une ligne de paramètres (incomplet par défaut)
+                info = list(map(str.strip, line.rstrip("\n").split(";")))
+                screens_default[translation_data[info[0]]] = [True,
+                                                              int(info[1]) if len(info) >= 2 else 0,
+                                                              int(info[2]) if len(info) >= 3 else 0,
+                                                              bool(info[3]) if len(info) >= 4 else 0]
+                screens_settings[translation_data[info[0]]] = [0, False, [0, 0], [0, 0]]
+
+            # Rajouter cette série d'écran à la catégorie
+            self.screen_default[translation_data[file_path.replace("_", " ")[3:-8]]] = screens_default
+            self.screen_settings[translation_data[file_path.replace("_", " ")[3:-8]]] = screens_settings
+
         # Définit le fonctionnement de base des boutons supérieurs et inférieurs
         # Aucun des boutons ne sera fonctionnel et aucune page ne sera chargée
-        if self.screen_default.keys():
+        if self.screen_default:
             # Rend le texte supérieur en gris claire
             self.page.findChild(QObject, "category_title").setProperty("is_dark_grey", False)
 
@@ -104,14 +121,6 @@ class PageRB8:
             # Rend fonctionnel les boutons inférieurs (visibles et activable que quand nécessaire)
             self.page.findChild(QObject, "left_screen_button").clicked.connect(self.on_left_screen_button_pressed)
             self.page.findChild(QObject, "right_screen_button").clicked.connect(self.on_right_screen_button_pressed)
-
-            # Initialise les résultats (mets tout à blanc)
-            for category_key in list(self.screen_default.keys()):
-                temp_category = {}
-                for screen_key in list(self.screen_default[category_key].keys()):
-                    temp_category[screen_key] = [0, False, [0, 0], [0, 0]]
-                self.screen_settings[category_key] = temp_category
-            self.change_visible_screen_list()
 
             # S'il y a plus d'une catégorie d'écrans, rend les boutons supérieurs de catégories fonctionnels
             if len(self.screen_default.keys()) > 1:

@@ -1,0 +1,13 @@
+# nom de l'écran                    ;h_mini ;w_mini ;Doit-être paramétré ?
+Dashboard                           ;1080   ;720    ;False
+Armament diagram                    ;540    ;720    ;False
+Speed                               ;540    ;360    ;False
+Acceleration                        ;540    ;360    ;False
+Longitudinal acceleration           ;540    ;360    ;False
+Transversal acceleration            ;540    ;360    ;False
+Vertical acceleration               ;540    ;360    ;False
+Euclidian acceleration              ;540    ;360    ;False
+Cant deficiency/excess              ;540    ;360    ;False
+Effort-Speed Diagram                ;540    ;360    ;False
+Power (traction/braking)            ;540    ;360    ;False
+Braking curves (EVC)                ;540    ;360    ;False
