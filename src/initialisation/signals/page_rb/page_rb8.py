@@ -231,7 +231,7 @@ class PageRB8:
         """
         # Initialise les paramètres récupérés et récupère le paramètre sur si les écrans sont éteins
         page_parameters = sd.SettingsDictionnary()
-        page_parameters["EcranEteints"] = self.page.findChild(QObject, "black_screens_check").property("is_checked")
+        page_parameters["immersion"] = self.page.findChild(QObject, "black_screens_check").property("is_checked")
 
         # Récupère les valeurs actuellement sur l'écran
         old_screens_values = self.page.get_values().toVariant()
@@ -246,12 +246,12 @@ class PageRB8:
                 screen_settings_key = translation_data[category_key] + "." + translation_data[screen_key] + "."
                 is_activable = self.screen_default[category_key][screen_key][0]
                 screen_settings_values = self.screen_settings[category_key][screen_key]
-                page_parameters[screen_settings_key + "IndexEcran"] = screen_settings_values[0] if is_activable else 0
-                page_parameters[screen_settings_key + "PleinEcran"] = screen_settings_values[1] if is_activable else False
-                page_parameters[screen_settings_key + "positionX"] = screen_settings_values[2][0] if is_activable else 0
-                page_parameters[screen_settings_key + "positionY"] = screen_settings_values[2][1] if is_activable else 0
-                page_parameters[screen_settings_key + "tailleX"] = screen_settings_values[3][0] if is_activable else 0
-                page_parameters[screen_settings_key + "tailleY"] = screen_settings_values[3][1] if is_activable else 0
+                page_parameters[screen_settings_key + "screen_index"] = screen_settings_values[0] if is_activable else 0
+                page_parameters[screen_settings_key + "full_screen"] = screen_settings_values[1] if is_activable else False
+                page_parameters[screen_settings_key + "x"] = screen_settings_values[2][0] if is_activable else 0
+                page_parameters[screen_settings_key + "y"] = screen_settings_values[2][1] if is_activable else 0
+                page_parameters[screen_settings_key + "w"] = screen_settings_values[3][0] if is_activable else 0
+                page_parameters[screen_settings_key + "h"] = screen_settings_values[3][1] if is_activable else 0
 
         return page_parameters
 
@@ -266,7 +266,7 @@ class PageRB8:
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) 
         """
         # Change la valeur pour les écrans noirs
-        data.update_parameter(self.page, "black_screens_check", "is_checked", "EcransEteints")
+        data.update_parameter(self.page, "black_screens_check", "is_checked", "immersion")
 
         # Inverse les données de traduction pour avoir un dictionnaire langue actuelle -> Français
         invert_translation = td.TranslationDictionnary()
@@ -282,13 +282,13 @@ class PageRB8:
 
                 # Essaye de récupérer les donnés reliées à l'écran
                 try:
-                    if int(data[screen_settings_key + "IndexEcran"]) <= self.screen_count:
-                        self.screen_settings[category_key][screen_key][0] = data[screen_settings_key + "IndexEcran"]
-                        self.screen_settings[category_key][screen_key][1] = data[screen_settings_key + "PleinEcran"]
-                        self.screen_settings[category_key][screen_key][2][0] = data[screen_settings_key + "positionX"]
-                        self.screen_settings[category_key][screen_key][2][1] = data[screen_settings_key + "positionY"]
-                        self.screen_settings[category_key][screen_key][3][0] = data[screen_settings_key + "tailleX"]
-                        self.screen_settings[category_key][screen_key][3][1] = data[screen_settings_key + "tailleY"]
+                    if int(data[screen_settings_key + "screen_index"]) <= self.screen_count:
+                        self.screen_settings[category_key][screen_key][0] = data[screen_settings_key + "screen_index"]
+                        self.screen_settings[category_key][screen_key][1] = data[screen_settings_key + "full_screen"]
+                        self.screen_settings[category_key][screen_key][2][0] = data[screen_settings_key + "x"]
+                        self.screen_settings[category_key][screen_key][2][1] = data[screen_settings_key + "y"]
+                        self.screen_settings[category_key][screen_key][3][0] = data[screen_settings_key + "w"]
+                        self.screen_settings[category_key][screen_key][3][1] = data[screen_settings_key + "h"]
                 except KeyError:
                     log.debug("L'écran : " + screen_settings_key + " n'a pas de paramètres sauvegardés.\n")
 

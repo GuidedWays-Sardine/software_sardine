@@ -36,7 +36,7 @@ class Simulation:
 
         # Initialise le DMI
         try:
-            exec("import src.train.DMI." + data["DMI"] + ".dmi as DMI\n" +
+            exec("import src.train.DMI." + data["dmi"] + ".dmi as DMI\n" +
                  "self.components.append(DMI.DriverMachineInterface(self, data))")
         except KeyError:
             # Dans le cas où aucun DMI n'a été sélectionné, essaye de charger le DMI ETCS
@@ -53,7 +53,7 @@ class Simulation:
                           prefix="initialisation simulation")
         except Exception as error:
             # Si une erreur est survenur lors du chargement du DMI, ne charge pas de DMI
-            log.error("Impossible de charger le DMI : " + data["DMI"] + ". Aucun DMI ne sera chargé.\n\t\t" +
+            log.error("Impossible de charger le DMI : " + data["dmi"] + ". Aucun DMI ne sera chargé.\n\t\t" +
                       "Erreur de type : " + str(type(error)) + "\n\t\t" +
                       "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
                       "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",

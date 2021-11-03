@@ -125,30 +125,30 @@ class PageRB1:
 
         # Paramètre du pupitre
         command_board = self.page.findChild(QObject, "command_board_combo").property("selection_text")
-        page_parameters["Pupitre"] = translation_data[command_board].replace(" ", "_")
+        page_parameters["command_board"] = translation_data[command_board].replace(" ", "_")
 
         # Paramètre si connecté à Renard
-        page_parameters["Renard"] = self.page.findChild(QObject, "renard_check").property("is_checked")
+        page_parameters["renard"] = self.page.findChild(QObject, "renard_check").property("is_checked")
 
         # Paramètre si caméra connecté pour Renard (ou alors visu direct sur renard)
-        page_parameters["Caméra"] = self.page.findChild(QObject, "camera_check").property("is_checked")
+        page_parameters["camera"] = self.page.findChild(QObject, "camera_check").property("is_checked")
 
         # Paramètre choix du DMI
         dmi_selection = self.page.findChild(QObject, "dmi_combo").property("selection_text")
-        page_parameters["DMI"] = translation_data[dmi_selection].replace(" ", "_")
+        page_parameters["dmi"] = translation_data[dmi_selection].replace(" ", "_")
 
         # Paramètre niveau de logging
         log_text = self.page.findChild(QObject, "log_button").property("text")
-        page_parameters["Registre"] = self.log_type_converter[log_text]
+        page_parameters["log_level"] = self.log_type_converter[log_text]
 
         # Paramètre langue
         page_parameters["Langue"] = self.page.findChild(QObject, "language_combo").property("selection_text")
 
         # Paramètre si PCC connecté
-        page_parameters["PCC"] = self.page.findChild(QObject, "pcc_check").property("is_checked")
+        page_parameters["ccs"] = self.page.findChild(QObject, "pcc_check").property("is_checked")
 
         # Paramètre si affichage des données en direct (vitesse, ...)
-        page_parameters["DonnéesDirect"] = self.page.findChild(QObject, "data_check").property("is_checked")
+        page_parameters["live_data"] = self.page.findChild(QObject, "data_check").property("is_checked")
 
         return page_parameters
 
@@ -164,21 +164,21 @@ class PageRB1:
         """
         # Paramètre du pupitre (quel pupitre sera utilisé)
         try:
-            command_board = data["Pupitre"].replace("_", " ")
+            command_board = data["command_board"].replace("_", " ")
         except KeyError:
             log.debug("Impossible de changer le paramètre: \"Pupitre\" manquant dans le fichier ouvert.\n")
         else:
             self.page.findChild(QObject, "command_board_combo").change_selection(translation_data[command_board])
 
         # Paramètre pour Renard (savoir si le pupitre est connecté à Renard)
-        data.update_parameter(self.page, "renard_check", "is_checked", "Renard")
+        data.update_parameter(self.page, "renard_check", "is_checked", "renard")
 
         # Paramètre pour la caméra (savoir si elle est connecté ou si on a un visu direct sur Renard)
-        data.update_parameter(self.page, "camera_check", "is_checked", "Caméra")
+        data.update_parameter(self.page, "camera_check", "is_checked", "camera")
 
         # Paramètre pour le DMI (savoir quelle Interface sera utilisée pour le pupitre
         try:
-            dmi = data["DMI"].replace("_", " ")
+            dmi = data["dmi"].replace("_", " ")
         except KeyError:
             log.debug("Impossible de changer le paramètre: \"DMI\" manquant dans le fichier ouvert.\n")
         else:
@@ -186,15 +186,15 @@ class PageRB1:
 
         # Paramètre niveau de registre (pour suivre les potentiels bugs lors de la simulation)
         try:
-            self.page.findChild(QObject, "log_button").setProperty("text", self.log_type_converter[int(data["Registre"])])
+            self.page.findChild(QObject, "log_button").setProperty("text", self.log_type_converter[int(data["log_level"])])
         except KeyError:
             log.debug("Impossible de changer le paramètre : \"Registre\" manquant dans le fichier ouvert.\n")
 
         # Paramètre pour le PCC (savoir s'il sera activé)
-        data.update_parameter(self.page, "pcc_check", "is_checked", "PCC")
+        data.update_parameter(self.page, "pcc_check", "is_checked", "ccs")
 
         # Paramètre pour l'affichage des données en direct (genre vitesse, ...)
-        data.update_parameter(self.page, "data_check", "is_checked", "DonnéesDirect")
+        data.update_parameter(self.page, "data_check", "is_checked", "live_data")
 
     def change_language(self, translation_data):    # TODO : simplifier avec le translation dict
         """Permet à partir d'un dictionaire de traduction, de traduire les textes de la page de paramètres

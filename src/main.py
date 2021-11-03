@@ -47,7 +47,7 @@ def main():
     log.change_log_prefix()
     log.info("Lancement du simulateur\n\n\n")
     try:
-        log.change_log_level(parameters["Registre"])
+        log.change_log_level(parameters["log_level"])
     except KeyError:
         log.warning("Aucun paramêtre \"log_level\" récupéré du programme d'initialisation" +
                     "\n\t\tNiveau par défaut gardé à suffisant (log.WARNING)\n")
