@@ -109,7 +109,6 @@ class PageRB8:
             self.screen_settings[translation_data[file_path.replace("_", " ")[3:-8]]] = screens_settings
 
         # Définit le fonctionnement de base des boutons supérieurs et inférieurs
-        # Aucun des boutons ne sera fonctionnel et aucune page ne sera chargée
         if self.screen_default:
             # Rend le texte supérieur en gris claire
             self.page.findChild(QObject, "category_title").setProperty("is_dark_grey", False)
@@ -137,26 +136,31 @@ class PageRB8:
             raise NameError("Aucun écran à paramétrer. Le dictionnaire \"screen_default\" est vide.")
 
         # connecte les différents boutons des autres pages à la paramétrabilité de certaines fenêtres
+        # FEATURE : Ajouter les conditions dans des fonctions annexes comme ci-dessous
+        self.connect_page_rb1(application)
 
-        # Commence par les éléments de la page 1
+        # Définit la page comme validée (toutes les valeurs par défaut suffisent)
+        application.is_completed_by_default[self.index - 1] = "is_page_valid" not in dir(self)
+
+    def connect_page_rb1(self, application):
         if application.visible_pages[0] is not None and not isinstance(application.visible_pages[0], type(self.engine)):
             # camera_check pour ligne virtuelle ou train caméra
-            application.visible_pages[0].page.findChild(QObject, "camera_check").value_changed.connect(lambda: self.on_camera_train_checked(application))
+            application.visible_pages[0].page.findChild(QObject, "camera_check").value_changed.connect(
+                lambda: self.on_camera_train_checked(application))
             self.on_camera_train_checked(application)
 
             # pcc_check pour TCO et toute autre fenêtre nécessaire au fonctionnement du PCC
-            application.visible_pages[0].page.findChild(QObject, "pcc_check").value_changed.connect(lambda: self.on_pcc_checked(application))
+            application.visible_pages[0].page.findChild(QObject, "pcc_check").value_changed.connect(
+                lambda: self.on_pcc_checked(application))
             self.on_pcc_checked(application)
 
             # data_check pour l'affichage des données en direct
-            application.visible_pages[0].page.findChild(QObject, "data_check").value_changed.connect(lambda: self.on_data_checked(application))
+            application.visible_pages[0].page.findChild(QObject, "data_check").value_changed.connect(
+                lambda: self.on_data_checked(application))
             self.on_data_checked(application)
         else:
             log.warning("Certains paramétrages d'écrans dépendent du bon fonctionnement de la page_rb1." +
                         "Ceux-ci ne peuvent pas se charger correctement.\n")
-
-        # Définit la page comme validée (toutes les valeurs par défaut suffisent)
-        application.is_completed_by_default[self.index - 1] = "is_page_valid" not in dir(self)
 
     def on_camera_train_checked(self, application):
         """Signal appelé lorsque le checkbutton camera_check est coché ou décoché.
