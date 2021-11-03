@@ -30,5 +30,6 @@ Window {
         is_activable: false
         is_positive: true
         is_visible: true
+        is_dark_grey: false
     }
 }
