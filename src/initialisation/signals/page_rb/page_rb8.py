@@ -136,7 +136,7 @@ class PageRB8:
             raise NameError("Aucun écran à paramétrer. Le dictionnaire \"screen_default\" est vide.")
 
         # connecte les différents boutons des autres pages à la paramétrabilité de certaines fenêtres
-        # FEATURE : Ajouter les conditions dans des fonctions annexes comme ci-dessous
+        # FEATURE : Ajouter les conditions dans des fonctions annexes comme ci-dessous pour les autres pages
         self.connect_page_rb1(application)
 
         # Définit la page comme validée (toutes les valeurs par défaut suffisent)
