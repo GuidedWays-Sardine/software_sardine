@@ -152,8 +152,10 @@ class PageRB1:
         # Paramètre si PCC connecté
         page_parameters["ccs"] = self.page.findChild(QObject, "pcc_check").property("is_checked")
 
-        # Paramètre si affichage des données en direct (vitesse, ...)
+        # Paramètres si affichage des données en direct (vitesse, ...)
         page_parameters["live_data"] = self.page.findChild(QObject, "data_check").property("is_checked")
+        page_parameters["dashboard"] = self.page.findChild(QObject, "dashboard_check").property("is_checked")
+        page_parameters["save_data"] = self.page.findChild(QObject, "data_save_check").property("is_checked")
 
         return page_parameters
 
@@ -198,10 +200,12 @@ class PageRB1:
         # Paramètre pour le PCC (savoir s'il sera activé)
         data.update_parameter(self.page, "pcc_check", "is_checked", "ccs")
 
-        # Paramètre pour l'affichage des données en direct (genre vitesse, ...)
+        # Paramètres pour l'affichage des données en direct (genre vitesse, ...)
         data.update_parameter(self.page, "data_check", "is_checked", "live_data")
+        data.update_parameter(self.page, "dashboard_check", "is_checked", "dashboard")
+        data.update_parameter(self.page, "data_save_check", "is_checked", "save_data")
 
-    def change_language(self, translation_data):    # TODO : simplifier avec le translation dict
+    def change_language(self, translation_data):
         """Permet à partir d'un dictionaire de traduction, de traduire les textes de la page de paramètres
 
         Parameters
@@ -214,7 +218,7 @@ class PageRB1:
 
         # Essaye de traduire chaque textes au dessus des widgets et check_button
         for widget_id in ["command_board_text", "dmi_text", "log_text", "language_text",
-                     "renard_check", "camera_check", "pcc_check", "data_check"]:
+                          "renard_check", "camera_check", "pcc_check", "data_check", "dashboard_check", "data_save_check"]:
             widget = self.page.findChild(QObject, widget_id)
             widget.setProperty("text", translation_data[widget.property("text")])
 

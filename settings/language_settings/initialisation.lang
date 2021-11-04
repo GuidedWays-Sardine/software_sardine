@@ -33,7 +33,9 @@ Aucun;None
 Langue;Language
 
 Activation du PCC (Poste de Commande Centralisé) ?;Activation of CCS (Centralised Control Station) ?
-Affichage en direct des données du train ?;Live display of train's data ?
+Affichage en direct des données ?;Live display of train's data ?
+Tableau de bord ?;Dashboard ?
+Sauvegarder les données ?; Save data ?
 
 
 
