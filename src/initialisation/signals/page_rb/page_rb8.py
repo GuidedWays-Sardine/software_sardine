@@ -157,6 +157,8 @@ class PageRB8:
             # data_check pour l'affichage des données en direct
             application.visible_pages[0].page.findChild(QObject, "data_check").value_changed.connect(
                 lambda: self.on_data_checked(application))
+            application.visible_pages[0].page.findChild(QObject, "dashboard_check").value_changed.connect(
+                lambda: self.on_data_checked(application))
             self.on_data_checked(application)
         else:
             log.warning("Certains paramétrages d'écrans dépendent du bon fonctionnement de la page_rb1." +
@@ -217,17 +219,21 @@ class PageRB8:
         application: `InitialisationWindow`
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
-        # Récupère si le checkbutton est activé, le nom de la catégorie et des écrans à modifier
-        is_checked = application.visible_pages[0].page.findChild(QObject, "data_check").property("is_checked")
+        # Récupère si les données sont activées et si elles sont activées en mode dashboard
+        is_data_checked = application.visible_pages[0].page.findChild(QObject, "data_check").property("is_checked")
+        dashboard = application.visible_pages[0].page.findChild(QObject, "dashboard_check")
+        dashboard.setProperty("is_activable", is_data_checked)
         category = list(self.screen_default.keys())[2]
-        screen_data = list(self.screen_default[category].keys())[0]
+        screen_graphs = list(self.screen_default[category].keys())
+        screen_dashboard = screen_graphs[0]
 
-        # Change la paramétrabilité des écrans souhaités
-        self.screen_default[category][screen_data][0] = is_checked
-
-        # Réinitialise les paramètres de ces écrans s'ils ne sont plus paramétrables
-        if not self.screen_default[category][screen_data][0]:
-            self.screen_settings[category][screen_data] = [0, False, [0, 0], [0, 0]]
+        # Mets à jour la paramétrabilité des écrans
+        for screen_graph in screen_graphs:
+            if is_data_checked and (dashboard.property("is_checked") == (screen_graph == screen_dashboard)):
+                self.screen_default[category][screen_graph][0] = True
+            else:
+                self.screen_default[category][screen_graph][0] = False
+                self.screen_settings[category][screen_graph] = [0, False, [0, 0], [0, 0]]
 
     def get_values(self, translation_data):
         """Récupère les paramètres de la page de paramètres page_rb8
