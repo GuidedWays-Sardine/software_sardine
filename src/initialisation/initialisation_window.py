@@ -6,7 +6,7 @@ import time
 
 
 # Librairies graphiques
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QDesktopWidget
 from PyQt5.QtCore import QObject
 from PyQt5.QtQml import QQmlApplicationEngine
 
@@ -72,10 +72,10 @@ class InitialisationWindow:
 
         # Si le fichier qml a été compris, récupère la fenêtre et initialise les différents boutons et pages
         self.win = self.engine.rootObjects()[0]
+        print(self.win.width(), self.win.height(), self.win.x(), self.win.y())
         self.bottom_buttons = bb.BottomButtons(self)
         self.right_buttons = rb.RightButtons(self)
 
-        # FEATURE:  ajouter un paramètre de la position et de la taille de la fenêtre
         # Vérifie si un fichier de paramètres par défaut existe
         if os.path.isfile(PROJECT_DIR + "settings\\general_settings\\default.settings"):
             # S'il existe, l'ouvre, récupère ses données et les changent dans l'application d'initialisation
@@ -83,8 +83,31 @@ class InitialisationWindow:
             default_settings = sd.SettingsDictionnary()
             default_settings.open(PROJECT_DIR + "settings\\general_settings\\default.settings")
             self.set_values(default_settings)
+
+            # De plus si les paramètres pour la taille et la position de la fenêtre existe, essaye de les récupérer
+            dimensions = [None] * 4  # x, y, w, h
+            try:
+                screen = default_settings["initialisation.screen_index"]
+                screen_dimensions = QDesktopWidget().screenGeometry(screen - 1).getCoords()
+                dimensions[0] = screen_dimensions[0] + default_settings["initialisation.x"]
+                dimensions[1] = screen_dimensions[1] + default_settings["initialisation.y"]
+                if dimensions[0] + default_settings["initialisation.w"] + 1 <= screen_dimensions[2]:
+                    dimensions[2] = default_settings["initialisation.w"]
+                elif screen_dimensions[2] - dimensions[0] + 1 >= self.win.property("minimumWidth"):
+                    dimensions[2] = screen_dimensions[2] - dimensions[0] + 1
+                if dimensions[1] + default_settings["initialisation.h"] + 1 <= screen_dimensions[3]:
+                    dimensions[3] = default_settings["initialisation.h"]
+                elif screen_dimensions[3] - dimensions[1] + 1 >= self.win.property("minimumHeight"):
+                    dimensions[3] = screen_dimensions[3] - dimensions[1] + 1
+                if not list(x for x in dimensions if x is None):
+                    self.win.setPosition(dimensions[0], dimensions[1])
+                    self.win.resize(dimensions[2],  dimensions[3])
+                else:
+                    log.debug("Les données pour la position et taille de la fenêtre d'initialisation sont incorect.\n\n")
+            except KeyError:
+                log.debug("Aucune information stocké sur la taille par défaut de la fenêtre d'initizlisation.\n\n")
         else:
-            log.info("Aucun fichier paramètres default.settings. Tous les éléments par défaut seront pris.\n")
+            log.info("Aucun fichier paramètres default.settings. Tous les éléments par défaut seront pris.\n\n")
 
         # Indique le temps de chargement de l'application
         log.info("Application d'initialisation chargée en " +
@@ -127,6 +150,25 @@ class InitialisationWindow:
         initial_time = time.time()
         log.info("Récupération des paramètres de l'application.\n")
         parameters = sd.SettingsDictionnary()
+
+        screens = QDesktopWidget()
+        screen_index = list(i for i in range(0, screens.screenCount())
+                            if screens.screenGeometry(i).getCoords()[0] - 1 < self.win.x() <=
+                            screens.screenGeometry(i).getCoords()[2]
+                            and screens.screenGeometry(i).getCoords()[1] - 1 < self.win.y() <=
+                            screens.screenGeometry(i).getCoords()[3])
+        if screen_index:
+            sg = screens.screenGeometry(screen_index[0]).getCoords()
+            parameters["initialisation.screen_index"] = screen_index[0] + 1
+            print(self.win.x(), " ", self.win.x() - sg[0], " ", self.win.y(), " ", self.win.y() - sg[1])
+            parameters["initialisation.x"] = self.win.x() - sg[0]
+            parameters["initialisation.y"] = self.win.y() - sg[1]
+            parameters["initialisation.w"] = (self.win.width() if (self.win.x() + self.win.width() <= sg[2] + 1)
+                                                               else self.win.property("minimumWidth"))
+            parameters["initialisation.h"] = (self.win.height() if (self.win.y() + self.win.height() <= sg[3] + 1)
+                                                                else self.win.property("minimumHeight"))
+        else:
+            log.warning("Impossible de localiser la fenêtre d'initialisation.\n")
 
         # Vérifie si au moins une page est chargé graphiquement. (sinon tente de charger les paramètres défaut.settings)
         if not any(self.is_fully_loaded) and os.path.isfile(PROJECT_DIR + "settings\\general_settings\\default.settings"):
