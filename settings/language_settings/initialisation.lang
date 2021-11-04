@@ -45,13 +45,24 @@ Eteindre les écrans qui ne sont pas utilisés ?;Turn off the screens that aren'
 
 Simulateur SARDINE;SARDINE simulator
 DMI central;Central DMI
-DMI gauche;Left DMI
-Ligne virtuelle;Virtual line
-Train caméra;Camera train
+Boutons virtuels;Virtual buttons
+Ligne virtuelle (UE5);Virtual line (UE5)
+Train caméra (Renard);Camera train (Renard)
 
 Poste de Commande Centralisé (PCC);Centralised Control Station (CCS)
 Tableau de Contrôle Optique (TCO);Optical Control Panel (OCP)
 
 Visualisation des données;Data visualisation
-Courbes;Graphs
+Tableau de bord;Dashboard
+Schéma d'armement;Alignement diagram
+Vitesse;Speed
+Accélération;Acceleration
+Accélération longitudinale;Longitudinale acceleration
+Accélération transversale;Transversal acceleration
+Accélération verticale;Vertical acceleration
+Accélération Euclidienne;Euclidian acceleration
+Insuffisance/Excès de dévers;Cant deficiency/excess
+Diagramme Effort-Vitesse;Effort-Speed Diagram
+Puissance (traction/freinage);Power (traction/braking)
+Courbes de freinage (EVC);Braking curves (EVC)
 
