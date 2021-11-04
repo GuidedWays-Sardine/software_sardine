@@ -105,7 +105,7 @@ class SettingsDictionnary(dict):
                     self[line[0]] = True if line[1] == "True" else False
                     continue
 
-                # regarde s'il peut être convertit en int ou en float
+                # Regarde s'il peut être convertit en int ou en float
                 try:
                     line[1] = float(line[1])
                 except ValueError:
@@ -116,6 +116,10 @@ class SettingsDictionnary(dict):
                     else:
                         self[line[0]] = int(line[1])
                     continue
+
+                # Dans le cas où aucun type autre que string a été détecté
+                if isinstance(line[1], type(" ")):
+                    self[line[0]] = line[1]
 
         file.close()
 

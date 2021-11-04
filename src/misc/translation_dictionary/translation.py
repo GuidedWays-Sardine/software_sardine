@@ -20,7 +20,7 @@ class TranslationDictionnary(dict):
         try:
             return super(TranslationDictionnary, self).__getitem__(key.lower())
         except KeyError:
-            log.debug("Aucune traduction pour : " + str(key))
+            log.debug("Aucune traduction pour : " + str(key) + "\n")
             return key
 
     def create_translation(self, file_path, current_language, new_language):
@@ -77,7 +77,7 @@ class TranslationDictionnary(dict):
             else:
                 # S'il n'y a pas autant de traductions que de langue, cela signifie que la ligne est incomplète
                 log.debug("Certaines traductions manquantes sur la ligne suivante (langues attendus, mots) :" +
-                          "\n\t\t" + ";".join(language_list) + "\n\t\t" + line,
+                          "\n\t\t" + ";".join(language_list) + "\n\t\t" + line + "\n",
                           prefix="dictionaire de traduction")
 
         file.close()
