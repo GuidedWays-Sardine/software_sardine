@@ -37,8 +37,6 @@ class PageRB1:
                           "Suffisant": log.Level.INFO,
                           "Complet": log.Level.DEBUG
                           }
-    log_type_converter.update(dict([reversed(i) for i in log_type_converter.items()]))
-    # Permet de faire un dictionaire bi-directionel
 
     def __init__(self, application, engine, index, current_button):
         """Fonction d'initialisation de la page de paramtètres 1 (page paramètres général)
@@ -173,7 +171,7 @@ class PageRB1:
         try:
             command_board = data["command_board"].replace("_", " ")
         except KeyError:
-            log.debug("Impossible de changer le paramètre: \"Pupitre\" manquant dans le fichier ouvert.\n")
+            log.debug("Impossible de changer le paramètre: \"command_board\" manquant dans le fichier ouvert.\n")
         else:
             self.page.findChild(QObject, "command_board_combo").change_selection(translation_data[command_board])
 
@@ -193,7 +191,7 @@ class PageRB1:
 
         # Paramètre niveau de registre (pour suivre les potentiels bugs lors de la simulation)
         try:
-            self.page.findChild(QObject, "log_button").setProperty("text", self.log_type_converter[int(data["log_level"])])
+            self.page.findChild(QObject, "log_button").setProperty("text", self.log_type_converter[log.Level[data["log_level"]]])
         except KeyError:
             log.debug("Impossible de changer le paramètre : \"Registre\" manquant dans le fichier ouvert.\n")
 
@@ -238,7 +236,6 @@ class PageRB1:
                                    translation_data[keys[2]]: self.log_type_converter[keys[2]],
                                    translation_data[keys[3]]: self.log_type_converter[keys[3]]
                                    }
-        self.log_type_converter.update(dict([reversed(i) for i in self.log_type_converter.items()]))
 
         # Modification du changeur de niveau de log
         self.next_log_level = \
