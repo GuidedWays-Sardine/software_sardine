@@ -92,10 +92,15 @@ class InitialisationWindow:
             # De plus si les paramètres pour la taille et la position de la fenêtre existe, essaye de les récupérer
             dimensions = [None] * 4  # x, y, w, h
             try:
+                # Récupère l'écran et calcule la position relative de la fenêtre
                 screen = default_settings["initialisation.screen_index"]
                 screen_dimensions = QDesktopWidget().screenGeometry(screen - 1).getCoords()
                 dimensions[0] = screen_dimensions[0] + default_settings["initialisation.x"]
                 dimensions[1] = screen_dimensions[1] + default_settings["initialisation.y"]
+
+                # Pour les deux dimensiosn des fenêtres vérifie si :
+                # La taille indiqué rentre dans l'écran sur lequel on se situe
+                # Sinon si la dimensions restant de la fenêtre est suffisant pour faire rentrer la fenêtre
                 if dimensions[0] + default_settings["initialisation.w"] + 1 <= screen_dimensions[2]:
                     dimensions[2] = default_settings["initialisation.w"]
                 elif screen_dimensions[2] - dimensions[0] + 1 >= self.win.property("minimumWidth"):
@@ -104,13 +109,15 @@ class InitialisationWindow:
                     dimensions[3] = default_settings["initialisation.h"]
                 elif screen_dimensions[3] - dimensions[1] + 1 >= self.win.property("minimumHeight"):
                     dimensions[3] = screen_dimensions[3] - dimensions[1] + 1
+
+                # Si la position et la taille de la fenêtre a été calculé avec succès, place et dimensionne la fenêtre
                 if not list(x for x in dimensions if x is None):
                     self.win.setPosition(dimensions[0], dimensions[1])
                     self.win.resize(dimensions[2],  dimensions[3])
                 else:
                     log.debug("Les données pour la position et taille de la fenêtre d'initialisation sont incorect.\n\n")
             except KeyError:
-                log.debug("Aucune information stocké sur la taille par défaut de la fenêtre d'initizlisation.\n\n")
+                log.debug("Aucune information stocké sur la taille par défaut de la fenêtre d'initialisation.\n\n")
         else:
             log.info("Aucun fichier paramètres default.settings. Tous les éléments par défaut seront pris.\n\n")
 
@@ -149,7 +156,7 @@ class InitialisationWindow:
 
         Returns
         -------
-        parameters : `dictionary`
+        parameters : `sd.SettingsDictionnary`
             un dictionaire de paramètres avec tous les paramètres du simulateur
         """
         initial_time = time.time()
@@ -207,7 +214,7 @@ class InitialisationWindow:
 
         Parameters
         ----------
-        data: `dict`
+        data: `sd.SettingsDictionnary`
             Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
         """
         # Si la combobox pour choisir la langue existe (page_rb1 chargée), alors change la langue dans cette combobox
