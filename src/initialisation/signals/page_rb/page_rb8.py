@@ -101,7 +101,7 @@ class PageRB8:
                 screens_default[translation_data[info[0]]] = [True,
                                                               int(info[1]) if len(info) >= 2 else 0,
                                                               int(info[2]) if len(info) >= 3 else 0,
-                                                              bool(info[3]) if len(info) >= 4 else 0]
+                                                              True if len(info) >= 4 and info[4].lower() == "true" else False]
                 screens_settings[translation_data[info[0]]] = [0, False, [0, 0], [0, 0]]
 
             # Rajouter cette série d'écran à la catégorie
