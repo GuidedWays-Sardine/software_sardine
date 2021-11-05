@@ -77,7 +77,6 @@ class InitialisationWindow:
 
         # Si le fichier qml a été compris, récupère la fenêtre et initialise les différents boutons et pages
         self.win = self.engine.rootObjects()[0]
-        print(self.win.width(), self.win.height(), self.win.x(), self.win.y())
         self.bottom_buttons = bb.BottomButtons(self)
         self.right_buttons = rb.RightButtons(self)
 
@@ -172,7 +171,6 @@ class InitialisationWindow:
         if screen_index:
             sg = screens.screenGeometry(screen_index[0]).getCoords()
             parameters["initialisation.screen_index"] = screen_index[0] + 1
-            print(self.win.x(), " ", self.win.x() - sg[0], " ", self.win.y(), " ", self.win.y() - sg[1])
             parameters["initialisation.x"] = self.win.x() - sg[0]
             parameters["initialisation.y"] = self.win.y() - sg[1]
             parameters["initialisation.w"] = (self.win.width() if (self.win.x() + self.win.width() <= sg[2] + 1)
