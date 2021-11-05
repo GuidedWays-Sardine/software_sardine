@@ -101,7 +101,8 @@ class PageRB8:
                 screens_default[translation_data[info[0]]] = [True,
                                                               int(info[1]) if len(info) >= 2 else 0,
                                                               int(info[2]) if len(info) >= 3 else 0,
-                                                              True if len(info) >= 4 and info[4].lower() == "true" else False]
+                                                              True if len(info) >= 4 and info[3].lower() == "true" else False]
+
                 screens_settings[translation_data[info[0]]] = [0, False, [0, 0], [0, 0]]
 
             # Rajouter cette série d'écran à la catégorie
@@ -163,6 +164,28 @@ class PageRB8:
         else:
             log.warning("Certains paramétrages d'écrans dépendent du bon fonctionnement de la page_rb1." +
                         "Ceux-ci ne peuvent pas se charger correctement.\n")
+
+    def is_page_valid(self):
+        # Récupère les valeurs actuellement sur l'écran
+        old_screens_values = self.page.get_values().toVariant()
+        for index in range(0, len(old_screens_values)):
+            self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
+
+        # Pour toutes les catégories de paramètrages d'écrans
+        for category_key in list(self.screen_default.keys()):
+            # Pour tous les écrans de cette catégorie
+            for screen_key in list(self.screen_default[category_key].keys()):
+                # Vérifier pour chaque page si la page doit et peut être complétée mais ne l'est pas
+                if self.screen_default[category_key][screen_key][0] and \
+                        self.screen_default[category_key][screen_key][3] \
+                        and self.screen_settings[category_key][screen_key][0] == 0:
+                    print(self.screen_default[category_key][screen_key][0],
+                          self.screen_default[category_key][screen_key][3],
+                          self.screen_settings[category_key][screen_key][0])
+                    return False
+
+        # Si aucune des pages n'a pas encore été complétée, retourne que la page est complète
+        return True
 
     def on_camera_train_checked(self, application):
         """Signal appelé lorsque le checkbutton camera_check est coché ou décoché.
