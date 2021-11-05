@@ -37,8 +37,6 @@ class PageRB1:
                           "Suffisant": log.Level.INFO,
                           "Complet": log.Level.DEBUG
                           }
-    log_type_converter.update(dict([reversed(i) for i in log_type_converter.items()]))
-    # Permet de faire un dictionaire bi-directionel
 
     def __init__(self, application, engine, index, current_button):
         """Fonction d'initialisation de la page de paramtètres 1 (page paramètres général)
@@ -152,8 +150,10 @@ class PageRB1:
         # Paramètre si PCC connecté
         page_parameters["ccs"] = self.page.findChild(QObject, "pcc_check").property("is_checked")
 
-        # Paramètre si affichage des données en direct (vitesse, ...)
+        # Paramètres si affichage des données en direct (vitesse, ...)
         page_parameters["live_data"] = self.page.findChild(QObject, "data_check").property("is_checked")
+        page_parameters["dashboard"] = self.page.findChild(QObject, "dashboard_check").property("is_checked")
+        page_parameters["save_data"] = self.page.findChild(QObject, "data_save_check").property("is_checked")
 
         return page_parameters
 
@@ -171,7 +171,7 @@ class PageRB1:
         try:
             command_board = data["command_board"].replace("_", " ")
         except KeyError:
-            log.debug("Impossible de changer le paramètre: \"Pupitre\" manquant dans le fichier ouvert.\n")
+            log.debug("Impossible de changer le paramètre: \"command_board\" manquant dans le fichier ouvert.\n")
         else:
             self.page.findChild(QObject, "command_board_combo").change_selection(translation_data[command_board])
 
@@ -191,17 +191,19 @@ class PageRB1:
 
         # Paramètre niveau de registre (pour suivre les potentiels bugs lors de la simulation)
         try:
-            self.page.findChild(QObject, "log_button").setProperty("text", self.log_type_converter[int(data["log_level"])])
+            self.page.findChild(QObject, "log_button").setProperty("text", self.log_type_converter[log.Level[data["log_level"]]])
         except KeyError:
             log.debug("Impossible de changer le paramètre : \"Registre\" manquant dans le fichier ouvert.\n")
 
         # Paramètre pour le PCC (savoir s'il sera activé)
         data.update_parameter(self.page, "pcc_check", "is_checked", "ccs")
 
-        # Paramètre pour l'affichage des données en direct (genre vitesse, ...)
+        # Paramètres pour l'affichage des données en direct (genre vitesse, ...)
         data.update_parameter(self.page, "data_check", "is_checked", "live_data")
+        data.update_parameter(self.page, "dashboard_check", "is_checked", "dashboard")
+        data.update_parameter(self.page, "data_save_check", "is_checked", "save_data")
 
-    def change_language(self, translation_data):    # TODO : simplifier avec le translation dict
+    def change_language(self, translation_data):
         """Permet à partir d'un dictionaire de traduction, de traduire les textes de la page de paramètres
 
         Parameters
@@ -214,7 +216,7 @@ class PageRB1:
 
         # Essaye de traduire chaque textes au dessus des widgets et check_button
         for widget_id in ["command_board_text", "dmi_text", "log_text", "language_text",
-                     "renard_check", "camera_check", "pcc_check", "data_check"]:
+                          "renard_check", "camera_check", "pcc_check", "data_check", "dashboard_check", "data_save_check"]:
             widget = self.page.findChild(QObject, widget_id)
             widget.setProperty("text", translation_data[widget.property("text")])
 
@@ -234,7 +236,6 @@ class PageRB1:
                                    translation_data[keys[2]]: self.log_type_converter[keys[2]],
                                    translation_data[keys[3]]: self.log_type_converter[keys[3]]
                                    }
-        self.log_type_converter.update(dict([reversed(i) for i in self.log_type_converter.items()]))
 
         # Modification du changeur de niveau de log
         self.next_log_level = \

@@ -33,7 +33,9 @@ Aucun;None
 Langue;Language
 
 Activation du PCC (Poste de Commande Centralisé) ?;Activation of CCS (Centralised Control Station) ?
-Affichage en direct des données du train ?;Live display of train's data ?
+Affichage en direct des données ?;Live display of train's data ?
+Tableau de bord ?;Dashboard ?
+Sauvegarder les données ?; Save data ?
 
 
 
@@ -54,10 +56,9 @@ Tableau de Contrôle Optique (TCO);Optical Control Panel (OCP)
 
 Visualisation des données;Data visualisation
 Tableau de bord;Dashboard
-Schéma d'armement;Alignement diagram
+Schéma d'armement;Alignment diagram
 Vitesse;Speed
-Accélération;Acceleration
-Accélération longitudinale;Longitudinale acceleration
+Accélération longitudinale;Longitudinal acceleration
 Accélération transversale;Transversal acceleration
 Accélération verticale;Vertical acceleration
 Accélération Euclidienne;Euclidian acceleration
