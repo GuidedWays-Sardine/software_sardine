@@ -165,6 +165,20 @@ class PageRB8:
             log.warning("Certains paramétrages d'écrans dépendent du bon fonctionnement de la page_rb1." +
                         "Ceux-ci ne peuvent pas se charger correctement.\n")
 
+            # Désactive l'écran train caméra
+            category = list(self.screen_default.keys())[0]
+            screen_camera_train = list(self.screen_default[category].keys())[3]
+            self.screen_default[category][screen_camera_train][0] = False
+
+            # Désactive les graphs en mode fenêtré
+            category = list(self.screen_default.keys())[2]
+            screen_dashboard = list(self.screen_default[category].keys())[0]
+            for screen_graph in list(self.screen_default[category].keys()):
+                if screen_graph == screen_dashboard:
+                    self.screen_default[category][screen_graph][0] = True
+                else:
+                    self.screen_default[category][screen_graph][0] = False
+
     def is_page_valid(self):
         # Récupère les valeurs actuellement sur l'écran
         old_screens_values = self.page.get_values().toVariant()
