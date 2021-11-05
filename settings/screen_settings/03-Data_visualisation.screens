@@ -1,4 +1,4 @@
-# nom de l'écran                    ;h_mini ;w_mini ;Doit-être paramétré ?
+# nom de l'écran                    ;w_mini ;h_mini ;Doit-être paramétré ?
 Dashboard                           ;1080   ;720    ;False
 Alignment diagram                   ;540    ;720    ;False
 Speed                               ;540    ;360    ;False

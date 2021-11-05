@@ -1,4 +1,4 @@
-# nom de l'écran                    ;h_mini ;w_mini ;Doit-être paramétré ?
+# nom de l'écran                    ;w_mini ;h_mini ;Doit-être paramétré ?
 Central DMI                         ;640    ;480    ;False
 Virtual buttons                     ;0      ;0      ;False
 Virtual line (UE5)                  ;1080   ;720    ;False
