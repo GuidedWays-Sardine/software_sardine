@@ -11,6 +11,7 @@ from PyQt5.QtCore import QObject
 #Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
+import src.initialisation.initialisation_window as ini
 import src.misc.settings_dictionary.settings as sd
 import src.misc.translation_dictionary.translation as td
 import src.misc.log.log as log
@@ -43,7 +44,7 @@ class PageRB1:
 
         Parameters
         ----------
-        application: `InitialisationWindow`
+        application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         page: `QQmlApplicationEngine`
             La QQmlApplicationEngine de la page à charger
@@ -116,12 +117,12 @@ class PageRB1:
 
         Parameters
         ----------
-        translation_data: `dict`
+        translation_data: `td.TranslationDictionnary`
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) 
 
         Returns
         -------
-        parameters : `dict`
+        parameters : `sd.SettingsDictionnary`
             un dictionaire de paramètres de la page de paramètres page_rb1
         """
         page_parameters = sd.SettingsDictionnary()
@@ -162,10 +163,10 @@ class PageRB1:
 
         Parameters
         ----------
-        data: `dict`
+        data: `sd.SettingsDictionnary`
             Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
-        translation_data: `dict`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
+        translation_data: `td.TranslationDictionnary`
+            Un dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
         """
         # Paramètre du pupitre (quel pupitre sera utilisé)
         try:
@@ -208,7 +209,7 @@ class PageRB1:
 
         Parameters
         ----------
-        translation_data: `dict`
+        translation_data: `td.TranslationDictionnary`
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitiv
         """
         # Traduit le nom de la catégorie
@@ -255,7 +256,7 @@ class PageRB1:
 
         Parameters
         ----------
-        application: `InitialisationWindow`
+        application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets
         """
         # Appelle la fonction de changement de langue de l'application avec la nouvelle langue sélectionnée
@@ -287,7 +288,7 @@ class PageRB1:
 
     def on_log_button_clicked(self):
         """Fonction appelée lorsque le bouton log_button est cliqué.
-        Permet de changer le niveau de registre affiché sur le bouton (et récupéré)
+        Permet de changer le niveau de registre affiché sur le bouton (et récupéré).
         """
         log_button = self.page.findChild(QObject, "log_button")
         log_button.setProperty("text", self.next_log_level[log_button.property("text")])
