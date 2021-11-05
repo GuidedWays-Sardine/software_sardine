@@ -45,7 +45,8 @@ Item{
     readonly property string dark_blue: "#031122"   //partie 5.2.1.3.3  Nr 6
     readonly property string black: "#000000"       //partie 5.2.1.3.3  Nr 2
     readonly property string grey: "#C3C3C3"        //partie 5.2.1.3.3  Nr 3
-    readonly property string dark_grey: "#969696"   //partie 5.2.1.3.3  Nr 5
+    readonly property string medium_grey: "#969696" //partie 5.2.1.3.3  Nr 4
+    readonly property string dark_grey: "#555555"   //partie 5.2.1.3.3  Nr 5
     readonly property string shadow: "#08182F"      //partie 5.2.1.3.3  Nr 7
 
 
@@ -120,13 +121,13 @@ Item{
 
         anchors.fill: parent
 
-        color: root.is_dark_grey ? root.dark_grey : (body.text != "" ? root.grey : root.dark_grey)
+        color: root.is_dark_grey ? root.dark_grey : (body.text != "" ? root.grey : root.medium_grey)
         font.pixelSize: root.font_size * root.ratio
         readOnly: !root.is_activable
         echoMode: TextInput.Normal
 
         placeholderText: root.is_max_default ? root.maximum_value.toString() : root.minimum_value.toString()
-        placeholderTextColor: root.dark_grey
+        placeholderTextColor: root.is_dark_grey ? root.dark_grey : root.medium_grey
 
         //rectangle de fond
         background: Rectangle {
