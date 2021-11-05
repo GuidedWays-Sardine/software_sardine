@@ -21,14 +21,14 @@ class Simulation:
     components = []
     running = True
 
-    def __init__(self, data):
+    def __init__(self, app, data):
 
         # Indique le début de l'initialisation de la simulation
         initial_time = time.time()
         log.info("Début de l'initialisation de la simulation.\n\n", prefix="initialisation simulation")
 
         # Initialise l'application
-        self.app = QApplication(sys.argv)
+        self.app = app
         self.app.setQuitOnLastWindowClosed(True)
 
         # A partir d'ici initialise tous les modules un par un sans les lancer

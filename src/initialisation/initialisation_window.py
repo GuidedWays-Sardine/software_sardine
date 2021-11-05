@@ -45,8 +45,13 @@ class InitialisationWindow:
     # Variable stockant si le simulateur va être lancé
     launch_simulator = False
 
-    def __init__(self):
+    def __init__(self, app):
         """initialise toutes les fenêtre du programme d'initialisation du simulateur sardine
+
+        Parameters
+        ----------
+        app: `QApplication`
+            L'application sur laquelle l'application d'initialisation va se lancer (un maximum par lancement)
 
         Raises
         ------
@@ -60,7 +65,7 @@ class InitialisationWindow:
         log.info("Début du chargement de l'application d'intialisation.\n\n")
 
         # Lance l'application et cherche pour le fichier QML avec tous les éléments de la fenêtre d'initialisation
-        self.app = QApplication(sys.argv)
+        self.app = app
         self.engine = QQmlApplicationEngine()
         self.engine.load(PROJECT_DIR + "src\\initialisation\\initialisation_window.qml")
 
