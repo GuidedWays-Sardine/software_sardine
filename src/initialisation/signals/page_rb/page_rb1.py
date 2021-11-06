@@ -186,15 +186,19 @@ class PageRB1:
         try:
             dmi = str(data["dmi"]).replace("_", " ")
         except KeyError:
-            log.debug("Impossible de changer le paramètre: \"DMI\" manquant dans le fichier ouvert.\n")
+            log.debug("Impossible de changer le paramètre: \"dmi\" manquant dans le fichier ouvert.\n")
         else:
             self.page.findChild(QObject, "command_board_combo").change_selection(translation_data[dmi])
 
         # Paramètre niveau de registre (pour suivre les potentiels bugs lors de la simulation)
         try:
-            self.page.findChild(QObject, "log_button").setProperty("text", self.log_type_converter[log.Level[data["log_level"]]])
-        except KeyError:
-            log.debug("Impossible de changer le paramètre : \"Registre\" manquant dans le fichier ouvert.\n")
+            self.page.findChild(QObject, "log_button").setProperty("text",
+                dict([reversed(i) for i in self.log_type_converter.items()])[log.Level[data["log_level"].replace("Level.", "")]])
+        except KeyError as error:
+            log.debug("Impossible de changer le paramètre : \"log_level\" manquant dans le fichier ouvert.\n" +
+                     "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                     "Avec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
+                     "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
 
         # Paramètre pour le PCC (savoir s'il sera activé)
         data.update_parameter(self.page, "pcc_check", "is_checked", "ccs")
@@ -221,14 +225,12 @@ class PageRB1:
             widget = self.page.findChild(QObject, widget_id)
             widget.setProperty("text", translation_data[widget.property("text")])
 
-        # Pour les combobox du pupitre et du DMI, essaye de traduire chaque éléments, et remet l'index sélectioné
-        # La combobox langue ne nécessite aucune traduction car les langes sont dans leur langue d'origine
+        # Pour les combobox du pupitre et du DMI, traduit chaque élément qui contient une traduction et remet la sélection
         for combo in ["command_board_combo", "dmi_combo"]:
             widget = self.page.findChild(QObject, combo)
             selection_index = widget.property("selection_index")
-            widget.setProperty("elements", [(translation_data[e] for e in widget.propety("selection_text").toVariant())])
+            widget.setProperty("elements", list(translation_data[e] for e in widget.property("elements").toVariant()))
             widget.change_selection(selection_index)
-
 
         # Traduit les clés dans le log_type converter et dans le convertiseur de niveau de registre
         keys = list(self.next_log_level.keys())
