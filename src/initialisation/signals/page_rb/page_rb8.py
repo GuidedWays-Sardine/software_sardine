@@ -280,6 +280,11 @@ class PageRB8:
         # Change la traduction pour le texte Plein écran ? du DMI_checkbutton
         self.page.setProperty("fullscreen_text", translation_data[self.page.property("fullscreen_text")])
 
+        # Change la traduction du aucun dans la liste d'écran
+        screen_list = self.page.property("screen_list").toVariant()
+        screen_list[0] = translation_data[screen_list[0]]
+        self.page.setProperty("screen_list", screen_list)
+
         # Pour chaque catégories
         for category_key in list(self.screen_default.keys()):
             # Pour chaque écrans de chaques catégories
