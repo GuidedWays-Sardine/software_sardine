@@ -170,7 +170,7 @@ class PageRB1:
         """
         # Paramètre du pupitre (quel pupitre sera utilisé)
         try:
-            command_board = data["command_board"].replace("_", " ")
+            command_board = str(data["command_board"]).replace("_", " ")
         except KeyError:
             log.debug("Impossible de changer le paramètre: \"command_board\" manquant dans le fichier ouvert.\n")
         else:
@@ -184,7 +184,7 @@ class PageRB1:
 
         # Paramètre pour le DMI (savoir quelle Interface sera utilisée pour le pupitre
         try:
-            dmi = data["dmi"].replace("_", " ")
+            dmi = str(data["dmi"]).replace("_", " ")
         except KeyError:
             log.debug("Impossible de changer le paramètre: \"DMI\" manquant dans le fichier ouvert.\n")
         else:
