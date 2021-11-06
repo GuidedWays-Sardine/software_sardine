@@ -46,7 +46,7 @@ class PageRB1:
         ----------
         application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
-        page: `QQmlApplicationEngine`
+        engine: `QQmlApplicationEngine`
             La QQmlApplicationEngine de la page à charger
         index: `int`
             index de la page (1 pour le bouton d'en haut -> 8 pour le bouton d'en bas
