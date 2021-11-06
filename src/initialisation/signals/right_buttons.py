@@ -119,10 +119,10 @@ class RightButtons:
                             "Assurez-vous que celui-ci ne contient pas d'erreurs.\n\n")
             # Sinon c'est qu'il n'existe pas où qu'il est mal placé
             else:
-                log.warning("le chargement de la page " + str(index) +
-                            " relié au bouton rb" + str(index) + " est impossible.\n\t\t" +
-                            "Le fichier " + page_path + " n'existe pas.\n\t\t" +
-                            "Assurez-vous que le fichier source est au bon endroit ou créez le\n\n")
+                log.debug("le chargement de la page " + str(index) +
+                          " relié au bouton rb" + str(index) + " est impossible.\n\t\t" +
+                          "Le fichier " + page_path + " n'existe pas.\n\t\t" +
+                          "Assurez-vous que le fichier source est au bon endroit ou créez le\n\n")
             return False
 
     def initialise_signals(self, application, engine, index, page_path, current_button):
@@ -156,11 +156,6 @@ class RightButtons:
                 exec("from src.initialisation.signals.page_rb import page_rb" + str(index) + " as rb" + str(index) + "\n" +
                      "application.visible_pages[index - 1] = " + "(rb" + str(index) + ".PageRB" + str(index) +
                      "(application, engine, index, current_button))")
-
-                # Indique que la page a entièrement été chargée (partie visuelle et signals)
-                application.is_fully_loaded[index - 1] = True
-                current_button.setProperty("is_positive", True)
-                return True
             except Exception as error:
                 # Permet de rattraper une erreur si le code est incorrect où qu'il ne suit pas la documentation
                 log.warning("Erreur lors du chargement des signaux de la page : " + page_path + ".\n\t\t" +
@@ -169,12 +164,41 @@ class RightButtons:
                             "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
                 current_button.setProperty("is_positive", False)
                 return False
+            else:
+                # Vérifie (ou l'indique) si des fonctions manquent
+                self.are_page_functions_there(application.visible_pages[index - 1])
+
+                # Indique que la page a entièrement été chargée (partie visuelle et signals)
+                application.is_fully_loaded[index - 1] = True
+                current_button.setProperty("is_positive", True)
+                return True
         else:
             # Sinon pas de signals handlers associé, le précise dans les logs
             log.warning("La page " + str(index) + " n\'a aucun fichier signals associé.\n\t\t" +
                         "La page sera visible mais ne sera pas fonctionnelle.\n")
             current_button.setProperty("is_positive", False)
             return False
+
+    def are_page_functions_there(self, page):
+        """Permet, à partir d'une page de paramètres correctement chargée, d'indiquer si toutes les fonctions
+        potentiellement nécessaires au fonctionnement de celle-ci sont présentes.
+
+        Parameters
+        ----------
+        page: `PageRBX`
+            page à vérifier (celle-ci doit être de type PageRBX)
+        """
+        # Dans l'ordre : get_values, set_values, change_language, on_page_opened, on_page_closed
+        if "get_values" not in dir(page):
+            log.warning("Aucune fonction \"get_values\", pour la PageRB " + str(page.index) + ".\n")
+        if "set_values" not in dir(page):
+            log.warning("Aucune fonction \"set_values\", pour la PageRB " + str(page.index) + ".\n")
+        if "change_language" not in dir(page):
+            log.warning("Aucune fonction \"change_language\", pour la PageRB " + str(page.index) + ".\n")
+        if "on_page_opened" not in dir(page):
+            log.debug("Aucune fonction \"on_page_opened\", pour la PageRB" + str(page.index) + ".\n")
+        if "on_page_closed" not in dir(page):
+            log.debug("Aucune fonction \"on_page_closed\", pour la PageRB" + str(page.index) + ".\n")
 
     def on_new_page_selected(self, application, engine, new_index):
         """Fonction permettant le changement de la page de paramètres active lorsqu'un bouton rb est cliqué
@@ -192,8 +216,7 @@ class RightButtons:
         # Vérifie que la page que l'on veut charger n'est pas celle qui est déjà chargée
         if new_index != application.active_settings_page:
             # Vérifie si la page que l'on va décharger a un protocole de déchargement spécifique
-            if application.is_fully_loaded[application.active_settings_page - 1] and \
-                    "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
+            if "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
                 # Si c'est le cas, appelle la fonction de fermeture de la page
                 try:
                     application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
@@ -203,12 +226,10 @@ class RightButtons:
                               "Erreur de type : " + str(type(error)) + "\n\t\t" +
                               "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
                               "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-            else:
-                log.debug("Aucune fonction on_page_closed page " + str(application.active_settings_page) + "\n")
 
             # Indique que l'on sort de l'ancienne page, change le préfixe et indique que l'on rentre dans la nouvelle page
             log.info("Fermeture de la page de paramètres page_rb" + str(application.active_settings_page) + ".\n\n")
-            log.change_log_prefix("[page_rb" + str(new_index) + "]")
+            log.change_log_prefix("page_rb" + str(new_index))
             log.info("Ouverture de la page de paramètres page_rb" + str(new_index) + ".\n")
 
             # Charge le graphique de la nouvelle page et indique à l'application l'index de la nouvelle page chargée
@@ -216,8 +237,7 @@ class RightButtons:
             application.active_settings_page = new_index
 
             # Vérifie si la page que l'on charge  a un protocole de chargement particulier
-            if application.is_fully_loaded[application.active_settings_page - 1] and \
-                    "on_page_opened" in dir(application.visible_pages[application.active_settings_page - 1]):
+            if "on_page_opened" in dir(application.visible_pages[application.active_settings_page - 1]):
                 # Si c'est le cas, appelle la fonction d'ouverture de la page
                 try:
                     application.visible_pages[application.active_settings_page - 1].on_page_opened(application)
@@ -227,5 +247,3 @@ class RightButtons:
                               "Erreur de type : " + str(type(error)) + "\n\t\t" +
                               "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
                               "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-            else:
-                log.debug("Aucune fonction on_page_opened page " + str(application.active_settings_page) + "\n")

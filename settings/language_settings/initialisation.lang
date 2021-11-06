@@ -33,7 +33,9 @@ Aucun;None
 Langue;Language
 
 Activation du PCC (Poste de Commande Centralisé) ?;Activation of CCS (Centralised Control Station) ?
-Affichage en direct des données du train ?;Live display of train's data ?
+Affichage en direct des données ?;Live display of train's data ?
+Tableau de bord ?;Dashboard ?
+Sauvegarder les données ?; Save data ?
 
 
 
@@ -41,17 +43,28 @@ Affichage en direct des données du train ?;Live display of train's data ?
 Écrans;Screens
 
 Plein écran ?;Fullscreen ?
+Aucun;None
 Eteindre les écrans qui ne sont pas utilisés ?;Turn off the screens that aren't used ?
 
 Simulateur SARDINE;SARDINE simulator
 DMI central;Central DMI
-DMI gauche;Left DMI
-Ligne virtuelle;Virtual line
-Train caméra;Camera train
+Boutons virtuels;Virtual buttons
+Ligne virtuelle (UE5);Virtual line (UE5)
+Train caméra (Renard);Camera train (Renard)
 
 Poste de Commande Centralisé (PCC);Centralised Control Station (CCS)
 Tableau de Contrôle Optique (TCO);Optical Control Panel (OCP)
 
 Visualisation des données;Data visualisation
-Courbes;Graphs
+Tableau de bord;Dashboard
+Schéma d'armement;Alignment diagram
+Vitesse;Speed
+Accélération longitudinale;Longitudinal acceleration
+Accélération transversale;Transversal acceleration
+Accélération verticale;Vertical acceleration
+Accélération Euclidienne;Euclidian acceleration
+Insuffisance/Excès de dévers;Cant deficiency/excess
+Diagramme Effort-Vitesse;Effort-Speed Diagram
+Puissance (traction/freinage);Power (traction/braking)
+Courbes de freinage (EVC);Braking curves (EVC)
 

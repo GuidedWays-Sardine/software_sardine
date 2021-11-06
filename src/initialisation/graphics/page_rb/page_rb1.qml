@@ -18,7 +18,39 @@ Item {
         default_x: 55
         default_y: 369
 
-        text: "Affichage en direct des données du train ?"
+        text: "Affichage en direct des données ?"
+
+        is_checked: false
+        is_activable: true
+        is_positive: false
+    }
+
+    //Checkbutton pour savoir si l'utilisateur veut afficher les données avec le tableau de bord (sinon en fenêtré)
+    INI_checkbutton {
+        id: dashboard_check
+        objectName: "dashboard_check"
+
+        box_length: 20
+        default_x: 335
+        default_y: 369 - 15
+
+        text: "Tableau de bord ?"
+
+        is_checked: true
+        is_activable: false
+        is_positive: false
+    }
+
+    //Checkbutton pour savoir si l'utilisateur veut sauvegarder les données de simulation
+    INI_checkbutton {
+        id: data_save_check
+        objectName: "data_save_check"
+
+        box_length: 20
+        default_x: 335
+        default_y: 369 + 15
+
+        text: "sauvegarder les données ?"
 
         is_checked: false
         is_activable: true

@@ -110,7 +110,7 @@ Item {
         anchors.left: body.left
         anchors.leftMargin: (1 + root.is_positive) * root.ratio
 
-        source: root.is_checked ? root.symbols_path + (root.is_dark_grey ? "dark_grey_cross/bmp" : "grey_cross.bmp") : ""
+        source: root.is_checked ? root.symbols_path + (root.is_dark_grey ? "dark_grey_cross.bmp" : "grey_cross.bmp") : ""
     }
 
     //Variable stockant si  le bouton est dans l'état appuyé (et donc si les bordures doivent êtres cachées

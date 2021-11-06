@@ -36,7 +36,7 @@ class DriverMachineInterface:
         # Commencer par charger suffisament d'écrans noirs (pour couvrir les écrans si nécessaire   # TODO : bouger ça dans la simulation
         # Todo : ajouter une fonction pour fermer toute les fenêtres si une est fermée.
         try:    # TODO : bouger en dehors du DMI pupitre
-            if data["EcransEteints"]:
+            if data["immersion"]:
                 self.black_screens = []
                 for screen_index in range(0, QDesktopWidget().screenCount()):
                     sg = QDesktopWidget().screenGeometry(screen_index).getCoords()
@@ -151,7 +151,7 @@ class DriverMachineInterface:
         central_dmi_key = "SARDINE simulator.Central DMI."
         try:
             # Tente de récuper l'index et si celui-ci n'a pas été trouvé, jette une erreur et crash le programme
-            screen_index = data[central_dmi_key + "IndexEcran"]
+            screen_index = data[central_dmi_key + "screen_index"]
         except KeyError:
             raise KeyError("Pas de valeurs : " + central_dmi_key + "\n\t\tL'écran DMI central n'a pas pu être chargé.\n")
         else:
@@ -161,15 +161,15 @@ class DriverMachineInterface:
             else:
                 # Récupères les informations de l'écran récupéré et vérifie si l'application est en plein écran ou non
                 sg = QDesktopWidget().screenGeometry(screen_index - 1).getCoords()
-                if data[central_dmi_key + "PleinEcran"]:
+                if data[central_dmi_key + "full_screen"]:
                     # Si c'est en plein écran, récupère les valeurs de l'écran
                     self.dmi_window.setPosition(sg[0], sg[1])
                     self.dmi_window.resize(sg[2] - sg[0] + 1, sg[3] - sg[1] + 1)
                 else:
                     # Si ce n'est pas en plein écran, récupère les valeurs de l'application d'initialisation
                     # Ces valeurs seront décallés selon la position
-                    self.dmi_window.setPosition(sg[0] + data[central_dmi_key + "positionX"], sg[1] + data[central_dmi_key + "positionY"])
-                    self.dmi_window.resize(data[central_dmi_key + "tailleX"], data[central_dmi_key + "tailleY"])
+                    self.dmi_window.setPosition(sg[0] + data[central_dmi_key + "x"], sg[1] + data[central_dmi_key + "y"])
+                    self.dmi_window.resize(data[central_dmi_key + "w"], data[central_dmi_key + "h"])
 
         # Indique le temps de chargement de l'application
         log.info("Application du DMI chargée en " +
@@ -191,7 +191,6 @@ class DriverMachineInterface:
 
     def update(self):
         # Pour chacune des sections
-        print("demaré")
         for folder in ["A", "B", "C", "D", "E", "F", "G"]:
             # Pour chacunes des pages de chaque sections
             files = list(self.pages[folder].keys())
@@ -228,13 +227,13 @@ def main():
     simulation.app = QApplication(sys.argv)
     simulation.app.setQuitOnLastWindowClosed(True)
 
-    data = {"EcransEteints": False,
-            "SARDINE simulator.Central DMI.IndexEcran": 1,
-            "SARDINE simulator.Central DMI.PleinEcran": False,
-            "SARDINE simulator.Central DMI.positionX": 240,
-            "SARDINE simulator.Central DMI.positionY": 0,
-            "SARDINE simulator.Central DMI.tailleX": 1440,
-            "SARDINE simulator.Central DMI.tailleY": 1080
+    data = {"immersion": False,
+            "SARDINE simulator.Central DMI.screen_index": 1,
+            "SARDINE simulator.Central DMI.full_screen": False,
+            "SARDINE simulator.Central DMI.x": 240,
+            "SARDINE simulator.Central DMI.y": 0,
+            "SARDINE simulator.Central DMI.w": 1440,
+            "SARDINE simulator.Central DMI.h": 1080
             }
 
     # Initialise, lance et montre le dmi
