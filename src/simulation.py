@@ -1,6 +1,7 @@
 # Librairies par défaut
 import sys
 import os
+import threading
 import traceback
 import time
 
@@ -14,6 +15,7 @@ from PyQt5.QtCore import Qt
 # Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
+import src.misc.settings_dictionary.settings as sd
 import src.misc.log.log as log
 
 
@@ -37,19 +39,37 @@ class Simulation:
     black_screens = []
 
     def __init__(self, app, data):
+        """Fonction de gestion de la simulation. S'occupe de l'initialisation, du lancemenet et de la mise à jour des
+        différents modules de simulation.
 
+        Parameters
+        ----------
+        app: `QApplication`
+            L'application sur laquelle les modules graphiques de la simulation vont se lancer
+        data: `sd.SettingsDictionnary`
+
+        Raises
+        ------
+        ModuleNotFoundError
+            Soulevée lorsque l'un des modules obligatoire n'a pas été correctement chargé ou lancé.
+        AttributeError:
+            Soulevée si un des modules n'a pas de fonction run()
+        Exception
+            Soulevée lorsqu'une des fonctions d'initialisation, de lancement ou de mise à jour contient une erreur
+        """
         # Indique le début de l'initialisation de la simulation
         initial_time = time.time()
         log.change_log_prefix("initialisation simulation")
         log.info("Début de l'initialisation de la simulation.\n\n")
 
-        # Initialise l'application
+        # Stocke les différents paramètres utiles à l'application
         self.app = app
-        self.app.setQuitOnLastWindowClosed(True)
         self.parameters = data
+        # FEATURE : initialiser la base de données train ici
+        # FEATURE : initialiser la base de données ligne ici (à partir de l'identifiant ligne)
 
-        # Initialise les différents modules
-        self.initialize()
+        # Initialise les différents modules fonctionnels
+        self.initialise()
 
         # Indique le temps de chargement de la simulation avant de lancer tous les modules
         middle_time = time.time()
