@@ -122,7 +122,7 @@ class Simulation:
     def launch_dmi(self):
         try:
             exec("import src.train.DMI." + str(self.parameters["dmi"]) + ".dmi as DMI\n" +
-                 "self.components.append(DMI.DriverMachineInterface(self, " + self.parameters["sardine simulator.central dmi.mandatory"] + "))")
+                 "self.components.append(DMI.DriverMachineInterface(self))")
         except KeyError:
             # Dans le cas où le DMI n'a pas été trouvé, vérifie s'il est obligatoire ou non
             if self.parameters["sardine simulator.central dmi.mandatory"]:
