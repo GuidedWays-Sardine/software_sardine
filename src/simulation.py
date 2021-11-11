@@ -139,21 +139,26 @@ class Simulation:
                           "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
                           prefix="initialisation simulation")
 
-
-    def initialize_off_screens(self):
+    def initialise_off_screens(self):
+        """Permet d'initialiser toutes les fenêtres d'immersions (fenêtres noires en plein écran).
+        Si le mode immersion est introuvable ou est désactivé, aucune fenêtre ne sera initialisée.
+        """
         try:
             if self.parameters["immersion"]:
-                # Récupère les potentiels indexs des écrans à ne pas éteindre (dû à un logiciel tierce utilisé)
-                # FEATURE : indiquer ici les potentielles exceptions sur les fenêtre nécessitant une autre application
+                # crée une liste d'exception. Celle-ci évitera d'éteindre les écrans contenant des modules indépendant
+                # du python (tel que la ligne virtuelle sur UE5 ou le train caméra).
                 exception_list = []
-                # Vérification pour le module de la ligne virtuelle (sur Unreal Engine 5)
+
+                # Vérifie pour chaque exception si elle existe et où elle se situe
+                # FEATURE : indiquer ici les potentielles exceptions sur les fenêtre nécessitant une autre application
                 try:
+                    # Vérification pour la ligne virtuelle (sur UE5)
                     if self.parameters["sardine simulator.virtual line (ue5).screen_index"] != 0:
                         exception_list.append(self.parameters["sardine simulator.virtual line (ue5).screen_index"] - 1)
                 except KeyError:
                     pass
 
-                # Génère toutes les fenêtres noir pour le mode immersion
+                # Génère une fenêtre noire par écran n'étant pas dans la liste d'exceptions.
                 for screen_index in (i for i in range(0, QDesktopWidget().screenCount()) if i not in exception_list):
                     sg = QDesktopWidget().screenGeometry(screen_index).getCoords()
                     self.black_screens.append(QMainWindow())
@@ -165,5 +170,8 @@ class Simulation:
             log.debug("Pas de paramètres \"immersion\". Le mode immersion est désactivé par défaut.\n")
 
     def run_off_screens(self):
+        """Fonction permettant de montrer toutes les fenêtres d'immersions (fenêtres noires en plein écran).
+        Dans le cas où le mode immersion est désactivé ou qu'aucune fenêtre n'est à montrer, rien ne se produira.
+        """
         for screen in self.black_screens:
             screen.show()
