@@ -223,6 +223,7 @@ class PageRB8:
                 page_parameters[screen_settings_key + "y"] = screen_settings_values[2][1] if is_activable else 0
                 page_parameters[screen_settings_key + "w"] = screen_settings_values[3][0] if is_activable else 0
                 page_parameters[screen_settings_key + "h"] = screen_settings_values[3][1] if is_activable else 0
+                page_parameters[screen_settings_key + "mandatory"] = self.screen_default[category_key][screen_key][3]
 
         return page_parameters
 
