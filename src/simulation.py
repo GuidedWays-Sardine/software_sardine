@@ -31,6 +31,10 @@ class Simulation:
     parameters = {}
     running = True
 
+    # Informations sur la mise à jour, utile surtout du point de vue pratique et debug
+    update_count = 0
+    update_average_time = 0
+
     #Différentes bases de données utiles au fonctionnement du simulateur
     train_database = None
     line_database = None
@@ -86,7 +90,15 @@ class Simulation:
                  str("{:.2f}".format((time.time() - initial_time) * 1000)) + " millisecondes.\n\n",
                  prefix="initialisation simulation")
 
+        # Lance le thread pour mettre à jour constament la simulation et lance la partié graphique
+        update = threading.Thread(target=self.update)
+        update.start()
         self.app.exec()
+
+        # Dans le cas où une fenêtre graphique est fermée par l'utilisateur :
+        # Indique que la simulation ne se lance plus, fini la boucle la mise à jour et sorte de l'application
+        self.running = False
+        update.join()
 
     def initialise(self):
         """Lance tous les modules initialisés.
