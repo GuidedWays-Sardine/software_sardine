@@ -7,8 +7,8 @@ import threading
 
 
 # librairies graphiques
-from PyQt5.QtWidgets import QDesktopWidget, QMainWindow
-from PyQt5.QtCore import Qt, QObject
+from PyQt5.QtWidgets import QDesktopWidget
+from PyQt5.QtCore import QObject
 from PyQt5.QtQml import QQmlApplicationEngine
 
 
@@ -22,7 +22,6 @@ class DriverMachineInterface:
     """Classe contenant tous les éléments pour le DMI"""
 
     # Eléments utiles à la fenêtre et les QWidgets contenus sur celle-ci
-    black_screens = None
     engine = None
     dmi_window = None
 
@@ -32,21 +31,6 @@ class DriverMachineInterface:
         initial_time = time.time()
         log.info("Début du chargement du Driver Machine Interface.\n\n",
                  prefix="Initialisation DMI ETCS")
-
-        # Commencer par charger suffisament d'écrans noirs (pour couvrir les écrans si nécessaire   # TODO : bouger ça dans la simulation
-        # Todo : ajouter une fonction pour fermer toute les fenêtres si une est fermée.
-        try:    # TODO : bouger en dehors du DMI pupitre
-            if data["immersion"]:
-                self.black_screens = []
-                for screen_index in range(0, QDesktopWidget().screenCount()):
-                    sg = QDesktopWidget().screenGeometry(screen_index).getCoords()
-                    self.black_screens.append(QMainWindow())
-                    self.black_screens[screen_index].setWindowFlag(Qt.FramelessWindowHint)
-                    self.black_screens[screen_index].setGeometry(sg[0], sg[1], sg[2] - sg[0] + 1, sg[3] - sg[1] + 1)
-                    self.black_screens[screen_index].setStyleSheet("QMainWindow {background: 'black';}")
-                    self.black_screens[screen_index].hide()
-        except KeyError:
-            log.debug("Pas de paramètres EcranEteints.\n")
 
         # crée un self.engine pour le chargement de la fenêtre du DMI et essaye de charger le DMI
         self.engine = QQmlApplicationEngine()
@@ -177,11 +161,7 @@ class DriverMachineInterface:
                  prefix="Initialisation DMI ETCS")
 
     def run(self):
-        # Si les autres écrans doivent êtres éteints, les éteints
-        if self.black_screens is not None:
-            for screen in self.black_screens:
-                screen.show()
-
+        # Lance la logique de mise à jour sur un nouveau thread
         logic = threading.Thread(target=self.update)
         logic.start()
 
