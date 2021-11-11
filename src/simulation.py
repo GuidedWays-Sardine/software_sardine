@@ -56,8 +56,6 @@ class Simulation:
         ------
         ModuleNotFoundError
             Soulevée lorsque l'un des modules obligatoire n'a pas été correctement chargé ou lancé.
-        AttributeError:
-            Soulevée si un des modules n'a pas de fonction run()
         Exception
             Soulevée lorsqu'une des fonctions d'initialisation, de lancement ou de mise à jour contient une erreur
         """
@@ -72,51 +70,21 @@ class Simulation:
         # FEATURE : initialiser la base de données train ici
         # FEATURE : initialiser la base de données ligne ici (à partir de l'identifiant ligne)
 
-        # Initialise les différents modules fonctionnels
-        self.initialise()
-
-        # Indique le temps de chargement de la simulation avant de lancer tous les modules
-        middle_time = time.time()
-        log.info("Simulation (" + str(len(self.components)) + " modules) initialisés en " +
-                 str("{:.2f}".format((middle_time - initial_time) * 1000)) + " millisecondes.\n\n",
-                 prefix="initialisation simulation")
-
-        # Lance tous les modules (en appelant la fonction run) et vérifie qu'au moins un module a été chargé
-        self.run()
-
-        log.info("Lancements des modules de simulation en " +
-                 str("{:.2f}".format((time.time() - middle_time) * 1000)) + " millisecondes.\n\t\t" +
-                 "Simulation entièrement chargée (initialisation ° lancement) en " +
-                 str("{:.2f}".format((time.time() - initial_time) * 1000)) + " millisecondes.\n\n",
-                 prefix="initialisation simulation")
-
-        # Lance le thread pour mettre à jour constament la simulation et lance la partié graphique
-        update = threading.Thread(target=self.update)
-        update.start()
-        self.app.exec()
-
-        # Dans le cas où une fenêtre graphique est fermée par l'utilisateur :
-        # Indique que la simulation ne se lance plus, fini la boucle la mise à jour et sorte de l'application
-        self.running = False
-        update.join()
-        # FIXME : mieux gérer l'appel de la fonction stop
-
-    def initialise(self):
-        """Lance tous les modules initialisés.
-
-        Raises
-        ------
-        ModuleNotFoundError
-            soulevée lorsque l'un des modules obligatoire n'a pas été correctement paramétré.
-        Exception
-            soulevée lorsqu'une des fonctions d'initialisation d'un module obligatoire contient une erreur
-        """
         # Initialise les fenêtre éteintes (Si elles le mode immersion a été activé)
         self.initialise_off_screens()
 
         # A partir d'ici initialise tous les modules un par un (ils seront lancées dans la fonction run())
         # FEATURE : appeler les différentes fonctions d'initialisation de modules ici
-        self.initialise_dmi()           # Initialisation du DMI
+        self.initialise_dmi()  # Initialisation du DMI
+
+        # Si aucun module de simulation n'a été lancé
+        if not self.components:
+            raise ModuleNotFoundError("Aucun des modules n'a correctement été initialisé. Impossible de lancer la simulation.")
+
+        # Indique le temps de chargement de la simulation avant de lancer tous les modules
+        log.change_log_prefix("initialisation simulation")
+        log.info("Simulation (" + str(len(self.components)) + " modules) initialisés en " +
+                 str("{:.2f}".format((time.time() - initial_time) * 1000)) + " millisecondes.\n\n")
 
     def run(self):
         """Lance tous les modules initialisés.
@@ -125,14 +93,13 @@ class Simulation:
         ------
         AttributeError:
             Soulevée si un des modules n'a pas de fonction run() (Les autres modules ne seront pas lancés).
-        ModuleNotFoundError:
-            Soulevée dans le cas où aucun module n'a été initialisé.
         Exception
             Soulevée dans le cas où la fonction run() d'un des modules contient une erreur
         """
-        # Si aucun module de simulation n'a été lancé
-        if not self.components:
-            raise ModuleNotFoundError("Aucun des modules n'a correctement été initialisé. Impossible de lancer la simulation.")
+        # Indique le début de l'initialisation de la simulation
+        initial_time = time.time()
+        log.change_log_prefix("lancement simulation")
+        log.info("Début du lancement de la simulation.\n\n")
 
         # Montre les écrans d'immersion (si le mode a été désactivé, aucune fenêtre n'apparaitra
         self.run_off_screens()
@@ -140,6 +107,20 @@ class Simulation:
         # Lance tous les modules en appelant la fonction run()
         for component in self.components:
             component.run()
+
+        # Indique le temps de lancement de l'application (celui-ci doit être le plus court possible)
+        log.info("Lancements des modules de simulation en " +
+                 str("{:.2f}".format((time.time() - initial_time) * 1000)) + " millisecondes.\n\t\t")
+
+        # Lance le thread pour mettre à jour constament la simulation et lance la partié graphique
+        update = threading.Thread(target=self.update)
+        update.start()
+        self.app.exec()
+
+        # Dans le cas où une fenêtre graphique est fermée par l'utilisateur, arrête la mise à jour de la simulation
+        # et attend que celle-ci finisse de se réaliser, avant de sortir de la fonction run().
+        self.running = False
+        update.join()
 
     def update(self):
         # Tant que la simulation est lancée
@@ -184,9 +165,8 @@ class Simulation:
         log.info("Fermeture de l'initialisation de la simulation.\n\n",
                  prefix="fermeture simulation")
 
-        # Appele les différentes fonctions de fermetures
+        # Appelle les différentes fonctions de fermetures
         # FEATURE : ajouter les différents appels de fonctions de fermetures ici
-        # FEATURE : appeler la fonction de sauvegarde des données
 
         # Indique le temps nécessaire à la fermeture
         log.info("Simulation (" + str(len(self.components)) + " modules) initialisés en " +

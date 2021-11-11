@@ -27,9 +27,9 @@ def main():
     log.info("Lancement de l'application d'initialisation du simulateur\n\n\n")
     application = QApplication(sys.argv)
 
-    # lance le programme d'initialisation et vérifie qu'il n'y a pas d'erreurs au lancement
     parameters = None
     try:
+        # lance le programme d'initialisation et vérifie qu'il n'y a pas d'erreurs au lancement
         initialisation = ini.InitialisationWindow(application)
 
         # Si le bouton lancer a été cliqué, récupère les informations, sinon sort
@@ -40,8 +40,8 @@ def main():
             log.change_log_prefix()
             log.info("l\'application d'initialisation a été fermée sans donner suite.\n")
             exit(0)
-    # Récupère une potentielle erreur fatale et la charge
     except Exception as error:
+        # Récupère une potentielle erreur fatale et la charge
         log.critical("Erreur fatale lors du chargement de l'application d'initialisation simulateur\n\t\t" +
                      "Erreur de type : " + str(type(error)) + "\n\t\t" +
                      "Avec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
@@ -59,27 +59,32 @@ def main():
                     "\n\t\tNiveau par défaut gardé à suffisant (log.WARNING)\n")
 
     # Lance le simulateur et en ressort que si une erreur fatale est détecté ou que le simulateur est fermé
-    crash = False
     try:
+        # Initialise la simulation
         simulation = sim.Simulation(application, parameters)
     except Exception as error:
-        log.critical("Erreur fatale lors du fonctionnement du simulateur\n\t\t" +
+        # Récupère une potentielle erreur lors de l'initialisation de la simulation
+        log.critical("Erreur fatale lors de l'initialisation du simulateur\n\t\t" +
                      "Erreur de type : " + str(type(error)) + "\n\t\t" +
                      "Avec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
                      "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
                      prefix="")
-        crash = True
-    finally:
-        # Enfin lance la procédure de fin de simulation, Permettant entre autre de sauvegarder les données de simulation
+        exit(-1)
+    else :
+        crash = False
         try:
+            # Lance la simulation
+            simulation.run()
+        except Exception as error:
+            log.critical("Erreur fatale lors du fonctionnement du simulateur\n\t\t" +
+                         "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                         "Avec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
+                         "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
+                         prefix="")
+            crash = True
+        finally:
             simulation.stop()
-        except Exception:
-            log.error("Erreur fatale lors du fonctionnement du simulateur\n\t\t" +
-                      "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                      "Avec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
-                      "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
-                      prefix="")
-        exit(-1 if crash else 0)
+            exit(0 if not crash else -1)
 
 
 if __name__ == "__main__":
