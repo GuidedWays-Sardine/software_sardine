@@ -119,17 +119,28 @@ class Simulation:
         if not any_launched:
             raise ModuleNotFoundError("Aucun des modules de simulations n'a pu être chargé correctement.\n\n")
 
-    def launch_dmi(self):
+    def initialise_dmi(self):
+        """Fonction permettant d'initialiser le DMI.
+
+        Raises
+        ------
+        ModuleNotFoundError
+            soulevée lorsque la clé "dmi" n'est pas dans les paramètres et que le module est obligatoire pour la simulation.
+        Exception
+            soulevée lorsqu'une erreur se trouve dans la fonction d'initialisation du dmi.
+        """
         try:
+            # Importe le module du DMI, essaye de l'initialiser et l'ajouter aux "components" (modules) initialisés
             exec("import src.train.DMI." + str(self.parameters["dmi"]) + ".dmi as DMI\n" +
                  "self.components.append(DMI.DriverMachineInterface(self))")
         except KeyError:
-            # Dans le cas où le DMI n'a pas été trouvé, vérifie s'il est obligatoire ou non
+            # Dans le cas où le DMI n'a pas été trouvé, crash si le dmi est obligatoire, laisse un message d'erreur sinon
             if self.parameters["sardine simulator.central dmi.mandatory"]:
-                raise ModuleNotFoundError("Aucun DMI n'a pu être chargé correctement alors qu'il est obligatoire.\n")
+                raise ModuleNotFoundError("Le paramètre \"dmi\" n'existe pas alors qu'il est obligatoire.\n")
             else:
-                log.debug("Impossible de charger le DMI, la paramètre \"dmi\" est introuvable")
+                log.error("Impossible de charger le DMI, la paramètre \"dmi\" est introuvable. Aucun D%I ne sera chargé.\n")
         except Exception as error:
+            # Dans le cas où l'initialisation contient une erreur, crash si le dmi est obligatoire sinon laisse un message d'erreur
             if self.parameters["sardine simulator.central dmi.mandatory"]:
                 raise
             else:
