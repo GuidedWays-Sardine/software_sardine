@@ -45,7 +45,8 @@ def main():
         log.critical("Erreur fatale lors du chargement de l'application d'initialisation simulateur\n\t\t" +
                      "Erreur de type : " + str(type(error)) + "\n\t\t" +
                      "Avec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
-                     "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                     "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
+                     prefix="")
         exit(-1)
 
     # Change le niveau de log à celui précisé par l'utilisateur et enlève tout préfixe
@@ -58,14 +59,27 @@ def main():
                     "\n\t\tNiveau par défaut gardé à suffisant (log.WARNING)\n")
 
     # Lance le simulateur et en ressort que si une erreur fatale est détecté ou que le simulateur est fermé
+    crash = False
     try:
         simulation = sim.Simulation(application, parameters)
     except Exception as error:
         log.critical("Erreur fatale lors du fonctionnement du simulateur\n\t\t" +
                      "Erreur de type : " + str(type(error)) + "\n\t\t" +
                      "Avec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
-                     "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-        exit(-1)
+                     "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
+                     prefix="")
+        crash = True
+    finally:
+        # Enfin lance la procédure de fin de simulation, Permettant entre autre de sauvegarder les données de simulation
+        try:
+            simulation.stop()
+        except Exception:
+            log.error("Erreur fatale lors du fonctionnement du simulateur\n\t\t" +
+                      "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                      "Avec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
+                      "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
+                      prefix="")
+        exit(-1 if crash else 0)
 
 
 if __name__ == "__main__":
