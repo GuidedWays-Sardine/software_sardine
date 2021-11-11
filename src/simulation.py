@@ -230,10 +230,11 @@ class Simulation:
                 for screen_index in (i for i in range(0, QDesktopWidget().screenCount()) if i not in exception_list):
                     sg = QDesktopWidget().screenGeometry(screen_index).getCoords()
                     self.black_screens.append(QMainWindow())
-                    self.black_screens[screen_index].setWindowFlag(Qt.FramelessWindowHint)
-                    self.black_screens[screen_index].setGeometry(sg[0], sg[1], sg[2] - sg[0] + 1, sg[3] - sg[1] + 1)
-                    self.black_screens[screen_index].setStyleSheet("QMainWindow {background: 'black';}")
-                    self.black_screens[screen_index].hide()
+                    index = len(self.black_screens) - 1
+                    self.black_screens[index].setWindowFlag(Qt.FramelessWindowHint)
+                    self.black_screens[index].setGeometry(sg[0], sg[1], sg[2] - sg[0] + 1, sg[3] - sg[1] + 1)
+                    self.black_screens[index].setStyleSheet("QMainWindow {background: 'black';}")
+                    self.black_screens[index].hide()
         except KeyError:
             log.debug("Pas de paramètres \"immersion\". Le mode immersion est désactivé par défaut.\n")
 
