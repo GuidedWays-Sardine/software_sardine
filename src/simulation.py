@@ -132,6 +132,41 @@ class Simulation:
         for component in self.components:
             component.run()
 
+    def update(self):
+        # Tant que la simulation est lancée
+        try:
+            while self.running:
+                # Récupère le temps du début de la mise à jour (à pure titre de debug)
+                update_initial_time = time.time()
+
+                # Mets à jour tous les modules dans un ordre logique
+                # FEATURE appeler toutes les fonctions update des modules dans un ordre logique
+
+                # Récupère le temps nécessaire à la mise à jour
+                update_time = time.time() - update_initial_time
+
+                # Mets à jour le tempos moyen des mises à jours ainsi que le nombre de mises à jours réussies
+                self.update_average_time = (self.update_average_time * self.update_count + update_time) / (self.update_count + 1)
+                self.update_count += 1
+
+                # Dans le cas où un délai a été ajouté
+                if self.DELAY != 0:
+                    # Vérifie si la mise à jour a pris moins de temps que le délai souhaité
+                    if self.DELAY - update_time >= 0:
+                        # Si c'est le cas, attend le temps nécessaire
+                        time.sleep(self.DELAY - update_time)
+                    else:
+                        # Sinon laisse un message de debug pour inciter à l'optimisation du code ou au changement du délai
+                        log.debug("Attention mise à jour de l'application en " + "{:.2f}".format(update_time * 1000) +
+                                  "ms, au lieu des " + "{:.2f}".format(self.DELAY * 1000) + "ms demandés.\n\t\t" +
+                                  "Prévoir une optimisation du code ou un délai plus long si le soucis persiste.\n",
+                                  prefix="simulation : update()")
+
+        except Exception as error:
+            # Dans le cas où un des modules de mise à jour à jeté une erreur, ferme l'application et rejette l'erreur
+            self.app.quit()
+            raise
+
     def initialise_dmi(self):
         """Fonction permettant d'initialiser le DMI.
 
