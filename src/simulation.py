@@ -105,8 +105,8 @@ class Simulation:
         self.run_off_screens()
 
         # Lance tous les modules en appelant la fonction run()
-        for component in self.components:
-            component.run()
+        for module in list(self.components.keys()):
+            self.components[module].run()
 
         # Indique le temps de lancement de l'application (celui-ci doit être le plus court possible)
         log.info("Lancements des modules de simulation en " +
