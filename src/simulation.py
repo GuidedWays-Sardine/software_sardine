@@ -68,21 +68,22 @@ class Simulation:
 
         self.app.exec()
 
-    def initialize(self):
+    def initialise(self):
+        """Lance tous les modules initialisés.
+
+        Raises
+        ------
+        ModuleNotFoundError
+            soulevée lorsque l'un des modules obligatoire n'a pas été correctement paramétré.
+        Exception
+            soulevée lorsqu'une des fonctions d'initialisation d'un module obligatoire contient une erreur
+        """
         # Initialise les fenêtre éteintes (Si elles le mode immersion a été activé)
-        self.initialize_off_screens()
+        self.initialise_off_screens()
 
-        # Initialisation des bases de données
-        # FEATURE : initialiser la base de données train
-        # FEATURE : initialiser la base de données ligne
-
-        # A partir d'ici initialise tous les modules un par un sans les lancer
-        # Ils seront tous lancés ensuite. Cela permet de tout faire apparaitre en même temps
-
-        # Initialise le DMI
-        self.launch_dmi()
-
-        # FEATURE : lancer la partie graphique de la ligne (UE5 ou train caméra) de façon similaire au DMI
+        # A partir d'ici initialise tous les modules un par un (ils seront lancées dans la fonction run())
+        self.initialise_dmi()           # Initialisation du DMI
+        # FEATURE : initialiser la partie graphique de la ligne (UE5 ou train caméra) de façon similaire au DMI
         # FEATURE : initialiser le PCC ici d'une façon similaire au DMI
         # FEATURE : initialiser les courbes d'une façon similaire mais simplifiée au DMI
         # FEATURE : initialiser le module dynamique du train similairement au DMI
@@ -98,7 +99,7 @@ class Simulation:
         ModuleNotFoundError:
             Soulevée dans le cas où aucun module n'a été initialisé.
         Exception
-            Soulevée dans le cas où
+            Soulevée dans le cas où la fonction run() d'un des modules contient une erreur
         """
         # Si aucun module de simulation n'a été lancé
         if not self.components:
