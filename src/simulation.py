@@ -99,6 +99,7 @@ class Simulation:
         # Indique que la simulation ne se lance plus, fini la boucle la mise à jour et sorte de l'application
         self.running = False
         update.join()
+        # FIXME : mieux gérer l'appel de la fonction stop
 
     def initialise(self):
         """Lance tous les modules initialisés.
@@ -114,12 +115,8 @@ class Simulation:
         self.initialise_off_screens()
 
         # A partir d'ici initialise tous les modules un par un (ils seront lancées dans la fonction run())
+        # FEATURE : appeler les différentes fonctions d'initialisation de modules ici
         self.initialise_dmi()           # Initialisation du DMI
-        # FEATURE : initialiser la partie graphique de la ligne (UE5 ou train caméra) de façon similaire au DMI
-        # FEATURE : initialiser le PCC ici d'une façon similaire au DMI
-        # FEATURE : initialiser les courbes d'une façon similaire mais simplifiée au DMI
-        # FEATURE : initialiser le module dynamique du train similairement au DMI
-        # FEATURE : initialiser l'EVC similairement au DMI
 
     def run(self):
         """Lance tous les modules initialisés.
@@ -178,6 +175,23 @@ class Simulation:
             # Dans le cas où un des modules de mise à jour à jeté une erreur, ferme l'application et rejette l'erreur
             self.app.quit()
             raise
+
+    def stop(self):
+        """Fonction de fermeture de la simulation, permet d'arrêter correctement la simulation"""
+        # Indique le début de la fermeture de la simulation dans les logs
+        initial_time = time.time()
+        log.change_log_prefix()
+        log.info("Fermeture de l'initialisation de la simulation.\n\n",
+                 prefix="fermeture simulation")
+
+        # Appele les différentes fonctions de fermetures
+        # FEATURE : ajouter les différents appels de fonctions de fermetures ici
+        # FEATURE : appeler la fonction de sauvegarde des données
+
+        # Indique le temps nécessaire à la fermeture
+        log.info("Simulation (" + str(len(self.components)) + " modules) initialisés en " +
+                 str("{:.2f}".format((time.time() - initial_time) * 1000)) + " millisecondes.\n\n",
+                 prefix="fermeture simulation")
 
     def initialise_dmi(self):
         """Fonction permettant d'initialiser le DMI.
