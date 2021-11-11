@@ -46,43 +46,50 @@ class Simulation:
         # Initialise l'application
         self.app = app
         self.app.setQuitOnLastWindowClosed(True)
+        self.parameters = data
+
+        # Initialise les différents modules
+        self.initialize()
+
+        # Indique le temps de chargement de la simulation avant de lancer tous les modules
+        middle_time = time.time()
+        log.info("Simulation (" + str(len(self.components)) + " modules) initialisés en " +
+                 str("{:.2f}".format((middle_time - initial_time) * 1000)) + " millisecondes.\n\n",
+                 prefix="initialisation simulation")
+
+        # Lance tous les modules (en appelant la fonction run) et vérifie qu'au moins un module a été chargé
+        self.run()
+
+        log.info("Lancements des modules de simulation en " +
+                 str("{:.2f}".format((time.time() - middle_time) * 1000)) + " millisecondes.\n\t\t" +
+                 "Simulation entièrement chargée (initialisation ° lancement) en " +
+                 str("{:.2f}".format((time.time() - initial_time) * 1000)) + " millisecondes.\n\n",
+                 prefix="initialisation simulation")
+
+        self.app.exec()
+
+    def initialize(self):
+        # Initialise les fenêtre éteintes (Si elles le mode immersion a été activé)
+        self.initialize_off_screens()
+
+        # Initialisation des bases de données
+        # FEATURE : initialiser la base de données train
+        # FEATURE : initialiser la base de données ligne
 
         # A partir d'ici initialise tous les modules un par un sans les lancer
         # Ils seront tous lancés ensuite. Cela permet de tout faire apparaitre en même temps
 
         # Initialise le DMI
-        try:
-            exec("import src.train.DMI." + data["dmi"] + ".dmi as DMI\n" +
-                 "self.components.append(DMI.DriverMachineInterface(self, data))")
-        except KeyError:
-            # Dans le cas où aucun DMI n'a été sélectionné, essaye de charger le DMI ETCS
-            log.info("Pas de DMI récupéré. Tentative de chargement du DMI ETCS.", prefix="chargement DMI")              # FIXME : charger le DMI ETCS si l'autre DMI n'est pas trouvé ?
-            try:
-                exec("import src.train.DMI.ETCS.dmi as DMI\n" +
-                     "self.components.append(DMI.DriverMachineInterface(self, data))")
-            except Exception as error:
-                # Si même le DMI ETCS ne peut pas se charger, ne charge aucun DMI
-                log.error("Impossible de charger le DMI : ETCS (mode secours). Aucun DMI ne sera chargé.\n\t\t" +
-                          "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                          "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
-                          "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
-                          prefix="initialisation simulation")
-        except Exception as error:
-            # Si une erreur est survenur lors du chargement du DMI, ne charge pas de DMI
-            log.error("Impossible de charger le DMI : " + data["dmi"] + ". Aucun DMI ne sera chargé.\n\t\t" +
-                      "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                      "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
-                      "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
-                      prefix="initialisation simulation")
+        self.launch_dmi()
 
+        # FEATURE : lancer la partie graphique de la ligne (UE5 ou train caméra) de façon similaire au DMI
         # FEATURE : initialiser le PCC ici d'une façon similaire au DMI
         # FEATURE : initialiser les courbes d'une façon similaire mais simplifiée au DMI
-        # FEATURE : lancer la partie ligne (et mettre any_launched a true si bien lancé)
+        # FEATURE : initialiser le module dynamique du train similairement au DMI
+        # FEATURE : initialiser l'EVC similairement au DMI
 
-        # Indique le temps de chargement de la simulation avant de lancer tous les modules
-        log.info("Simulation (" + str(len(self.components)) + " modules) chargée en " +
-                 str("{:.2f}".format((time.time() - initial_time) * 1000)) + " millisecondes.\n\n",
-                 prefix="initialisation simulation")
+    def run(self):
+        #TODO : Lancer un thread qui vérifie si tous les modules tournent ou non
 
         # Montre les écrans d'immersion (si le mode a été désactivé, aucune fenêtre n'apparaitra
         self.run_off_screens()
@@ -90,17 +97,48 @@ class Simulation:
         any_launched = False
         for component in self.components:
             if "run" in dir(component):
-                component.run()
-                any_launched = True
+                try:
+                    component.run()
+                    any_launched = True
+                except Exception as error:
+                    if component.is_mandatory:
+                        raise
+                    else:
+                        log.error("Erreur dans la fonction run() du module de type : " + type(component) + "\n\t\t" +
+                                  "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                                  "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
+                                  "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
             else:
-                log.error("Impossible d'éxécuter le module : " + type(component) + " qui n'a pas de fonction run().\n")
-
-        # FEATURE : lancer la boucle de dynamique du train sur un thread
-        # FEATURE : lancer la bboucle de l'EVC (ETCS) sur un thread
+                if component.is_mandatory:
+                    raise ModuleNotFoundError("Aucune fonction run() dans le module obligatoire : " + type(component))
+                else:
+                    log.error(
+                        "Impossible d'éxécuter le module : " + type(component) + " qui n'a pas de fonction run().\n")
 
         # Vérifie qu'au moins un module graphique c'est lancé
         if not any_launched:
             raise ModuleNotFoundError("Aucun des modules de simulations n'a pu être chargé correctement.\n\n")
+
+    def launch_dmi(self):
+        try:
+            exec("import src.train.DMI." + str(self.parameters["dmi"]) + ".dmi as DMI\n" +
+                 "self.components.append(DMI.DriverMachineInterface(self, " + self.parameters["sardine simulator.central dmi.mandatory"] + "))")
+        except KeyError:
+            # Dans le cas où le DMI n'a pas été trouvé, vérifie s'il est obligatoire ou non
+            if self.parameters["sardine simulator.central dmi.mandatory"]:
+                raise ModuleNotFoundError("Aucun DMI n'a pu être chargé correctement alors qu'il est obligatoire.\n")
+            else:
+                log.debug("Impossible de charger le DMI, la paramètre \"dmi\" est introuvable")
+        except Exception as error:
+            if self.parameters["sardine simulator.central dmi.mandatory"]:
+                raise
+            else:
+                log.error("Impossible de charger le DMI : " + self.parameters["dmi"] + ". Aucun DMI ne sera chargé.\n\t\t" +
+                          "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                          "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
+                          "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
+                          prefix="initialisation simulation")
+
 
     def initialize_off_screens(self):
         try:
