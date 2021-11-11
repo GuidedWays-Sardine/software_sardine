@@ -27,7 +27,7 @@ class Simulation:
 
     # Elements utiles à toutes les GUIs (fenêtres graphiques or ligne)
     app = None
-    components = []
+    components = {}
     parameters = {}
     running = True
 
@@ -132,6 +132,9 @@ class Simulation:
                 # Mets à jour tous les modules dans un ordre logique
                 # FEATURE appeler toutes les fonctions update des modules dans un ordre logique
 
+                if "dmi" in self.components:
+                    self.components["dmi"].update()
+
                 # Récupère le temps nécessaire à la mise à jour
                 update_time = time.time() - update_initial_time
 
@@ -186,7 +189,7 @@ class Simulation:
         try:
             # Importe le module du DMI, essaye de l'initialiser et l'ajouter aux "components" (modules) initialisés
             exec("import src.train.DMI." + str(self.parameters["dmi"]) + ".dmi as DMI\n" +
-                 "self.components.append(DMI.DriverMachineInterface(self))")
+                 "self.components[\"dmi\"] = DMI.DriverMachineInterface(self)")
         except KeyError:
             # Dans le cas où le DMI n'a pas été trouvé, crash si le dmi est obligatoire, laisse un message d'erreur sinon
             if self.parameters["sardine simulator.central dmi.mandatory"]:
