@@ -89,35 +89,27 @@ class Simulation:
         # FEATURE : initialiser l'EVC similairement au DMI
 
     def run(self):
-        #TODO : Lancer un thread qui vérifie si tous les modules tournent ou non
+        """Lance tous les modules initialisés.
+
+        Raises
+        ------
+        AttributeError:
+            Soulevée si un des modules n'a pas de fonction run() (Les autres modules ne seront pas lancés).
+        ModuleNotFoundError:
+            Soulevée dans le cas où aucun module n'a été initialisé.
+        Exception
+            Soulevée dans le cas où
+        """
+        # Si aucun module de simulation n'a été lancé
+        if not self.components:
+            raise ModuleNotFoundError("Aucun des modules n'a correctement été initialisé. Impossible de lancer la simulation.")
 
         # Montre les écrans d'immersion (si le mode a été désactivé, aucune fenêtre n'apparaitra
         self.run_off_screens()
 
-        any_launched = False
+        # Lance tous les modules en appelant la fonction run()
         for component in self.components:
-            if "run" in dir(component):
-                try:
-                    component.run()
-                    any_launched = True
-                except Exception as error:
-                    if component.is_mandatory:
-                        raise
-                    else:
-                        log.error("Erreur dans la fonction run() du module de type : " + type(component) + "\n\t\t" +
-                                  "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                                  "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
-                                  "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-            else:
-                if component.is_mandatory:
-                    raise ModuleNotFoundError("Aucune fonction run() dans le module obligatoire : " + type(component))
-                else:
-                    log.error(
-                        "Impossible d'éxécuter le module : " + type(component) + " qui n'a pas de fonction run().\n")
-
-        # Vérifie qu'au moins un module graphique c'est lancé
-        if not any_launched:
-            raise ModuleNotFoundError("Aucun des modules de simulations n'a pu être chargé correctement.\n\n")
+            component.run()
 
     def initialise_dmi(self):
         """Fonction permettant d'initialiser le DMI.
