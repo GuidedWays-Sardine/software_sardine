@@ -7,19 +7,34 @@ import time
 
 # Librairies graphiques
 from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QDesktopWidget, QMainWindow
+from PyQt5.QtCore import Qt
 
 
 # Librairies SARDINE
-from src.misc.log import log as log
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
+sys.path.append(os.path.dirname(PROJECT_DIR))
+import src.misc.log.log as log
 
 
 class Simulation:
     """Classe utile à l'initialisation et au lancement de la simulation"""
 
+    # Constante permettant de gérer le temps alloué à chaque tick (temps entre chaque mise à jour de tous les modules)
+    DELAY = 0.250   # en s
+
     # Elements utiles à toutes les GUIs (fenêtres graphiques or ligne)
     app = None
     components = []
+    parameters = {}
     running = True
+
+    #Différentes bases de données utiles au fonctionnement du simulateur
+    train_database = None
+    line_database = None
+
+    # Elément stockant la liste des fenêtre permettant d'éteindre les écrans en mode immersion
+    black_screens = []
 
     def __init__(self, app, data):
 
