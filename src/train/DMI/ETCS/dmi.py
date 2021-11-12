@@ -67,7 +67,7 @@ class DriverMachineInterface:
                     # Essaye de charger la partie graphique de la page
                     if self.initialise_section(folder, file):
                         # Si celle-ci a correctement été chargée tente de charger la partie logique
-                        self.initialise_signals(folder, file, initial_time)
+                        self.initialise_signals(simulation, folder, file, initial_time)
                     #FIXME : faire l'initialisation des STM aussi, comme ça tout sera bon
 
                 # Vérifie qu'au moins un fichier graphique a été correctement chargé
@@ -131,16 +131,16 @@ class DriverMachineInterface:
                         prefix="Initialisation DMI ETCS ; section " + section)
             return False
 
-    def initialise_signals(self, section, file, initial_time):
+    def initialise_signals(self, simulation, section, file, initial_time):
         # Vérifie si la page a des signals handlers associés (en recherchant un ficher .py associé)
         fully_loaded = False
-        if os.path.isfile(PROJECT_DIR + "src\\train\\DMI\\ETCS\\ETCS\\signals\\" + section + "\\" + file + ".qml"):
+        if os.path.isfile(PROJECT_DIR + "src\\train\\DMI\\ETCS\\ETCS\\signals\\" + section + "\\" + file + ".py"):
             # Si c'est le cas, initialise les signals handlers et le stock
             try:
                 # Import localement le fichier de la page et appelle le constructeur de la page pour initialiser les signaux
-                exec("from src.train.DMI.ETCS.ETCS.signals." + section + " import " + file + " as " + file + "\n" +
+                exec("import src.train.DMI.ETCS.ETCS.signals." + section + "." + file + " as " + file + "\n" +
                      "self.pages[\"" + section + "\"][\"" + file + "\"] = " +
-                     file + "." + file + "(simulation, engine, folder, file)")
+                     file + "." + file + "(simulation, self.pages[\"" + section + "\"][\"" + file + "\"], section, file)")
             except Exception as error:
                 # Permet de rattraper une erreur si le code est incorrect
                 log.warning("Erreur lors du chargement des signaux de la page : " + file + ".\n\t\t" +
@@ -151,7 +151,7 @@ class DriverMachineInterface:
             else:
                 # Si la page a sa partie logique de chargée, l'indique et vérifie l'existence de toutes les fonctions nécessaires
                 fully_loaded = True
-                # TODO : fonction pour vérifier si la fonction update de la page existe
+                self.are_page_functions_there(self.pages[section][file])
         else:
             # Sinon pas de signals handlers associé, le précise dans les logs
             log.warning("La page " + file + " n\'a aucun fichier signals associé." +
@@ -159,9 +159,23 @@ class DriverMachineInterface:
                         prefix="Initialisation DMI ETCS ; section " + section)
 
         # Indique le temps de chargement partiel (graphique uniquement) ou complet (graphique et logique) de la page
-        log.info("Page : " + file + " chargée partiellement (graphique " + "et logique)" if fully_loaded else "uniquement)" +
+        log.info("Page : " + file + " chargée partiellement (graphique " + ("et logique)" if fully_loaded else "uniquement)") +
                  " en " + str("{:.2f}".format((time.time() - initial_time) * 1000)) + " millisecondes.\n\n",
                  prefix="Initialisation DMI ETCS ; section " + section)
+
+    def are_page_functions_there(self, page):
+        """Permet, à partir d'une page de section de DMI correctement charger, d'indiquer si toutes les fonctions
+        potentiellement nécessaires au fonctionnement de celle-ci sont présentes.
+
+        Parameters
+        ----------
+        page: ``
+            page à vérifier
+        """
+        # Dans l'ordre : update
+        if "update" not in dir(page):
+            log.debug("Aucune fonction \"update\", pour la page " + page.section + "." + page.file + ".\n",
+                      prefix="Initialisation DMI ETCS ; section " + page.section)
 
     def run(self):
         # Lance la logique de mise à jour sur un nouveau thread
@@ -173,7 +187,7 @@ class DriverMachineInterface:
         self.dmi_window.show()
 
     def update(self):
-        # Pour chacune des sections
+        # Pour chacune des sections #FIXME à mettre à jour avec le DMI actif
         for folder in ["A", "B", "C", "D", "E", "F", "G"]:
             # Pour chacunes des pages de chaque sections
             files = list(self.pages[folder].keys())
@@ -191,10 +205,6 @@ class DriverMachineInterface:
                                     "Avec comme message d\'erreur : " + str(error.args) +
                                     "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
                                     prefix="Update DMI ETCS ; section " + folder)
-                else:
-                    log.debug("Aucune fonction update pour la section" + folder + "." + file + " du DMI.\n",
-                              prefix="Initialisation DMI ETCS ; section " + folder)                                     #FIXME : à vérifier lors de l'initialisation pour éviter le spam
-
 
 def main():
     log.initialise("../../../../log/", "1.1.0", log.Level.DEBUG)
