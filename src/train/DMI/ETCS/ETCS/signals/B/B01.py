@@ -34,6 +34,8 @@ class B01:
              [400, "FS", "RSM", "IndS", 25, 0, 52, -1, 28],
              [400, "FS", "RSM", "IndS", 25, 0, 12, -1, 19]]
 
+    index = 0
+
     def __init__(self, simulation, engine, folder, file):
         self.simulation = simulation
         self.section = folder
@@ -41,19 +43,15 @@ class B01:
         self.engine = engine
         self.page = engine.rootObjects()[0]
 
-    def run(self):
-        print("nothing")
-
-
     def update(self):
-        for test in self.tests:
-            self.page.setProperty("max_speed", test[0])
-            self.page.setProperty("operating_mode", test[1])
-            self.page.setProperty("speed_monitoring", test[2])
-            self.page.setProperty("status_information", test[3])
-            self.page.setProperty("release_speed", test[4])
-            self.page.setProperty("target_speed", test[5])
-            self.page.setProperty("permitted_speed", test[6])
-            self.page.setProperty("brake_speed", test[7])
-            self.page.setProperty("speed", test[8])
-            time.sleep(0.250)
+        test = self.tests[self.index]
+        self.page.setProperty("max_speed", test[0])
+        self.page.setProperty("operating_mode", test[1])
+        self.page.setProperty("speed_monitoring", test[2])
+        self.page.setProperty("status_information", test[3])
+        self.page.setProperty("release_speed", test[4])
+        self.page.setProperty("target_speed", test[5])
+        self.page.setProperty("permitted_speed", test[6])
+        self.page.setProperty("brake_speed", test[7])
+        self.page.setProperty("speed", test[8])
+        self.index = (self.index + 1) % len(self.tests)
