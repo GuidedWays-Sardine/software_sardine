@@ -105,7 +105,7 @@ class Simulation:
         self.run_off_screens()
 
         # Lance tous les modules en appelant la fonction run()
-        for module in list(self.components.keys()):
+        for module in self.components:
             self.components[module].run()
 
         # Indique le temps de lancement de l'application (celui-ci doit être le plus court possible)
@@ -164,17 +164,17 @@ class Simulation:
         """Fonction de fermeture de la simulation, permet d'arrêter correctement la simulation"""
         # Indique le début de la fermeture de la simulation dans les logs
         initial_time = time.time()
-        log.change_log_prefix()
-        log.info("Fermeture de l'initialisation de la simulation.\n\n",
-                 prefix="fermeture simulation")
+        log.change_log_prefix("fermeture simulation")
+        log.info("Fermeture de l'initialisation de la simulation.\n\n")
+
+        # Indique le nombre de mises à jours réussies et le temps moyen de mise à jour
+        log.info("Simulation mises à jour " + str(self.update_count) + " avec un temps moyen de " + str(self.update_average_time) + ".\n")
 
         # Appelle les différentes fonctions de fermetures
         # FEATURE : ajouter les différents appels de fonctions de fermetures ici
 
         # Indique le temps nécessaire à la fermeture
-        log.info("Simulation (" + str(len(self.components)) + " modules) initialisés en " +
-                 str("{:.2f}".format((time.time() - initial_time) * 1000)) + " millisecondes.\n\n",
-                 prefix="fermeture simulation")
+        log.info("Simulation terminée en " + str("{:.2f}".format((time.time() - initial_time) * 1000)) + " millisecondes.\n\n")
 
     def initialise_dmi(self):
         """Fonction permettant d'initialiser le DMI.
