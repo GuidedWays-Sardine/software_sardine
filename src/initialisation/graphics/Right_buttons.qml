@@ -21,8 +21,8 @@ Item {
         default_height: 50
         default_width: 60
 
-        is_activable: true
-        is_positive: true
+        is_positive: false
+        is_activable: false
         is_visible: true
     }
 
@@ -36,8 +36,8 @@ Item {
         default_height: 50
         default_width: 60
 
-        is_activable: true
-        is_positive: true
+        is_positive: false
+        is_activable: false
         is_visible: true
     }
 
@@ -51,8 +51,8 @@ Item {
         default_height: 50
         default_width: 60
 
-        is_activable: true
-        is_positive: true
+        is_positive: false
+        is_activable: false
         is_visible: true
     }
 
@@ -66,8 +66,8 @@ Item {
         default_height: 50
         default_width: 60
 
-        is_activable: true
-        is_positive: true
+        is_positive: false
+        is_activable: false
         is_visible: true
     }
 
@@ -81,8 +81,8 @@ Item {
         default_height: 50
         default_width: 60
 
-        is_activable: true
-        is_positive: true
+        is_positive: false
+        is_activable: false
         is_visible: true
     }
 
@@ -96,8 +96,8 @@ Item {
         default_height: 50
         default_width: 60
 
-        is_activable: true
-        is_positive: true
+        is_positive: false
+        is_activable: false
         is_visible: true
     }
 
@@ -111,8 +111,8 @@ Item {
         default_height: 50
         default_width: 60
 
-        is_activable: true
-        is_positive: true
+        is_positive: false
+        is_activable: false
         is_visible: true
     }
 
@@ -126,8 +126,8 @@ Item {
         default_height: 50
         default_width: 60
 
-        is_activable: true
-        is_positive: true
+        is_positive: false
+        is_activable: false
         is_visible: true
     }
 }
