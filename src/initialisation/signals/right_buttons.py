@@ -42,7 +42,7 @@ class RightButtons:
                                         if f.startswith("page_rb") and f.endswith(".qml"))))
 
         if not_exist != "":
-            log.warning("Les pages de paramètres : " + not_exist + " N'ont aucun fichier graphique(.qml) associés.\n")
+            log.warning("Les pages de paramètres : " + not_exist + " N'ont aucun fichier graphique(.qml) associés.\n\n")
 
         # Pour toutes les pages de paramètres ayant un ficher graphique (.qml) existant
         for index in (int(f[7:-4]) for f in os.listdir(PROJECT_DIR + "src\\initialisation\\graphics\\page_rb")
@@ -67,9 +67,8 @@ class RightButtons:
 
         # Vérifie si au moins une page est chargée, sinon l'indique et cache les boutons ouvrir et sauvegarder
         if not any(application.is_fully_loaded):
-            log.error("Aucune des pages n'a été correctement chargée. Les valeurs par défaut seront utilisés.\n\t\t"
-                      + "Seuls les boutons quitter et lancer sont fonctionnels.\n\t\t"
-                      + "Veuillez lire les warnings ci-dessus pour comprendre la cause du problème et le régler.\n")
+            log.error("Aucune des pages n'a été correctement chargée. Les valeurs par défaut seront utilisés. " +
+                      "Seuls les boutons quitter et lancer sont fonctionnels.\n\t\t")
             application.win.findChild(QObject, "save").setProperty("is_visible", False)
             application.win.findChild(QObject, "open").setProperty("is_visible", False)
 
@@ -120,10 +119,7 @@ class RightButtons:
             current_button.setProperty("text", "")
 
             # Si le fichier n'a été chargé correctement
-            log.warning("le chargement de la page " + str(index) +
-                        " relié au bouton rb" + str(index) + " est impossible.\n\t\t" +
-                        "Le fichier " + page_path + " existe mais ne se charge pas correctement.\n\t\t" +
-                        "Assurez-vous que celui-ci ne contient pas d'erreurs.\n\n")
+            log.warning("Le fichier graphique " + page_path + "contient des erreurs.\n\n")
             return False
 
     def initialise_signals(self, application, engine, index, page_path, current_button):

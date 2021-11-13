@@ -68,9 +68,9 @@ class DriverMachineInterface:
             self.pages[dmi_key] = {"A": {}, "B": {}, "C": {}, "D": {}, "E": {}, "F": {}, "G": {}}
 
             # Dans le cas où il existe des sections sans dossiers graphiques, les indique toutes dans le registre
-            if list({"A", "B", "C", "D", "E", "F", "G"}.difference(os.listdir(dmi + "\\graphics"))):
+            if {"A", "B", "C", "D", "E", "F", "G"}.difference(os.listdir(dmi + "\\graphics")):
                 log.warning("Le DMI " + dmi_key + " n'a pas les sections : " +
-                            " ; ".join(sorted(list({"A", "B", "C", "D", "E", "F", "G"}.difference(os.listdir(dmi + "\\graphics"))))) + ".\n")
+                            " ; ".join(sorted({"A", "B", "C", "D", "E", "F", "G"}.difference(os.listdir(dmi + "\\graphics")))) + ".\n")
 
             # Pour chaque sections graphiques du DMI ayant un dossier associé (normalement A à G)
             for folder in (f for f in ["A", "B", "C", "D", "E", "F", "G"] if f in os.listdir(dmi + "\\graphics")):

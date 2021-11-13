@@ -116,7 +116,7 @@ class PageRB8:
             self.page.findChild(QObject, "category_title").setProperty("is_dark_grey", False)
 
             # Change le nom de la catégorie pour la première catégorie d'écrans (pour initialiser une page)
-            self.category_active = list(self.screen_default.keys())[0]
+            self.category_active = list(self.screen_default)[0]
             self.page.findChild(QObject, "category_title").setProperty("text", self.category_active)
 
             # Rend fonctionnel les boutons inférieurs (visibles et activable que quand nécessaire)
@@ -124,7 +124,7 @@ class PageRB8:
             self.page.findChild(QObject, "right_screen_button").clicked.connect(self.on_right_screen_button_pressed)
 
             # S'il y a plus d'une catégorie d'écrans, rend les boutons supérieurs de catégories fonctionnels
-            if len(self.screen_default.keys()) > 1:
+            if len(self.screen_default) > 1:
                 left_category_button = self.page.findChild(QObject, "left_category_button")
                 left_category_button.setProperty("is_activable", False)
                 left_category_button.clicked.connect(self.on_left_category_button_clicked)
@@ -174,14 +174,14 @@ class PageRB8:
                         "Ceux-ci ne peuvent pas se charger correctement.\n")
 
             # Désactive l'écran train caméra
-            category = list(self.screen_default.keys())[0]
-            screen_camera_train = list(self.screen_default[category].keys())[3]
+            category = list(self.screen_default)[0]
+            screen_camera_train = list(self.screen_default[category])[3]
             self.screen_default[category][screen_camera_train][0] = False
 
             # Désactive les graphs en mode fenêtré
-            category = list(self.screen_default.keys())[2]
-            screen_dashboard = list(self.screen_default[category].keys())[0]
-            for screen_graph in list(self.screen_default[category].keys()):
+            category = list(self.screen_default)[2]
+            screen_dashboard = list(self.screen_default[category])[0]
+            for screen_graph in self.screen_default[category]:
                 if screen_graph == screen_dashboard:
                     self.screen_default[category][screen_graph][0] = True
                 else:
@@ -210,9 +210,9 @@ class PageRB8:
             self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
 
         # Pour chaque catégorie d'écrans
-        for category_key in list(self.screen_settings.keys()):
+        for category_key in self.screen_settings:
             # Pour chaque écrans de cette catégorie
-            for screen_key in list(self.screen_settings[category_key].keys()):
+            for screen_key in self.screen_settings[category_key]:
                 # Récupère les paramètres de l'écran et les sauvegardes (dépend de si l'écran est sélectionable ou non
                 screen_settings_key = translation_data[category_key] + "." + translation_data[screen_key] + "."
                 is_activable = self.screen_default[category_key][screen_key][0]
@@ -246,9 +246,9 @@ class PageRB8:
                                               translation_data["English"], "English")
 
         # Pour chaque catégorie d'écrans
-        for category_key in list(self.screen_settings.keys()):
+        for category_key in self.screen_settings:
             # Pour chaque écrans de cette catégorie
-            for screen_key in list(self.screen_settings[category_key].keys()):
+            for screen_key in self.screen_settings[category_key]:
                 # Crée pour chaque écran la clé avec laquelle l'information serait sauvegardée
                 screen_settings_key = invert_translation[category_key] + "." + invert_translation[screen_key] + "."
 
@@ -287,9 +287,9 @@ class PageRB8:
         self.page.setProperty("screen_list", screen_list)
 
         # Pour chaque catégories
-        for category_key in list(self.screen_default.keys()):
+        for category_key in self.screen_default:
             # Pour chaque écrans de chaques catégories
-            for screen_key in list(self.screen_default[category_key].keys()):
+            for screen_key in self.screen_default[category_key]:
                 # Traduit la clé d'écran pour le dictionaire de paramètres choisis et de paramètres par défaut
                 self.screen_default[category_key][translation_data[screen_key]] = self.screen_default[category_key][screen_key]
                 self.screen_settings[category_key][translation_data[screen_key]] = self.screen_settings[category_key][screen_key]
@@ -334,9 +334,9 @@ class PageRB8:
             self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
 
         # Pour toutes les catégories de paramètrages d'écrans
-        for category_key in list(self.screen_default.keys()):
+        for category_key in self.screen_default:
             # Pour tous les écrans de cette catégorie
-            for screen_key in list(self.screen_default[category_key].keys()):
+            for screen_key in self.screen_default[category_key]:
                 # Vérifier pour chaque page si la page doit et peut être complétée mais ne l'est pas
                 if self.screen_default[category_key][screen_key][0] and \
                         self.screen_default[category_key][screen_key][3] \
@@ -393,8 +393,8 @@ class PageRB8:
         category_title = self.page.findChild(QObject, "category_title")
 
         # Récupère l'index et le nom du nouvel élément
-        new_index = list(self.screen_default.keys()).index(category_title.property("text")) - 1
-        self.category_active = list(self.screen_default.keys())[new_index]
+        new_index = list(self.screen_default).index(category_title.property("text")) - 1
+        self.category_active = list(self.screen_default)[new_index]
 
         # Si nouvel élément trouvé, change le titre de la catégorie.
         category_title.setProperty("text", self.category_active)
@@ -421,8 +421,8 @@ class PageRB8:
         category_title = self.page.findChild(QObject, "category_title")
 
         # Récupère l'index et le nom du nouvel élément
-        new_index = list(self.screen_default.keys()).index(self.category_active) + 1
-        self.category_active = list(self.screen_default.keys())[new_index]
+        new_index = list(self.screen_default).index(self.category_active) + 1
+        self.category_active = list(self.screen_default)[new_index]
 
         # Change le nom de la catégorie active
         category_title.setProperty("text", self.category_active)
@@ -433,7 +433,7 @@ class PageRB8:
 
         # Rend le bouton de gauche actif, et si dernière catégorie rend celui de droite inactif
         self.page.findChild(QObject, "left_category_button").setProperty("is_activable", True)
-        if new_index == len(self.screen_default.keys()) - 1:
+        if new_index == len(self.screen_default) - 1:
             right_category_button.setProperty("is_activable", False)
 
     def on_left_screen_button_pressed(self):
@@ -469,7 +469,7 @@ class PageRB8:
         # Essaye de récupérer le dictionnaire des écrans de la catégorie sélectionnée et récupère leurs clés
         category_screen_dict = self.screen_default[self.category_active]
         default_settings_dict = self.screen_settings[self.category_active]
-        category_screen_list = list(category_screen_dict.keys())
+        category_screen_list = list(category_screen_dict)
 
         # Vide les liste qui seront envoyés à la partie graphique
         visible_screen_names = []
@@ -524,9 +524,9 @@ class PageRB8:
         """
         # Récupère si le checkbutton est activé, le nom de la catégorie et des écrans à modifier
         is_checked = application.visible_pages[0].page.findChild(QObject, "camera_check").property("is_checked")
-        category = list(self.screen_default.keys())[0]
-        screen_virtual_line = list(self.screen_default[category].keys())[2]
-        screen_camera_train = list(self.screen_default[category].keys())[3]
+        category = list(self.screen_default)[0]
+        screen_virtual_line = list(self.screen_default[category])[2]
+        screen_camera_train = list(self.screen_default[category])[3]
 
         # Change la paramétrabilité des écrans souhaités
         self.screen_default[category][screen_virtual_line][0] = not is_checked
@@ -549,8 +549,8 @@ class PageRB8:
         """
         # Récupère si le checkbutton est activé, le nom de la catégorie et des écrans à modifier
         is_checked = application.visible_pages[0].page.findChild(QObject, "pcc_check").property("is_checked")
-        category = list(self.screen_default.keys())[1]
-        screen_tco = list(self.screen_default[category].keys())[0]
+        category = list(self.screen_default)[1]
+        screen_tco = list(self.screen_default[category])[0]
 
         # Change la paramétrabilité des écrans souhaités
         self.screen_default[category][screen_tco][0] = is_checked
@@ -572,8 +572,8 @@ class PageRB8:
         is_data_checked = application.visible_pages[0].page.findChild(QObject, "data_check").property("is_checked")
         dashboard = application.visible_pages[0].page.findChild(QObject, "dashboard_check")
         dashboard.setProperty("is_activable", is_data_checked)
-        category = list(self.screen_default.keys())[2]
-        screen_graphs = list(self.screen_default[category].keys())
+        category = list(self.screen_default)[2]
+        screen_graphs = list(self.screen_default[category])
         screen_dashboard = screen_graphs[0]
 
         # Mets à jour la paramétrabilité des écrans
