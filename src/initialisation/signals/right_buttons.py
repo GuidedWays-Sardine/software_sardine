@@ -37,8 +37,16 @@ class RightButtons:
         self.right_buttons = application.win.findChild(QObject, "right_buttons")
         self.pages_stackview = application.win.findChild(QObject, "settings_pages")
 
-        # Pour les 8 boutons de droite
-        for index in range(1, 9):
+        not_exist = " ; ".join(sorted({"1", "2", "3", "4", "5", "6", "7", "8"}.difference(f[7:-4]
+                                        for f in os.listdir(PROJECT_DIR + "src\\initialisation\\graphics\\page_rb")
+                                        if f.startswith("page_rb") and f.endswith(".qml"))))
+
+        if not_exist != "":
+            log.warning("Les pages de paramètres : " + not_exist + " N'ont aucun fichier graphique(.qml) associés.\n")
+
+        # Pour toutes les pages de paramètres ayant un ficher graphique (.qml) existant
+        for index in (int(f[7:-4]) for f in os.listdir(PROJECT_DIR + "src\\initialisation\\graphics\\page_rb")
+                              if f.startswith("page_rb") and f.endswith(".qml") and int(f[7:-4]) >= 1 and int(f[7:-4]) <= 8):
             # Vérifie si la partie graphique de la page existe et charge la page et le bouton associé
             engine = QQmlApplicationEngine()
             page_path = PROJECT_DIR + "src\\initialisation\\graphics\\page_rb\\page_rb" + str(index) + ".qml"
@@ -111,18 +119,11 @@ class RightButtons:
             current_button.setProperty("is_activable", False)
             current_button.setProperty("text", "")
 
-            # Si le fichier existe mais n'a pas été ouvert, cela veut dire qu'il y a une erreur dans le fichier
-            if os.path.isfile(page_path):
-                log.warning("le chargement de la page " + str(index) +
-                            " relié au bouton rb" + str(index) + " est impossible.\n\t\t" +
-                            "Le fichier " + page_path + " existe mais ne se charge pas correctement.\n\t\t" +
-                            "Assurez-vous que celui-ci ne contient pas d'erreurs.\n\n")
-            # Sinon c'est qu'il n'existe pas où qu'il est mal placé
-            else:
-                log.debug("le chargement de la page " + str(index) +
-                          " relié au bouton rb" + str(index) + " est impossible.\n\t\t" +
-                          "Le fichier " + page_path + " n'existe pas.\n\t\t" +
-                          "Assurez-vous que le fichier source est au bon endroit ou créez le\n\n")
+            # Si le fichier n'a été chargé correctement
+            log.warning("le chargement de la page " + str(index) +
+                        " relié au bouton rb" + str(index) + " est impossible.\n\t\t" +
+                        "Le fichier " + page_path + " existe mais ne se charge pas correctement.\n\t\t" +
+                        "Assurez-vous que celui-ci ne contient pas d'erreurs.\n\n")
             return False
 
     def initialise_signals(self, application, engine, index, page_path, current_button):
