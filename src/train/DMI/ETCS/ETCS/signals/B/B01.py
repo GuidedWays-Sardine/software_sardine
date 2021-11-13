@@ -1,9 +1,22 @@
-import time
+# Librairies par défaut
+import os
+import sys
+
+
+# librairies graphiques
+from PyQt5.QtQml import QQmlApplicationEngine
+
+
+# Librairies SARDINE
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
+sys.path.append(os.path.dirname(PROJECT_DIR))
+import src.misc.log.log as log
 
 
 class B01:
+    """Classe contenant les éléments d'initialisation et de mise à jour de la page B01 de section B du DMI ETCS ETCS"""
+
     # variables nécessaire au bon fonctionnement de la page
-    simulation = None
     section = "B"
     page_name = "B01"
     engine = None
@@ -36,14 +49,25 @@ class B01:
 
     index = 0
 
-    def __init__(self, simulation, engine, folder, file):
-        self.simulation = simulation
-        self.section = folder
-        self.page_name = file
+    def __init__(self, engine, section, page_name): # TODO : voir pour envoyer le DMI ou la simulation et la dmi_key
+        """Fonction permettant d'initialiser la page B01 de la section B du DMI ETCS ETCS
+
+        Parameters
+        ----------
+        engine: `QQmlApplicationEngine`
+            La QQmlApplicationEngine de la page
+        section: `string`
+            La clé de la section de la page
+        page_name: `string`
+            Le nom de la page
+        """
+        self.section = section
+        self.page_name = page_name
         self.engine = engine
         self.page = engine.rootObjects()[0]
 
-    def update(self):
+    def update(self):  # TODO : voir si la fonction récupère la base de donnée EVC
+        """Fonction permettant de mettre à jour l'EVC"""
         test = self.tests[self.index]
         self.page.setProperty("max_speed", test[0])
         self.page.setProperty("operating_mode", test[1])
