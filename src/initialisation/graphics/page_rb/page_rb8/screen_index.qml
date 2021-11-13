@@ -2,7 +2,7 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 
-import "../../../../DMI_Default/ETCS"
+import "../../../components"
 
 
 Window {
@@ -18,7 +18,7 @@ Window {
     property int index: -1
 
     //Boutton inactivable contenant le numéro de la fenètre
-     DMI_button{
+     INI_button{
         id: screen_index
         objectName: "screen_index"
 
@@ -30,5 +30,6 @@ Window {
         is_activable: false
         is_positive: true
         is_visible: true
+        is_dark_grey: false
     }
 }
