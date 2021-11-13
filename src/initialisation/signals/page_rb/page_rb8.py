@@ -1,9 +1,21 @@
-import logging
-import traceback
+# Librairies par défaut
+import os
+import sys
 
+
+# Librairies graphiques
 from PyQt5.QtWidgets import QDesktopWidget
 from PyQt5.QtQml import QQmlApplicationEngine
 from PyQt5.QtCore import QObject
+
+
+# Librairies SARDINE
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src\\")[0]
+sys.path.append(os.path.dirname(PROJECT_DIR))
+import src.initialisation.initialisation_window as ini
+import src.misc.settings_dictionary.settings as sd
+import src.misc.translation_dictionary.translation as td
+import src.misc.log.log as log
 
 
 class PageRB8:
@@ -19,16 +31,7 @@ class PageRB8:
     screen_index = []
 
     # Informations par défauts des écrans {"nom écran": [sera utilisé ?, longuer minimum, hauteur minimum]}
-    screen_default = {"Simulateur SARDINE": {"DMI central":     [True, 640, 480],
-                                             "DMI gauche":      [True, 640, 480],
-                                             "Ligne virtuelle": [True, 1080, 720],
-                                             "Train caméra":    [False, 640, 480]
-                                             },
-                      "Poste de Commande Centralisé (PCC)": {"Tableau de Contrôle Optique (TCO)":   [False, 640, 480]
-                                                             },
-                      "Visualisation des données": {"Courbes": [False, 0, 0]
-                                                    }
-                      }
+    screen_default = {}
     screen_settings = {}
     category_active = ""
     screen_list_active = 0
@@ -38,9 +41,9 @@ class PageRB8:
 
         Parameters
         ----------
-        application: `InitialisationWindow`
+        application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
-        page: `QQmlApplicationEngine`
+        engine: `QQmlApplicationEngine`
             La QQmlApplicationEngine de la page à charger
         index: `int`
             index de la page (1 pour le bouton d'en haut -> 8 pour le bouton d'en bas
@@ -57,11 +60,11 @@ class PageRB8:
         # Récupère le nombre d'écrans présents
         self.screen_count = QDesktopWidget().screenCount()
         self.screen_index = [None] * self.screen_count
-        logging.info(str(self.screen_count) + " écrans détectés.\n")
+        log.info(str(self.screen_count) + " écrans détectés.\n")
 
         # Charge autant de fenêtres d'index d'écrans qu'il y a d'écrans
         for screen_index in range(0, self.screen_count):
-            application.engine.load('initialisation/graphics/page_rb/page_rb8/screen_index.qml')
+            application.engine.load(PROJECT_DIR + "src\\initialisation\\graphics\\page_rb\\page_rb8\\screen_index.qml")
             self.screen_index[screen_index] = application.engine.rootObjects()[len(application.engine.rootObjects()) - 1]
             self.screen_index[screen_index].hide()
 
@@ -80,30 +83,48 @@ class PageRB8:
         self.page.setProperty("screen_list", screen_list)
         self.page.setProperty("screen_size", screen_dimensions)
 
+        # Charge la traduction pour le nom des fichiers et des catégories (Anglais -> langue actuelle)
+        translation_data = td.TranslationDictionnary()
+        translation_data.create_translation(PROJECT_DIR + "settings\\language_settings\\initialisation.lang",
+                                            "English", application.language)
+
+        # Pour chacun des fichiers dans le répertoire de paramètres d'écrans
+        for file_path in (f for f in os.listdir(PROJECT_DIR + "settings\\screen_settings") if f.endswith(".screens")):
+            # Ouvre le fichier, et crée un dictionaire vide pour les écrans dans le fichier
+            file = open(PROJECT_DIR + "settings\\screen_settings\\" + file_path, "r", encoding="utf-8-sig")
+            screens_default = {}
+            screens_settings = {}
+
+            # Pour chacune des lignes contenant des informations
+            for line in (l for l in file.readlines() if l != "\n" and l[0] != "#"):
+                # Rajoute les paramètres par défaut et crée une ligne de paramètres (incomplet par défaut)
+                info = list(map(str.strip, line.rstrip("\n").split(";")))
+                screens_default[translation_data[info[0]]] = [True,
+                                                              int(info[1]) if len(info) >= 2 else 0,
+                                                              int(info[2]) if len(info) >= 3 else 0,
+                                                              True if len(info) >= 4 and info[3].lower() == "true" else False]
+
+                screens_settings[translation_data[info[0]]] = [0, False, [0, 0], [0, 0]]
+
+            # Rajouter cette série d'écran à la catégorie
+            self.screen_default[translation_data[file_path.replace("_", " ")[3:-8]]] = screens_default
+            self.screen_settings[translation_data[file_path.replace("_", " ")[3:-8]]] = screens_settings
+
         # Définit le fonctionnement de base des boutons supérieurs et inférieurs
-        # Aucun des boutons ne sera fonctionnel et aucune page ne sera chargée
-        if len(self.screen_default.keys()) != 0:
+        if self.screen_default:
             # Rend le texte supérieur en gris claire
             self.page.findChild(QObject, "category_title").setProperty("is_dark_grey", False)
 
             # Change le nom de la catégorie pour la première catégorie d'écrans (pour initialiser une page)
-            self.category_active = list(self.screen_default.keys())[0]
+            self.category_active = list(self.screen_default)[0]
             self.page.findChild(QObject, "category_title").setProperty("text", self.category_active)
 
             # Rend fonctionnel les boutons inférieurs (visibles et activable que quand nécessaire)
             self.page.findChild(QObject, "left_screen_button").clicked.connect(self.on_left_screen_button_pressed)
             self.page.findChild(QObject, "right_screen_button").clicked.connect(self.on_right_screen_button_pressed)
 
-            # Initialise les résultats (mets tout à blanc)
-            for category_key in list(self.screen_default.keys()):
-                temp_category = {}
-                for screen_key in list(self.screen_default[category_key].keys()):
-                    temp_category[screen_key] = [0, False, [0, 0], [0, 0]]
-                self.screen_settings[category_key] = temp_category
-            self.change_visible_screen_list()
-
             # S'il y a plus d'une catégorie d'écrans, rend les boutons supérieurs de catégories fonctionnels
-            if len(self.screen_default.keys()) > 1:
+            if len(self.screen_default) > 1:
                 left_category_button = self.page.findChild(QObject, "left_category_button")
                 left_category_button.setProperty("is_activable", False)
                 left_category_button.clicked.connect(self.on_left_category_button_clicked)
@@ -117,109 +138,71 @@ class PageRB8:
             raise NameError("Aucun écran à paramétrer. Le dictionnaire \"screen_default\" est vide.")
 
         # connecte les différents boutons des autres pages à la paramétrabilité de certaines fenêtres
-
-        # Commence par les éléments de la page 1
-        if application.visible_pages[0] is not None and not isinstance(application.visible_pages[0], type(self.engine)):
-            # camera_check pour ligne virtuelle ou train caméra
-            application.visible_pages[0].page.findChild(QObject, "camera_check").value_changed.connect(lambda: self.on_camera_train_checked(application))
-            self.on_camera_train_checked(application)
-
-            # pcc_check pour TCO et toute autre fenêtre nécessaire au fonctionnement du PCC
-            application.visible_pages[0].page.findChild(QObject, "pcc_check").value_changed.connect(lambda: self.on_pcc_checked(application))
-            self.on_pcc_checked(application)
-
-            # data_check pour l'affichage des données en direct
-            application.visible_pages[0].page.findChild(QObject, "data_check").value_changed.connect(lambda: self.on_data_checked(application))
-            self.on_data_checked(application)
-        else:
-            logging.warning("Certains paramétrages d'écrans dépendent du bon fonctionnement de la page_rb1." +
-                            "Ceux-ci ne peucent pas se charger correctement.\n")
+        # FEATURE : Ajouter les conditions dans des fonctions annexes comme ci-dessous pour les autres pages
+        self.connect_page_rb1(application)
 
         # Définit la page comme validée (toutes les valeurs par défaut suffisent)
         application.is_completed_by_default[self.index - 1] = "is_page_valid" not in dir(self)
 
-    def on_camera_train_checked(self, application):
-        """Signal appelé lorsque le checkbutton camera_check est coché ou décoché.
-        Permet de mettre à jour la paramétrabilité des fenêtres Train caméra et ligne virtuelle
+    def connect_page_rb1(self, application):
+        """Fonction permettant de connecter les différents composants de la page de paramètres page_rb1 à leurs fenêtres
 
         Parameters
         ----------
-        application: `InitialisationWindow`
+        application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
-        # Récupère si le checkbutton est activé, le nom de la catégorie et des écrans à modifier
-        is_checked = application.visible_pages[0].page.findChild(QObject, "camera_check").property("is_checked")
-        category = list(self.screen_default.keys())[0]
-        screen_virtual_line = list(self.screen_default[category].keys())[2]
-        screen_camera_train = list(self.screen_default[category].keys())[3]
+        if application.visible_pages[0] is not None and not isinstance(application.visible_pages[0], type(self.engine)):
+            # camera_check pour ligne virtuelle ou train caméra
+            application.visible_pages[0].page.findChild(QObject, "camera_check").value_changed.connect(
+                lambda: self.on_camera_train_checked(application))
+            self.on_camera_train_checked(application)
 
-        # Change la paramétrabilité des écrans souhaités
-        self.screen_default[category][screen_virtual_line][0] = not is_checked
-        self.screen_default[category][screen_camera_train][0] = is_checked
+            # pcc_check pour TCO et toute autre fenêtre nécessaire au fonctionnement du PCC
+            application.visible_pages[0].page.findChild(QObject, "pcc_check").value_changed.connect(
+                lambda: self.on_pcc_checked(application))
+            self.on_pcc_checked(application)
 
-        # Réinitialise les paramètres de ces écrans s'ils ne sont plus paramétrables
-        if not self.screen_default[category][screen_virtual_line][0]:
-            self.screen_settings[category][screen_virtual_line] = [0, False, [0, 0], [0, 0]]
+            # data_check pour l'affichage des données en direct
+            application.visible_pages[0].page.findChild(QObject, "data_check").value_changed.connect(
+                lambda: self.on_data_checked(application))
+            application.visible_pages[0].page.findChild(QObject, "dashboard_check").value_changed.connect(
+                lambda: self.on_data_checked(application))
+            self.on_data_checked(application)
         else:
-            self.screen_settings[category][screen_camera_train] = [0, False, [0, 0], [0, 0]]
+            log.warning("Certains paramétrages d'écrans dépendent du bon fonctionnement de la page_rb1." +
+                        "Ceux-ci ne peuvent pas se charger correctement.\n")
 
-    def on_pcc_checked(self, application):
-        """Signal appelé lorsque le checkbutton camera_check est coché ou décoché.
-        Permet de mettre à jour la paramétrabilité des fenêtres TCO du PCC
+            # Désactive l'écran train caméra
+            category = list(self.screen_default)[0]
+            screen_camera_train = list(self.screen_default[category])[3]
+            self.screen_default[category][screen_camera_train][0] = False
 
-        Parameters
-        ----------
-        application: `InitialisationWindow`
-            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
-        """
-        # Récupère si le checkbutton est activé, le nom de la catégorie et des écrans à modifier
-        is_checked = application.visible_pages[0].page.findChild(QObject, "pcc_check").property("is_checked")
-        category = list(self.screen_default.keys())[1]
-        screen_tco = list(self.screen_default[category].keys())[0]
-
-        # Change la paramétrabilité des écrans souhaités
-        self.screen_default[category][screen_tco][0] = is_checked
-
-        # Réinitialise les paramètres de ces écrans s'ils ne sont plus paramétrables
-        if not self.screen_default[category][screen_tco][0]:
-            self.screen_settings[category][screen_tco] = [0, False, [0, 0], [0, 0]]
-
-    def on_data_checked(self, application):
-        """Signal appelé lorsque le checkbutton camera_check est coché ou décoché.
-        Permet de mettre à jour la paramétrabilité des fenêtres des courbes de paramètres en direct
-
-        Parameters
-        ----------
-        application: `InitialisationWindow`
-            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
-        """
-        # Récupère si le checkbutton est activé, le nom de la catégorie et des écrans à modifier
-        is_checked = application.visible_pages[0].page.findChild(QObject, "data_check").property("is_checked")
-        category = list(self.screen_default.keys())[2]
-        screen_data = list(self.screen_default[category].keys())[0]
-
-        # Change la paramétrabilité des écrans souhaités
-        self.screen_default[category][screen_data][0] = is_checked
-
-        # Réinitialise les paramètres de ces écrans s'ils ne sont plus paramétrables
-        if not self.screen_default[category][screen_data][0]:
-            self.screen_settings[category][screen_data] = [0, False, [0, 0], [0, 0]]
+            # Désactive les graphs en mode fenêtré
+            category = list(self.screen_default)[2]
+            screen_dashboard = list(self.screen_default[category])[0]
+            for screen_graph in self.screen_default[category]:
+                if screen_graph == screen_dashboard:
+                    self.screen_default[category][screen_graph][0] = True
+                else:
+                    self.screen_default[category][screen_graph][0] = False
 
     def get_values(self, translation_data):
         """Récupère les paramètres de la page de paramètres page_rb8
 
         Parameters
         ----------
-        translation_data: `dict`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive
+        translation_data: `td.TranslationDictionnary`
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
 
         Returns
         -------
-        parameters : `dictionary`
+        parameters : `sd.SettingsDictionnary`
             un dictionaire de paramètres de la page de paramètres page_rb8
         """
         # Initialise les paramètres récupérés et récupère le paramètre sur si les écrans sont éteins
-        page_parameters = {"EcransEteints": self.page.findChild(QObject, "black_screens_check").property("is_checked")}
+        page_parameters = sd.SettingsDictionnary()
+        page_parameters["immersion"] = self.page.findChild(QObject, "black_screens_check").property("is_checked")
 
         # Récupère les valeurs actuellement sur l'écran
         old_screens_values = self.page.get_values().toVariant()
@@ -227,30 +210,20 @@ class PageRB8:
             self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
 
         # Pour chaque catégorie d'écrans
-        for category_key in list(self.screen_settings.keys()):
+        for category_key in self.screen_settings:
             # Pour chaque écrans de cette catégorie
-            for screen_key in list(self.screen_settings[category_key].keys()):
-                # Sauvegarde chaque donné au format : category.screen.data = value
-                try:
-                    screen_settings_key = translation_data[category_key] + "."
-                except KeyError:
-                    logging.debug("Traduction de " + category_key + " manquante.\n")
-                    screen_settings_key = category_key + "."
-                try:
-                    screen_settings_key += translation_data[screen_key] + "."
-                except KeyError:
-                    logging.debug("Traduction de " + screen_key + " manquante.\n")
-                    screen_settings_key += screen_key + "."
-
+            for screen_key in self.screen_settings[category_key]:
                 # Récupère les paramètres de l'écran et les sauvegardes (dépend de si l'écran est sélectionable ou non
+                screen_settings_key = translation_data[category_key] + "." + translation_data[screen_key] + "."
                 is_activable = self.screen_default[category_key][screen_key][0]
                 screen_settings_values = self.screen_settings[category_key][screen_key]
-                page_parameters[screen_settings_key + "IndexEcran"] = screen_settings_values[0] if is_activable else 0
-                page_parameters[screen_settings_key + "PleinEcran"] = screen_settings_values[1] if is_activable else False
-                page_parameters[screen_settings_key + "positionX"] = screen_settings_values[2][0] if is_activable else 0
-                page_parameters[screen_settings_key + "positionY"] = screen_settings_values[2][1] if is_activable else 0
-                page_parameters[screen_settings_key + "tailleX"] = screen_settings_values[3][0] if is_activable else 0
-                page_parameters[screen_settings_key + "tailleY"] = screen_settings_values[3][1] if is_activable else 0
+                page_parameters[screen_settings_key + "screen_index"] = screen_settings_values[0] if is_activable else 0
+                page_parameters[screen_settings_key + "full_screen"] = screen_settings_values[1] if is_activable else False
+                page_parameters[screen_settings_key + "x"] = screen_settings_values[2][0] if is_activable else 0
+                page_parameters[screen_settings_key + "y"] = screen_settings_values[2][1] if is_activable else 0
+                page_parameters[screen_settings_key + "w"] = screen_settings_values[3][0] if is_activable else 0
+                page_parameters[screen_settings_key + "h"] = screen_settings_values[3][1] if is_activable else 0
+                page_parameters[screen_settings_key + "mandatory"] = self.screen_default[category_key][screen_key][3]
 
         return page_parameters
 
@@ -259,47 +232,37 @@ class PageRB8:
 
         Parameters
         ----------
-        data: `dict`
+        data: `sd.SettingsDictionnary`
             Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
-        translation_data: `dict`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive
+        translation_data: `td.TranslationDictionnary`
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
         """
         # Change la valeur pour les écrans noirs
-        try:
-            self.page.findChild(QObject, "black_screens_check").setProperty("is_checked", data["EcransEteints"])
-        except KeyError:
-            logging.debug("Aucune données EcransEteints dans le fichier paramètres ouverts.\n")
+        data.update_parameter(self.page, "black_screens_check", "is_checked", "immersion")
 
         # Inverse les données de traduction pour avoir un dictionnaire langue actuelle -> Français
-        translation_data = dict([reversed(i) for i in translation_data.items()])
+        invert_translation = td.TranslationDictionnary()
+        invert_translation.create_translation(PROJECT_DIR + "settings\\language_settings\\initialisation.lang",
+                                              translation_data["English"], "English")
 
         # Pour chaque catégorie d'écrans
-        for category_key in list(self.screen_settings.keys()):
+        for category_key in self.screen_settings:
             # Pour chaque écrans de cette catégorie
-            for screen_key in list(self.screen_settings[category_key].keys()):
-                # Sauvegarde chaque donné au format : category.screen.data = value
-                try:
-                    screen_settings_key = translation_data[category_key] + "."
-                except KeyError:
-                    logging.debug("Traduction de " + category_key + " manquante.\n")
-                    screen_settings_key = category_key + "."
-                try:
-                    screen_settings_key += translation_data[screen_key] + "."
-                except KeyError:
-                    logging.debug("Traduction de " + screen_key + " manquante.\n")
-                    screen_settings_key += screen_key + "."
+            for screen_key in self.screen_settings[category_key]:
+                # Crée pour chaque écran la clé avec laquelle l'information serait sauvegardée
+                screen_settings_key = invert_translation[category_key] + "." + invert_translation[screen_key] + "."
 
-                # Essaye de récupérer les donnés reliés à l'écran
+                # Essaye de récupérer les donnés reliées à l'écran
                 try:
-                    if int(data[screen_settings_key + "IndexEcran"]) <= self.screen_count:
-                        self.screen_settings[category_key][screen_key][0] = int(data[screen_settings_key + "IndexEcran"])
-                        self.screen_settings[category_key][screen_key][1] = data[screen_settings_key + "PleinEcran"] == "True"
-                        self.screen_settings[category_key][screen_key][2][0] = int(data[screen_settings_key + "positionX"])
-                        self.screen_settings[category_key][screen_key][2][1] = int(data[screen_settings_key + "positionY"])
-                        self.screen_settings[category_key][screen_key][3][0] = int(data[screen_settings_key + "tailleX"])
-                        self.screen_settings[category_key][screen_key][3][1] = int(data[screen_settings_key + "tailleY"])
+                    if int(data[screen_settings_key + "screen_index"]) <= self.screen_count:
+                        self.screen_settings[category_key][screen_key][0] = data[screen_settings_key + "screen_index"]
+                        self.screen_settings[category_key][screen_key][1] = data[screen_settings_key + "full_screen"]
+                        self.screen_settings[category_key][screen_key][2][0] = data[screen_settings_key + "x"]
+                        self.screen_settings[category_key][screen_key][2][1] = data[screen_settings_key + "y"]
+                        self.screen_settings[category_key][screen_key][3][0] = data[screen_settings_key + "w"]
+                        self.screen_settings[category_key][screen_key][3][1] = data[screen_settings_key + "h"]
                 except KeyError:
-                    logging.debug("L'écran : " + screen_settings_key + " n'a pas de paramètres sauvegardés.\n")
+                    log.debug("L'écran : " + screen_settings_key + " n'a pas de paramètres sauvegardés.\n")
 
         # Met à jour la page visible de settings
         self.change_visible_screen_list()
@@ -309,64 +272,79 @@ class PageRB8:
 
         Parameters
         ----------
-        translation_data: `dict`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive
+        translation_data: `td.TranslationDictionnary`
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
         """
         # Traduit le nom de la catégorie
-        try:
-            self.current_button.setProperty("text", translation_data[self.current_button.property("text")])
-        except KeyError:
-            logging.debug("Impossible de traduire le nom de la catégorie de la page_rb8.\n")
+        self.current_button.setProperty("text", translation_data[self.current_button.property("text")])
 
         # Change la traduction pour le texte Plein écran ? du DMI_checkbutton
-        try:
-            self.page.setProperty("fullscreen_text", translation_data[self.page.property("fullscreen_text")])
-        except KeyError:
-            logging.debug("Traduction manquante pour : " + self.page.property("fullscreen_text") + ".\n")
+        self.page.setProperty("fullscreen_text", translation_data[self.page.property("fullscreen_text")])
+
+        # Change la traduction du aucun dans la liste d'écran
+        screen_list = self.page.property("screen_list").toVariant()
+        screen_list[0] = translation_data[screen_list[0]]
+        self.page.setProperty("screen_list", screen_list)
 
         # Pour chaque catégories
-        for category_index in list(self.screen_default.keys()):
+        for category_key in self.screen_default:
             # Pour chaque écrans de chaques catégories
-            for screen_index in list(self.screen_default[category_index].keys()):
-                try:
-                    # Essaye de rajouter la version avec la clé traduite de l'écran
-                    self.screen_default[category_index][translation_data[screen_index]] = self.screen_default[category_index][screen_index]
-                    self.screen_settings[category_index][translation_data[screen_index]] = self.screen_settings[category_index][screen_index]
-                except KeyError:
-                    # Récupère dans l'éventualité d'une traduction manquante
-                    logging.debug("Traduction manquante pour l'écran : " + screen_index +
-                                  " de la catégorie : " + category_index + ", traduction sautée.\n")
-                else:
-                    # Si les écrans traduites ont été rajoutés avec succès enlève les versions non traduites
-                    self.screen_default[category_index].pop(screen_index)
-                    self.screen_settings[category_index].pop(screen_index)
+            for screen_key in self.screen_default[category_key]:
+                # Traduit la clé d'écran pour le dictionaire de paramètres choisis et de paramètres par défaut
+                self.screen_default[category_key][translation_data[screen_key]] = self.screen_default[category_key][screen_key]
+                self.screen_settings[category_key][translation_data[screen_key]] = self.screen_settings[category_key][screen_key]
 
-            try:
-                # Essaye de traduire le nom de la catégorie
-                self.screen_default[translation_data[category_index]] = self.screen_default[category_index]
-                self.screen_settings[translation_data[category_index]] = self.screen_settings[category_index]
-            except KeyError:
-                # Récupère dans l'éventualité d'une traduction manquante
-                logging.debug("Traduction manquante pour la catégorie : " + category_index + ", traduction sautée.\n")
-            else:
-                # Si les catégories traduites ont été rajoutés avec succès enlève les versions non traduites
-                self.screen_default.pop(category_index)
-                self.screen_settings.pop(category_index)
+                # Si la clé d'écran a été traduite avec succès, enlève la version non traduite
+                if screen_key != translation_data[screen_key]:
+                    self.screen_default[category_key].pop(screen_key)
+                    self.screen_settings[category_key].pop(screen_key)
 
-                # Si la catégorie est la catégorie active, traduit la catégorie active
-                if self.category_active == category_index:
-                    self.category_active = translation_data[self.category_active]
+            # Traduit la clé de catégorie pour le dictionaire de paramètres choisis et de paramètres par défaut
+            self.screen_default[translation_data[category_key]] = self.screen_default[category_key]
+            self.screen_settings[translation_data[category_key]] = self.screen_settings[category_key]
+
+            # Si la clé de la catégorie a été traduite avec succès, enlève la version non traduite
+            if category_key != translation_data[category_key]:
+                self.screen_default.pop(category_key)
+                self.screen_settings.pop(category_key)
+
+            # Si la catégorie est la catégorie active, traduit la catégorie active
+            if self.category_active == category_key:
+                self.category_active = translation_data[self.category_active]
 
         # Traduit le texte devant le DMI_checkbutton pour savoir
-        try:
-            black_screens_check = self.page.findChild(QObject, "black_screens_check")
-            black_screens_check.setProperty("text", translation_data[black_screens_check.property("text")])
-        except KeyError:
-            logging.debug("Traduction manquante pour : " + black_screens_check.property("text") + ", traduction sautée.\n")
+        black_screens_check = self.page.findChild(QObject, "black_screens_check")
+        black_screens_check.setProperty("text", translation_data[black_screens_check.property("text")])
 
         # Remets à jour la page actuelle et le titre de la catégorie
         self.page.findChild(QObject, "category_title").setProperty("text", self.category_active)
         self.change_visible_screen_list()
+
+    def is_page_valid(self):
+        """Méthode permettant d'indiquer si la pagede paramètre est complétés
+
+        Returns
+        -------
+        is_page_valid: `bool`
+            Est ce que la page de paramètre est complétée ?
+        """
+        # Récupère les valeurs actuellement sur l'écran
+        old_screens_values = self.page.get_values().toVariant()
+        for index in range(0, len(old_screens_values)):
+            self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
+
+        # Pour toutes les catégories de paramètrages d'écrans
+        for category_key in self.screen_default:
+            # Pour tous les écrans de cette catégorie
+            for screen_key in self.screen_default[category_key]:
+                # Vérifier pour chaque page si la page doit et peut être complétée mais ne l'est pas
+                if self.screen_default[category_key][screen_key][0] and \
+                        self.screen_default[category_key][screen_key][3] \
+                        and self.screen_settings[category_key][screen_key][0] == 0:
+                    return False
+
+        # Si aucune des pages n'a pas encore été complétée, retourne que la page est complète
+        return True
 
     def on_page_opened(self, application):
         """Fonction appelée lorsque la page de paramètres 8 est chargée.
@@ -374,7 +352,7 @@ class PageRB8:
 
         Parameters
         ----------
-        application: `InitialisationWindow`
+        application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
         # Rend visible tous les écrans d'index
@@ -390,7 +368,7 @@ class PageRB8:
 
         Parameters
         ----------
-        application: `InitialisationWindow`
+        application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
         # Cache toutes les fenêtres d'index
@@ -415,8 +393,8 @@ class PageRB8:
         category_title = self.page.findChild(QObject, "category_title")
 
         # Récupère l'index et le nom du nouvel élément
-        new_index = list(self.screen_default.keys()).index(category_title.property("text")) - 1
-        self.category_active = list(self.screen_default.keys())[new_index]
+        new_index = list(self.screen_default).index(category_title.property("text")) - 1
+        self.category_active = list(self.screen_default)[new_index]
 
         # Si nouvel élément trouvé, change le titre de la catégorie.
         category_title.setProperty("text", self.category_active)
@@ -443,8 +421,8 @@ class PageRB8:
         category_title = self.page.findChild(QObject, "category_title")
 
         # Récupère l'index et le nom du nouvel élément
-        new_index = list(self.screen_default.keys()).index(self.category_active) + 1
-        self.category_active = list(self.screen_default.keys())[new_index]
+        new_index = list(self.screen_default).index(self.category_active) + 1
+        self.category_active = list(self.screen_default)[new_index]
 
         # Change le nom de la catégorie active
         category_title.setProperty("text", self.category_active)
@@ -455,7 +433,7 @@ class PageRB8:
 
         # Rend le bouton de gauche actif, et si dernière catégorie rend celui de droite inactif
         self.page.findChild(QObject, "left_category_button").setProperty("is_activable", True)
-        if new_index == len(self.screen_default.keys()) - 1:
+        if new_index == len(self.screen_default) - 1:
             right_category_button.setProperty("is_activable", False)
 
     def on_left_screen_button_pressed(self):
@@ -491,7 +469,7 @@ class PageRB8:
         # Essaye de récupérer le dictionnaire des écrans de la catégorie sélectionnée et récupère leurs clés
         category_screen_dict = self.screen_default[self.category_active]
         default_settings_dict = self.screen_settings[self.category_active]
-        category_screen_list = list(category_screen_dict.keys())
+        category_screen_list = list(category_screen_dict)
 
         # Vide les liste qui seront envoyés à la partie graphique
         visible_screen_names = []
@@ -513,7 +491,7 @@ class PageRB8:
                 visible_screen_minimum_wh.append([int(screen_data[1]), int(screen_data[2])])
             else:
                 # Si les valeurs ne sont pas présentes, laisse un message d'erreur et rajoute des valeurs par défaut
-                logging.warning("Les caractéristiques de " + category_screen_list[index] + " ne sont pas bonnes.\n")
+                log.warning("Les caractéristiques de " + category_screen_list[index] + " ne sont pas bonnes.\n")
                 visible_screen_activable.append(False)
                 visible_screen_minimum_wh.append([0, 0])
 
@@ -534,3 +512,74 @@ class PageRB8:
         else:
             self.page.findChild(QObject, "left_screen_button").setProperty("is_visible", False)
             self.page.findChild(QObject, "right_screen_button").setProperty("is_visible", False)
+
+    def on_camera_train_checked(self, application):
+        """Signal appelé lorsque le checkbutton camera_check est coché ou décoché.
+        Permet de mettre à jour la paramétrabilité des fenêtres Train caméra et ligne virtuelle
+
+        Parameters
+        ----------
+        application: `ini.InitialisationWindow`
+            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+        """
+        # Récupère si le checkbutton est activé, le nom de la catégorie et des écrans à modifier
+        is_checked = application.visible_pages[0].page.findChild(QObject, "camera_check").property("is_checked")
+        category = list(self.screen_default)[0]
+        screen_virtual_line = list(self.screen_default[category])[2]
+        screen_camera_train = list(self.screen_default[category])[3]
+
+        # Change la paramétrabilité des écrans souhaités
+        self.screen_default[category][screen_virtual_line][0] = not is_checked
+        self.screen_default[category][screen_camera_train][0] = is_checked
+
+        # Réinitialise les paramètres de ces écrans s'ils ne sont plus paramétrables
+        if not self.screen_default[category][screen_virtual_line][0]:
+            self.screen_settings[category][screen_virtual_line] = [0, False, [0, 0], [0, 0]]
+        else:
+            self.screen_settings[category][screen_camera_train] = [0, False, [0, 0], [0, 0]]
+
+    def on_pcc_checked(self, application):
+        """Signal appelé lorsque le checkbutton camera_check est coché ou décoché.
+        Permet de mettre à jour la paramétrabilité des fenêtres TCO du PCC
+
+        Parameters
+        ----------
+        application: `InitialisationWindow`
+            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+        """
+        # Récupère si le checkbutton est activé, le nom de la catégorie et des écrans à modifier
+        is_checked = application.visible_pages[0].page.findChild(QObject, "pcc_check").property("is_checked")
+        category = list(self.screen_default)[1]
+        screen_tco = list(self.screen_default[category])[0]
+
+        # Change la paramétrabilité des écrans souhaités
+        self.screen_default[category][screen_tco][0] = is_checked
+
+        # Réinitialise les paramètres de ces écrans s'ils ne sont plus paramétrables
+        if not self.screen_default[category][screen_tco][0]:
+            self.screen_settings[category][screen_tco] = [0, False, [0, 0], [0, 0]]
+
+    def on_data_checked(self, application):
+        """Signal appelé lorsque le checkbutton camera_check est coché ou décoché.
+        Permet de mettre à jour la paramétrabilité des fenêtres des courbes de paramètres en direct
+
+        Parameters
+        ----------
+        application: `InitialisationWindow`
+            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+        """
+        # Récupère si les données sont activées et si elles sont activées en mode dashboard
+        is_data_checked = application.visible_pages[0].page.findChild(QObject, "data_check").property("is_checked")
+        dashboard = application.visible_pages[0].page.findChild(QObject, "dashboard_check")
+        dashboard.setProperty("is_activable", is_data_checked)
+        category = list(self.screen_default)[2]
+        screen_graphs = list(self.screen_default[category])
+        screen_dashboard = screen_graphs[0]
+
+        # Mets à jour la paramétrabilité des écrans
+        for screen_graph in screen_graphs:
+            if is_data_checked and (dashboard.property("is_checked") == (screen_graph == screen_dashboard)):
+                self.screen_default[category][screen_graph][0] = True
+            else:
+                self.screen_default[category][screen_graph][0] = False
+                self.screen_settings[category][screen_graph] = [0, False, [0, 0], [0, 0]]
