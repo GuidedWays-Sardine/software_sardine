@@ -233,7 +233,7 @@ class PageRB1:
             widget.change_selection(selection_index)
 
         # Traduit les clés dans le log_type converter et dans le convertiseur de niveau de registre
-        keys = list(self.next_log_level.keys())
+        keys = list(self.next_log_level)
         self.log_type_converter = {translation_data[keys[0]]: self.log_type_converter[keys[0]],
                                    translation_data[keys[1]]: self.log_type_converter[keys[1]],
                                    translation_data[keys[2]]: self.log_type_converter[keys[2]],

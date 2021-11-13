@@ -60,7 +60,7 @@ class BottomButtons:
         log.info("Fermeture de la page de paramètres page_rb" + str(application.active_settings_page) + ".\n\n")
         application.app.quit()
 
-    def on_launch_clicked(self, application):   # OPTIMIZE: trouver un moyen de vérification plus compact
+    def on_launch_clicked(self, application):
         """Ferme la fenêtre d'initialisation et indique au programme de récupérer les données entrées
 
         Parameters
