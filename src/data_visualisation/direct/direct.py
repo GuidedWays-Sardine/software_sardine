@@ -213,7 +213,7 @@ class Graph(DashboardWindow):
         Parameters
         ----------
         plots : 'numpy.array'
-            Matrice de points
+            Matrice de points à afficher
 
         Returns
         -------
