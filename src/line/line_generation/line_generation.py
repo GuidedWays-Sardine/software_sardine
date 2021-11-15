@@ -101,4 +101,9 @@ class LineGenerator:
 
 
 if __name__ == "__main__":
-    read_raw_data()
+    log.initialise("../../../log", "1.1.0", log.Level.DEBUG)
+
+    # Codes pour la LGV Sud-Est
+    line_generator = LineGenerator()
+    line_generator.generate_line(752000)
+
