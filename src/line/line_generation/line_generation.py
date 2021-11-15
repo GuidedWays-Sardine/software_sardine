@@ -11,22 +11,47 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
 
 
-def read_raw_data():
-    initial_time = time.time()
-    columns = ["NOM_VOIE", "CODE_LIGNE", "LIB_LIGNE", "SENS", "RAYON", "PKD", "PKF", "C_GEO_D", "C_GEO_F"]
-    df = pd.read_csv(PROJECT_DIR + "src\\line\\raw_data\\courbe-des-voies.csv", delimiter=";", usecols=columns)
-    #print(df)
-    print(int((time.time() - initial_time) * 1000))
+DATA_DIR = PROJECT_DIR + "src\\line\\raw_data\\"
 
 
+class LineGenerator:
+    # Lignes existantes sur le RFN
+    lines_link = "https://ressources.data.sncf.com/explore/dataset/lignes-par-statut/table/"
+    lines_path = DATA_DIR + "line\\lignes-par-statut.csv"
+    lines_attr = ["CODE_LIGNE", "LIB_LIGNE", "STATUT", "PKD", "PKF", "C_GEO_D"]
+    lines = None
+
+    # Liste des voies sur le RFN
+    tracks_link = "https://ressources.data.sncf.com/explore/dataset/fichier-de-formes-des-voies-du-reseau-ferre-national/table/"
+    tracks_path = DATA_DIR + "line\\fichier-de-formes-des-voies-du-reseau-ferre-national.csv"
+    tracks_attr = ["CODE_LIGNE", "NOM_VOIE", "PK_DEBUT_R", "PK_FIN_R"]
+    tracks = None
 
 
+    # Données reliées aux courbes
+    curves_link = "https://ressources.data.sncf.com/explore/dataset/courbe-des-voies/table/"
+    curves_path = DATA_DIR + "line\\courbe-des-voies.csv"
+    curves_attr = ["CODE_LIGNE", "PKD", "PKF", "C_GEO_D", "C_GEO_F", "SENS", "RAYON"]
+    curves = None
 
-# Récupération des données SNCF
-# Trie de ses données (pour garder que les données utile au tracé) et les mets dans l'ordre
-# Convertis tout en courbe de Bésziers pour pour facilement pouvoir placer des ékéments
-# Reconvertit tout en données compatible UE5
-# Les sauvegardes
+    # Données reliées aux déclivités
+    slopes_link = "https://ressources.data.sncf.com/explore/dataset/caracteristique-des-voies-et-declivite/table/"
+    slopes_path = DATA_DIR + "line\\caracteristique-des-voies-et-declivite.csv"
+    slopes_attr = ["CODE_LIGNE", "NOM_VOIE", "TYPE", "VALEUR", "PKD", "PKF", "C_GEO_D", "C_GEO_F"]
+    slopes = None
+
+    # Données reliées à la vitesse maximale
+    max_speed_link = "https://ressources.data.sncf.com/explore/dataset/vitesse-maximale-nominale-sur-ligne/table/"
+    max_speed_path = DATA_DIR + "line\\vitesse-maximale-nominale-sur-ligne.csv"
+    max_speed_attr = ["CODE_LIGNE", "V_MAX", "PKD", "PKF", "C_GEO_D", "C_GEO_F"]
+    max_speed = None
+
+    # Données reliées à l'électrification des lignes
+    electrification_link = "https://ressources.data.sncf.com/explore/dataset/liste-des-lignes-electrifiees/table/"
+    electrification_path = DATA_DIR + "line\\liste-des-lignes-electrifiees.csv"
+    electrification_attr = ["CODE_LIGNE", "ELECT", "PKD", "PKF", "C_GEO_D", "C_GEO_F"]
+    electrification = None
+
 
 
 
