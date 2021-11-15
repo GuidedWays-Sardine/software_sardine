@@ -52,6 +52,26 @@ class LineGenerator:
     electrification_attr = ["CODE_LIGNE", "ELECT", "PKD", "PKF", "C_GEO_D", "C_GEO_F"]
     electrification = None
 
+    def __init__(self):
+        """Initialise le générateur de ligne en chargeant toutes les bases de données"""
+        initial_time = time.time()
+        log.change_log_prefix("initialisation des données lignes")
+        log.info("Chargement des bases de données pour la génération des lignes.\n")
+
+        # Chargement des lignes existantes et de la liste des voies sur le RFN
+        self.lines = pandas.read_csv(self.lines_path, delimiter=";", usecols=self.lines_attr)
+        self.tracks = pandas.read_csv(self.tracks_path, delimiter=";", usecols=self.tracks_attr)
+
+        # Chargement des éléments nécessaires à la génération de la ligne (courbe des voies, déclivités, vitesses maximales)
+        self.curves = pandas.read_csv(self.curves_path, delimiter=";", usecols=self.curves_attr)
+        self.slopes = pandas.read_csv(self.slopes_path, delimiter=";", usecols=self.slopes_attr)
+        self.max_speed = pandas.read_csv(self.max_speed_path, delimiter=";", usecols=self.max_speed_attr)
+        self.electrification = pandas.read_csv(self.electrification_path, delimiter=";", usecols=self.electrification_attr)
+
+        # Indique le temps de chargement des bases de données
+        log.info("Chargement de toutes les bases de données en " +
+                 str("{:.2f}".format((time.time() - initial_time)*1000)) + " milisecondes.\n\n")
+
 
 
 
