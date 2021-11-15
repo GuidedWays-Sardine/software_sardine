@@ -72,6 +72,26 @@ class LineGenerator:
         log.info("Chargement de toutes les bases de données en " +
                  str("{:.2f}".format((time.time() - initial_time)*1000)) + " milisecondes.\n\n")
 
+    def generate_line(self, line_code, reload=False):
+        """Fonction permettant de générer les données lignes (Python et UE5) à partir du code ligne
+
+        Parameter
+        ---------
+        line_code: `int`
+            Code de la ligne (trouvable en ligne selon le nom de la ligne
+        """
+        # Vérifie que la ligne n'existe pas encore et si non la recharge
+        if str(line_code) in os.listdir(PROJECT_DIR + "settings\\line_settings\\" + str(line_code)) and not reload:
+            log.info("La ligne " + str(line_code) + " existe déjà. Elle ne sera pas recréée.\n\n")
+            return
+
+        # Vérifie que la ligne qu'on essaye de charger existe
+        line_name = self.lines.loc[self.lines["CODE_LIGNE"] == line_code]
+        if not line_name:
+            log.warning("Aucune ligne existance avec le code_ligne : " + str(line_code) + ".\n\n")
+            return
+
+        # Sinon indique le nom et les informations clés de la ligne en question
 
 
 
