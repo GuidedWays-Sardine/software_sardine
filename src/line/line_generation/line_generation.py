@@ -2,7 +2,11 @@
 import sys
 import os
 import time
-import pandas as pd
+
+
+# Librairies de traitement de données
+import pandas
+import numpy
 
 
 #librairies SARDINE
