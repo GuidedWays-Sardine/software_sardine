@@ -64,17 +64,73 @@ class LineGenerator:
 
         # Chargement des lignes existantes et de la liste des voies sur le RFN
         self.lines = pandas.read_csv(self.lines_path, delimiter=";", usecols=self.lines_attr)
-        self.tracks = pandas.read_csv(self.tracks_path, delimiter=";", usecols=self.tracks_attr)
+        #self.tracks = pandas.read_csv(self.tracks_path, delimiter=";", usecols=self.tracks_attr)
 
         # Chargement des éléments nécessaires à la génération de la ligne (courbe des voies, déclivités, vitesses maximales)
-        self.curves = pandas.read_csv(self.curves_path, delimiter=";", usecols=self.curves_attr)
-        self.slopes = pandas.read_csv(self.slopes_path, delimiter=";", usecols=self.slopes_attr)
-        self.max_speed = pandas.read_csv(self.max_speed_path, delimiter=";", usecols=self.max_speed_attr)
-        self.electrification = pandas.read_csv(self.electrification_path, delimiter=";", usecols=self.electrification_attr)
+        #self.curves = pandas.read_csv(self.curves_path, delimiter=";", usecols=self.curves_attr)
+        #self.slopes = pandas.read_csv(self.slopes_path, delimiter=";", usecols=self.slopes_attr)
+        #self.max_speed = pandas.read_csv(self.max_speed_path, delimiter=";", usecols=self.max_speed_attr)
+        #self.electrification = pandas.read_csv(self.electrification_path, delimiter=";", usecols=self.electrification_attr)
 
         # Indique le temps de chargement des bases de données
         log.info("Chargement de toutes les bases de données en " +
                  str("{:.2f}".format((time.time() - initial_time)*1000)) + " milisecondes.\n\n")
+
+    def test(self, line_code):
+        """
+        .head() -> affiche les premiers
+        .tail() -> affiche les derniers
+        .shape -> nb lignes, nb_atributes
+        .describe() -> donne le nombre de valeurs, le nombre de valeurs différentes et la valeur avec la valeur la plus élevée
+        .columns -> Le nom des colonnes
+        .index -> le numéro des lignes (avec pandas, l'index est indépendant de [])
+        .columns = ["", "",...]-> pour renommer les colonnes
+        ["column_name] -> retourne la colonne avec se nom en format Series (DataFrame avec un seul colonne)
+        .loc[index, "column_name"]      attention index
+        .loc[index, "first_column":"end_column"]
+        ["column"][index]
+        .loc[index]["column_index"]
+        .loc[5, ["column_1", "column_2", ...]]
+        .iloc[index, index_column]
+        .iloc[index, index_columb_begin:index_column_end]
+        .iloc/loc[index_begin:index_end, ...]
+        ["column_name"].mean()
+
+        .append({"column_1":...})
+
+
+
+        mask = ...["column_1", ...] > value
+        si plusieurs colomnes, valeurs comparés sur plusieurs colones
+        stock colomne avec le résultat pour toutes les lignes. Permet de rendre le tableau plus lisible
+
+        ...[mask]
+
+        .dtypes -> type de chaque colonne
+        si string ou truc au pif -> object
+        df.index[0]     -> index de la première ligne
+        .drop[index, inplace=True]      -> inplace indique si le nouveau tableau doit être retourné, ou s'il doit être stocké dans le tableau actuel
+        .to_list() -> transforme la Series en Liste
+        .dropna() -> supprime toutes les colonnes qui contient un NaN dans une des valeurs
+        .drop_duplicate()   -> supprime toutes les lignes en doubles
+        .reset_index(drop=True)      -> reset tous les index (0, 1,...) (drop sinon ça garde les anciens index dans une colonnes)
+        .where(mask, inplace=True)  -> remplace toutes les cas ou le mask retourne true en NaN
+        .replace(old_value, new_value)  -> à regarder plus en détail ?
+        .isin([])       -> regarde si la valeur est cases sont dans cette list
+        .copy()         -> renvoie une copie (pas un pointeur)
+        .datetime()     -> pour les dates ?
+        np.vectorize(lambda...)     -> parfois rapide que juste df["column_name"] = ...
+        ~signifie l'inverse
+        .concat()       -> existe mais peu utile pour le projet
+        .merge()        -> existe mais peu utile pour le projet
+        regex (re)      -> pour des recherches pas complètes
+        df["A"] = pd.to_numeric(df["A"], downcast="float")
+        df["column_name"].astype(type)      -> attention string object donc possibilité que ça ne marche pas
+        pas de for dans les tableaux        -> truc que j'ai loupé -> vectorisation pour l'optimiser
+        https://www.google.com/url?sa=i&url=https%3A%2F%2Fstackoverflow.com%2Fquestions%2F52783882%2Fpandas-and-numpy-program-slower-than-loop-version-of-same-functionality-how-to&psig=AOvVaw1X5Q98avR9f1Ipj9jDxT2k&ust=1637102449664000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCKDlvYO4m_QCFQAAAAAdAAAAABAD
+        .sort pour trier()
+        """
+        print(self.lines.head(10))
 
     def generate_line(self, line_code, reload=False):
         """Fonction permettant de générer les données lignes (Python et UE5) à partir du code ligne
@@ -105,5 +161,6 @@ if __name__ == "__main__":
 
     # Codes pour la LGV Sud-Est
     line_generator = LineGenerator()
-    line_generator.generate_line(752000)
+    line_generator.test(752000)
+    #line_generator.generate_line(752000)
 
