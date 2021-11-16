@@ -64,6 +64,16 @@ class LineGenerator:
 
         # Chargement des lignes existantes et de la liste des voies sur le RFN
         self.lines = pandas.read_csv(self.lines_path, delimiter=";", usecols=self.lines_attr)
+        self.lines.loc[self.lines.PKD.str.contains("-"), "PKD"] = "-" + self.lines.PKD.str.replace("-", ".", regex=False)
+        self.lines.loc[self.lines.PKD.str.contains("+", regex=False), "PKD"] = self.lines.PKD.str.replace("+", ".", regex=False)
+        self.lines.loc[self.lines.PKD.str.contains("^[a-zA-Z].*", regex=True), "PKD"] = (self.lines.PKD.str.get(0).apply(ord) - 64).astype("string") + self.lines.PKD.str[1::]
+        self.lines.loc[self.lines.PKF.str.contains("-"), "PKF"] = "-" + self.lines.PKF.str.replace("-", ".", regex=False)
+        self.lines.loc[self.lines.PKF.str.contains("+", regex=False), "PKF"] = self.lines.PKF.str.replace("+", ".", regex=False)
+        self.lines.loc[self.lines.PKF.str.contains("^[a-zA-Z].*", regex=True), "PKF"] = (self.lines.PKF.str.get(0).apply(ord) - 64).astype("string") + self.lines.PKF.str[1::]
+        self.lines.PKD.astype(float)
+        self.lines.PKD.astype(float)
+        print(self.lines.loc[330:350, ["CODE_LIGNE", "PKD", "PKF"]])
+        #print(self.lines.dtypes)
         #self.tracks = pandas.read_csv(self.tracks_path, delimiter=";", usecols=self.tracks_attr)
 
         # Chargement des éléments nécessaires à la génération de la ligne (courbe des voies, déclivités, vitesses maximales)
@@ -161,6 +171,5 @@ if __name__ == "__main__":
 
     # Codes pour la LGV Sud-Est
     line_generator = LineGenerator()
-    line_generator.test(752000)
     #line_generator.generate_line(752000)
 
