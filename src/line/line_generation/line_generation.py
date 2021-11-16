@@ -22,7 +22,7 @@ class LineGenerator:
     # Lignes existantes sur le RFN
     lines_link = "https://ressources.data.sncf.com/explore/dataset/lignes-par-statut/table/"
     lines_path = DATA_DIR + "line\\lignes-par-statut.csv"
-    lines_attr = ["CODE_LIGNE", "LIB_LIGNE", "STATUT", "PKD", "PKF", "C_GEO_D"]
+    lines_attr = ["CODE_LIGNE", "LIB_LIGNE", "STATUT", "PKD", "PKF", "C_GEO_D", "C_GEO_F"]
     lines = None
 
     # Liste des voies sur le RFN
@@ -64,18 +64,18 @@ class LineGenerator:
 
         # Chargement des lignes existantes et de la liste des voies sur le RFN
         self.lines = pandas.read_csv(self.lines_path, delimiter=";", usecols=self.lines_attr)
-        self.lines.loc[self.lines.PKD.str.contains("-"), "PKD"] = "-" + self.lines.PKD.str.replace("-", ".", regex=False)
-        self.lines.loc[self.lines.PKD.str.contains("+", regex=False), "PKD"] = self.lines.PKD.str.replace("+", ".", regex=False)
-        self.lines.loc[self.lines.PKD.str.contains("^[a-zA-Z].*", regex=True), "PKD"] = (self.lines.PKD.str.get(0).apply(ord) - 64).astype("string") + self.lines.PKD.str[1::]
-        self.lines.loc[self.lines.PKF.str.contains("-"), "PKF"] = "-" + self.lines.PKF.str.replace("-", ".", regex=False)
-        self.lines.loc[self.lines.PKF.str.contains("+", regex=False), "PKF"] = self.lines.PKF.str.replace("+", ".", regex=False)
-        self.lines.loc[self.lines.PKF.str.contains("^[a-zA-Z].*", regex=True), "PKF"] = (self.lines.PKF.str.get(0).apply(ord) - 64).astype("string") + self.lines.PKF.str[1::]
-        self.lines.PKD.astype(float)
-        self.lines.PKD.astype(float)
+        self.lines.insert(6, "GEO_D_lo", numpy.nan)
+        self.lines.insert(8, "GEO_F_lo", numpy.nan)
+        #["CODE_LIGNE", "LIB_LIGNE", "STATUT", "PKD", "PKF", "C_GEO_D", "C_GEO_F"]
+        self.lines.CODE_LIGNE.astype(int)
+        for col in ["PKD", "PKF"]:
+            self.lines[col] = numpy.where(self.lines[col].str.contains("-"), "-", "") + self.lines[col].str.replace("[-+]", ".", regex=True)
+            self.lines.loc[self.lines[col].str.contains("^[a-zA-Z].*", regex=True), col] = (self.lines[col].str.get(0).apply(ord) - 64).astype("string") + self.lines[col].str[1:]
+            self.lines[col] = self.lines[col].astype(numpy.float32)
+        print(self.lines.dtypes)
         print(self.lines.loc[330:350, ["CODE_LIGNE", "PKD", "PKF"]])
-        #print(self.lines.dtypes)
-        #self.tracks = pandas.read_csv(self.tracks_path, delimiter=";", usecols=self.tracks_attr)
 
+        #self.tracks = pandas.read_csv(self.tracks_path, delimiter=";", usecols=self.tracks_attr)
         # Chargement des éléments nécessaires à la génération de la ligne (courbe des voies, déclivités, vitesses maximales)
         #self.curves = pandas.read_csv(self.curves_path, delimiter=";", usecols=self.curves_attr)
         #self.slopes = pandas.read_csv(self.slopes_path, delimiter=";", usecols=self.slopes_attr)
