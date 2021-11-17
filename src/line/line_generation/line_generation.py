@@ -5,8 +5,8 @@ import time
 
 
 # Librairies de traitement de données
-import pandas
-import numpy
+import pandas as pd
+import numpy as np
 
 
 #librairies SARDINE
@@ -15,7 +15,16 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
 
 
+# Chemin d'accès vers les données
 DATA_DIR = PROJECT_DIR + "src\\line\\raw_data\\"
+
+
+# Constantes sur les noms des colonnes
+GEO_LO = "GEO_LO"
+GEO_LA = "GEO_LA"
+PK = "PK"
+DEBUT = "_D"
+FIN = "_F"
 
 
 class LineGenerator:
@@ -28,14 +37,14 @@ class LineGenerator:
     # Liste des voies sur le RFN
     tracks_link = "https://ressources.data.sncf.com/explore/dataset/fichier-de-formes-des-voies-du-reseau-ferre-national/table/"
     tracks_path = DATA_DIR + "line\\fichier-de-formes-des-voies-du-reseau-ferre-national.csv"
-    tracks_attr = ["CODE_LIGNE", "NOM_VOIE", "PK_DEBUT_R", "PK_FIN_R"]
+    tracks_attr = ["CODE_LIGNE", "NOM_VOIE", "PK_DEBUT_R", "PK_FIN_R", "Geo Point"]
     tracks = None
 
 
     # Données reliées aux courbes
     curves_link = "https://ressources.data.sncf.com/explore/dataset/courbe-des-voies/table/"
     curves_path = DATA_DIR + "line\\courbe-des-voies.csv"
-    curves_attr = ["CODE_LIGNE", "PKD", "PKF", "C_GEO_D", "C_GEO_F", "SENS", "RAYON"]
+    curves_attr = ["CODE_LIGNE", "SENS", "RAYON", "PKD", "PKF", "C_GEO_D", "C_GEO_F"]
     curves = None
 
     # Données reliées aux déclivités
@@ -63,24 +72,56 @@ class LineGenerator:
         log.info("Chargement des bases de données pour la génération des lignes.\n")
 
         # Chargement des lignes existantes et de la liste des voies sur le RFN
-        self.lines = pandas.read_csv(self.lines_path, delimiter=";", usecols=self.lines_attr)
-        self.lines.insert(6, "GEO_D_lo", numpy.nan)
-        self.lines.insert(8, "GEO_F_lo", numpy.nan)
-        #["CODE_LIGNE", "LIB_LIGNE", "STATUT", "PKD", "PKF", "C_GEO_D", "C_GEO_F"]
-        self.lines.CODE_LIGNE.astype(int)
-        for col in ["PKD", "PKF"]:
-            self.lines[col] = numpy.where(self.lines[col].str.contains("-"), "-", "") + self.lines[col].str.replace("[-+]", ".", regex=True)
-            self.lines.loc[self.lines[col].str.contains("^[a-zA-Z].*", regex=True), col] = (self.lines[col].str.get(0).apply(ord) - 64).astype("string") + self.lines[col].str[1:]
-            self.lines[col] = self.lines[col].astype(numpy.float32)
-        print(self.lines.dtypes)
-        print(self.lines.loc[330:350, ["CODE_LIGNE", "PKD", "PKF"]])
-
-        #self.tracks = pandas.read_csv(self.tracks_path, delimiter=";", usecols=self.tracks_attr)
+        self.lines = pd.read_csv(self.lines_path, delimiter=";", usecols=self.lines_attr)[self.lines_attr]
+        self.tracks = pd.read_csv(self.tracks_path, delimiter=";", usecols=self.tracks_attr)[self.tracks_attr]
         # Chargement des éléments nécessaires à la génération de la ligne (courbe des voies, déclivités, vitesses maximales)
-        #self.curves = pandas.read_csv(self.curves_path, delimiter=";", usecols=self.curves_attr)
-        #self.slopes = pandas.read_csv(self.slopes_path, delimiter=";", usecols=self.slopes_attr)
-        #self.max_speed = pandas.read_csv(self.max_speed_path, delimiter=";", usecols=self.max_speed_attr)
-        #self.electrification = pandas.read_csv(self.electrification_path, delimiter=";", usecols=self.electrification_attr)
+        #self.curves = pd.read_csv(self.curves_path, delimiter=";", usecols=self.curves_attr)[self.curves_attr]
+        #self.slopes = pd.read_csv(self.slopes_path, delimiter=";", usecols=self.slopes_attr)[self.slopes_attr]
+        #self.max_speed = pd.read_csv(self.max_speed_path, delimiter=";", usecols=self.max_speed_attr)[self.max_speed_attr]
+        #self.electrification = pd.read_csv(self.electrification_path, delimiter=";", usecols=self.electrification_attr)[self.electrification_attr]
+
+        # Pour chacunes des bases de données chargées
+        for df in (df for df in [self.lines, self.tracks, self.curves, self.slopes, self.max_speed, self.electrification
+                                 ] if df is not None):
+            # Récupère la liste des colonnes
+            df_columns = list(df.columns)
+
+            # Pour toutes les colonnes mentionnant des positions géographiques
+            # (Actuellement les colonnes C_GEO sont de la forme : "GEO_longitude,GEO_latitude")
+            geo_index = [g_i for g_i in range(len(df_columns)) if "geo" in df_columns[g_i].lower()]
+            for i in range(0, len(geo_index)):
+                # Récupère la liste, sépare et convertit en float, les positions de longitude et de latitude
+                split_geo_points = df[df_columns[geo_index[i] + i]].str.split(",", expand=True).astype(np.float64)
+
+                # Change les valeurs de la colonne existante pour la longitude et en insert une nouvelle pour la latitude
+                df[df_columns[geo_index[i] + i]] = split_geo_points[0]
+                df.insert(geo_index[i] + i + 1, GEO_LA + str(i), split_geo_points[1])
+
+                # Change le nom des colonnes pour garder un format compréhensible et normalisé
+                df_columns[geo_index[i] + i] = GEO_LO + (DEBUT if "D" in df_columns[geo_index[i] + i]
+                                                         else FIN if "F" in df_columns[geo_index[i] + i]
+                                                         else "")
+                df_columns.insert(geo_index[i] + i + 1, GEO_LA + (DEBUT if "D" in df_columns[geo_index[i] + i]
+                                                                  else FIN if "F" in df_columns[geo_index[i] + i]
+                                                                  else ""))
+                # Le nom des colonnes dans la dataFrame seront changés en fin de processus
+
+            # Pour toutes les colonnes mentionnant des Points Kilométriques
+
+
+            # Change le nom des colonnes
+            df.columns = df_columns
+            print(df.dtypes)
+
+
+        for col in ["PKD", "PKF"]:
+            self.lines[col] = np.where(self.lines[col].str.contains("-"), "-", "") + self.lines[col].str.replace("[-+]", ".", regex=True)
+            self.lines.loc[self.lines[col].str.contains("^[a-zA-Z].*", regex=True), col] = (self.lines[col].str.get(0).apply(ord) - 64).astype("string") + self.lines[col].str[1:]
+            self.lines[col] = self.lines[col].astype(np.float32)
+        #print(self.lines.dtypes)
+        #print(self.lines.loc[330:350, ["CODE_LIGNE", "PKD", "PKF"]])
+
+
 
         # Indique le temps de chargement des bases de données
         log.info("Chargement de toutes les bases de données en " +
