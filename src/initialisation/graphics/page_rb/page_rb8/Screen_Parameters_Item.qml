@@ -1,7 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
-import "../../../../DMI_default/ETCS"
+import "../../../components"
 
 Item {
     id: root
@@ -74,7 +74,7 @@ Item {
 
 
     //Bouton permettant de créer l'encadré du combobox
-    DMI_button {
+    INI_button {
         id: body
 
         default_x: 54
@@ -88,7 +88,7 @@ Item {
     }
 
     //Texte affichant l'utilisation de l'écran
-    DMI_text{
+    INI_text{
         id: screen_text
 
         default_x: body.default_x + 2 + root.font_size
@@ -102,7 +102,7 @@ Item {
     }
 
     //Combobox pour sélectioner l'écran d'affichage
-    DMI_combobox {
+    INI_combobox {
         id: screen_index_combo
         objectName: "screen_index_combo"
 
@@ -120,7 +120,7 @@ Item {
         is_visible: root.screen_name != ""
 
 
-        //Signal handler pour griser les textes pour l'emplacement de l'écran et changer les valeurs/valeurs par défaut des DMI_valueinput
+        //Signal handler pour griser les textes pour l'emplacement de l'écran et changer les valeurs/valeurs par défaut des INI_valueinput
         onSelection_changed: {
 
             //cas si l'écran est passé à aucun
@@ -156,7 +156,7 @@ Item {
 
 
     //Checkbutton pour savoir si l'écran sera en fullscreen
-    DMI_checkbutton {
+    INI_checkbutton {
         id: fullscreen_on_check
 
         box_length: 16
@@ -172,7 +172,7 @@ Item {
         is_visible: root.screen_name != ""
 
 
-        //fonction permettant de vider les DMI_valueinput quand le mode fullscreen est activé
+        //fonction permettant de vider les INI_valueinput quand le mode fullscreen est activé
         onIs_checkedChanged: {
             x_input.clear()
             y_input.clear()
@@ -183,7 +183,7 @@ Item {
 
 
     //position x de la fenêtre
-    DMI_text {
+    INI_text {
         id: x_text
 
         default_x: x_input.default_x - root.font_size * 1.2
@@ -196,7 +196,7 @@ Item {
         is_visible: root.screen_name != ""
     }
 
-    DMI_valueinput {
+    INI_valueinput {
         id: x_input
         objectName: "x_input"
 
@@ -223,7 +223,7 @@ Item {
     }
 
     //position y de la fenêtre
-    DMI_text {
+    INI_text {
         id: y_text
 
         default_x: y_input.default_x - root.font_size * 1.2
@@ -236,7 +236,7 @@ Item {
         is_visible: root.screen_name != ""
     }
 
-    DMI_valueinput {
+    INI_valueinput {
         id: y_input
         objectName: "y_input"
 
@@ -264,7 +264,7 @@ Item {
 
 
     //hauteur de la fenètre
-    DMI_text {
+    INI_text {
         id: height_text
 
         default_x: height_input.default_x - root.font_size * 1.2
@@ -277,7 +277,7 @@ Item {
         is_dark_grey: !root.screen_valid || !(screen_index_combo.selection_index !== 0 && !fullscreen_on_check.is_checked)
     }
 
-    DMI_valueinput {
+    INI_valueinput {
         id: height_input
         objectName: "height_input"
 
@@ -296,7 +296,7 @@ Item {
     }
 
     //largeur de la fenètre
-    DMI_text {
+    INI_text {
         id: width_text
 
         default_x: width_input.default_x - root.font_size * 1.2
@@ -309,7 +309,7 @@ Item {
         is_visible: root.screen_name != ""
     }
 
-    DMI_valueinput {
+    INI_valueinput {
         id: width_input
         objectName: "width_input"
 

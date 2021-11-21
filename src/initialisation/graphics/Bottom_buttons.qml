@@ -1,6 +1,6 @@
 import QtQuick 2.0
 
-import "../../DMI_default/ETCS"
+import "../components"
 
 
 Item {
@@ -12,7 +12,7 @@ Item {
 
 
     //Bouton quitter
-    DMI_button{
+    INI_button{
         id: quit
         objectName: "quit"
 
@@ -30,7 +30,7 @@ Item {
 
 
     //Bouton ouvrir
-    DMI_button{
+    INI_button{
         id: open
         objectName: "open"
 
@@ -47,7 +47,7 @@ Item {
     }
 
     //Bouton sauvegarder
-    DMI_button{
+    INI_button{
         id: save
         objectName: "save"
 
@@ -64,7 +64,7 @@ Item {
     }
 
     //Bouton lancer
-    DMI_button{
+    INI_button{
         id: launch
         objectName: "launch"
 

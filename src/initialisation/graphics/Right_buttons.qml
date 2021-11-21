@@ -1,6 +1,6 @@
 import QtQuick 2.0
 
-import "../../DMI_default/ETCS"
+import "../components"
 
 
 Item {
@@ -12,7 +12,7 @@ Item {
 
 
     //Bouton rb1
-    DMI_button{
+    INI_button{
         id: rb1
         objectName: "rb1"
 
@@ -21,13 +21,13 @@ Item {
         default_height: 50
         default_width: 60
 
-        is_activable: true
-        is_positive: true
+        is_positive: false
+        is_activable: false
         is_visible: true
     }
 
     //Bouton rb2
-    DMI_button{
+    INI_button{
         id: rb2
         objectName: "rb2"
 
@@ -36,13 +36,13 @@ Item {
         default_height: 50
         default_width: 60
 
-        is_activable: true
-        is_positive: true
+        is_positive: false
+        is_activable: false
         is_visible: true
     }
 
     //Bouton rb3
-    DMI_button{
+    INI_button{
         id: rb3
         objectName: "rb3"
 
@@ -51,13 +51,13 @@ Item {
         default_height: 50
         default_width: 60
 
-        is_activable: true
-        is_positive: true
+        is_positive: false
+        is_activable: false
         is_visible: true
     }
 
     //Bouton rb4
-    DMI_button{
+    INI_button{
         id: rb4
         objectName: "rb4"
 
@@ -66,13 +66,13 @@ Item {
         default_height: 50
         default_width: 60
 
-        is_activable: true
-        is_positive: true
+        is_positive: false
+        is_activable: false
         is_visible: true
     }
 
     //Bouton rb5
-    DMI_button{
+    INI_button{
         id: rb5
         objectName: "rb5"
 
@@ -81,13 +81,13 @@ Item {
         default_height: 50
         default_width: 60
 
-        is_activable: true
-        is_positive: true
+        is_positive: false
+        is_activable: false
         is_visible: true
     }
 
     //Bouton rb6
-    DMI_button{
+    INI_button{
         id: rb6
         objectName: "rb6"
 
@@ -96,13 +96,13 @@ Item {
         default_height: 50
         default_width: 60
 
-        is_activable: true
-        is_positive: true
+        is_positive: false
+        is_activable: false
         is_visible: true
     }
 
     //Bouton rb7
-    DMI_button{
+    INI_button{
         id: rb7
         objectName: "rb7"
 
@@ -111,13 +111,13 @@ Item {
         default_height: 50
         default_width: 60
 
-        is_activable: true
-        is_positive: true
+        is_positive: false
+        is_activable: false
         is_visible: true
     }
 
     //Bouton rb8
-    DMI_button{
+    INI_button{
         id: rb8
         objectName: "rb8"
 
@@ -126,8 +126,8 @@ Item {
         default_height: 50
         default_width: 60
 
-        is_activable: true
-        is_positive: true
+        is_positive: false
+        is_activable: false
         is_visible: true
     }
 }
