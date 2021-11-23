@@ -75,7 +75,8 @@ class Simulation:
 
         # A partir d'ici initialise tous les modules un par un (ils seront lancées dans la fonction run())
         # FEATURE : appeler les différentes fonctions d'initialisation de modules ici
-        self.initialise_dmi()  # Initialisation du DMI
+        self.initialise_dmi()
+        self.initialise_command_board()
 
         # Si aucun module de simulation n'a été lancé
         if not self.components:
@@ -131,7 +132,6 @@ class Simulation:
 
                 # Mets à jour tous les modules dans un ordre logique
                 # FEATURE appeler toutes les fonctions update des modules dans un ordre logique
-
                 if "dmi" in self.components:
                     self.components["dmi"].update()
 
@@ -172,6 +172,8 @@ class Simulation:
 
         # Appelle les différentes fonctions de fermetures
         # FEATURE : ajouter les différents appels de fonctions de fermetures ici
+        if "command_board" in self.components:
+            self.components["command_board"].stop()
 
         # Indique le temps nécessaire à la fermeture
         log.info("Simulation terminée en " + str("{:.2f}".format((time.time() - initial_time) * 1000)) + " millisecondes.\n\n")
@@ -206,6 +208,11 @@ class Simulation:
                           "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
                           "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
                           prefix="initialisation simulation")
+
+    def initialise_command_board(self):
+        """Permet d'initialiser le pupitre de commande"""
+        # TODO : initialiser le pupitre de commande
+        pass
 
     def initialise_off_screens(self):
         """Permet d'initialiser toutes les fenêtres d'immersions (fenêtres noires en plein écran).
