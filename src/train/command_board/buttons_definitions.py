@@ -1,3 +1,4 @@
+# Librairies par défaut
 import sys
 import os
 import time
@@ -14,8 +15,6 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
 import src.train.command_board.control as control
 
-
-#dans les classes on doit stocker l'etat du bouton et de la led, le pin sur l'arduino du bouton et de led
 
 class PushButton:
     button_pin = None
@@ -42,12 +41,14 @@ class PushButton:
                 print(pressed)
             time.sleep(0.05)
 
+
 class Potentiometer:
-    pin =  None
+    pin = None
     state = None
 
     def __init__(self, pin):
         self.pin = pin
+
 
 class SwitchButton:
     pin = None

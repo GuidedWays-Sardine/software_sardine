@@ -159,10 +159,10 @@ class Control:
 
     # Fonction (à surcharger) permettant de lire les états des différents boutons en boucles
     def get_buttons_state(self):
-        """Fonction permettant de lire en boucles les états des différents éléments du pupitre"""
+        """Fonction permettant de lire en boucle les états des différents éléments du pupitre"""
         pass
 
     # Fonction (à surchager) permettant de lire les valeurs analogiques (position manip de traction...)
     def read_specific_values(self):
-        """Fonction permettant de récupérer les valeurs ne nécessitant pas une lecture en continue"""
+        """Fonction permettant de récupérer les valeurs ne nécessitant pas une lecture en continu"""
         pass
