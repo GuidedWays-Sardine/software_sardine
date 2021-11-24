@@ -211,8 +211,14 @@ class Simulation:
 
     def initialise_command_board(self):
         """Permet d'initialiser le pupitre de commande"""
-        # TODO : initialiser le pupitre de commande
-        pass
+        try:
+            # Importe le module du pupitre, essaye de l'initialiser et l'ajouter aux "components" (modules) initialisés
+            exec("import src.train.command_board." + str(self.parameters["command_board"]) + ".dmi as cb\n" +
+                 "self.components[\"command_board\"] = cb.CommandBoard(self.app)")
+        except KeyError:
+            # Dans le cas où le pupitre n'a pas été trouvé, crash en indiquant que le paramètre n'existe pas
+            raise ModuleNotFoundError("Le paramètre \"command_board\" n'existe pas alors qu'il est obligatoire.\n")
+        # Dans le cas où l'initialisation contient une erreur, rejette juste l'erreur
 
     def initialise_off_screens(self):
         """Permet d'initialiser toutes les fenêtres d'immersions (fenêtres noires en plein écran).
