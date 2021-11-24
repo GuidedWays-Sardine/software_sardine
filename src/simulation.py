@@ -213,7 +213,7 @@ class Simulation:
         """Permet d'initialiser le pupitre de commande"""
         try:
             # Importe le module du pupitre, essaye de l'initialiser et l'ajouter aux "components" (modules) initialisés
-            exec("import src.train.command_board." + str(self.parameters["command_board"]) + ".dmi as cb\n" +
+            exec("import src.train.command_board." + str(self.parameters["command_board"]) + ".command_board as cb\n" +
                  "self.components[\"command_board\"] = cb.CommandBoard(self.app)")
         except KeyError:
             # Dans le cas où le pupitre n'a pas été trouvé, crash en indiquant que le paramètre n'existe pas
