@@ -26,7 +26,7 @@ class LineGenerator:
                         "https://ressources.data.sncf.com/explore/dataset/lignes-par-statut/table/")
 
     tracks = DB.DataBase("line\\fichier-de-formes-des-voies-du-reseau-ferre-national.csv",
-                         ["CODE_LIGNE", "NOM_VOIE", "PK_DEBUT_R", "PK_FIN_R", "Geo Point"],
+                         ["CODE_LIGNE", "NOM_VOIE", "PK_DEBUT_R", "PK_FIN_R", "Geo Shape"],
                          "https://ressources.data.sncf.com/explore/dataset/fichier-de-formes-des-voies-du-reseau-ferre-national/table/")
 
     curves = DB.DataBase("line\\courbe-des-voies.csv",
@@ -47,6 +47,7 @@ class LineGenerator:
 
     def __init__(self):
         """Initialise la liste des lignes"""
+        # Initialise la base de données lignes
         self.lines.load()
 
     def generate_line(self, line_code, reload=False):
@@ -62,7 +63,7 @@ class LineGenerator:
             log.info("La ligne " + str(line_code) + " existe déjà. Elle ne sera pas recréée.\n\n")
             return
 
-        # Vérifie que la ligne qu'on essaye de charger existe
+        # Vérifie que la ligne qu'on essaye de charger existe, sinon arrête le chargement de la ligne
         line_name = list(self.lines.df.loc[self.lines.df["CODE_LIGNE"] == line_code, "LIB_LIGNE"])
         if not line_name:
             log.warning("Aucune ligne existance avec le code_ligne : " + str(line_code) + ".\n\n")
@@ -87,7 +88,22 @@ class LineGenerator:
         log.info("Chargement des bases de données pour la génération des lignes")
 
         # Chargement base de données voies
-        self.tracks.load()
+        if self.tracks.load():
+            # Récupère à partir du linestring le premier et dernier point géographique
+            self.tracks.df.loc["Geo Shape"] = self.tracks.df.loc["Geo Shape"].split("[[", regex=False)[1].split("]]", regex=False)[0]
+            self.tracks.df.insert(len(self.tracks.df.columns), DB.GEO_LO + DB.DEBUT,
+                                  self.tracks.df.loc["Geo Shape"].split["], ["][0].split(", ")[1]).astype(np.float32)
+            self.tracks.df.insert(len(self.tracks.df.columns), DB.GEO_LA + DB.DEBUT,
+                                  self.tracks.df.loc["Geo Shape"].split["], ["][0].split(", ")[0]).astype(np.float32)
+            self.tracks.df.insert(len(self.tracks.df.columns), DB.GEO_LO + DB.FIN,
+                                  self.tracks.df.loc["Geo Shape"].split["], ["][-1].split(", ")[1]).astype(np.float32)
+            self.tracks.df.insert(len(self.tracks.df.columns), DB.GEO_LA + DB.FIN,
+                                  self.tracks.df.loc["Geo Shape"].split["], ["][-1].split(", ")[0]).astype(np.float32)
+
+            # Enlève la colonne Geo Shape, plus utile pour les calculs
+            self.tracks.df.drop("Geo Shape")
+            self.tracks.attr.pop()
+            self.tracks.attr.append([DB.GEO_LO + DB.DEBUT, DB.GEO_LA + DB.DEBUT, DB.GEO_LO + DB.FIN, DB.GEO_LA + DB.FIN])
 
         # Chargement bases de données courbes
         if self.curves.load():
