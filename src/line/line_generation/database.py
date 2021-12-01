@@ -107,6 +107,10 @@ class DataBase:
         # Change le nom des colonnes
         self.df.columns = self.attr
 
+        # Trie les colonnes par CODE_LIGNE et par PK (ou PK_D)
+        if any([pk for pk in self.attr if PK in pk]):
+            self.df.sort_values(by=["CODE_LIGNE", PK + (DEBUT if (PK + DEBUT) in self.attr else "")]).reset_index(drop=True)
+
         # Indique le temps de chargement et de normaliusation de la base de données
         log.info("Base de données : " + self.path[len(DATA_DIR)::] + "chargée en : " +
                  str("{:.2f}".format((time.time() - initial_time) * 1000)) + " milisecondes.")
