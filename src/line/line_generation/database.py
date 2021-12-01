@@ -68,7 +68,7 @@ class DataBase:
 
         # Pour toutes les colonnes mentionnant des positions géographiques
         # (Actuellement les colonnes C_GEO sont de la forme : "GEO_longitude,GEO_latitude")
-        geo_index = [g_i for g_i in range(len(self.attr)) if "geo" in self.attr[g_i].lower()]
+        geo_index = [g_i for g_i in range(len(self.attr)) if "c_geo" in self.attr[g_i].lower()]
         for i in range(0, len(geo_index)):
             # Récupère la liste, sépare et convertit en float, les positions de longitude et de latitude
             split_geo_points = self.df[self.attr[geo_index[i] + i]].str.split(",", expand=True).astype(np.float64)
