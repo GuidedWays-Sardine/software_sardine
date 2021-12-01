@@ -150,12 +150,10 @@ def get_distance_to_line(line_begin, line_end, point):
     print(abs(point[1] - a * point[1] - b) / ((1 + a ** 2) ** 0.5))
 
 if __name__ == "__main__":
-    #log.initialise("../../../log", "1.1.0", log.Level.DEBUG)
+    log.initialise("../../../log", "1.1.0", log.Level.DEBUG)
 
     # Codes pour la LGV Sud-Est
-    #line_generator = LineGenerator()
-    #line_generator.generate_line(752000)
-
-    get_distance_to_line([0, 0], [2, 2], [1, 1])
+    line_generator = LineGenerator()
+    line_generator.generate_line(752000)
 
 
