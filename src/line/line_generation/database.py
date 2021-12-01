@@ -114,3 +114,4 @@ class DataBase:
         # Indique le temps de chargement et de normaliusation de la base de données
         log.info("Base de données : " + self.path[len(DATA_DIR)::] + "chargée en : " +
                  str("{:.2f}".format((time.time() - initial_time) * 1000)) + " milisecondes.")
+        return True
