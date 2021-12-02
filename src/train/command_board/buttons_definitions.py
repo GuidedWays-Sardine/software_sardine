@@ -71,10 +71,31 @@ class PushButton:
 
 class Potentiometer:
     pin = None
-    state = None
+    action = None
+    value = None
 
-    def __init__(self, pin):
-        self.pin = pin
+    max_value = 1023
+    error = 0
+
+    def __init__(self, carte, pin, action, max_value=1023, error=0):
+        self.pin = carte.get_pin('a:' + str(pin) + ':i')
+        self.action = action
+        self.max_value = max_value
+        self.error = error
+
+    def add_action(self, actions_list):
+        self.read_value()
+        actions_list.append([self.action, time.time(), self.value])
+
+    def verify_value(self, actions_list):
+        old_value = self.value
+        self.read_value()
+        if old_value != self.value:
+            actions_list.append([self.action, time.time(), self.value])
+
+    def read_value(self):
+        value = (self.pin.read() - self.max_value * 0.5) / (self.max_value * 0.5)
+        self.value = value * (value < -self.error or value > self.error)
 
 
 class SwitchButton:
