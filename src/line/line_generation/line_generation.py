@@ -48,6 +48,7 @@ class LineGenerator:
     def __init__(self):
         """Initialise la liste des lignes"""
         # Initialise la base de données lignes
+        log.change_log_prefix("line generator")
         self.lines.load()
 
     def generate_line(self, line_code, reload=False):
