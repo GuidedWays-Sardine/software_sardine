@@ -52,7 +52,7 @@ class Spline:
         self.pk_debut = track[DB.PK + DB.DEBUT]
         self.geo_debut = [track[DB.GEO_LO + DB.DEBUT], track[DB.GEO_LA + DB.DEBUT]]
         self.pk_fin = track[DB.PK + DB.FIN]
-        self.geo_debut = [track[DB.GEO_LO + DB.FIN], track[DB.GEO_LA + DB.FIN]]
+        self.geo_fin = [track[DB.GEO_LO + DB.FIN], track[DB.GEO_LA + DB.FIN]]
 
         # Stocke les bases de données avec les informations sur la voie
         self.curves = curves
