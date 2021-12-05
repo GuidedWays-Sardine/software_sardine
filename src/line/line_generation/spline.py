@@ -29,7 +29,7 @@ class Spline:
     max_speed = None
     electrification = None
 
-    def __init__(self, track, curves, slopes, max_speed, electrification):
+    def __init__(self, track, curves, slopes, max_speed=pd.DataFrame(), electrification=pd.DataFrame):
         """Permet d'initialiser la spline en fonction des informations de la ligne.
         Considère toutes les informations envoyées comme provenant directement de la voie et avec des données cohérentes
 
