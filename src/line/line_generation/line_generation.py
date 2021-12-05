@@ -87,16 +87,16 @@ class LineGenerator:
             # Récupère à partir du linestring le premier et dernier point géographique
             self.tracks.df.loc["Geo Shape"] = self.tracks.df.loc["Geo Shape"].split("[[", regex=False)[1].split("]]", regex=False)[0]
             self.tracks.df.insert(len(self.tracks.df.columns), DB.GEO_LO + DB.DEBUT,
-                                  self.tracks.df.loc["Geo Shape"].split["], ["][0].split(", ")[1]).astype(np.float32)
+                                  self.tracks.df["Geo Shape"].str.split("\], \[", n=1).str[0].str.split(", ").str[1].astype(np.float32))
             self.tracks.df.insert(len(self.tracks.df.columns), DB.GEO_LA + DB.DEBUT,
-                                  self.tracks.df.loc["Geo Shape"].split["], ["][0].split(", ")[0]).astype(np.float32)
+                                  self.tracks.df["Geo Shape"].str.split("\], \[", n=1).str[0].str.split(", ").str[0].astype(np.float32))
             self.tracks.df.insert(len(self.tracks.df.columns), DB.GEO_LO + DB.FIN,
-                                  self.tracks.df.loc["Geo Shape"].split["], ["][-1].split(", ")[1]).astype(np.float32)
+                                  self.tracks.df["Geo Shape"].str.split("\], \[").str[-1].str.split(", ").str[1].astype(np.float32))
             self.tracks.df.insert(len(self.tracks.df.columns), DB.GEO_LA + DB.FIN,
-                                  self.tracks.df.loc["Geo Shape"].split["], ["][-1].split(", ")[0]).astype(np.float32)
+                                  self.tracks.df["Geo Shape"].str.split("\], \[").str[-1].str.split(", ").str[0].astype(np.float32))
 
             # Enlève la colonne Geo Shape, plus utile pour les calculs
-            self.tracks.df.drop("Geo Shape")
+            self.tracks.df.drop("Geo Shape", axis=1, inplace=True)
             self.tracks.attr.pop()
             self.tracks.attr.append([DB.GEO_LO + DB.DEBUT, DB.GEO_LA + DB.DEBUT, DB.GEO_LO + DB.FIN, DB.GEO_LA + DB.FIN])
 
