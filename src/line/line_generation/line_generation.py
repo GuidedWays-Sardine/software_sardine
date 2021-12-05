@@ -93,7 +93,7 @@ class LineGenerator:
         # Chargement base de données voies
         if self.tracks.load():
             # Récupère à partir du linestring le premier et dernier point géographique
-            self.tracks.df.loc["Geo Shape"] = self.tracks.df.loc["Geo Shape"].split("[[", regex=False)[1].split("]]", regex=False)[0]
+            self.tracks.df["Geo Shape"] = self.tracks.df["Geo Shape"].str.split("[\[\]]{2,}", n=2).str[1]
             self.tracks.df.insert(len(self.tracks.df.columns), DB.GEO_LO + DB.DEBUT,
                                   self.tracks.df["Geo Shape"].str.split("\], \[", n=1).str[0].str.split(", ").str[1].astype(np.float32))
             self.tracks.df.insert(len(self.tracks.df.columns), DB.GEO_LA + DB.DEBUT,
