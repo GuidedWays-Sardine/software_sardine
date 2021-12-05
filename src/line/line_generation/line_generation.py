@@ -2,6 +2,7 @@
 import sys
 import os
 import time
+import traceback
 
 
 # Librairies de traitement de données
@@ -148,7 +149,15 @@ if __name__ == "__main__":
     log.initialise("../../../log", "1.1.0", log.Level.DEBUG)
 
     # Codes pour la LGV Sud-Est
-    line_generator = LineGenerator()
-    line_generator.generate_line(752000)
+    try:
+        line_generator = LineGenerator()
+        line_generator.generate_line(752000)
+    except Exception as error:
+        # Récupère une potentielle erreur lors de l'initialisation de la simulation
+        log.critical("Erreur fatale lors de l'initialisation du simulateur\n\t\t" +
+                     "Erreur de type : " + str(type(error)) + "\n\t\t" +
+                     "Avec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
+                     "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
+                     prefix="")
 
 
