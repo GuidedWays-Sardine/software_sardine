@@ -8,7 +8,6 @@ import traceback
 # Librairies de traitement de données
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 #librairies SARDINE
@@ -16,6 +15,7 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
 import src.line.line_generation.database as DB
+import src.line.line_generation.spline as SP
 
 
 class LineGenerator:
@@ -77,6 +77,13 @@ class LineGenerator:
         # charge le reste des bases de données ligne (si ce n'est pas déjà fait)
         self.load_line_databases()
 
+        # Génère la liste de toutes les splines de la ligne
+        line_splines = self.generate_splines_data(self.tracks.df.loc[self.tracks.df["CODE_LIGNE"] == line_code].reset_index(drop=True),
+                                                  self.curves.df.loc[self.curves.df["CODE_LIGNE"] == line_code].reset_index(drop=True),
+                                                  self.slopes.df.loc[self.slopes.df["CODE_LIGNE"] == line_code].reset_index(drop=True),
+                                                  self.max_speed.df.loc[self.max_speed.df["CODE_LIGNE"] == line_code].reset_index(drop=True),
+                                                  self.electrification.df.loc[self.electrification.df["CODE_LIGNE"] == line_code].reset_index(drop=True))
+
     def load_line_databases(self):
         """Charge toutes les bases de données reliées à la ligne"""
         initial_time = time.time()
@@ -125,6 +132,55 @@ class LineGenerator:
         log.info("Chargement de toutes les bases de données génération de ligne en " +
                  str("{:.2f}".format((time.time() - initial_time)*1000)) + " milisecondes.\n\n")
 
+    def generate_splines_data(self, tracks, curves, slopes, max_speed, electrification):
+        """Permet à partir des données d'une ligne de générer la liste des splines nécessaires
+
+        Parameters
+        ----------
+        tracks: `pd.DataFrame`
+            Liste de toutes les voies de la ligne chargée
+        curves: `pd.DataFrame`
+            Liste de toutes les courbes de la ligne chargée
+        slopes: `pd.DataFrame`
+            Liste de toutes les pentes et ramples de la ligne chargée
+        max_speed: `pd.DataFrame`
+            Liste de toutes les vitesses maximales de la ligne chargée
+        electrification: `pd.DataFrame`
+            Liste des électrifications de la ligne actuelle
+        """
+        splines = []
+        # Pour chacune des voies de la ligne, crée une nouvelle spline avec les informations de la voie
+        for index, track in tracks.iterrows():
+            # Récupère les informations principales pour la voir (pour simplifier la lecture des masques)
+            track_name = track["NOM_VOIE"]
+            pk_d = track[DB.PK + DB.DEBUT]
+            pk_f = track[DB.PK + DB.FIN]
+
+            # Crée la liste des splines au format
+            splines.append(SP.Spline(track,
+                                     curves.loc[(curves["NOM_VOIE"] == track_name) &
+                                                (curves[DB.PK + DB.DEBUT] >= pk_d) &
+                                                (curves[DB.PK + DB.FIN] <= pk_f)],
+                                     slopes.loc[(slopes["NOM_VOIE"] == track_name) &
+                                                (slopes[DB.PK + DB.DEBUT] >= pk_d) &
+                                                (slopes[DB.PK + DB.FIN] <= pk_f)]))
+
+        # Pour chacunes des voies créées, vérifie si le début et la fin de celle-ci n'est pas connectée à une autre spline
+        for spline in splines:
+            # Fait d'abord la vérification pour le pk de début
+            possibly_connected = [s for s in splines if s is not spline and spline.pk_debut >= s.pk_debut and spline.pk_debut <= s.pk_fin]
+            # Vérifier pour chacune des splines
+
+            possibly_connected = [s for s in splines if s is not spline and spline.pk_fin >= s.pk_debut and spline.pk_fin <= s.pk_fin]
+            # Vérifier pour chacune des splines
+
+
+            # Pour le pk de début fait la vérification pour toutes les splines passant par le même PK
+
+        # Pour chaque spline s'occupe
+        # Pour chaque spline dans la liste de splie :
+            # Crée la spline avec les informations par défaut
+            # Vérifie par rapport au PKD et PKF sur toutes les autres splines ayant
 
 def get_distance_to_line(line_begin, line_end, point):
     """
