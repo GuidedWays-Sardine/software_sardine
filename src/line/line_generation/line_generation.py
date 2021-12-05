@@ -69,18 +69,12 @@ class LineGenerator:
         if not line_name:
             log.warning("Aucune ligne existance avec le code_ligne : " + str(line_code) + ".\n\n")
             return
+        else:
+            # Sinon indique le nom et les informations clés de la ligne en question
+            log.info("Génération de la ligne " + line_name[0] + ".\n")
 
-        # Sinon commence par charger les bases de données ligne (si ce n'est pas déjà fait)
+        # charge le reste des bases de données ligne (si ce n'est pas déjà fait)
         self.load_line_databases()
-
-        # Sinon indique le nom et les informations clés de la ligne en question
-        log.info("Génération de la ligne " + line_name[0] + ".\n")
-
-        df_line = self.curves.df.loc[self.curves.df["CODE_LIGNE"] == line_code].sort_values(DB.PK + DB.DEBUT).reset_index()
-        #print(list(self.curves.df["NOM_VOIE"].unique()))
-        #print(self.curves.df.loc[self.curves.df["NOM_VOIE"].str.contains("4CIRC", regex=False)][["CODE_LIGNE", "NOM_VOIE", 'PK_D', 'GEO_LO_D', "GEO_LA_D"]])
-        print(df_line["NOM_VOIE"].unique())
-        print(df_line.loc[df_line["NOM_VOIE"].str.contains("J5966", regex=False)].sort_values("PK_D")[['PK_D', "PK_F", "RAYON", 'GEO_LO_D', "GEO_LA_D"]])
 
     def load_line_databases(self):
         """Charge toutes les bases de données reliées à la ligne"""
