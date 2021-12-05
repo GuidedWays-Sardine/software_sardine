@@ -112,6 +112,6 @@ class DataBase:
             self.df.sort_values(by=["CODE_LIGNE", PK + (DEBUT if (PK + DEBUT) in self.attr else "")]).reset_index(drop=True)
 
         # Indique le temps de chargement et de normaliusation de la base de données
-        log.info("Base de données : " + self.path[len(DATA_DIR)::] + "chargée en : " +
-                 str("{:.2f}".format((time.time() - initial_time) * 1000)) + " milisecondes.")
+        log.info("Base de données : " + self.path[len(DATA_DIR)::] + " chargée en : " +
+                 str("{:.2f}".format((time.time() - initial_time) * 1000)) + " milisecondes.\n")
         return True
