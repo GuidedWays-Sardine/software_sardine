@@ -33,6 +33,7 @@ class Spline:
     max_speed = None
     electrification = None
 
+    # Fonctions d'initialisation et de mise à jour de la spline
     def __init__(self, track, curves, slopes, max_speed=pd.DataFrame(), electrification=pd.DataFrame):
         """Permet d'initialiser la spline en fonction des informations de la ligne.
         Considère toutes les informations envoyées comme provenant directement de la voie et avec des données cohérentes
@@ -47,12 +48,12 @@ class Spline:
             Liste de toutes les pentes et ramples de la ligne chargée
         max_speed: `pd.DataFrame`
             Liste de toutes les vitesses maximales de la ligne chargée
-        electrification: `str`
+        electrification: `pd.DataFrame`
             Electrification de la ligne
         """
         # Commence par récupérer les éléments généraux de la spline
         self.line_code = track["CODE_LIGNE"]
-        self.track_name = track["NOM_VOIE"]
+        self.track_name = track["NOM_VOIE"]     # TODO : faire un algorithme qui inclut le PK de début et de fin dans le nom de la spline
         self.pk_debut = track[DB.PK + DB.DEBUT]
         self.geo_debut = [track[DB.GEO_LO + DB.DEBUT], track[DB.GEO_LA + DB.DEBUT]]
         self.pk_fin = track[DB.PK + DB.FIN]
