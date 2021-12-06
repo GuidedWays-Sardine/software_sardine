@@ -60,6 +60,7 @@ class LineGenerator:
         line_code: `int`
             Code de la ligne (trouvable en ligne selon le nom de la ligne
         """
+        initial_time = time.time()
         # Si la ligne existe déjà (enregistrée dans settings/line_settings/line_code) et qu'elle ne doit pas être rechargée, retourne
         if str(line_code) in os.listdir(PROJECT_DIR + "settings\\line_settings") and not reload:
             log.info("La ligne " + str(line_code) + " existe déjà. Elle ne sera pas recréée.\n\n")
@@ -78,11 +79,32 @@ class LineGenerator:
         self.load_line_databases()
 
         # Génère la liste de toutes les splines de la ligne
-        line_splines = self.generate_splines_data(self.tracks.df.loc[self.tracks.df["CODE_LIGNE"] == line_code].reset_index(drop=True),
-                                                  self.curves.df.loc[self.curves.df["CODE_LIGNE"] == line_code].reset_index(drop=True),
-                                                  self.slopes.df.loc[self.slopes.df["CODE_LIGNE"] == line_code].reset_index(drop=True),
-                                                  self.max_speed.df.loc[self.max_speed.df["CODE_LIGNE"] == line_code].reset_index(drop=True),
-                                                  self.electrification.df.loc[self.electrification.df["CODE_LIGNE"] == line_code].reset_index(drop=True))
+        splines = self.generate_splines_data(self.tracks.df.loc[self.tracks.df["CODE_LIGNE"] == line_code].reset_index(drop=True),
+                                             self.curves.df.loc[self.curves.df["CODE_LIGNE"] == line_code].reset_index(drop=True),
+                                             self.slopes.df.loc[self.slopes.df["CODE_LIGNE"] == line_code].reset_index(drop=True),
+                                             self.max_speed.df.loc[self.max_speed.df["CODE_LIGNE"] == line_code].reset_index(drop=True),
+                                             self.electrification.df.loc[self.electrification.df["CODE_LIGNE"] == line_code].reset_index(drop=True))
+
+        initial_save_time = time.time()
+
+        # Commencer par supprimer le dossier de paramètre des lignes si celui-ci existe déjà
+        if str(line_code) in PROJECT_DIR + "settings\\line_settings\\":
+            os.remove(PROJECT_DIR + "settings\\line_settings\\" + str(line_code))
+
+        # Ensuite crée les dossier nécessaires pour la sauvegarde de la ligne
+            os.mkdir(PROJECT_DIR + "settings\\line_settings\\" + str(line_code))
+            os.mkdir(PROJECT_DIR + "settings\\line_settings\\" + str(line_code) + "\\UE5")
+            os.mkdir(PROJECT_DIR + "settings\\line_settings\\" + str(line_code) + "\\Python")
+
+        # Sauvegarde les splines en format python et en format UE5
+        for spline in splines:
+            spline.save_to_ue5(PROJECT_DIR + "settings\\line_settings\\" + str(line_code) + "\\UE5")
+            spline.save_to_python(PROJECT_DIR + "settings\\line_settings\\" + str(line_code) + "\\Python")
+
+        # indique le temps de suavegarde des splines ainsi que le temps total de chargement de la ligne
+        log.info("Informations chargement ligne : " + self.lines.df.loc[self.lines.df["CODE_LIGNE"] == line_code, "LIB_LIGNE"] + "\n\t\t" +
+                 "Splines (python et UE5) sauvegardées en " + str("{:.2f}".format((time.time() - initial_save_time) * 1000)) + " milisecondes.\n\t\t" +
+                 "Chargement (et sauvegarde) en : " + str("{:.2f}".format((time.time() - initial_time) * 1000)) + " milisecondes.\n")
 
     def load_line_databases(self):
         """Charge toutes les bases de données reliées à la ligne"""
@@ -147,7 +169,13 @@ class LineGenerator:
             Liste de toutes les vitesses maximales de la ligne chargée
         electrification: `pd.DataFrame`
             Liste des électrifications de la ligne actuelle
+
+        Returns
+        -------
+        splines: `list`
+            liste des splines générés pour la ligne
         """
+        initial_time = time.time()
         splines = []
         # Pour chacune des voies de la ligne, crée une nouvelle spline avec les informations de la voie
         for index, track in tracks.iterrows():
@@ -165,49 +193,33 @@ class LineGenerator:
                                                 (slopes[DB.PK + DB.DEBUT] >= pk_d) &
                                                 (slopes[DB.PK + DB.FIN] <= pk_f)]))
 
-        # Pour chacunes des voies créées, vérifie si le début et la fin de celle-ci n'est pas connectée à une autre spline
+        # Essaye de connecter chaque points de début avec les autres splines
         for spline in splines:
-            # Fait d'abord la vérification pour le pk de début
-            possibly_connected = [s for s in splines if s is not spline and spline.pk_debut >= s.pk_debut and spline.pk_debut <= s.pk_fin]
-            # Vérifier pour chacune des splines
-
-            possibly_connected = [s for s in splines if s is not spline and spline.pk_fin >= s.pk_debut and spline.pk_fin <= s.pk_fin]
-            # Vérifier pour chacune des splines
+            # Récupère toutes les splines potentiellement connectés
+            to_check = [s for s in splines if s is not spline and spline.pk_debut >= s.pk_debut and spline.pk_debut <= s.pk_fin]
 
 
-            # Pour le pk de début fait la vérification pour toutes les splines passant par le même PK
+        # Essaye de connecter chaque points de fin avec les autres splines
+        for spline in reversed(splines):        # Ici en reverse pour s'assurer que les vérifications soient dans le bon ordre
+            # Récupère toutes les splines potentiellement connectés
+            to_check = [s for s in splines if s is not spline and spline.pk_fin >= s.pk_debut and spline.pk_fin <= s.pk_fin]
 
-        # Pour chaque spline s'occupe
-        # Pour chaque spline dans la liste de splie :
-            # Crée la spline avec les informations par défaut
-            # Vérifie par rapport au PKD et PKF sur toutes les autres splines ayant
+        #TODO : add function for personalized splits (for connections with other lines)
 
-def get_distance_to_line(line_begin, line_end, point):
-    """
+        # indique le temps de suavegarde des splines ainsi que le temps total de chargement de la ligne
+        log.info("Chargement de " + str(len(splines)) + " splines en " + str("{:.2f}".format((time.time() - initial_time) * 1000)) + "milisecondes.\n")
 
-    :param line_:
-    :param la_d:
-    :param lo_f:
-    :param la_f:
-    :param x:
-    :param y:
-    :return:
-    """
-    # ax1 + b = y1      =>      a = (x1-x2)/(y1+y2)
-    # ax2 + b = y2      =>      b = y1-x1*(x1-x2)/(y1+y2)
-    a = (line_begin[0] - line_end[0])/(line_begin[1] + line_end[1])
-    b = line_begin[1] - line_begin[0] * a
+        return splines
 
-    # d =  |y - ax - b|/sqrt(1 + a²)
-    print(abs(point[1] - a * point[1] - b) / ((1 + a ** 2) ** 0.5))
 
 if __name__ == "__main__":
     log.initialise("../../../log", "1.1.0", log.Level.DEBUG)
+    log.info("Générateur de ligne")
 
     # Codes pour la LGV Sud-Est
     try:
         line_generator = LineGenerator()
-        line_generator.generate_line(752000)
+        line_generator.generate_line(752000, reload=True)
     except Exception as error:
         # Récupère une potentielle erreur lors de l'initialisation de la simulation
         log.critical("Erreur fatale lors de l'initialisation du simulateur\n\t\t" +
@@ -215,5 +227,4 @@ if __name__ == "__main__":
                      "Avec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
                      "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
                      prefix="")
-
-
+        exit(-1)
