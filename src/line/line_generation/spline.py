@@ -14,6 +14,10 @@ import src.misc.log.log as log
 import src.line.line_generation.database as DB
 
 
+# constantes pour la création des splines
+DISTANCE_ERROR = 2      # Erreur de localisation permise en m
+
+
 class Spline:
     # Informations générales sur la spline
     line_code = 0
