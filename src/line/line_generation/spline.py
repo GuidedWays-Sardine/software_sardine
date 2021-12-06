@@ -87,3 +87,18 @@ class Spline:
     def split(self):
         # Fonction qui à partir d'un PK split la spline en deux
         pass
+
+ # Fonctions d'ouverture et d'enregistrement des splines
+    def open(self):
+        # Fonction qui permet de créer un spline depuis un (ou plusieurs) fichiers csv)
+        pass
+
+    def save_to_python(self, folder_path):
+        """Fonction permettant de sauvegarder la spline"""
+        # Fonction permettant de sauvegarder la spline dans un fichier adapté
+        pass
+
+    def save_to_ue5(self, folder_path):
+        """Fonction permettant de convertir et d'enregistrer les informations d'une spline"""
+        # Fonction permettant de convertir en une spline compatible pour UE 5
+        pass
