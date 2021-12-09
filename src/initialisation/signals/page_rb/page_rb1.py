@@ -88,7 +88,7 @@ class PageRB1:
 
         # Charge tous les dossiers dans src.train.command_board et les indiques comme pupitre sélectionables
         command_boards = [t_data[f.replace("_", " ")] for f in os.listdir(PROJECT_DIR + "src\\train\\command_board")
-                          if os.path.isdir(os.path.join(PROJECT_DIR + "src\\train\\command_board", f))]
+                          if os.path.isdir(os.path.join(PROJECT_DIR + "src\\train\\command_board", f))  and f != "__pycache__"]
         self.page.findChild(QObject, "command_board_combo").setProperty("elements", command_boards)
 
         # Charge tous les DMI présents dans src.train.DMI et les indiques comme DMI sélectionables
