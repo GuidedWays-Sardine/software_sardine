@@ -123,10 +123,43 @@ class Potentiometer:
 
 
 class SwitchButton:
-    pin = None
-    button_state = None
-    number_of_state = None
+    pins = []
+    pins_state = []
+    functions = {}
 
-    def __init__(self, pin, number_of_state):
-        self.pin = pin
-        self.number_of_state = number_of_state
+    def __init__(self, carte, pins, functions):
+        for pin in pins:
+            self.pins.append(carte.get_pin('d:' + str(pin) + ':i'))
+        self.functions = functions
+        for func in self.functions:
+            if len(self.pin) != len(func):
+                log.debug("Cle non valide pour appel de la fonction : " + str(self.functions[func]) + ".\n")
+                self.functions.pop(func)
+
+    def add_action(self, actions_list):
+        self.read_value()
+        try:
+            action = self.functions[self.pins_state]
+        except KeyError:
+            pass
+        else:
+            if action is not None:
+                actions_list.append([action, time.time()])
+
+    def verify_value(self, actions_list):
+        old_value = self.pins_state
+        self.read_value()
+        if old_value != self.pins_state:
+            try:
+                action = self.functions[self.pins_state]
+            except KeyError:
+                pass
+            else:
+                if action is not None:
+                    actions_list.append([action, time.time()])
+
+    def read_value(self):
+        self.pins_state = []
+        for pin in self.pins:
+            self.pins_state.append(pin.read())
+
