@@ -132,7 +132,7 @@ class SwitchButton:
             self.pins.append(carte.get_pin('d:' + str(pin) + ':i'))
         self.functions = functions
         for func in self.functions:
-            if len(self.pin) != len(func):
+            if len(self.pins) != len(func):
                 log.debug("Cle non valide pour appel de la fonction : " + str(self.functions[func]) + ".\n")
                 self.functions.pop(func)
 
