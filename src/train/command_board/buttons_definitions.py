@@ -18,12 +18,15 @@ import src.train.command_board.control as control
 
 
 class PushButton:
+    # Cadenas permettant d'éviter les data races lors du clignotement de la LED (pour led_pin, led_state, frequency)
+    lock = threading.Lock()
+
     button_pin = None
     led_pin = None
     action_up = None
     action_down = None
-    button_state = None
-    led_state = None
+    button_state = False
+    led_state = False
     frequency = 0
 
     def __init__(self, carte, button_pin, led_pin=None, action_up=None, action_down=None):
@@ -49,25 +52,46 @@ class PushButton:
                 actions_list.append([self.action_up, time.time()])
 
     def change_led_state(self, led_state=False, frequency=0):
-        if self.led_pin is not None:
-            if frequency != 0:
-                self.frequency = frequency
-                led_blinking = threading.Thread(target=self.blinking_led, daemon=True)
-                led_blinking.start()
-            else:
-                self.led_pin.write(led_state)
-                self.led_state = led_state
-                self.frequency = 0
+        # bloque le cadenas le temps du changement d'état de la LED pour éviter les data races
+        with self.lock:
+            if self.led_pin is not None:
+                if frequency > 0:
+                    self.frequency = frequency
+                    led_blinking = threading.Thread(target=self.__blinking_led, daemon=True)
+                    led_blinking.start()
+                else:
+                    self.led_pin.write(led_state)
+                    self.led_state = led_state
+                    self.frequency = 0
 
     def read_value(self):
         self.button_state = self.button_pin.read()
 
-    def blinking_led(self):
-        change_state_time = 1/(2*self.frequency)
-        while self.frequency != 0:
-            self.led_pin.write(not self.led_state)
-            self.led_state = not self.led_state
-            time.sleep(change_state_time)
+    def __blinking_led(self):
+        """Fonction permettant de faire clignoter la led du bouton (si celle-ci existe)
+        Attention, cette fonction bloque le thread courrant jusqu'à ce que frequency soit changé.
+        """
+        # Revérifie que le bouton a bien une led
+        if self.led_pin is not None:
+            # Récupère le temps entre chaque changement d'état et crée variable pour savoir si la led doit encore clignoter
+            change_state_time = 1/(2*self.frequency)
+            with self.lock:
+                is_blinking = self.frequency != 0
+
+            # Tant que la LED doit clignoter, clignote
+            while is_blinking:
+                # Inverse l'état de la LED (en bloquant les autres fonctions de lire sur les variables du bouton)
+                with self.lock:
+                    self.led_pin.write(not self.led_state)
+                    self.led_state = not self.led_state
+
+                # Attends la moite d'une période (pour faire clignoter la LED à la bonne fréquence)
+                time.sleep(change_state_time)
+
+                # Vérifie que la LED doit toujours clignoter (toujours en bloquand la class pour éviter les data races)
+                with self.lock:
+                    is_blinking = self.frequency != 0
+
 
 class Potentiometer:
     pin = None
