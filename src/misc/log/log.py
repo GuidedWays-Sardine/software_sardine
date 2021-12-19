@@ -83,15 +83,14 @@ def change_log_prefix(prefix=""):
     ----------
     prefix: `string`
         Le nouveau préfix à mettre en plus de l'heure et du niveau du registre
-
-    Raises
-    ------
-    FileNotFoundError
-        Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
     """
     # Vérifie qu'un fichier registre existe bien sinon jette l'erreur FileNotFoundError
     if not logging.getLogger().hasHandlers():
-        raise FileNotFoundError("Aucun fichier de registre existant pour cette simulation")
+        # Sinon crée une configuration de registre par défaut pour pouvoir afficher le message
+        logging.basicConfig(level=Level.DEBUG.value,
+                            datefmt="%H:%M:%S",
+                            format="%(asctime)s - %(levelname)s - %(message)s")
+        logging.warning("préfix changé sans configuration de registre initialisé précédement (log.initialise().\n")
 
     # Récupère le handler (fichier registre) à modifier
     handler = logging.getLogger().handlers[0]
@@ -116,11 +115,6 @@ def log(log_level, message, prefix=None):
         Le message à afficher dans le registre
     prefix: `string`
         Le préfix temporaire à afficher
-
-    Raises
-    ------
-    FileNotFoundError
-        Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
     """
     # Vérifie qu'un fichier registre existe bien sinon jette l'erreur FileNotFoundError
     if not logging.getLogger().hasHandlers():
@@ -148,11 +142,6 @@ def debug(message, prefix=None):
         Le message à afficher dans le registre
     prefix: `string`
         Le préfix temporaire à afficher
-
-    Raises
-    ------
-    FileNotFoundError
-        Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
     """
     log(Level.DEBUG, message, prefix)
 
@@ -166,11 +155,6 @@ def info(message, prefix=None):
         Le message à afficher dans le registre
     prefix: `string`
         Le préfix temporaire à afficher
-
-    Raises
-    ------
-    FileNotFoundError
-        Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
     """
     log(Level.INFO, message, prefix)
 
@@ -184,11 +168,6 @@ def warning(message, prefix=None):
         Le message à afficher dans le registre
     prefix: `string`
         Le préfix temporaire à afficher
-
-    Raises
-    ------
-    FileNotFoundError
-        Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
     """
     log(Level.WARNING, message, prefix)
 
@@ -202,11 +181,6 @@ def error(message, prefix=None):
         Le message à afficher dans le registre
     prefix: `string`
         Le préfix temporaire à afficher
-
-    Raises
-    ------
-    FileNotFoundError
-        Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
     """
     log(Level.ERROR, message, prefix)
 
@@ -220,10 +194,5 @@ def critical(message, prefix=None):
         Le message à afficher dans le registre
     prefix: `string`
         Le préfix temporaire à afficher
-
-    Raises
-    ------
-    FileNotFoundError
-        Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
     """
     log(Level.CRITICAL, message, prefix)
