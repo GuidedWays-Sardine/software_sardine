@@ -212,7 +212,7 @@ class LineGenerator:
 
 
 if __name__ == "__main__":
-    log.initialise("../../../log", "1.1.0", log.Level.DEBUG)
+    log.initialise(log_level=log.Level.DEBUG, save=False)
     log.info("Générateur de ligne")
 
     # Codes pour la LGV Sud-Est

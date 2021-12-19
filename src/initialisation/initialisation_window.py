@@ -288,7 +288,7 @@ class InitialisationWindow:
 
 
 def main():
-    log.initialise(f"{PROJECT_DIR}log", "1.1.0", log.Level.DEBUG)
+    log.initialise(log_level=log.Level.DEBUG, save=True)
 
     #Lance l'application d'initialisation
     app = QApplication(sys.argv)

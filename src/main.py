@@ -21,9 +21,8 @@ INITIAL_LOGGING = log.Level.DEBUG
 
 
 def main():
-
     # Lance le fichier de log en mode warning pour récupérer les warnings et erreurs critiques
-    log.initialise(f"{PROJECT_DIR}log\\", VERSION, INITIAL_LOGGING)
+    log.initialise(log_level=log.Level.DEBUG, save=True)
     log.info(f"Lancement de l'application d'initialisation du simulateur.\n\n\n")
     application = QApplication(sys.argv)
 

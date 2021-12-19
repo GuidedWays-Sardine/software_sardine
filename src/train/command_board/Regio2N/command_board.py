@@ -21,7 +21,7 @@ import src.misc.log.log as log
 
 def main():
     # Lance un fichier de registre
-    log.initialise(f"{PROJECT_DIR}log", "1.1.0", log.Level.DEBUG)
+    log.initialise(log_level=log.Level.DEBUG, save=True)
     log.info(f"Lancement des essais du pupitre léger.\n")
 
     # TODO : initialiser une instance de la base de donnée train et appeler son constructeur afin de tester le pupitre avec différents matériels roulants

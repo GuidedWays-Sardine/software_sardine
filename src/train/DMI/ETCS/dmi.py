@@ -243,7 +243,7 @@ class DriverMachineInterface:
 
 def main():
     # Lance le fichier registre
-    log.initialise("../../../../log/", "1.1.0", log.Level.DEBUG)
+    log.initialise(log_level=log.Level.DEBUG, save=True)
 
     # Crée une micro simulation (avec juste le DMI, les bases de données et des paramètres)
     from PyQt5.QtWidgets import QApplication

@@ -1,7 +1,12 @@
 """Module dérivé du module logging permettant de créer des fichiers de registres adapté à la simulation de SARDINE"""
 import logging
+import os
 from enum import Enum
 from datetime import datetime
+
+
+VERSION = "1.1.0"
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 
 
 class Level(Enum):
@@ -14,17 +19,23 @@ class Level(Enum):
     CRITICAL = logging.CRITICAL
 
 
-def initialise(path, version, log_level):
+def initialise(path=f"{PROJECT_DIR}log\\", version=VERSION, log_level=Level.DEBUG, save=True):
     """ crée le fichier log
 
     Parameters
     ----------
     path : `string`
         Le chemin vers le fichier log par rapport au fichier source
+        Par défaut chemin d'accès vers le dossier log du project
     version : `string`
         La version du programme
+        Par défaut la version sauvegardée dans le module log (pour éviter les incohérences)
     log_level : `Level`
         Le niveau de logging (Level.WARNING, Level.INFO, Level.DEBUG, Level.NOTSET)
+        Par défaut mis pour avoir tous les messages (Level.DEBUG)
+    save : `bool`
+        Indique si les messages doivent être sauvegardés dans un fichier (sinon elles apparaitront dans le terminal
+        Par défault les informations s'enregistrent dans un fichier
     """
     # Vérifie si un fichier log a déjà été créé, si oui, change le niveau de logging sinon le crée
     if logging.getLogger().hasHandlers():
@@ -32,25 +43,26 @@ def initialise(path, version, log_level):
         logging.warning("Fichier de registre pour cette simulation déjà existant. Aucun besoin d'en créer un nouveau.\n")
         return
 
-    # Si aucun log n'est demandé, définit le niveau de log comme "aucun" et retourne
-    if log_level is Level.NOTSET:
-        logging.basicConfig(level=logging.NOTSET)
-        return
+    # Dans le cas où les logs doivent être enregistrées et que le niveau n'est pas mis à log.NOTSET
+    if save and log_level is not Level.NOTSET:
+        # Rajoute un / à la fin du chemin s'il a été oublié
+        path += "\\" if path[-1] != "/" or "\\" else ""
+        path.replace("/", "\\")
 
-    # Rajoute un / à la fin du chemin s'il a été oublié
-    if path[len(path) - 1] != "/" or "\\":
-        path += "\\"
-    path.replace("/", "\\")
+        # Prend la date et crée le nom du fichier log
+        now = str(datetime.now()).split(".", 1)[0]
+        file_name = path + f"sardine {version} {now}.log".replace(':', ';')
 
-    # Prend la date et crée le nom du fichier log
-    now = str(datetime.now()).split(".", 1)[0]
-    file_name = path + f"sardine {version} {now}.log".replace(':', ';')
-
-    # Crée le fichier log avec les informations envoyées
-    logging.basicConfig(level=log_level.value,
-                        filename=file_name,
-                        datefmt="%H:%M:%S",
-                        format="%(asctime)s - %(levelname)s - %(message)s")
+        # Crée le fichier log avec les informations envoyées
+        logging.basicConfig(level=log_level.value,
+                            filename=file_name,
+                            datefmt="%H:%M:%S",
+                            format="%(asctime)s - %(levelname)s - %(message)s")
+    else:
+        # Sinon change juste le niveau de debug et le format
+        logging.basicConfig(level=log_level.value,
+                            datefmt="%H:%M:%S",
+                            format="%(asctime)s - %(levelname)s - %(message)s")
 
 
 def change_log_level(log_level):
