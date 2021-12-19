@@ -23,8 +23,8 @@ INITIAL_LOGGING = log.Level.DEBUG
 def main():
 
     # Lance le fichier de log en mode warning pour récupérer les warnings et erreurs critiques
-    log.initialise(PROJECT_DIR + "log\\", VERSION, INITIAL_LOGGING)
-    log.info("Lancement de l'application d'initialisation du simulateur\n\n\n")
+    log.initialise(f"{PROJECT_DIR}log\\", VERSION, INITIAL_LOGGING)
+    log.info(f"Lancement de l'application d'initialisation du simulateur.\n\n\n")
     application = QApplication(sys.argv)
 
     parameters = None
@@ -38,25 +38,25 @@ def main():
             del initialisation
         else:
             log.change_log_prefix()
-            log.info("l\'application d'initialisation a été fermée sans donner suite.\n")
+            log.info(f"l'application d'initialisation a été fermée sans donner suite.\n")
             exit(0)
     except Exception as error:
         # Récupère une potentielle erreur fatale et la charge
-        log.critical("Erreur fatale lors du chargement de l'application d'initialisation simulateur\n\t\t" +
-                     "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                     "Avec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
+        log.critical(f"""Erreur fatale lors du chargement de l'application d'initialisation simulateur
+                     \t\tErreur de type : {type(error)}
+                     \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
                      "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
                      prefix="")
         exit(-1)
 
     # Change le niveau de log à celui précisé par l'utilisateur et enlève tout préfixe
     log.change_log_prefix()
-    log.info("Lancement du simulateur\n\n\n")
+    log.info(f"Lancement du simulateur.\n\n\n")
     try:
         log.change_log_level(parameters["log_level"])
     except KeyError:
-        log.warning("Aucun paramêtre \"log_level\" récupéré du programme d'initialisation" +
-                    "\n\t\tNiveau par défaut gardé à suffisant (log.WARNING)\n")
+        log.warning(f"""Aucun paramêtre \"log_level\" récupéré du programme d'initialisation
+                    \t\tNiveau par défaut gardé ({INITIAL_LOGGING})\n""")
 
     # Lance le simulateur et en ressort que si une erreur fatale est détecté ou que le simulateur est fermé
     try:
@@ -64,21 +64,21 @@ def main():
         simulation = sim.Simulation(application, parameters)
     except Exception as error:
         # Récupère une potentielle erreur lors de l'initialisation de la simulation
-        log.critical("Erreur fatale lors de l'initialisation du simulateur\n\t\t" +
-                     "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                     "Avec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
+        log.critical(f"""Erreur fatale lors de l'initialisation du simulateur
+                     \t\tErreur de type : {type(error)}
+                     \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
                      "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
                      prefix="")
         exit(-1)
-    else :
+    else:
         crash = False
         try:
             # Lance la simulation
             simulation.run()
         except Exception as error:
-            log.critical("Erreur fatale lors du fonctionnement du simulateur\n\t\t" +
-                         "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                         "Avec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
+            log.critical(f"""Erreur fatale lors du fonctionnement du simulateur
+                         \t\tErreur de type : {type(error)}
+                         \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
                          "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
                          prefix="")
             crash = True

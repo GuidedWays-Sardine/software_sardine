@@ -20,7 +20,7 @@ class TranslationDictionnary(dict):
         try:
             return super(TranslationDictionnary, self).__getitem__(key.lower())
         except KeyError:
-            log.debug("Aucune traduction pour : " + str(key) + "\n")
+            log.debug(f"Aucune traduction pour : {key}.\n")
             return key
 
     def create_translation(self, file_path, current_language, new_language):
@@ -40,9 +40,9 @@ class TranslationDictionnary(dict):
             file = open(file_path, "r", encoding="utf-8-sig")
         except Exception as error:
             # Cas où le fichier ouvert n'est pas accessible
-            log.warning("Impossible d'ouvrir le fichier de traduction : " + str(file_path) +
-                        "\n\t\tErreur de type : " + str(type(error)) +
-                        "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
+            log.warning(f"""Impossible d'ouvrir le fichier de traduction : {file_path}
+                        \t\tErreur de type : {type(error)}
+                        \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
                         "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
                         prefix="dictionaire de traduction")
             return
@@ -56,7 +56,7 @@ class TranslationDictionnary(dict):
             new_index = language_list.index(new_language.upper())
         except ValueError:
             # Si l'une des langues n'existe pas (la combobox langue est générée automatiquement, donc par redondance)
-            log.warning("Langues : " + (str(current_language) + " ; ") if current_index is not None else "" +
+            log.warning(f"Langues : {current_language} ; " if current_index is not None else "" +
                         str(new_language) if new_index is not None else "" + "\n")
             return
 
@@ -76,12 +76,12 @@ class TranslationDictionnary(dict):
                 self[translations[current_index]] = translations[new_index]
             else:
                 # S'il n'y a pas autant de traductions que de langue, cela signifie que la ligne est incomplète
-                log.debug("Certaines traductions manquantes sur la ligne suivante (langues attendus, mots) :" +
-                          "\n\t\t" + ";".join(language_list) + "\n\t\t" + line + "\n",
+                log.debug(f"""Certaines traductions manquantes sur la ligne suivante (langues attendus, mots) :
+                          \t\t{';'.join(language_list)}\n\t\t{line}\n""",
                           prefix="dictionaire de traduction")
 
         file.close()
 
         # Indique en debug le nombre d'éléments récupérées
-        log.debug(str(len(self) - current_length) + " éléments récupérés dans :\n\t\t" + str(file_path) + "\n",
-                          prefix="dictionaire de traduction")
+        log.debug(f"{len(self) - current_length} éléments récupérés dans : {file_path}\n",
+                  prefix="dictionaire de traduction")

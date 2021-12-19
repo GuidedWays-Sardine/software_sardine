@@ -13,7 +13,7 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
 
 # Chemin d'accès vers les données
-DATA_DIR = PROJECT_DIR + "src\\line\\raw_data\\"
+DATA_DIR = f"{PROJECT_DIR}src\\line\\raw_data\\"
 
 # Constantes sur les noms des colonnes
 GEO_LO = "GEO_LO"
@@ -112,6 +112,5 @@ class DataBase:
             self.df.sort_values(by=["CODE_LIGNE", PK + (DEBUT if (PK + DEBUT) in self.attr else "")]).reset_index(drop=True)
 
         # Indique le temps de chargement et de normaliusation de la base de données
-        log.info("Base de données : " + self.path[len(DATA_DIR)::] + " chargée en : " +
-                 str("{:.2f}".format((time.time() - initial_time) * 1000)) + " milisecondes.\n")
+        log.info(f"Base de données : {self.path[len(DATA_DIR)::]} chargée en : {((time.time() - initial_time) * 1000):.2f} milisecondes.\n")
         return True

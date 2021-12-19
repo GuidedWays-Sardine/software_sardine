@@ -40,8 +40,8 @@ class SettingsDictionnary(dict):
         try:
             page.findChild(QObject, widget_id).setProperty(property, self[key])
         except KeyError:
-            log.debug("Impossible de changer le paramètre : " + property + " du composant" + widget_id + ".\n\t\t" +
-                      "Pas de valeurs pour le paramètre : " + key + " dans le fichier ouvert.\n")
+            log.debug(f"""Impossible de changer le paramètre : {property} du composant {widget_id}
+                      \t\tPas de valeurs pour le paramètre : {key} dans le fichier ouvert.\n""")
 
     def save(self, file_path):
         """Méthode permettant de sauvegarder les paramètres dans un fichier
@@ -55,14 +55,14 @@ class SettingsDictionnary(dict):
             file = open(file_path, "w", encoding="utf-8-sig")
         except Exception as error:
             # Cas où le fichier ouvert n'est pas accessible
-            log.warning("Impossible d'enregistrer le fichier :\n\t\t" + str(file_path + "\n") +
-                        "\n\t\tErreur de type : " + str(type(error)) +
-                        "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
+            log.warning(f"""Impossible d'enregistrer le fichier : {file_path}
+                        \t\tErreur de type : {type(error)}
+                        \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
                         "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
                         prefix="dictionaire de données")
         else:
             for key in self.keys():
-                file.write(str(key) + ";" + str(self[key]) + "\n")
+                file.write(f"{key};{self[key]}\n")
 
             # Ferme le fichier
             file.close()
@@ -80,9 +80,9 @@ class SettingsDictionnary(dict):
             file = open(file_path, "r", encoding="utf-8-sig")
         except Exception as error:
             # Cas où le fichier ouvert n'existe pas ou qu'il n'est pas accessible
-            log.warning("Impossible d'ouvrir le fichier :\n\t\t" + str(file_path) + "\n" +
-                        "\n\t\tErreur de type : " + str(type(error)) +
-                        "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
+            log.warning(f"""Impossible d'ouvrir le fichier : {file_path}
+                        \t\tErreur de type : {type.errors}
+                        \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
                         "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
                         prefix="dictionaire de données")
             return
@@ -94,7 +94,7 @@ class SettingsDictionnary(dict):
         for line in file:
             # Si la ligne ne contient pas le délimiteur (ici ;) l'indique dans les logs et saute la ligne
             if ";" not in line:
-                log.debug("Ligne sautée. Délimiteur \";\" manquant dans la ligne :\n\t\t" + line + '\n',
+                log.debug("Ligne sautée. Délimiteur \";\" manquant dans la ligne : {line} \n",
                           prefix="dictionaire de données")
             else:
                 # Récupère les deux éléments de la ligne
@@ -124,5 +124,5 @@ class SettingsDictionnary(dict):
         file.close()
 
         # Indique en debug le nombre d'éléments récupérés
-        log.debug(str(len(self) - current_length) + " éléments récupérés dans :\n\t\t" + str(file_path) + "\n",
+        log.debug(f"{len(self) - current_length} éléments récupérés dans : {file_path}\n",
                   prefix="dictionaire de traduction")

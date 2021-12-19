@@ -11,7 +11,7 @@ from PyQt5.QtCore import QObject
 
 
 # Librairies SARDINE
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src\\")[0]
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
 
@@ -38,37 +38,37 @@ class RightButtons:
         self.pages_stackview = application.win.findChild(QObject, "settings_pages")
 
         not_exist = " ; ".join(sorted({"1", "2", "3", "4", "5", "6", "7", "8"}.difference(f[7:-4]
-                                        for f in os.listdir(PROJECT_DIR + "src\\initialisation\\graphics\\page_rb")
+                                        for f in os.listdir(f"{PROJECT_DIR}src\\initialisation\\graphics\\page_rb")
                                         if f.startswith("page_rb") and f.endswith(".qml"))))
 
         if not_exist != "":
-            log.warning("Les pages de paramètres : " + not_exist + " N'ont aucun fichier graphique(.qml) associés.\n\n")
+            log.warning(f"Les pages de paramètres : {not_exist} N'ont aucun fichier graphique(.qml) associés.\n\n")
 
         # Pour toutes les pages de paramètres ayant un ficher graphique (.qml) existant
-        for index in (int(f[7:-4]) for f in os.listdir(PROJECT_DIR + "src\\initialisation\\graphics\\page_rb")
+        for index in (int(f[7:-4]) for f in os.listdir(f"{PROJECT_DIR}src\\initialisation\\graphics\\page_rb")
                               if f.startswith("page_rb") and f.endswith(".qml") and int(f[7:-4]) >= 1 and int(f[7:-4]) <= 8):
             # Vérifie si la partie graphique de la page existe et charge la page et le bouton associé
             engine = QQmlApplicationEngine()
-            page_path = PROJECT_DIR + "src\\initialisation\\graphics\\page_rb\\page_rb" + str(index) + ".qml"
+            page_path = f"{PROJECT_DIR}src\\initialisation\\graphics\\page_rb\\page_rb{index}.qml"
             engine.load(page_path)
-            current_button = self.right_buttons.findChild(QObject, "rb" + str(index))
+            current_button = self.right_buttons.findChild(QObject, f"rb{index}")
 
             initial_time = time.time()
-            log.info("Tentative du chargement de la page " + str(index) + ".\n")
+            log.info(f"Tentative du chargement de la page {index}.\n")
 
             # Essaye d'initialiser la page et si elle est correctement initialisé, tente de charger les signals
             if self.initialise_page(application, engine, index, page_path, current_button):
                 if self.initialise_signals(application, engine, index, page_path, current_button):
-                    log.info("Chargement complet (graphique et fonctionelle) de la  page " + str(index) + " en " +
-                             str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n\n")
+                    log.info(f"Chargement complet (graphique et fonctionelle) de la  page_rb{index} en " +
+                             f"{((time.time() - initial_time)*1000):.2f} millisecondes.\n\n")
                 else:
-                    log.info("Chargement partiel (graphique uniquement) de la page " + str(index) + " en " +
-                             str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n\n")
+                    log.info(f"Chargement partiel (graphique uniquement) de la page_rb{index} en " +
+                             f"{((time.time() - initial_time)*1000):.2f} millisecondes.\n\n")
 
         # Vérifie si au moins une page est chargée, sinon l'indique et cache les boutons ouvrir et sauvegarder
         if not any(application.is_fully_loaded):
-            log.error("Aucune des pages n'a été correctement chargée. Les valeurs par défaut seront utilisés. " +
-                      "Seuls les boutons quitter et lancer sont fonctionnels.\n\t\t")
+            log.error(f"""Aucune des pages n'a été correctement chargée. Les valeurs par défaut seront utilisés.
+                      \t\tSeuls les boutons quitter et lancer sont fonctionnels.\n""")
             application.win.findChild(QObject, "save").setProperty("is_visible", False)
             application.win.findChild(QObject, "open").setProperty("is_visible", False)
 
@@ -119,7 +119,7 @@ class RightButtons:
             current_button.setProperty("text", "")
 
             # Si le fichier n'a été chargé correctement
-            log.warning("Le fichier graphique " + page_path + "contient des erreurs.\n\n")
+            log.warning(f"Le fichier graphique {page_path} contient des erreurs.\n\n")
             return False
 
     def initialise_signals(self, application, engine, index, page_path, current_button):
@@ -145,19 +145,18 @@ class RightButtons:
             La partie fonctionnelle de la page a-t-elle été chargé correctement ?
         """
         # Vérifie si la page a des signals handlers associés (en recherchant un ficher .py associé)
-        if os.path.isfile(PROJECT_DIR + "src/initialisation/signals/page_rb/page_rb" + str(index) + ".py"):
+        if os.path.isfile(f"{PROJECT_DIR}src/initialisation/signals/page_rb/page_rb{index}.py"):
             # Si c'est le cas, initialise les signals handlers et le stock
             try:
                 # Import localement le fichier de la page
                 # Appelle le constructeur de la page pour affilier tous les signals aux widgets
-                exec("from src.initialisation.signals.page_rb import page_rb" + str(index) + " as rb" + str(index) + "\n" +
-                     "application.visible_pages[index - 1] = " + "(rb" + str(index) + ".PageRB" + str(index) +
-                     "(application, engine, index, current_button))")
+                exec(f"from src.initialisation.signals.page_rb import page_rb{index} as rb{index}\n" +
+                     f"application.visible_pages[index - 1] = rb{index}.PageRB{index}(application, engine, index, current_button)")
             except Exception as error:
                 # Permet de rattraper une erreur si le code est incorrect où qu'il ne suit pas la documentation
-                log.warning("Erreur lors du chargement des signaux de la page : " + page_path + ".\n\t\t" +
-                            "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                            "Avec comme message d\'erreur : " + str(error.args) +
+                log.warning(f"""Erreur lors du chargement des signaux de la page : {page_path}
+                            \t\tErreur de type : {type(error)}
+                            \t\tAvec comme message d'erreur : {error.args}""" +
                             "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
                 current_button.setProperty("is_positive", False)
                 return False
@@ -171,8 +170,8 @@ class RightButtons:
                 return True
         else:
             # Sinon pas de signals handlers associé, le précise dans les logs
-            log.warning("La page " + str(index) + " n\'a aucun fichier signals associé.\n\t\t" +
-                        "La page sera visible mais ne sera pas fonctionnelle.\n")
+            log.warning(f"""La page_rb{index} n'a aucun fichier signals associé.
+                        \t\tLa page sera visible mais ne sera pas fonctionnelle.\n""")
             current_button.setProperty("is_positive", False)
             return False
 
@@ -187,15 +186,15 @@ class RightButtons:
         """
         # Dans l'ordre : get_values, set_values, change_language, on_page_opened, on_page_closed
         if "get_values" not in dir(page):
-            log.warning("Aucune fonction \"get_values\", pour la PageRB " + str(page.index) + ".\n")
+            log.warning(f"Aucune fonction \"get_values\", pour la PageRB{page.index}.\n")
         if "set_values" not in dir(page):
-            log.warning("Aucune fonction \"set_values\", pour la PageRB " + str(page.index) + ".\n")
+            log.warning(f"Aucune fonction \"set_values\", pour la PageRB{page.index}.\n")
         if "change_language" not in dir(page):
-            log.warning("Aucune fonction \"change_language\", pour la PageRB " + str(page.index) + ".\n")
+            log.warning(f"Aucune fonction \"change_language\", pour la PageRB{page.index}.\n")
         if "on_page_opened" not in dir(page):
-            log.debug("Aucune fonction \"on_page_opened\", pour la PageRB" + str(page.index) + ".\n")
+            log.debug(f"Aucune fonction \"on_page_opened\", pour la PageRB{page.index}.\n")
         if "on_page_closed" not in dir(page):
-            log.debug("Aucune fonction \"on_page_closed\", pour la PageRB" + str(page.index) + ".\n")
+            log.debug(f"Aucune fonction \"on_page_closed\", pour la PageRB{page.index}.\n")
 
     def on_new_page_selected(self, application, engine, new_index):
         """Fonction permettant le changement de la page de paramètres active lorsqu'un bouton rb est cliqué
@@ -218,16 +217,15 @@ class RightButtons:
                 try:
                     application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
                 except Exception as error:
-                    log.error("La fonction on_page_closed de la page " + str(application.active_settings_page) +
-                              " contient une erreur\n\t\t" +
-                              "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                              "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
+                    log.error(f"""La fonction on_page_closed de la page_rb{application.active_settings_page} contient une erreur
+                              \t\tErreur de type : {type(error)}
+                              \t\tAvec comme message d'erreur{error.args}\n\n\t\t""" +
                               "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
 
             # Indique que l'on sort de l'ancienne page, change le préfixe et indique que l'on rentre dans la nouvelle page
-            log.info("Fermeture de la page de paramètres page_rb" + str(application.active_settings_page) + ".\n\n")
-            log.change_log_prefix("page_rb" + str(new_index))
-            log.info("Ouverture de la page de paramètres page_rb" + str(new_index) + ".\n")
+            log.info(f"Fermeture de la page de paramètres page_rb{application.active_settings_page}.\n\n")
+            log.change_log_prefix(f"page_rb{new_index}")
+            log.info(f"Ouverture de la page de paramètres page_rb{new_index}.\n")
 
             # Charge le graphique de la nouvelle page et indique à l'application l'index de la nouvelle page chargée
             self.pages_stackview.set_active_page(engine.rootObjects()[0])
@@ -239,8 +237,7 @@ class RightButtons:
                 try:
                     application.visible_pages[application.active_settings_page - 1].on_page_opened(application)
                 except Exception as error:
-                    log.error("La fonction on_page_opened de la page " + str(application.active_settings_page) +
-                              " contient une erreur.\n\t\t" +
-                              "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                              "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
+                    log.error(f"""La fonction on_page_opened de la page_rb{application.active_settings_page} contient une erreur.
+                              \t\tErreur de type : {type(error)}
+                              \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
                               "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")

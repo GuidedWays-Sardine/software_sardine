@@ -62,11 +62,11 @@ class PageRB1:
 
         try:
             # Essaye de charger la combobox langue
-            file = open(PROJECT_DIR + "settings\\language_settings\\initialisation.lang", "r", encoding='utf-8-sig')
+            file = open(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang", "r", encoding='utf-8-sig')
         except (FileNotFoundError, OSError):
             # Ne change charge pas  la combobox langues dans le cas ou le combobox n'est pas chargé
-            log.warning("Le fichier de traduction de langue n'existe pas. assurez vous qu'il existe :\n\t\t" +
-                        PROJECT_DIR + "settings\\language_settings\\initialisation.lang\n")
+            log.warning(f"""Le fichier de traduction de langue n'existe pas. assurez vous qu'il existe :
+                        \t\t{PROJECT_DIR}settings\\language_settings\\initialisation.lang\n""")
         # Sinon lit la première ligne pour récupérer la liste des langues
         else:
             # Récupère la liste des langues (ligne 1 du fichier initialisation.lang)
@@ -83,17 +83,17 @@ class PageRB1:
 
         # Essaye de récupérer le dictionaire Anglais -> langue principale afin de traduire les répertoires par défaut en anglais
         t_data = td.TranslationDictionnary()
-        t_data.create_translation(PROJECT_DIR + "settings\\language_settings\\initialisation.lang",
+        t_data.create_translation(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang",
                                   "English", application.language)
 
         # Charge tous les dossiers dans src.train.command_board et les indiques comme pupitre sélectionables
-        command_boards = [t_data[f.replace("_", " ")] for f in os.listdir(PROJECT_DIR + "src\\train\\command_board")
-                          if os.path.isdir(os.path.join(PROJECT_DIR + "src\\train\\command_board", f))]
+        command_boards = [t_data[f.replace("_", " ")] for f in os.listdir(f"{PROJECT_DIR}src\\train\\command_board")
+                          if os.path.isdir(os.path.join(f"{PROJECT_DIR}src\\train\\command_board", f))]
         self.page.findChild(QObject, "command_board_combo").setProperty("elements", command_boards)
 
         # Charge tous les DMI présents dans src.train.DMI et les indiques comme DMI sélectionables
-        dmi_list = [t_data[f.replace("_", " ")] for f in os.listdir(PROJECT_DIR + "src\\train\\DMI")
-                    if os.path.isdir(os.path.join(PROJECT_DIR + "src\\train\\DMI", f))]
+        dmi_list = [t_data[f.replace("_", " ")] for f in os.listdir(f"{PROJECT_DIR}src\\train\\DMI")
+                    if os.path.isdir(os.path.join(f"{PROJECT_DIR}src\\train\\DMI", f))]
         self.page.findChild(QObject, "dmi_combo").setProperty("elements", dmi_list)
 
         # Rend le checkbutton renard et le checkbutton caméra fonctionnel
@@ -172,7 +172,7 @@ class PageRB1:
         try:
             command_board = str(data["command_board"]).replace("_", " ")
         except KeyError:
-            log.debug("Impossible de changer le paramètre: \"command_board\" manquant dans le fichier ouvert.\n")
+            log.debug(f"Impossible de changer le paramètre: \"command_board\" manquant dans le fichier ouvert.\n")
         else:
             self.page.findChild(QObject, "command_board_combo").change_selection(translation_data[command_board])
 
@@ -186,7 +186,7 @@ class PageRB1:
         try:
             dmi = str(data["dmi"]).replace("_", " ")
         except KeyError:
-            log.debug("Impossible de changer le paramètre: \"dmi\" manquant dans le fichier ouvert.\n")
+            log.debug(f"Impossible de changer le paramètre: \"dmi\" manquant dans le fichier ouvert.\n")
         else:
             self.page.findChild(QObject, "command_board_combo").change_selection(translation_data[dmi])
 
@@ -195,10 +195,7 @@ class PageRB1:
             self.page.findChild(QObject, "log_button").setProperty("text",
                 dict([reversed(i) for i in self.log_type_converter.items()])[log.Level[data["log_level"].replace("Level.", "")]])
         except KeyError as error:
-            log.debug("Impossible de changer le paramètre : \"log_level\" manquant dans le fichier ouvert.\n" +
-                     "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                     "Avec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
-                     "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+            log.debug(f"Impossible de changer le paramètre : \"log_level\" manquant dans le fichier ouvert.\n")
 
         # Paramètre pour le PCC (savoir s'il sera activé)
         data.update_parameter(self.page, "pcc_check", "is_checked", "ccs")

@@ -62,18 +62,18 @@ class LineGenerator:
         """
         initial_time = time.time()
         # Si la ligne existe déjà (enregistrée dans settings/line_settings/line_code) et qu'elle ne doit pas être rechargée, retourne
-        if str(line_code) in os.listdir(PROJECT_DIR + "settings\\line_settings") and not reload:
-            log.info("La ligne " + str(line_code) + " existe déjà. Elle ne sera pas recréée.\n\n")
+        if str(line_code) in os.listdir(f"{PROJECT_DIR}settings\\line_settings") and not reload:
+            log.info(f"La ligne {line_code} existe déjà. Elle ne sera pas recréée.\n\n")
             return
 
         # Vérifie que la ligne qu'on essaye de charger existe, sinon arrête le chargement de la ligne
         line_name = list(self.lines.df.loc[self.lines.df["CODE_LIGNE"] == line_code, "LIB_LIGNE"])
         if not line_name:
-            log.warning("Aucune ligne existance avec le code_ligne : " + str(line_code) + ".\n\n")
+            log.warning(f"Aucune ligne existance avec le code_ligne : {line_code}.\n\n")
             return
         else:
             # Sinon indique le nom et les informations clés de la ligne en question
-            log.info("Génération de la ligne " + line_name[0] + ".\n")
+            log.info(f"Génération de la ligne {line_name[0]}.\n")
 
         # charge le reste des bases de données ligne (si ce n'est pas déjà fait)
         self.load_line_databases()
@@ -88,23 +88,23 @@ class LineGenerator:
         initial_save_time = time.time()
 
         # Commencer par supprimer le dossier de paramètre des lignes si celui-ci existe déjà
-        if str(line_code) in PROJECT_DIR + "settings\\line_settings\\":
-            os.remove(PROJECT_DIR + "settings\\line_settings\\" + str(line_code))
+        if str(line_code) in f"{PROJECT_DIR}settings\\line_settings\\":
+            os.remove(f"{PROJECT_DIR}settings\\line_settings\\{line_code}")
 
         # Ensuite crée les dossier nécessaires pour la sauvegarde de la ligne
-            os.mkdir(PROJECT_DIR + "settings\\line_settings\\" + str(line_code))
-            os.mkdir(PROJECT_DIR + "settings\\line_settings\\" + str(line_code) + "\\UE5")
-            os.mkdir(PROJECT_DIR + "settings\\line_settings\\" + str(line_code) + "\\Python")
+            os.mkdir(f"{PROJECT_DIR}settings\\line_settings\\{line_code}")
+            os.mkdir(f"{PROJECT_DIR}settings\\line_settings\\{line_code}\\UE5")
+            os.mkdir(f"{PROJECT_DIR}settings\\line_settings\\{line_code}\\Python")
 
         # Sauvegarde les splines en format python et en format UE5
         for spline in splines:
-            spline.save_to_ue5(PROJECT_DIR + "settings\\line_settings\\" + str(line_code) + "\\UE5")
-            spline.save_to_python(PROJECT_DIR + "settings\\line_settings\\" + str(line_code) + "\\Python")
+            spline.save_to_ue5(f"{PROJECT_DIR}settings\\line_settings\\{line_code}\\UE5")
+            spline.save_to_python(f"{PROJECT_DIR}settings\\line_settings\\{line_code}\\Python")
 
         # indique le temps de suavegarde des splines ainsi que le temps total de chargement de la ligne
-        log.info("Informations chargement ligne : " + self.lines.df.loc[self.lines.df["CODE_LIGNE"] == line_code, "LIB_LIGNE"] + "\n\t\t" +
-                 "Splines (python et UE5) sauvegardées en " + str("{:.2f}".format((time.time() - initial_save_time) * 1000)) + " milisecondes.\n\t\t" +
-                 "Chargement (et sauvegarde) en : " + str("{:.2f}".format((time.time() - initial_time) * 1000)) + " milisecondes.\n")
+        log.info(f"""Informations chargement ligne : {self.lines.df.loc[self.lines.df["CODE_LIGNE"] == line_code, "LIB_LIGNE"]}
+                 \t\tSplines (python et UE5) sauvegardées en {((time.time() - initial_save_time) * 1000):.2f} milisecondes.
+                 \t\tChargement (et sauvegarde) en : {((time.time() - initial_time) * 1000):.2f}) milisecondes.\n""")
 
     def load_line_databases(self):
         """Charge toutes les bases de données reliées à la ligne"""
@@ -151,8 +151,8 @@ class LineGenerator:
         self.electrification.load()
 
         # Indique le temps de chargement des bases de données
-        log.info("Chargement de toutes les bases de données génération de ligne en " +
-                 str("{:.2f}".format((time.time() - initial_time)*1000)) + " milisecondes.\n\n")
+        log.info(f"Chargement de toutes les bases de données génération de ligne en " +
+                 f"{((time.time() - initial_time)*1000):.2f} milisecondes.\n\n")
 
     def generate_splines_data(self, tracks, curves, slopes, max_speed, electrification):
         """Permet à partir des données d'une ligne de générer la liste des splines nécessaires
@@ -207,8 +207,7 @@ class LineGenerator:
         #TODO : add function for personalized splits (for connections with other lines)
 
         # indique le temps de suavegarde des splines ainsi que le temps total de chargement de la ligne
-        log.info("Chargement de " + str(len(splines)) + " splines en " + str("{:.2f}".format((time.time() - initial_time) * 1000)) + "milisecondes.\n")
-
+        log.info(f"Chargement de {len(splines)} splines en {((time.time() - initial_time) * 1000):.2f} milisecondes.\n")
         return splines
 
 
@@ -222,9 +221,9 @@ if __name__ == "__main__":
         line_generator.generate_line(752000, reload=True)
     except Exception as error:
         # Récupère une potentielle erreur lors de l'initialisation de la simulation
-        log.critical("Erreur fatale lors de l'initialisation du simulateur\n\t\t" +
-                     "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                     "Avec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
+        log.critical(f"""Erreur fatale lors de l'initialisation du simulateur.
+                     \t\tErreur de type : {type(error)}
+                     \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
                      "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
                      prefix="")
         exit(-1)

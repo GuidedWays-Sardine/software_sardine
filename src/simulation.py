@@ -83,8 +83,8 @@ class Simulation:
 
         # Indique le temps de chargement de la simulation avant de lancer tous les modules
         log.change_log_prefix("initialisation simulation")
-        log.info("Simulation (" + str(len(self.components)) + " modules) initialisés en " +
-                 str("{:.2f}".format((time.time() - initial_time) * 1000)) + " millisecondes.\n\n")
+        log.info(f"Simulation ({len(self.components)} modules) initialisés en " +
+                 f"{((time.time() - initial_time) * 1000):.2f} millisecondes.\n\n")
 
     def run(self):
         """Lance tous les modules initialisés.
@@ -109,8 +109,8 @@ class Simulation:
             self.components[module].run()
 
         # Indique le temps de lancement de l'application (celui-ci doit être le plus court possible)
-        log.info("Lancements des modules de simulation en " +
-                 str("{:.2f}".format((time.time() - initial_time) * 1000)) + " millisecondes.\n\t\t")
+        log.info(f"Lancements des modules de simulation en " +
+                 f"{((time.time() - initial_time) * 1000):.2f} millisecondes.\n")
 
         # Lance le thread pour mettre à jour constament la simulation et lance la partié graphique
         update = threading.Thread(target=self.update)
@@ -150,9 +150,9 @@ class Simulation:
                         time.sleep(self.DELAY - update_time)
                     else:
                         # Sinon laisse un message de debug pour inciter à l'optimisation du code ou au changement du délai
-                        log.debug("Attention mise à jour de l'application en " + "{:.2f}".format(update_time * 1000) +
-                                  "ms, au lieu des " + "{:.2f}".format(self.DELAY * 1000) + "ms demandés.\n\t\t" +
-                                  "Prévoir une optimisation du code ou un délai plus long si le soucis persiste.\n",
+                        log.debug(f"Attention mise à jour de l'application en {(update_time * 1000):.2f} millisecondes" +
+                                  f"ms, au lieu des {self.DELAY * 1000:.2f} millisecondes demandées.\n" +
+                                  "\t\tPrévoir une optimisation du code ou un délai plus long si le soucis persiste.\n",
                                   prefix="simulation : update()")
 
         except Exception as error:
@@ -168,13 +168,14 @@ class Simulation:
         log.info("Fermeture de l'initialisation de la simulation.\n\n")
 
         # Indique le nombre de mises à jours réussies et le temps moyen de mise à jour
-        log.info("Simulation mises à jour " + str(self.update_count) + " avec un temps moyen de " + str(self.update_average_time) + ".\n")
+        log.info(f"Simulation mises à jour {self.update_count} fois avec un temps moyen de {self.update_average_time}.\n")
 
         # Appelle les différentes fonctions de fermetures
         # FEATURE : ajouter les différents appels de fonctions de fermetures ici
 
         # Indique le temps nécessaire à la fermeture
-        log.info("Simulation terminée en " + str("{:.2f}".format((time.time() - initial_time) * 1000)) + " millisecondes.\n\n")
+        log.info(f"Simulation fermée correctement en : " +
+                 f"{((time.time() - initial_time) * 1000):.2f} millisecondes.\n\n")
 
     def initialise_dmi(self):
         """Fonction permettant d'initialiser le DMI.
@@ -188,8 +189,8 @@ class Simulation:
         """
         try:
             # Importe le module du DMI, essaye de l'initialiser et l'ajouter aux "components" (modules) initialisés
-            exec("import src.train.DMI." + str(self.parameters["dmi"]) + ".dmi as DMI\n" +
-                 "self.components[\"dmi\"] = DMI.DriverMachineInterface(self)")
+            exec(f"import src.train.DMI.{self.parameters['dmi']}.dmi as DMI\n" +
+                 f"self.components[\"dmi\"] = DMI.DriverMachineInterface(self)")
         except KeyError:
             # Dans le cas où le DMI n'a pas été trouvé, crash si le dmi est obligatoire, laisse un message d'erreur sinon
             if self.parameters["sardine simulator.central dmi.mandatory"]:
@@ -201,9 +202,9 @@ class Simulation:
             if self.parameters["sardine simulator.central dmi.mandatory"]:
                 raise
             else:
-                log.error("Impossible de charger le DMI : " + self.parameters["dmi"] + ". Aucun DMI ne sera chargé.\n\t\t" +
-                          "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                          "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
+                log.error(f"""Impossible de charger le DMI : {self.parameters['dmi']}. Aucun DMI ne sera chargé
+                          \t\tErreur de type : {type(error)}
+                          \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
                           "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
                           prefix="initialisation simulation")
 

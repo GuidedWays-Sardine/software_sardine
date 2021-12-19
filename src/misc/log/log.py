@@ -44,7 +44,7 @@ def initialise(path, version, log_level):
 
     # Prend la date et crée le nom du fichier log
     now = str(datetime.now()).split(".", 1)[0]
-    file_name = path + ("sardine " + version + " " + now + ".log").replace(':', ';')
+    file_name = path + f"sardine {version} {now}.log".replace(':', ';')
 
     # Crée le fichier log avec les informations envoyées
     logging.basicConfig(level=log_level.value,
@@ -87,7 +87,7 @@ def change_log_prefix(prefix=""):
     # Si le préfixe est vide, l'ajoute, sinon remet le logging par défaut
     if prefix != "":
         handler.setFormatter(logging.Formatter(datefmt="%H:%M:%S",
-                                               fmt="%(asctime)s - [" + str(prefix) + "] - %(levelname)s - %(message)s"))
+                                               fmt=f"%(asctime)s - [{prefix}] - %(levelname)s - %(message)s"))
     else:
         handler.setFormatter(logging.Formatter(datefmt="%H:%M:%S",
                                                fmt="%(asctime)s - %(levelname)s - %(message)s"))

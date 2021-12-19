@@ -29,7 +29,7 @@ class DataVisualisation:
 
 
 def main():
-    log.initialise(PROJECT_DIR + 'log\\', "1.1.0", log.Level.DEBUG)
+    log.initialise(f"{PROJECT_DIR}log\\", "1.1.0", log.Level.DEBUG)
 
     # Crée une micro simulation (avec juste le DMI)
     from PyQt5.QtWidgets import QApplication
