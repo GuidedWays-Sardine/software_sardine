@@ -52,17 +52,14 @@ class SettingsDictionnary(dict):
         """
         try:
             # Essaye de créer (ou d'écraser) le fichier avec les paramètres actuels
-            file = open(file_path, "w", encoding="utf-8-sig")
+            with open(file_path, "w", encoding="utf-8-sig") as file:
+                # Ecrit chacune des clés à l'intérieur séparé par le délimiteur
+                for key in self.keys():
+                    file.write(f"{key};{self[key]}\n")
         except Exception as error:
             # Cas où le fichier ouvert n'est pas accessible
             log.warning(f"Impossible d'enregistrer le fichier : {file_path}.\n",
                         exception=error, prefix="dictionaire de données")
-        else:
-            for key in self.keys():
-                file.write(f"{key};{self[key]}\n")
-
-            # Ferme le fichier
-            file.close()
 
     def open(self, file_path):
         """Méthode permettant d'ouvrir un fichier de paramètres et de rajouter les paramètres au dictionnaire
@@ -72,51 +69,62 @@ class SettingsDictionnary(dict):
         file_path: `string`
             chemin d'accès vers le fichier de paramètres à ouvrir et lire
         """
+        # Récupère la longueur actuelle
+        current_length = len(self)
+
         try:
             # Essaye d'ouvrir le fichier avec les paramètres
-            file = open(file_path, "r", encoding="utf-8-sig")
+            with open(file_path, "r", encoding="utf-8-sig") as file:
+                # Si le fichier est ouvert, récupère chaque lignes de celui-ci
+                for line in file:
+                    # Si la ligne ne contient pas le délimiteur (ici ;) l'indique dans les logs et saute la ligne
+                    if ";" not in line:
+                        log.debug("Ligne sautée. Délimiteur \";\" manquant dans la ligne : {line} \n",
+                                  prefix="dictionaire de données")
+                    else:
+                        # Récupère les deux éléments de la ligne et les ajoutent comme clé et valeur
+                        line = list(map(str.strip, line.rstrip('\n').split(";")))
+                        line[0] = SettingsDictionnary.convert_type(line[1])
+
         except Exception as error:
             # Cas où le fichier ouvert n'existe pas ou qu'il n'est pas accessible
             log.warning(f"Impossible d'ouvrir le fichier : {file_path}.\n",
                         exception=error, prefix="dictionaire de données")
-            return
+        else:
+            # Indique en debug le nombre d'éléments récupérés
+            log.debug(f"{len(self) - current_length} éléments récupérés dans : {file_path}\n",
+                      prefix="dictionaire de traduction")
 
-        # Récupère la longueur actuelle
-        current_length = len(self)
+    @staticmethod
+    def convert_type(data):
+        """Fonction permettant de convertir un string de la data en son type correct.
+        Fonctionne pour tous les types immutables par défaut
 
-        # Si le fichier est ouvert, récupère chaque lignes de celui-ci
-        for line in file:
-            # Si la ligne ne contient pas le délimiteur (ici ;) l'indique dans les logs et saute la ligne
-            if ";" not in line:
-                log.debug("Ligne sautée. Délimiteur \";\" manquant dans la ligne : {line} \n",
-                          prefix="dictionaire de données")
-            else:
-                # Récupère les deux éléments de la ligne
-                line = list(map(str.strip, line.rstrip('\n').split(";")))
+        Parameters
+        ----------
+        data: `string`
+            donnée à convertir
 
-                # Regarde s'il peut être convertir en bool?
-                if line[1] == "True" or line[1] == "False":
-                    self[line[0]] = True if line[1] == "True" else False
-                    continue
+        Returns
+        -------
+        converted_data : `Union[bool, int, float, None, str]`
+            donnée convertie (string si aucun moyen de le convertir)
+        """
+        # Regarde s'il peut être convertir en bool?
+        if data.lower() == "true" or data.lower() == "false":
+            return data.lower() == "true"
 
-                # Regarde s'il peut être convertit en int ou en float
-                try:
-                    line[1] = float(line[1])
-                except ValueError:
-                    pass
-                else:
-                    if line[1].is_integer():
-                        self[line[0]] = int(line[1])
-                    else:
-                        self[line[0]] = int(line[1])
-                    continue
+        # Regarde s'il peut être convertit en int
+        if data.isnumeric():
+            return int(data)
 
-                # Dans le cas où aucun type autre que string a été détecté
-                if isinstance(line[1], type(" ")):
-                    self[line[0]] = line[1]
+        # Regarde s'il peut être convertit en float
+        if data.replace(".", "", 1).isnumeric():
+            return float(data)
 
-        file.close()
+        # Regarde s'il peut être convertit en NoneType
+        if data.lower == "none":
+            return None
 
-        # Indique en debug le nombre d'éléments récupérés
-        log.debug(f"{len(self) - current_length} éléments récupérés dans : {file_path}\n",
-                  prefix="dictionaire de traduction")
+        # Dans tous les cas (si aucun des autres cas n'a été intercepté) retourne le string
+        return data

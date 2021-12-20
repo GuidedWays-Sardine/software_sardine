@@ -35,49 +35,45 @@ class TranslationDictionnary(dict):
             la langue dans laquelle il faut récupérer les traductions
         """
         try:
+            current_index, new_index = None, None
             # essaye d'ouvrir le fichier avec les traductions
-            file = open(file_path, "r", encoding="utf-8-sig")
+            with open(file_path, "r", encoding="utf-8-sig") as file:
+                try:
+                    # Récupère les index des langues (dans le cas où elles existent
+                    language_list = file.readline().upper().rstrip('\n').split(";")
+                    language_list = list(map(str.strip, language_list))
+                    current_index = language_list.index(current_language.upper())
+                    new_index = language_list.index(new_language.upper())
+                except ValueError:
+                    # Si l'une des langues n'existe pas (la combobox langue est générée automatiquement, donc par redondance)
+                    log.warning(f"Langues : {current_language} ; " if current_index is not None else "" +
+                                                                                                     str(new_language) if new_index is not None else "" + "\n")
+                    return
+
+                # Récupère la longueur actuelle
+                current_length = len(self)
+
+                # Ajoute la traduction de la langue actuelle
+                self[current_language] = new_language
+
+                # our chacune des lignes contenant des traductions (saute les lignes vides et avec des commentaires)
+                for line in (l for l in file if l != "\n" and l[0] != "#"):
+                    # récupère toutes les traductions présentes sur la ligne
+                    translations = list(map(str.strip, line.rstrip('\n').split(";")))
+
+                    # Si la ligne contient le bon nombre de traduction, récupère les 2 traductions nécessaires et les ajoute
+                    if len(translations) == len(language_list):
+                        self[translations[current_index]] = translations[new_index]
+                    else:
+                        # S'il n'y a pas autant de traductions que de langue, cela signifie que la ligne est incomplète
+                        log.debug(f"""Certaines traductions manquantes sur la ligne suivante (langues attendus, mots) :
+                                  \t\t{';'.join(language_list)}\n\t\t{line}\n""",
+                                  prefix="dictionaire de traduction")
         except Exception as error:
             # Cas où le fichier ouvert n'est pas accessible
             log.warning(f"Impossible d'ouvrir le fichier de traduction : {file_path}.\n",
                         exception=error,  prefix="dictionaire de traduction")
-            return
-
-        current_index, new_index = None, None
-        try:
-            # Récupère les index des langues (dans le cas où elles existent
-            language_list = file.readline().upper().rstrip('\n').split(";")
-            language_list = list(map(str.strip, language_list))
-            current_index = language_list.index(current_language.upper())
-            new_index = language_list.index(new_language.upper())
-        except ValueError:
-            # Si l'une des langues n'existe pas (la combobox langue est générée automatiquement, donc par redondance)
-            log.warning(f"Langues : {current_language} ; " if current_index is not None else "" +
-                        str(new_language) if new_index is not None else "" + "\n")
-            return
-
-        # Récupère la longueur actuelle
-        current_length = len(self)
-
-        # Ajoute la traduction de la langue actuelle
-        self[current_language] = new_language
-
-        # our chacune des lignes contenant des traductions (saute les lignes vides et avec des commentaires)
-        for line in (l for l in file if l != "\n" and l[0] != "#"):
-            # récupère toutes les traductions présentes sur la ligne
-            translations = list(map(str.strip, line.rstrip('\n').split(";")))
-
-            # Si la ligne contient le bon nombre de traduction, récupère les 2 traductions nécessaires et les ajoute
-            if len(translations) == len(language_list):
-                self[translations[current_index]] = translations[new_index]
-            else:
-                # S'il n'y a pas autant de traductions que de langue, cela signifie que la ligne est incomplète
-                log.debug(f"""Certaines traductions manquantes sur la ligne suivante (langues attendus, mots) :
-                          \t\t{';'.join(language_list)}\n\t\t{line}\n""",
-                          prefix="dictionaire de traduction")
-
-        file.close()
-
-        # Indique en debug le nombre d'éléments récupérées
-        log.debug(f"{len(self) - current_length} éléments récupérés dans : {file_path}\n",
-                  prefix="dictionaire de traduction")
+        else:
+            # Indique en debug le nombre d'éléments récupérées
+            log.debug(f"{len(self) - current_length} éléments récupérés dans : {file_path}\n",
+                      prefix="dictionaire de traduction")
