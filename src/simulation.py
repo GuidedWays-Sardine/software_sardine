@@ -2,7 +2,6 @@
 import sys
 import os
 import threading
-import traceback
 import time
 
 

@@ -1,7 +1,6 @@
 # Librairies par défaut
 import os.path
 import sys
-import traceback
 import time
 
 

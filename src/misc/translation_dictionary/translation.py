@@ -1,7 +1,6 @@
 #Librairies par défaut
 import sys
 import os
-import traceback
 
 
 # Librairies SARDINE

@@ -1,7 +1,6 @@
 # Librairies par défaut
 import os
 import sys
-import traceback
 
 
 # Librairies graphiques

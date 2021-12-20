@@ -1,7 +1,7 @@
 # Librairies par défaut
 import sys
 import os
-import traceback
+from typing import Union
 
 
 # Librairies graphiques

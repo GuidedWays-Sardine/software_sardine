@@ -2,7 +2,6 @@
 import sys
 import os
 import time
-import traceback
 
 
 # Librairies de traitement de données
