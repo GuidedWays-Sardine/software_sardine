@@ -55,11 +55,8 @@ class SettingsDictionnary(dict):
             file = open(file_path, "w", encoding="utf-8-sig")
         except Exception as error:
             # Cas où le fichier ouvert n'est pas accessible
-            log.warning(f"""Impossible d'enregistrer le fichier : {file_path}
-                        \t\tErreur de type : {type(error)}
-                        \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
-                        "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
-                        prefix="dictionaire de données")
+            log.warning(f"Impossible d'enregistrer le fichier : {file_path}.\n",
+                        exception=error, prefix="dictionaire de données")
         else:
             for key in self.keys():
                 file.write(f"{key};{self[key]}\n")
@@ -80,11 +77,8 @@ class SettingsDictionnary(dict):
             file = open(file_path, "r", encoding="utf-8-sig")
         except Exception as error:
             # Cas où le fichier ouvert n'existe pas ou qu'il n'est pas accessible
-            log.warning(f"""Impossible d'ouvrir le fichier : {file_path}
-                        \t\tErreur de type : {type.errors}
-                        \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
-                        "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
-                        prefix="dictionaire de données")
+            log.warning(f"Impossible d'ouvrir le fichier : {file_path}.\n",
+                        exception=error, prefix="dictionaire de données")
             return
 
         # Récupère la longueur actuelle

@@ -154,10 +154,8 @@ class RightButtons:
                      f"application.visible_pages[index - 1] = rb{index}.PageRB{index}(application, engine, index, current_button)")
             except Exception as error:
                 # Permet de rattraper une erreur si le code est incorrect où qu'il ne suit pas la documentation
-                log.warning(f"""Erreur lors du chargement des signaux de la page : {page_path}
-                            \t\tErreur de type : {type(error)}
-                            \t\tAvec comme message d'erreur : {error.args}""" +
-                            "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                log.warning(f"Erreur lors du chargement des signaux de la page : {page_path}",
+                            exception=error)
                 current_button.setProperty("is_positive", False)
                 return False
             else:
@@ -217,10 +215,8 @@ class RightButtons:
                 try:
                     application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
                 except Exception as error:
-                    log.error(f"""La fonction on_page_closed de la page_rb{application.active_settings_page} contient une erreur
-                              \t\tErreur de type : {type(error)}
-                              \t\tAvec comme message d'erreur{error.args}\n\n\t\t""" +
-                              "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                    log.error(f"La fonction on_page_closed de la page_rb{application.active_settings_page} contient une erreur",
+                              exception=error)
 
             # Indique que l'on sort de l'ancienne page, change le préfixe et indique que l'on rentre dans la nouvelle page
             log.info(f"Fermeture de la page de paramètres page_rb{application.active_settings_page}.\n\n")
@@ -237,7 +233,5 @@ class RightButtons:
                 try:
                     application.visible_pages[application.active_settings_page - 1].on_page_opened(application)
                 except Exception as error:
-                    log.error(f"""La fonction on_page_opened de la page_rb{application.active_settings_page} contient une erreur.
-                              \t\tErreur de type : {type(error)}
-                              \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
-                              "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                    log.error(f"La fonction on_page_opened de la page_rb{application.active_settings_page} contient une erreur.\n",
+                              exception=error)

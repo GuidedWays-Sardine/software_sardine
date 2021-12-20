@@ -41,10 +41,8 @@ class BottomButtons:
             application.win.findChild(QObject, "open").clicked.connect(lambda: self.on_open_clicked(application))
             application.win.findChild(QObject, "save").clicked.connect(lambda: self.on_save_clicked(application))
         except Exception as error:
-            log.warning(f"""Problème lors du chargement du signal du bouton sauvegarder ou ouvrir.
-                        \t\tErreur de type : {type(error)}
-                        \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
-                        "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+            log.warning(f"Problème lors du chargement du signal du bouton sauvegarder ou ouvrir.\n",
+                        exception=error)
 
         log.info(f"Boutons inférieurs chargés en " +
                  f"{((time.time() - initial_time)*1000):.2f} millisecondes.\n\n")
@@ -75,10 +73,8 @@ class BottomButtons:
                                        and not application.visible_pages[i].is_page_valid())
         except Exception as error:
             # Si une erreur a été détectée dans une des fonction de validation, l'indique et ne complète pas l'initialisation
-            log.warning(f"""Erreur lors de la validation d'une des pages de paramètres.
-                        \t\tErreur de type : {type(error)}
-                        \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
-                        "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+            log.warning(f"Erreur lors de la validation d'une des pages de paramètres.\n",
+                        exception=error)
         else:
             # Dans le cas où toutes les pages ont été vérifiées avec succès
             if not non_completed_pages:
@@ -89,10 +85,8 @@ class BottomButtons:
                         application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
                     except Exception as error:
                         # Si la fonction de fermeture de page contient une erreur, l'indique
-                        log.error(f"""La fonction on_page_closed de la page_rb{application.active_settings_page} contient une erreur
-                                  \t\tErreur de type : {type(error)}
-                                  \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
-                                  "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                        log.error(f"La fonction on_page_closed de la page_rb{application.active_settings_page} contient une erreur.\n",
+                                  exception=error)
 
                 # Indique que le simulateur va être lancée et ferme l'application (les données seront alors récupérées
                 log.change_log_prefix("Récupération des données")

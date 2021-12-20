@@ -202,11 +202,8 @@ class Simulation:
             if self.parameters["sardine simulator.central dmi.mandatory"]:
                 raise
             else:
-                log.error(f"""Impossible de charger le DMI : {self.parameters['dmi']}. Aucun DMI ne sera chargé
-                          \t\tErreur de type : {type(error)}
-                          \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
-                          "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
-                          prefix="initialisation simulation")
+                log.error(f"Impossible de charger le DMI : {self.parameters['dmi']}. Aucun DMI ne sera chargé.\n",
+                          exception=error, prefix="initialisation simulation")
 
     def initialise_off_screens(self):
         """Permet d'initialiser toutes les fenêtres d'immersions (fenêtres noires en plein écran).

@@ -40,11 +40,8 @@ class TranslationDictionnary(dict):
             file = open(file_path, "r", encoding="utf-8-sig")
         except Exception as error:
             # Cas où le fichier ouvert n'est pas accessible
-            log.warning(f"""Impossible d'ouvrir le fichier de traduction : {file_path}
-                        \t\tErreur de type : {type(error)}
-                        \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
-                        "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
-                        prefix="dictionaire de traduction")
+            log.warning(f"Impossible d'ouvrir le fichier de traduction : {file_path}.\n",
+                        exception=error,  prefix="dictionaire de traduction")
             return
 
         current_index, new_index = None, None

@@ -41,11 +41,8 @@ def main():
             exit(0)
     except Exception as error:
         # Récupère une potentielle erreur fatale et la charge
-        log.critical(f"""Erreur fatale lors du chargement de l'application d'initialisation simulateur
-                     \t\tErreur de type : {type(error)}
-                     \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
-                     "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
-                     prefix="")
+        log.critical(f"Erreur fatale lors du chargement de l'application d'initialisation simulateur.\n",
+                     exception=error, prefix="")
         exit(-1)
 
     # Change le niveau de log à celui précisé par l'utilisateur et enlève tout préfixe
@@ -63,11 +60,8 @@ def main():
         simulation = sim.Simulation(application, parameters)
     except Exception as error:
         # Récupère une potentielle erreur lors de l'initialisation de la simulation
-        log.critical(f"""Erreur fatale lors de l'initialisation du simulateur
-                     \t\tErreur de type : {type(error)}
-                     \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
-                     "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
-                     prefix="")
+        log.critical(f"Erreur fatale lors de l'initialisation du simulateur.\n",
+                     exception=error, prefix="")
         exit(-1)
     else:
         crash = False
@@ -75,11 +69,8 @@ def main():
             # Lance la simulation
             simulation.run()
         except Exception as error:
-            log.critical(f"""Erreur fatale lors du fonctionnement du simulateur
-                         \t\tErreur de type : {type(error)}
-                         \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
-                         "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
-                         prefix="")
+            log.critical(f"Erreur fatale lors du fonctionnement du simulateur.\n",
+                         exception=error, prefix="")
             crash = True
         finally:
             simulation.stop()

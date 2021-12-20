@@ -187,10 +187,8 @@ class DriverMachineInterface:
                      f"self.pages[\"{dmi}\"][\"{section}\"][\"{file}\"] = {file}.{file}(self.pages[\"{dmi}\"][\"{section}\"][\"{file}\"], section, file)")
             except Exception as error:
                 # Permet de rattraper une erreur si le code est incorrect
-                log.warning(f"""Erreur lors du chargement des signaux de la page : {file}.
-                            \t\tErreur de type : {type(error)}
-                            \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
-                            "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                log.warning(f"Erreur lors du chargement des signaux de la page : {file}.\n",
+                            exception=error)
             else:
                 # Si la page a sa partie logique de chargée, l'indique et vérifie l'existence de toutes les fonctions nécessaires
                 fully_loaded = True
@@ -235,11 +233,8 @@ class DriverMachineInterface:
                 try:
                     self.pages[self.active_dmi][folder][file].update()
                 except Exception as error:
-                    log.warning(f"""Erreur lors de la mise à jour de la page {folder}.{file} du DMI.\n\t\t" +
-                                \t\tErreur de type : {type(error)}
-                                \t\tAvec comme message d'erreur : {error.args}\n\n\t\t"""
-                                "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-
+                    log.warning(f"Erreur lors de la mise à jour de la page {folder}.{file} du DMI.\n\t\t.\n",
+                                exception=error)
 
 def main():
     # Lance le fichier registre

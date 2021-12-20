@@ -221,9 +221,6 @@ if __name__ == "__main__":
         line_generator.generate_line(752000, reload=True)
     except Exception as error:
         # Récupère une potentielle erreur lors de l'initialisation de la simulation
-        log.critical(f"""Erreur fatale lors de l'initialisation du simulateur.
-                     \t\tErreur de type : {type(error)}
-                     \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
-                     "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
-                     prefix="")
+        log.critical(f"Erreur fatale lors de l'initialisation du simulateur.\n",
+                     exception=error, prefix="")
         exit(-1)

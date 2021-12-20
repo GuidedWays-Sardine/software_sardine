@@ -136,10 +136,8 @@ class InitialisationWindow:
                 try:
                     self.visible_pages[self.active_settings_page - 1].on_page_opened(self)
                 except Exception as error:
-                    log.error(f"""La fonction on_page_opened de la page_rb{self.active_settings_page} contient une erreur.
-                              \t\tErreur de type : {type(error)}
-                              \t\tAvec comme message d\'erreur : {error.args}\n\n\t\t""" +
-                              "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                    log.error(f"La fonction on_page_opened de la page_rb{self.active_settings_page} contient une erreur.\n",
+                              exception=error)
 
         # Montre la fenêtre principale, indique que l'application doit se quitter quand celle-ci est fermée et Lance l'application
         self.win.show()
@@ -196,10 +194,8 @@ class InitialisationWindow:
                     parameters.update(page.get_values(translation_data))
                 except Exception as error:
                     # Permet de rattraper une potentielle erreur dans la fonction get_values()
-                    log.warning(f"""Erreur lors de la récupération des paramètres pour la page_rb{page.index}
-                                \t\tErreur de type : {type(error)}
-                                \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
-                                "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                    log.warning(f"Erreur lors de la récupération des paramètres pour la page_rb{page.index}.\n",
+                                exception=error)
 
         # Retourne le dictionnaire complété grâce aux différentes valeurs des get_values() de chaques pages
         log.info(f"Récupération de {len(parameters)} paramètres sur l'application d'initialisation en " +
@@ -243,10 +239,8 @@ class InitialisationWindow:
                 count += 1
             except Exception as error:
                 # Permet de rattraper une potentielle erreur dans la fonction get_values()
-                log.warning(f"""Erreur lors du changement des paramètres pour la page_rb{page.index}.
-                            \t\tErreur de type : {type(error)}.
-                            \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
-                            "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                log.warning(f"Erreur lors du changement des paramètres pour la page_rb{page.index}.\n",
+                            exception=error)
 
             # Indique le nombre de pages dont les paramètres on été changés
         log.info(f"Paramètres correctement changés sur {count} pages en {((time.time() - initial_time)*1000):.2f} millisecondes.\n\n")
@@ -276,10 +270,8 @@ class InitialisationWindow:
                 page.change_language(translation_data)
             except Exception as error:
                 # Permet de rattraper une potentielle erreur dans la fonction get_values()
-                log.warning(f"""Erreur lors du changement de langue pour la page_rb{page.index}
-                            \t\tErreur de type : {type(error)}
-                            \t\tAvec comme message d'erreur : {error.args}\n\n\t\t""" +
-                            "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                log.warning(f"Erreur lors du changement de langue pour la page_rb{page.index}.\n",
+                            exception=error)
 
         # Si la traduction a été réalisée correctement (traduction trouvée) alors change la langue actuelle
         self.language = new_language if translation_data else self.language
