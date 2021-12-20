@@ -23,8 +23,29 @@ class SettingsDictionnary(dict):
     def __getitem__(self, key):
         return super(SettingsDictionnary, self).__getitem__(key.lower())
 
+    def get_value(self, key, default=None):
+        """Méthode pour récupérer une valeur à partir de sa clé, et de mettre un message dans le registre s'il n'existe pas
+
+        Parameters
+        ----------
+        key: `string`
+            La clé à vérifier (la valeur associée à la clé sera retournée si elle existe
+        default: `Any`
+            La valeur à retourner si la clé n'a pas de valeurs associés (pour une facilité de lecture du code).
+
+        Returns
+        -------
+        value: `Any`
+            La valeur associée à la clé (si elle existe dans le dictionnaire) sinon la valeur par défaut
+        """
+        try:
+            return self[key]
+        except KeyError:
+            log.debug(f"Aucun paramètre \"{key.lower()}\" dans le dictionnaire de paramètres ouvert.\n")
+            return default
+
     def update_parameter(self, page, widget_id, property, key):
-        """Structure pour mettre à jour une propriété.
+        """Méthode pour mettre à jour une propriété d'un composant qml à partir de son ID et de la propriété.
 
         Parameters
         ----------

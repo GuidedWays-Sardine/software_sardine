@@ -87,7 +87,8 @@ class PageRB1:
 
         # Charge tous les dossiers dans src.train.command_board et les indiques comme pupitre sélectionables
         command_boards = [t_data[f.replace("_", " ")] for f in os.listdir(f"{PROJECT_DIR}src\\train\\command_board")
-                          if os.path.isdir(os.path.join(f"{PROJECT_DIR}src\\train\\command_board", f))]
+                          if os.path.isdir(os.path.join(f"{PROJECT_DIR}src\\train\\command_board", f))
+                          and f != "__pycache__"]
         self.page.findChild(QObject, "command_board_combo").setProperty("elements", command_boards)
 
         # Charge tous les DMI présents dans src.train.DMI et les indiques comme DMI sélectionables
@@ -168,12 +169,8 @@ class PageRB1:
             Un dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
         """
         # Paramètre du pupitre (quel pupitre sera utilisé)
-        try:
-            command_board = str(data["command_board"]).replace("_", " ")
-        except KeyError:
-            log.debug(f"Impossible de changer le paramètre: \"command_board\" manquant dans le fichier ouvert.\n")
-        else:
-            self.page.findChild(QObject, "command_board_combo").change_selection(translation_data[command_board])
+        if data.get_value("command_board") is not None:
+            self.page.findChild(QObject, "command_board_combo").change_selection(translation_data[str(data["command_board"])])
 
         # Paramètre pour Renard (savoir si le pupitre est connecté à Renard)
         data.update_parameter(self.page, "renard_check", "is_checked", "renard")
@@ -182,19 +179,17 @@ class PageRB1:
         data.update_parameter(self.page, "camera_check", "is_checked", "camera")
 
         # Paramètre pour le DMI (savoir quelle Interface sera utilisée pour le pupitre
-        try:
-            dmi = str(data["dmi"]).replace("_", " ")
-        except KeyError:
-            log.debug(f"Impossible de changer le paramètre: \"dmi\" manquant dans le fichier ouvert.\n")
-        else:
-            self.page.findChild(QObject, "command_board_combo").change_selection(translation_data[dmi])
+        if data.get_value("dmi") is not None:
+            self.page.findChild(QObject, "command_board_combo").change_selection(translation_data[str(data["dmi"]).replace("_", " ")])
 
         # Paramètre niveau de registre (pour suivre les potentiels bugs lors de la simulation)
-        try:
-            self.page.findChild(QObject, "log_button").setProperty("text",
-                dict([reversed(i) for i in self.log_type_converter.items()])[log.Level[data["log_level"].replace("Level.", "")]])
-        except KeyError as error:
-            log.debug(f"Impossible de changer le paramètre : \"log_level\" manquant dans le fichier ouvert.\n")
+        if data.get_value("log_level") is not None:
+            new_log_level = [key for key, value in self.log_type_converter.items()
+                             if value == log.Level[data["log_level"].replace("Level.", "")]]
+            if new_log_level:
+                self.page.findChild(QObject, "log_button").setProperty("text", new_log_level[0])
+            else:
+                log.debug(f"Le niveau de registre du fichier de paramètre \"{data['log_level']}\" n'existe pas.\n")
 
         # Paramètre pour le PCC (savoir s'il sera activé)
         data.update_parameter(self.page, "pcc_check", "is_checked", "ccs")
