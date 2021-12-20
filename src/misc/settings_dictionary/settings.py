@@ -84,7 +84,7 @@ class SettingsDictionnary(dict):
                     else:
                         # Récupère les deux éléments de la ligne et les ajoutent comme clé et valeur
                         line = list(map(str.strip, line.rstrip('\n').split(";")))
-                        line[0] = SettingsDictionnary.convert_type(line[1])
+                        self[line[0]] = SettingsDictionnary.convert_type(line[1])
 
         except Exception as error:
             # Cas où le fichier ouvert n'existe pas ou qu'il n'est pas accessible
