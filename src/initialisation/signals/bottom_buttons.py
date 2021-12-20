@@ -28,7 +28,7 @@ class BottomButtons:
         application: `InitialisationWindow`
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
-        initial_time = time.time()
+        initial_time = time.perf_counter()
         log.info("Tentative de chargement des boutons inférieurs.\n")
 
         # Boutons quitter/lancer (obligatoires pour le lancement de l'application)
@@ -44,7 +44,7 @@ class BottomButtons:
                         exception=error)
 
         log.info(f"Boutons inférieurs chargés en " +
-                 f"{((time.time() - initial_time)*1000):.2f} millisecondes.\n\n")
+                 f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\n")
 
     def on_quit_clicked(self, application):
         """Ferme la fenêtre d'initialisation

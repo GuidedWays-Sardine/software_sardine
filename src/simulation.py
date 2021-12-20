@@ -59,7 +59,7 @@ class Simulation:
             Soulevée lorsqu'une des fonctions d'initialisation, de lancement ou de mise à jour contient une erreur
         """
         # Indique le début de l'initialisation de la simulation
-        initial_time = time.time()
+        initial_time = time.perf_counter()
         log.change_log_prefix("initialisation simulation")
         log.info("Début de l'initialisation de la simulation.\n\n")
 
@@ -83,7 +83,7 @@ class Simulation:
         # Indique le temps de chargement de la simulation avant de lancer tous les modules
         log.change_log_prefix("initialisation simulation")
         log.info(f"Simulation ({len(self.components)} modules) initialisés en " +
-                 f"{((time.time() - initial_time) * 1000):.2f} millisecondes.\n\n")
+                 f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n\n")
 
     def run(self):
         """Lance tous les modules initialisés.
@@ -96,7 +96,7 @@ class Simulation:
             Soulevée dans le cas où la fonction run() d'un des modules contient une erreur
         """
         # Indique le début de l'initialisation de la simulation
-        initial_time = time.time()
+        initial_time = time.perf_counter()
         log.change_log_prefix("lancement simulation")
         log.info("Début du lancement de la simulation.\n\n")
 
@@ -109,7 +109,7 @@ class Simulation:
 
         # Indique le temps de lancement de l'application (celui-ci doit être le plus court possible)
         log.info(f"Lancements des modules de simulation en " +
-                 f"{((time.time() - initial_time) * 1000):.2f} millisecondes.\n")
+                 f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n")
 
         # Lance le thread pour mettre à jour constament la simulation et lance la partié graphique
         update = threading.Thread(target=self.update)
@@ -126,7 +126,7 @@ class Simulation:
         try:
             while self.running:
                 # Récupère le temps du début de la mise à jour (à pure titre de debug)
-                update_initial_time = time.time()
+                update_initial_time = time.perf_counter()
 
                 # Mets à jour tous les modules dans un ordre logique
                 # FEATURE appeler toutes les fonctions update des modules dans un ordre logique
@@ -135,7 +135,7 @@ class Simulation:
                     self.components["dmi"].update()
 
                 # Récupère le temps nécessaire à la mise à jour
-                update_time = time.time() - update_initial_time
+                update_time = time.perf_counter() - update_initial_time
 
                 # Mets à jour le tempos moyen des mises à jours ainsi que le nombre de mises à jours réussies
                 self.update_average_time = (self.update_average_time * self.update_count + update_time) / (self.update_count + 1)
@@ -162,7 +162,7 @@ class Simulation:
     def stop(self):
         """Fonction de fermeture de la simulation, permet d'arrêter correctement la simulation"""
         # Indique le début de la fermeture de la simulation dans les logs
-        initial_time = time.time()
+        initial_time = time.perf_counter()
         log.change_log_prefix("fermeture simulation")
         log.info("Fermeture de l'initialisation de la simulation.\n\n")
 
@@ -174,7 +174,7 @@ class Simulation:
 
         # Indique le temps nécessaire à la fermeture
         log.info(f"Simulation fermée correctement en : " +
-                 f"{((time.time() - initial_time) * 1000):.2f} millisecondes.\n\n")
+                 f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n\n")
 
     def initialise_dmi(self):
         """Fonction permettant d'initialiser le DMI.

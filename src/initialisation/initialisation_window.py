@@ -59,7 +59,7 @@ class InitialisationWindow:
         SyntaxError
             Soulevé quand le fichier .qml de la fenêtre d'initialisation a une erreur de syntaxe et n'est pas lisible
         """
-        initial_time = time.time()
+        initial_time = time.perf_counter()
         log.change_log_prefix("Initialisation")
         log.info(f"Début du chargement de l'application d'intialisation.\n\n")
 
@@ -121,7 +121,8 @@ class InitialisationWindow:
             log.info(f"Aucun fichier paramètres default.settings. Tous les éléments par défaut seront pris.\n\n")
 
         # Indique le temps de chargement de l'application
-        log.info(f"Application d'initialisation chargée en {((time.time() - initial_time)*1000):.2f} millisecondes.\n\n")
+        log.info(f"Application d'initialisation chargée en " +
+                 f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\n")
 
         # Charge la logique de la première page de paramètres
         if self.active_settings_page is not None:
@@ -154,7 +155,7 @@ class InitialisationWindow:
         parameters : `sd.SettingsDictionnary`
             un dictionaire de paramètres avec tous les paramètres du simulateur
         """
-        initial_time = time.time()
+        initial_time = time.perf_counter()
         log.info(f"Récupération des paramètres de l'application.\n")
         parameters = sd.SettingsDictionnary()
 
@@ -198,7 +199,7 @@ class InitialisationWindow:
 
         # Retourne le dictionnaire complété grâce aux différentes valeurs des get_values() de chaques pages
         log.info(f"Récupération de {len(parameters)} paramètres sur l'application d'initialisation en " +
-                 f"{((time.time() - initial_time)*1000):.2f} millisecondes.\n\n")
+                 f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\n")
         return parameters
 
     def set_values(self, data):
@@ -221,7 +222,7 @@ class InitialisationWindow:
                 # Si le paramètre "Langue" n'apparait pas, laisse juste un message de debug
                 log.debug(f"Impossible de changer la langue du simulateur car : \"Langue\" est manquant.\n")
 
-        initial_time = time.time()
+        initial_time = time.perf_counter()
         log.info(f"Tentative de changement des paramètres.\n")
         count = 0
 
@@ -242,7 +243,8 @@ class InitialisationWindow:
                             exception=error)
 
             # Indique le nombre de pages dont les paramètres on été changés
-        log.info(f"Paramètres correctement changés sur {count} pages en {((time.time() - initial_time)*1000):.2f} millisecondes.\n\n")
+        log.info(f"Paramètres correctement changés sur {count} pages en " +
+                 f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\n")
 
     def change_language(self, new_language):
         """Permet à partir d'un dictionaire de traduction, de traduire les textes de l'application d'initialisation
@@ -252,7 +254,7 @@ class InitialisationWindow:
         new_language: `str`
             la nouvelle langue de l'application
         """
-        initial_time = time.time()
+        initial_time = time.perf_counter()
         log.info(f"Changement du choix de langue, mise à jour de l'application d'initialisation.\n")
 
         translation_data = td.TranslationDictionnary()
@@ -275,7 +277,8 @@ class InitialisationWindow:
         # Si la traduction a été réalisée correctement (traduction trouvée) alors change la langue actuelle
         self.language = new_language if translation_data else self.language
 
-        log.info(f"La langue de l'application d'initialisation a été changée en {((time.time() - initial_time) * 1000):.2f} millisecondes.\n\n")
+        log.info(f"La langue de l'application d'initialisation a été changée en " +
+                 f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n\n")
 
 
 def main():

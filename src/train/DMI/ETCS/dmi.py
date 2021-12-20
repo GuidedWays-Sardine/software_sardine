@@ -36,7 +36,7 @@ class DriverMachineInterface:
             Simulation contenant toutes les bases de données et modules de la simulation initialisée
         """
         # Indique le début du chargement de l'initialisation du dmi
-        initial_time = time.time()
+        initial_time = time.perf_counter()
         log.info("Début du chargement du Driver Machine Interface.\n\n",
                  prefix="Initialisation DMI ETCS")
 
@@ -78,7 +78,7 @@ class DriverMachineInterface:
 
                 # Regarde pour chaque fichier graphique contenu dans le dossier de la section
                 for file in (f.replace(".qml", "") for f in os.listdir(f"{PROJECT_DIR}src\\train\\DMI\\ETCS\\ETCS\\graphics\\{folder}") if f.endswith(".qml")):
-                    page_initial_time = time.time()
+                    page_initial_time = time.perf_counter()
 
                     # Essaye de charger la partie graphique de la page
                     if self.initialise_section(dmi_key, folder, file):
@@ -116,7 +116,7 @@ class DriverMachineInterface:
         # Indique le temps de chargement de l'application
         log.change_log_prefix("Initialisation DMI ETCS")
         log.info(f"Application du DMI chargée en " +
-                 f"{((time.time() - initial_time)*1000):.2f} millisecondes.\n\n")
+                 f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\n")
 
     def initialise_section(self, dmi, section, file):
         """Fonction permettant d'initialiser un fichier graphique en fonction du dmi auquel il appartient, de la section
@@ -198,7 +198,7 @@ class DriverMachineInterface:
 
         # Indique le temps de chargement partiel (graphique uniquement) ou complet (graphique et logique) de la page
         log.info(f"Page : {file} chargée partiellement (graphique " + ("et logique)" if fully_loaded else "uniquement)") +
-                 f" en {((time.time() - page_initial_time) * 1000):.2f} millisecondes.\n\n")
+                 f" en {((time.perf_counter() - page_initial_time) * 1000):.2f} millisecondes.\n\n")
         return fully_loaded
 
     def are_page_functions_there(self, page):

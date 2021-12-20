@@ -57,7 +57,7 @@ class DataBase:
             return False
 
         # Si la base de donnée doit être chargée, commence par ouvrir et lire les données du fichier indiqué
-        initial_time = time.time()
+        initial_time = time.perf_counter()
         self.df = pd.read_csv(self.path, delimiter=";", usecols=self.attr)[self.attr]
 
         # Gère en deuxième lieu la conversion de tous les paramètres par défaut (Point Kilométrique et Position Géographique)
@@ -112,5 +112,5 @@ class DataBase:
             self.df.sort_values(by=["CODE_LIGNE", PK + (DEBUT if (PK + DEBUT) in self.attr else "")]).reset_index(drop=True)
 
         # Indique le temps de chargement et de normaliusation de la base de données
-        log.info(f"Base de données : {self.path[len(DATA_DIR)::]} chargée en : {((time.time() - initial_time) * 1000):.2f} milisecondes.\n")
+        log.info(f"Base de données : {self.path[len(DATA_DIR)::]} chargée en : {((time.perf_counter() - initial_time) * 1000):.2f} milisecondes.\n")
         return True

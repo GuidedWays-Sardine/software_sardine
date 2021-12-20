@@ -59,7 +59,7 @@ class LineGenerator:
         line_code: `int`
             Code de la ligne (trouvable en ligne selon le nom de la ligne
         """
-        initial_time = time.time()
+        initial_time = time.perf_counter()
         # Si la ligne existe déjà (enregistrée dans settings/line_settings/line_code) et qu'elle ne doit pas être rechargée, retourne
         if str(line_code) in os.listdir(f"{PROJECT_DIR}settings\\line_settings") and not reload:
             log.info(f"La ligne {line_code} existe déjà. Elle ne sera pas recréée.\n\n")
@@ -84,7 +84,7 @@ class LineGenerator:
                                              self.max_speed.df.loc[self.max_speed.df["CODE_LIGNE"] == line_code].reset_index(drop=True),
                                              self.electrification.df.loc[self.electrification.df["CODE_LIGNE"] == line_code].reset_index(drop=True))
 
-        initial_save_time = time.time()
+        initial_save_time = time.perf_counter()
 
         # Commencer par supprimer le dossier de paramètre des lignes si celui-ci existe déjà
         if str(line_code) in f"{PROJECT_DIR}settings\\line_settings\\":
@@ -102,12 +102,12 @@ class LineGenerator:
 
         # indique le temps de suavegarde des splines ainsi que le temps total de chargement de la ligne
         log.info(f"""Informations chargement ligne : {self.lines.df.loc[self.lines.df["CODE_LIGNE"] == line_code, "LIB_LIGNE"]}
-                 \t\tSplines (python et UE5) sauvegardées en {((time.time() - initial_save_time) * 1000):.2f} milisecondes.
-                 \t\tChargement (et sauvegarde) en : {((time.time() - initial_time) * 1000):.2f}) milisecondes.\n""")
+                 \t\tSplines (python et UE5) sauvegardées en {((time.perf_counter() - initial_save_time) * 1000):.2f} milisecondes.
+                 \t\tChargement (et sauvegarde) en {((time.perf_counter() - initial_time) * 1000):.2f}) milisecondes.\n""")
 
     def load_line_databases(self):
         """Charge toutes les bases de données reliées à la ligne"""
-        initial_time = time.time()
+        initial_time = time.perf_counter()
         log.change_log_prefix("chargement des bases de données lignes")
         log.info("Chargement des bases de données pour la génération des lignes")
 
@@ -151,7 +151,7 @@ class LineGenerator:
 
         # Indique le temps de chargement des bases de données
         log.info(f"Chargement de toutes les bases de données génération de ligne en " +
-                 f"{((time.time() - initial_time)*1000):.2f} milisecondes.\n\n")
+                 f"{((time.perf_counter() - initial_time)*1000):.2f} milisecondes.\n\n")
 
     def generate_splines_data(self, tracks, curves, slopes, max_speed, electrification):
         """Permet à partir des données d'une ligne de générer la liste des splines nécessaires
@@ -174,7 +174,7 @@ class LineGenerator:
         splines: `list`
             liste des splines générés pour la ligne
         """
-        initial_time = time.time()
+        initial_time = time.perf_counter()
         splines = []
         # Pour chacune des voies de la ligne, crée une nouvelle spline avec les informations de la voie
         for index, track in tracks.iterrows():
@@ -206,7 +206,8 @@ class LineGenerator:
         #TODO : add function for personalized splits (for connections with other lines)
 
         # indique le temps de suavegarde des splines ainsi que le temps total de chargement de la ligne
-        log.info(f"Chargement de {len(splines)} splines en {((time.time() - initial_time) * 1000):.2f} milisecondes.\n")
+        log.info(f"Chargement de {len(splines)} splines en " +
+                 f"{((time.perf_counter() - initial_time) * 1000):.2f} milisecondes.\n")
         return splines
 
 
