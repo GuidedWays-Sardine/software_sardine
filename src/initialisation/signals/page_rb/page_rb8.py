@@ -84,7 +84,7 @@ class PageRB8:
         self.page.setProperty("screen_size", screen_dimensions)
 
         # Charge la traduction pour le nom des fichiers et des catégories (Anglais -> langue actuelle)
-        translation_data = td.TranslationDictionnary()
+        translation_data = td.TranslationDictionary()
         translation_data.create_translation(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang",
                                             "English", application.language)
 
@@ -192,16 +192,16 @@ class PageRB8:
 
         Parameters
         ----------
-        translation_data: `td.TranslationDictionnary`
+        translation_data: `td.TranslationDictionary`
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
 
         Returns
         -------
-        parameters : `sd.SettingsDictionnary`
+        parameters : `sd.SettingsDictionary`
             un dictionaire de paramètres de la page de paramètres page_rb8
         """
         # Initialise les paramètres récupérés et récupère le paramètre sur si les écrans sont éteins
-        page_parameters = sd.SettingsDictionnary()
+        page_parameters = sd.SettingsDictionary()
         page_parameters["immersion"] = self.page.findChild(QObject, "black_screens_check").property("is_checked")
 
         # Récupère les valeurs actuellement sur l'écran
@@ -232,16 +232,16 @@ class PageRB8:
 
         Parameters
         ----------
-        data: `sd.SettingsDictionnary`
+        data: `sd.SettingsDictionary`
             Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
-        translation_data: `td.TranslationDictionnary`
+        translation_data: `td.TranslationDictionary`
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
         """
         # Change la valeur pour les écrans noirs
         data.update_parameter(self.page, "black_screens_check", "is_checked", "immersion")
 
         # Inverse les données de traduction pour avoir un dictionnaire langue actuelle -> Français
-        invert_translation = td.TranslationDictionnary()
+        invert_translation = td.TranslationDictionary()
         invert_translation.create_translation(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang",
                                               translation_data["English"], "English")
 
@@ -272,7 +272,7 @@ class PageRB8:
 
         Parameters
         ----------
-        translation_data: `td.TranslationDictionnary`
+        translation_data: `td.TranslationDictionary`
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
         """
         # Traduit le nom de la catégorie

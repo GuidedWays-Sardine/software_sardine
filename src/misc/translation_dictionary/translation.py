@@ -9,15 +9,15 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
 
 
-class TranslationDictionnary(dict):
+class TranslationDictionary(dict):
     """Classe permettant de convertir un fichier de paramètres en un dictionnaire fonctionnel"""
 
     def __setitem__(self, key, value):
-        super(TranslationDictionnary, self).__setitem__(key.lower(), value)
+        super(TranslationDictionary, self).__setitem__(key.lower(), value)
 
     def __getitem__(self, key):
         try:
-            return super(TranslationDictionnary, self).__getitem__(key.lower())
+            return super(TranslationDictionary, self).__getitem__(key.lower())
         except KeyError:
             log.debug(f"Aucune traduction pour : {key}.\n")
             return key

@@ -120,7 +120,7 @@ class BottomButtons:
             log.change_log_prefix("Changement des données")
 
             #Récupère les données dans le fichier sélectionné et les envoies à set_values
-            data = sd.SettingsDictionnary()
+            data = sd.SettingsDictionary()
             data.open(file_path[0])
             application.set_values(data)
 
@@ -147,7 +147,7 @@ class BottomButtons:
             log.change_log_prefix("Sauvegarde des données")
 
             # Récupère les paramètres de l'application d'initialisation, les stockes et les enregistres dans le fichier
-            data = sd.SettingsDictionnary()
+            data = sd.SettingsDictionary()
             data.update(application.get_values())
             data.save(file_path[0])
 

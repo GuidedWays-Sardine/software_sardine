@@ -14,14 +14,14 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
 
 
-class SettingsDictionnary(dict):
+class SettingsDictionary(dict):
     """Classe permettant de convertir un fichier de paramètres en un dictionnaire fonctionnel"""
 
     def __setitem__(self, key, value):
-        super(SettingsDictionnary, self).__setitem__(key.lower(), value)
+        super(SettingsDictionary, self).__setitem__(key.lower(), value)
 
     def __getitem__(self, key):
-        return super(SettingsDictionnary, self).__getitem__(key.lower())
+        return super(SettingsDictionary, self).__getitem__(key.lower())
 
     def get_value(self, key, default=None):
         """Méthode pour récupérer une valeur à partir de sa clé, et de mettre un message dans le registre s'il n'existe pas
@@ -105,7 +105,7 @@ class SettingsDictionnary(dict):
                     else:
                         # Récupère les deux éléments de la ligne et les ajoutent comme clé et valeur
                         line = list(map(str.strip, line.rstrip('\n').split(";")))
-                        self[line[0]] = SettingsDictionnary.convert_type(line[1])
+                        self[line[0]] = SettingsDictionary.convert_type(line[1])
 
         except Exception as error:
             # Cas où le fichier ouvert n'existe pas ou qu'il n'est pas accessible

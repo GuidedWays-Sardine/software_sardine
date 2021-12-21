@@ -49,7 +49,7 @@ class Simulation:
         ----------
         app: `QApplication`
             L'application sur laquelle les modules graphiques de la simulation vont se lancer
-        data: `sd.SettingsDictionnary`
+        data: `sd.SettingsDictionary`
 
         Raises
         ------

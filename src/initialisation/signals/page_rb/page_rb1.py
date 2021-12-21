@@ -81,7 +81,7 @@ class PageRB1:
                 application.change_language(language_combobox.property("selection_text"))
 
         # Essaye de récupérer le dictionaire Anglais -> langue principale afin de traduire les répertoires par défaut en anglais
-        t_data = td.TranslationDictionnary()
+        t_data = td.TranslationDictionary()
         t_data.create_translation(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang",
                                   "English", application.language)
 
@@ -117,15 +117,15 @@ class PageRB1:
 
         Parameters
         ----------
-        translation_data: `td.TranslationDictionnary`
+        translation_data: `td.TranslationDictionary`
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) 
 
         Returns
         -------
-        parameters : `sd.SettingsDictionnary`
+        parameters : `sd.SettingsDictionary`
             un dictionaire de paramètres de la page de paramètres page_rb1
         """
-        page_parameters = sd.SettingsDictionnary()
+        page_parameters = sd.SettingsDictionary()
 
         # Paramètre du pupitre
         command_board = self.page.findChild(QObject, "command_board_combo").property("selection_text")
@@ -163,9 +163,9 @@ class PageRB1:
 
         Parameters
         ----------
-        data: `sd.SettingsDictionnary`
+        data: `sd.SettingsDictionary`
             Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
-        translation_data: `td.TranslationDictionnary`
+        translation_data: `td.TranslationDictionary`
             Un dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
         """
         # Paramètre du pupitre (quel pupitre sera utilisé)
@@ -204,7 +204,7 @@ class PageRB1:
 
         Parameters
         ----------
-        translation_data: `td.TranslationDictionnary`
+        translation_data: `td.TranslationDictionary`
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitiv
         """
         # Traduit le nom de la catégorie

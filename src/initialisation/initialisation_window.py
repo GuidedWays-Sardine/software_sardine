@@ -84,7 +84,7 @@ class InitialisationWindow:
         if os.path.isfile(f"{PROJECT_DIR}settings\\general_settings\\default.settings"):
             # S'il existe, l'ouvre, récupère ses données et les changent dans l'application d'initialisation
             log.info(f"Chargement des paramètres du fichier default.settings.\n")
-            default_settings = sd.SettingsDictionnary()
+            default_settings = sd.SettingsDictionary()
             default_settings.open(f"{PROJECT_DIR}settings\\general_settings\\default.settings")
             self.set_values(default_settings)
 
@@ -152,12 +152,12 @@ class InitialisationWindow:
 
         Returns
         -------
-        parameters : `sd.SettingsDictionnary`
+        parameters : `sd.SettingsDictionary`
             un dictionaire de paramètres avec tous les paramètres du simulateur
         """
         initial_time = time.perf_counter()
         log.info(f"Récupération des paramètres de l'application.\n")
-        parameters = sd.SettingsDictionnary()
+        parameters = sd.SettingsDictionary()
 
         screens = QDesktopWidget()
         screen_index = list(i for i in range(0, screens.screenCount())
@@ -183,7 +183,7 @@ class InitialisationWindow:
             parameters.open(f"{PROJECT_DIR}settings\\general_settings\\default.settings")
         elif any(self.is_fully_loaded):
             # Récupère ma traduction anglaise car les paramètres textuels sont stockés en anglais
-            translation_data = td.TranslationDictionnary()
+            translation_data = td.TranslationDictionary()
             translation_data.create_translation(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang",
                                                 self.language, "English")
 
@@ -207,7 +207,7 @@ class InitialisationWindow:
 
         Parameters
         ----------
-        data: `sd.SettingsDictionnary`
+        data: `sd.SettingsDictionary`
             Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
         """
         # Si la combobox pour choisir la langue existe (page_rb1 chargée), alors change la langue dans cette combobox
@@ -227,7 +227,7 @@ class InitialisationWindow:
         count = 0
 
         # Récupère la traduction par rapport à l'anglais car les paramètres textuels sont stockés en anglais
-        translation_data = td.TranslationDictionnary()
+        translation_data = td.TranslationDictionary()
         translation_data.create_translation(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang",
                                             "English", self.language)
 
@@ -257,7 +257,7 @@ class InitialisationWindow:
         initial_time = time.perf_counter()
         log.info(f"Changement du choix de langue, mise à jour de l'application d'initialisation.\n")
 
-        translation_data = td.TranslationDictionnary()
+        translation_data = td.TranslationDictionary()
         translation_data.create_translation(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang",
                                             self.language, new_language)
 
