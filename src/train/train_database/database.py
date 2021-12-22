@@ -1,6 +1,7 @@
 # Librairies par défaut python
 import sys
 import os
+import Dynamic.dynamic_data
 
 
 # Librairies SARDINE
