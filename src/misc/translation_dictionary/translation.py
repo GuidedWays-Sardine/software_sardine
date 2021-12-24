@@ -13,9 +13,33 @@ class TranslationDictionary(dict):
     """Classe permettant de convertir un fichier de paramètres en un dictionnaire fonctionnel"""
 
     def __setitem__(self, key, value):
-        super(TranslationDictionary, self).__setitem__(key.lower(), value)
+        """Opérateur self["key"] = value permettant de rajouter des valeurs dans le dictionnaire de traduction
+
+        Parameters
+        ----------
+        key: `str`
+            Mot à traduire (non sensible aux minuscules et aux majuscules)
+        value: `str`
+            Sa traduction
+        """
+        if isinstance(key, str):
+            super(TranslationDictionary, self).__setitem__(key.lower(), value)
+        else:
+            log.debug(f"la clé : {key}, n'est pas de type string : {type(key)}.\n")
 
     def __getitem__(self, key):
+        """Opérateur value = self["key"] permettant de lire des valeurs du dictionnaire de traduction
+
+        Parameters
+        ----------
+        key : `str`
+            Mot à traduire (non sensible aux minuscules et aux majuscules)
+
+        Returns
+        -------
+        value: `str`
+            Sa traduction si elle existe sinon le mot non traduit
+        """
         try:
             return super(TranslationDictionary, self).__getitem__(key.lower())
         except KeyError:
@@ -47,7 +71,7 @@ class TranslationDictionary(dict):
                 except ValueError:
                     # Si l'une des langues n'existe pas (la combobox langue est générée automatiquement, donc par redondance)
                     log.warning(f"Langues : {current_language} ; " if current_index is not None else "" +
-                                                                                                     str(new_language) if new_index is not None else "" + "\n")
+                                str(new_language) if new_index is not None else "" + "\n")
                     return
 
                 # Récupère la longueur actuelle

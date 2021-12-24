@@ -18,9 +18,38 @@ class SettingsDictionary(dict):
     """Classe permettant de convertir un fichier de paramètres en un dictionnaire fonctionnel"""
 
     def __setitem__(self, key, value):
-        super(SettingsDictionary, self).__setitem__(key.lower(), value)
+        """Opérateur self["key"] = value permettant de rajouter des valeurs dans le dictionnaire de paramètres
+
+        Parameters
+        ----------
+        key: `str`
+            Nom du paramètre (non sensible aux minuscules et aux majuscules)
+        value: `Any`
+            Sa valeur
+        """
+        if isinstance(key, str):
+            super(SettingsDictionary, self).__setitem__(key.lower().replace(";", " "), value)
+        else:
+            log.debug(f"la clé : {key}, n'est pas de type string : {type(key)}.\n")
 
     def __getitem__(self, key):
+        """Opérateur value = self["key"] permettant de lire des valeurs du dictionnaire de paramètres
+
+        Parameters
+        ----------
+        key : `str`
+            Nom du paramètre (non sensible aux minuscules et aux majuscules)
+
+        Returns
+        -------
+        value: `Any`
+            Sa valeur associée (si elle existe)
+
+        Raises
+        ------
+        KeyError :
+            Jetté si la clé n'a pas de valeur associée
+        """
         return super(SettingsDictionary, self).__getitem__(key.lower())
 
     def get_value(self, key, default=None):
@@ -64,30 +93,30 @@ class SettingsDictionary(dict):
             log.debug(f"""Impossible de changer le paramètre : {property} du composant {widget_id}
                       \t\tPas de valeurs pour le paramètre : {key} dans le fichier ouvert.\n""")
 
-    def save(self, file_path):
+    def save(self, path):
         """Méthode permettant de sauvegarder les paramètres dans un fichier
 
         Parameters
         ----------
-        file_path: `string`
+        path: `string`
         """
         try:
             # Essaye de créer (ou d'écraser) le fichier avec les paramètres actuels
-            with open(file_path, "w", encoding="utf-8-sig") as file:
+            with open(path, "w", encoding="utf-8-sig") as file:
                 # Ecrit chacune des clés à l'intérieur séparé par le délimiteur
                 for key in self.keys():
                     file.write(f"{key};{self[key]}\n")
         except Exception as error:
             # Cas où le fichier ouvert n'est pas accessible
-            log.warning(f"Impossible d'enregistrer le fichier : {file_path}.\n",
+            log.warning(f"Impossible d'enregistrer le fichier : {path}.\n",
                         exception=error, prefix="dictionaire de données")
 
-    def open(self, file_path):
+    def open(self, path):
         """Méthode permettant d'ouvrir un fichier de paramètres et de rajouter les paramètres au dictionnaire
 
         Parameters
         ----------
-        file_path: `string`
+        path: `string`
             chemin d'accès vers le fichier de paramètres à ouvrir et lire
         """
         # Récupère la longueur actuelle
@@ -95,7 +124,7 @@ class SettingsDictionary(dict):
 
         try:
             # Essaye d'ouvrir le fichier avec les paramètres
-            with open(file_path, "r", encoding="utf-8-sig") as file:
+            with open(path, "r", encoding="utf-8-sig") as file:
                 # Si le fichier est ouvert, récupère chaque lignes de celui-ci
                 for line in file:
                     # Si la ligne ne contient pas le délimiteur (ici ;) l'indique dans les logs et saute la ligne
@@ -109,11 +138,11 @@ class SettingsDictionary(dict):
 
         except Exception as error:
             # Cas où le fichier ouvert n'existe pas ou qu'il n'est pas accessible
-            log.warning(f"Impossible d'ouvrir le fichier : {file_path}.\n",
+            log.warning(f"Impossible d'ouvrir le fichier : {path}.\n",
                         exception=error, prefix="dictionaire de données")
         else:
             # Indique en debug le nombre d'éléments récupérés
-            log.debug(f"{len(self) - current_length} éléments récupérés dans : {file_path}\n",
+            log.debug(f"{len(self) - current_length} éléments récupérés dans : {path}\n",
                       prefix="dictionaire de traduction")
 
     @staticmethod
