@@ -1,7 +1,6 @@
 # Librairies par défaut
 import os
 import sys
-import traceback
 
 
 # Librairies graphiques
@@ -62,11 +61,11 @@ class PageRB1:
 
         try:
             # Essaye de charger la combobox langue
-            file = open(PROJECT_DIR + "settings\\language_settings\\initialisation.lang", "r", encoding='utf-8-sig')
+            file = open(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang", "r", encoding='utf-8-sig')
         except (FileNotFoundError, OSError):
             # Ne change charge pas  la combobox langues dans le cas ou le combobox n'est pas chargé
-            log.warning("Le fichier de traduction de langue n'existe pas. assurez vous qu'il existe :\n\t\t" +
-                        PROJECT_DIR + "settings\\language_settings\\initialisation.lang\n")
+            log.warning(f"""Le fichier de traduction de langue n'existe pas. assurez vous qu'il existe :
+                        \t\t{PROJECT_DIR}settings\\language_settings\\initialisation.lang\n""")
         # Sinon lit la première ligne pour récupérer la liste des langues
         else:
             # Récupère la liste des langues (ligne 1 du fichier initialisation.lang)
@@ -82,18 +81,19 @@ class PageRB1:
                 application.change_language(language_combobox.property("selection_text"))
 
         # Essaye de récupérer le dictionaire Anglais -> langue principale afin de traduire les répertoires par défaut en anglais
-        t_data = td.TranslationDictionnary()
-        t_data.create_translation(PROJECT_DIR + "settings\\language_settings\\initialisation.lang",
+        t_data = td.TranslationDictionary()
+        t_data.create_translation(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang",
                                   "English", application.language)
 
         # Charge tous les dossiers dans src.train.command_board et les indiques comme pupitre sélectionables
-        command_boards = [t_data[f.replace("_", " ")] for f in os.listdir(PROJECT_DIR + "src\\train\\command_board")
-                          if os.path.isdir(os.path.join(PROJECT_DIR + "src\\train\\command_board", f))]
+        command_boards = [t_data[f.replace("_", " ")] for f in os.listdir(f"{PROJECT_DIR}src\\train\\command_board")
+                          if os.path.isdir(os.path.join(f"{PROJECT_DIR}src\\train\\command_board", f))
+                          and f != "__pycache__"]
         self.page.findChild(QObject, "command_board_combo").setProperty("elements", command_boards)
 
         # Charge tous les DMI présents dans src.train.DMI et les indiques comme DMI sélectionables
-        dmi_list = [t_data[f.replace("_", " ")] for f in os.listdir(PROJECT_DIR + "src\\train\\DMI")
-                    if os.path.isdir(os.path.join(PROJECT_DIR + "src\\train\\DMI", f))]
+        dmi_list = [t_data[f.replace("_", " ")] for f in os.listdir(f"{PROJECT_DIR}src\\train\\DMI")
+                    if os.path.isdir(os.path.join(f"{PROJECT_DIR}src\\train\\DMI", f))]
         self.page.findChild(QObject, "dmi_combo").setProperty("elements", dmi_list)
 
         # Rend le checkbutton renard et le checkbutton caméra fonctionnel
@@ -117,15 +117,15 @@ class PageRB1:
 
         Parameters
         ----------
-        translation_data: `td.TranslationDictionnary`
+        translation_data: `td.TranslationDictionary`
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) 
 
         Returns
         -------
-        parameters : `sd.SettingsDictionnary`
+        parameters : `sd.SettingsDictionary`
             un dictionaire de paramètres de la page de paramètres page_rb1
         """
-        page_parameters = sd.SettingsDictionnary()
+        page_parameters = sd.SettingsDictionary()
 
         # Paramètre du pupitre
         command_board = self.page.findChild(QObject, "command_board_combo").property("selection_text")
@@ -163,18 +163,14 @@ class PageRB1:
 
         Parameters
         ----------
-        data: `sd.SettingsDictionnary`
+        data: `sd.SettingsDictionary`
             Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
-        translation_data: `td.TranslationDictionnary`
+        translation_data: `td.TranslationDictionary`
             Un dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
         """
         # Paramètre du pupitre (quel pupitre sera utilisé)
-        try:
-            command_board = str(data["command_board"]).replace("_", " ")
-        except KeyError:
-            log.debug("Impossible de changer le paramètre: \"command_board\" manquant dans le fichier ouvert.\n")
-        else:
-            self.page.findChild(QObject, "command_board_combo").change_selection(translation_data[command_board])
+        if data.get_value("command_board") is not None:
+            self.page.findChild(QObject, "command_board_combo").change_selection(translation_data[str(data["command_board"])])
 
         # Paramètre pour Renard (savoir si le pupitre est connecté à Renard)
         data.update_parameter(self.page, "renard_check", "is_checked", "renard")
@@ -183,22 +179,17 @@ class PageRB1:
         data.update_parameter(self.page, "camera_check", "is_checked", "camera")
 
         # Paramètre pour le DMI (savoir quelle Interface sera utilisée pour le pupitre
-        try:
-            dmi = str(data["dmi"]).replace("_", " ")
-        except KeyError:
-            log.debug("Impossible de changer le paramètre: \"dmi\" manquant dans le fichier ouvert.\n")
-        else:
-            self.page.findChild(QObject, "command_board_combo").change_selection(translation_data[dmi])
+        if data.get_value("dmi") is not None:
+            self.page.findChild(QObject, "command_board_combo").change_selection(translation_data[str(data["dmi"]).replace("_", " ")])
 
         # Paramètre niveau de registre (pour suivre les potentiels bugs lors de la simulation)
-        try:
-            self.page.findChild(QObject, "log_button").setProperty("text",
-                dict([reversed(i) for i in self.log_type_converter.items()])[log.Level[data["log_level"].replace("Level.", "")]])
-        except KeyError as error:
-            log.debug("Impossible de changer le paramètre : \"log_level\" manquant dans le fichier ouvert.\n" +
-                     "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                     "Avec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
-                     "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+        if data.get_value("log_level") is not None:
+            new_log_level = [key for key, value in self.log_type_converter.items()
+                             if value == log.Level[data["log_level"].replace("Level.", "")]]
+            if new_log_level:
+                self.page.findChild(QObject, "log_button").setProperty("text", new_log_level[0])
+            else:
+                log.debug(f"Le niveau de registre du fichier de paramètre \"{data['log_level']}\" n'existe pas.\n")
 
         # Paramètre pour le PCC (savoir s'il sera activé)
         data.update_parameter(self.page, "pcc_check", "is_checked", "ccs")
@@ -213,7 +204,7 @@ class PageRB1:
 
         Parameters
         ----------
-        translation_data: `td.TranslationDictionnary`
+        translation_data: `td.TranslationDictionary`
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitiv
         """
         # Traduit le nom de la catégorie
