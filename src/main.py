@@ -72,7 +72,12 @@ def main():
                          exception=error, prefix="")
             crash = True
         finally:
-            simulation.stop()
+            try:
+                simulation.stop()
+            except Exception as error:
+                log.critical(f"Erreur fatale lors de la fermeture du simulateur.\n",
+                             exception=error, prefix="")
+                crash = True
             exit(0 if not crash else -1)
 
 

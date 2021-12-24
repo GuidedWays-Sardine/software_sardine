@@ -73,7 +73,7 @@ class Simulation:
         self.initialise_off_screens()
 
         # A partir d'ici initialise tous les modules un par un (ils seront lancées dans la fonction run())
-        # FEATURE : appeler les différentes fonctions d'initialisation de modules ici
+        # FEATURE : appeler les différentes fonctions d'initialisation de modules
         self.initialise_dmi()  # Initialisation du DMI
 
         # Si aucun module de simulation n'a été lancé
@@ -104,6 +104,7 @@ class Simulation:
         self.run_off_screens()
 
         # Lance tous les modules en appelant la fonction run()
+        # Chaque module doit avoir une fonction run() sinon la simulation ne se lance pas
         for module in self.components:
             self.components[module].run()
 
@@ -130,7 +131,6 @@ class Simulation:
 
                 # Mets à jour tous les modules dans un ordre logique
                 # FEATURE appeler toutes les fonctions update des modules dans un ordre logique
-
                 if "dmi" in self.components:
                     self.components["dmi"].update()
 
@@ -215,10 +215,10 @@ class Simulation:
                 exception_list = []
 
                 # Vérifie pour chaque exception si elle existe et où elle se situe
-                # FEATURE : indiquer ici les potentielles exceptions sur les fenêtre nécessitant une autre application
+                # FEATURE : indiquer ici les potentielles exceptions sur les fenêtres nécessitant une autre application
                 try:
                     # Vérification pour la ligne virtuelle (sur UE5)
-                    if self.parameters["sardine simulator.virtual line (ue5).screen_index"] != 0:
+                    if self.parameters["sardine simulator.virtual line (ue5).screen_index"]:
                         exception_list.append(self.parameters["sardine simulator.virtual line (ue5).screen_index"] - 1)
                 except KeyError:
                     pass
