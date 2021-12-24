@@ -74,7 +74,7 @@ class PageRB8:
         screen_dimensions = []
         for screen_index in range(0, self.screen_count):
             sg = QDesktopWidget().screenGeometry(screen_index).getCoords()
-            self.screen_index[screen_index].setPosition(sg[0], sg[1])
+            self.screen_index[screen_index].setPosition(sg[0] + sg[2] - self.screen_index[0].property("minimumWidth") + 1, sg[1])
             screen_dimensions.append([sg[2] - sg[0] + 1, sg[3] - sg[1] + 1])
             self.screen_index[screen_index].findChild(QObject, "screen_index").setProperty("text", str(screen_index + 1))
             screen_list.append(str(screen_index + 1))
