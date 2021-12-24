@@ -37,9 +37,9 @@ Item{
     //Propriétés liés à l'état du valueinput
     property bool is_max_default: false      //définit si la valeur par défaut (dans le placeholder) est la valeur max (ou mini si mis sur false)
     property bool is_dark_grey: !is_activable//est ce que le texte doit-être en gris foncé ?
-    property bool is_activable: true         //si le bouton peut être activée
-    property bool is_positive: false         //si le bouton doit-être visible en couche positive (sinon négatif)
-    property bool is_visible: true           //si le bouton est visible
+    property bool is_activable: true         //si le valueinput peut être activée
+    property bool is_positive: false         //si le valueinput doit-être visible en couche positive (sinon négatif)
+    property bool is_visible: true           //si le valueinput est visible
 
     //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
     readonly property string dark_blue: "#031122"   //partie 5.2.1.3.3  Nr 6

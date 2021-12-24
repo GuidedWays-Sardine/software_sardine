@@ -120,7 +120,7 @@ Item {
         is_visible: root.screen_name != ""
 
 
-        //Signal handler pour griser les textes pour l'emplacement de l'écran et changer les valeurs/valeurs par défaut des INI_valueinput
+        //Signal handler pour griser les textes pour l'emplacement de l'écran et changer les valeurs/valeurs par défaut des INI_integerinput
         onSelection_changed: {
 
             //cas si l'écran est passé à aucun
@@ -172,7 +172,7 @@ Item {
         is_visible: root.screen_name != ""
 
 
-        //fonction permettant de vider les INI_valueinput quand le mode fullscreen est activé
+        //fonction permettant de vider les INI_integerinput quand le mode fullscreen est activé
         onIs_checkedChanged: {
             x_input.clear()
             y_input.clear()
@@ -196,7 +196,7 @@ Item {
         is_visible: root.screen_name != ""
     }
 
-    INI_valueinput {
+    INI_integerinput {
         id: x_input
         objectName: "x_input"
 
@@ -236,7 +236,7 @@ Item {
         is_visible: root.screen_name != ""
     }
 
-    INI_valueinput {
+    INI_integerinput {
         id: y_input
         objectName: "y_input"
 
@@ -277,7 +277,7 @@ Item {
         is_dark_grey: !root.screen_valid || !(screen_index_combo.selection_index !== 0 && !fullscreen_on_check.is_checked)
     }
 
-    INI_valueinput {
+    INI_integerinput {
         id: height_input
         objectName: "height_input"
 
@@ -309,7 +309,7 @@ Item {
         is_visible: root.screen_name != ""
     }
 
-    INI_valueinput {
+    INI_integerinput {
         id: width_input
         objectName: "width_input"
 
