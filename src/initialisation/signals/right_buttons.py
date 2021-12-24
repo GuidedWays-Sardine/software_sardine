@@ -62,7 +62,7 @@ class RightButtons:
                              f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\n")
                 else:
                     log.info(f"Chargement partiel (graphique uniquement) de la page_rb{index} en " +
-                             f"{((time.timperf_countere() - initial_time)*1000):.2f} millisecondes.\n\n")
+                             f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\n")
 
         # Vérifie si au moins une page est chargée, sinon l'indique et cache les boutons ouvrir et sauvegarder
         if not any(application.is_fully_loaded):
