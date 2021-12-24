@@ -10,7 +10,7 @@ from PyQt5.QtCore import QObject
 
 
 # Librairies SARDINE
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src\\")[0]
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.initialisation.initialisation_window as ini
 import src.misc.settings_dictionary.settings as sd
@@ -64,7 +64,7 @@ class PageRB8:
 
         # Charge autant de fenêtres d'index d'écrans qu'il y a d'écrans
         for screen_index in range(0, self.screen_count):
-            application.engine.load(PROJECT_DIR + "src\\initialisation\\graphics\\page_rb\\page_rb8\\screen_index.qml")
+            application.engine.load(f"{PROJECT_DIR}src\\initialisation\\graphics\\page_rb\\page_rb8\\screen_index.qml")
             self.screen_index[screen_index] = application.engine.rootObjects()[len(application.engine.rootObjects()) - 1]
             self.screen_index[screen_index].hide()
 
@@ -84,14 +84,14 @@ class PageRB8:
         self.page.setProperty("screen_size", screen_dimensions)
 
         # Charge la traduction pour le nom des fichiers et des catégories (Anglais -> langue actuelle)
-        translation_data = td.TranslationDictionnary()
-        translation_data.create_translation(PROJECT_DIR + "settings\\language_settings\\initialisation.lang",
+        translation_data = td.TranslationDictionary()
+        translation_data.create_translation(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang",
                                             "English", application.language)
 
         # Pour chacun des fichiers dans le répertoire de paramètres d'écrans
-        for file_path in (f for f in os.listdir(PROJECT_DIR + "settings\\screen_settings") if f.endswith(".screens")):
+        for file_path in (f for f in os.listdir(f"{PROJECT_DIR}settings\\screen_settings") if f.endswith(".screens")):
             # Ouvre le fichier, et crée un dictionaire vide pour les écrans dans le fichier
-            file = open(PROJECT_DIR + "settings\\screen_settings\\" + file_path, "r", encoding="utf-8-sig")
+            file = open(f"{PROJECT_DIR}settings\\screen_settings\\{file_path}", "r", encoding="utf-8-sig")
             screens_default = {}
             screens_settings = {}
 
@@ -170,8 +170,8 @@ class PageRB8:
                 lambda: self.on_data_checked(application))
             self.on_data_checked(application)
         else:
-            log.warning("Certains paramétrages d'écrans dépendent du bon fonctionnement de la page_rb1." +
-                        "Ceux-ci ne peuvent pas se charger correctement.\n")
+            log.warning(f"""Certains paramétrages d'écrans dépendent du bon fonctionnement de la page_rb1.
+                        \t\tCeux-ci ne peuvent pas se charger correctement.\n""")
 
             # Désactive l'écran train caméra
             category = list(self.screen_default)[0]
@@ -192,16 +192,16 @@ class PageRB8:
 
         Parameters
         ----------
-        translation_data: `td.TranslationDictionnary`
+        translation_data: `td.TranslationDictionary`
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
 
         Returns
         -------
-        parameters : `sd.SettingsDictionnary`
+        parameters : `sd.SettingsDictionary`
             un dictionaire de paramètres de la page de paramètres page_rb8
         """
         # Initialise les paramètres récupérés et récupère le paramètre sur si les écrans sont éteins
-        page_parameters = sd.SettingsDictionnary()
+        page_parameters = sd.SettingsDictionary()
         page_parameters["immersion"] = self.page.findChild(QObject, "black_screens_check").property("is_checked")
 
         # Récupère les valeurs actuellement sur l'écran
@@ -214,7 +214,7 @@ class PageRB8:
             # Pour chaque écrans de cette catégorie
             for screen_key in self.screen_settings[category_key]:
                 # Récupère les paramètres de l'écran et les sauvegardes (dépend de si l'écran est sélectionable ou non
-                screen_settings_key = translation_data[category_key] + "." + translation_data[screen_key] + "."
+                screen_settings_key = f"{translation_data[category_key]}.{translation_data[screen_key]}."
                 is_activable = self.screen_default[category_key][screen_key][0]
                 screen_settings_values = self.screen_settings[category_key][screen_key]
                 page_parameters[screen_settings_key + "screen_index"] = screen_settings_values[0] if is_activable else 0
@@ -232,17 +232,17 @@ class PageRB8:
 
         Parameters
         ----------
-        data: `sd.SettingsDictionnary`
+        data: `sd.SettingsDictionary`
             Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
-        translation_data: `td.TranslationDictionnary`
+        translation_data: `td.TranslationDictionary`
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
         """
         # Change la valeur pour les écrans noirs
         data.update_parameter(self.page, "black_screens_check", "is_checked", "immersion")
 
         # Inverse les données de traduction pour avoir un dictionnaire langue actuelle -> Français
-        invert_translation = td.TranslationDictionnary()
-        invert_translation.create_translation(PROJECT_DIR + "settings\\language_settings\\initialisation.lang",
+        invert_translation = td.TranslationDictionary()
+        invert_translation.create_translation(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang",
                                               translation_data["English"], "English")
 
         # Pour chaque catégorie d'écrans
@@ -250,7 +250,7 @@ class PageRB8:
             # Pour chaque écrans de cette catégorie
             for screen_key in self.screen_settings[category_key]:
                 # Crée pour chaque écran la clé avec laquelle l'information serait sauvegardée
-                screen_settings_key = invert_translation[category_key] + "." + invert_translation[screen_key] + "."
+                screen_settings_key = f"{invert_translation[category_key]}.{invert_translation[screen_key]}."
 
                 # Essaye de récupérer les donnés reliées à l'écran
                 try:
@@ -262,7 +262,7 @@ class PageRB8:
                         self.screen_settings[category_key][screen_key][3][0] = data[screen_settings_key + "w"]
                         self.screen_settings[category_key][screen_key][3][1] = data[screen_settings_key + "h"]
                 except KeyError:
-                    log.debug("L'écran : " + screen_settings_key + " n'a pas de paramètres sauvegardés.\n")
+                    log.debug(f"L'écran : {screen_settings_key} n'a pas de paramètres sauvegardés.\n")
 
         # Met à jour la page visible de settings
         self.change_visible_screen_list()
@@ -272,7 +272,7 @@ class PageRB8:
 
         Parameters
         ----------
-        translation_data: `td.TranslationDictionnary`
+        translation_data: `td.TranslationDictionary`
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
         """
         # Traduit le nom de la catégorie
@@ -491,7 +491,7 @@ class PageRB8:
                 visible_screen_minimum_wh.append([int(screen_data[1]), int(screen_data[2])])
             else:
                 # Si les valeurs ne sont pas présentes, laisse un message d'erreur et rajoute des valeurs par défaut
-                log.warning("Les caractéristiques de " + category_screen_list[index] + " ne sont pas bonnes.\n")
+                log.warning(f"Les caractéristiques de {category_screen_list[index]} ne sont pas bonnes.\n")
                 visible_screen_activable.append(False)
                 visible_screen_minimum_wh.append([0, 0])
 

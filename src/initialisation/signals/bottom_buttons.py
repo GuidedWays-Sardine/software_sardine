@@ -1,7 +1,6 @@
 # Librairies par défaut
 import os
 import sys
-import traceback
 import time
 
 
@@ -11,7 +10,7 @@ from PyQt5.QtWidgets import QFileDialog
 
 
 # Librairies SARDINE
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src\\")[0]
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.settings_dictionary.settings as sd
 import src.misc.log.log as log
@@ -29,7 +28,7 @@ class BottomButtons:
         application: `InitialisationWindow`
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
-        initial_time = time.time()
+        initial_time = time.perf_counter()
         log.info("Tentative de chargement des boutons inférieurs.\n")
 
         # Boutons quitter/lancer (obligatoires pour le lancement de l'application)
@@ -41,13 +40,11 @@ class BottomButtons:
             application.win.findChild(QObject, "open").clicked.connect(lambda: self.on_open_clicked(application))
             application.win.findChild(QObject, "save").clicked.connect(lambda: self.on_save_clicked(application))
         except Exception as error:
-            log.warning("Problème lors du chargement du signal du bouton sauvegarder ou ouvrir.\n\t" +
-                        "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                        "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
-                        "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+            log.warning(f"Problème lors du chargement du signal du bouton sauvegarder ou ouvrir.\n",
+                        exception=error)
 
-        log.info("Boutons inférieurs chargés en " +
-                 str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n\n")
+        log.info(f"Boutons inférieurs chargés en " +
+                 f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\n")
 
     def on_quit_clicked(self, application):
         """Ferme la fenêtre d'initialisation
@@ -57,7 +54,7 @@ class BottomButtons:
         application: `InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets
         """
-        log.info("Fermeture de la page de paramètres page_rb" + str(application.active_settings_page) + ".\n\n")
+        log.info(f"Fermeture de la page de paramètres page_rb{application.active_settings_page}.\n\n")
         application.app.quit()
 
     def on_launch_clicked(self, application):
@@ -75,10 +72,8 @@ class BottomButtons:
                                        and not application.visible_pages[i].is_page_valid())
         except Exception as error:
             # Si une erreur a été détectée dans une des fonction de validation, l'indique et ne complète pas l'initialisation
-            log.warning("Erreur lors de la validation d'une des pages de paramètres : "
-                        "\n\t\tErreur de type : " + str(type(error)) + "\n\t\t" +
-                        "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
-                        "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+            log.warning(f"Erreur lors de la validation d'une des pages de paramètres.\n",
+                        exception=error)
         else:
             # Dans le cas où toutes les pages ont été vérifiées avec succès
             if not non_completed_pages:
@@ -89,11 +84,8 @@ class BottomButtons:
                         application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
                     except Exception as error:
                         # Si la fonction de fermeture de page contient une erreur, l'indique
-                        log.error("La fonction on_page_closed de la page " + str(application.active_settings_page) +
-                                  " contient une erreur\n\t\t" +
-                                  "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                                  "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
-                                  "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                        log.error(f"La fonction on_page_closed de la page_rb{application.active_settings_page} contient une erreur.\n",
+                                  exception=error)
 
                 # Indique que le simulateur va être lancée et ferme l'application (les données seront alors récupérées
                 log.change_log_prefix("Récupération des données")
@@ -101,8 +93,7 @@ class BottomButtons:
                 application.app.quit()
             else:
                 # Si toutes les pages ne sont pas complétées, indique en niveau debug les pages qui ne le sont pas
-                for index in non_completed_pages:
-                    log.debug("Page de paramètres " + str(index + 1) + " n'est pas complète.\n")
+                log.debug(f"Pages de paramètres : {' ; '.join([str(n + 1) for n in non_completed_pages])} non complétés.\n")
 
                 # Et change la page de paramètres active sur la première page non complète
                 application.right_buttons.on_new_page_selected(application,
@@ -120,7 +111,7 @@ class BottomButtons:
         """
         # Ouvre la fenêtre d'ouverture de fichier pour sélectionner le fichier à ouvrir
         file_path = QFileDialog.getOpenFileName(caption="Ouvrir un fichier de configuration",
-                                                directory=PROJECT_DIR + "settings\\general_settings",
+                                                directory=f"{PROJECT_DIR}settings\\general_settings",
                                                 filter="Fichiers de configuration Sardine (*.settings)")
 
         # Si un fichier a bien été sélectionné
@@ -129,12 +120,12 @@ class BottomButtons:
             log.change_log_prefix("Changement des données")
 
             #Récupère les données dans le fichier sélectionné et les envoies à set_values
-            data = sd.SettingsDictionnary()
+            data = sd.SettingsDictionary()
             data.open(file_path[0])
             application.set_values(data)
 
             # Remet le préfixe de registre de la page active
-            log.change_log_prefix("page_rb" + str(application.active_settings_page) + "")
+            log.change_log_prefix(f"page_rb{application.active_settings_page}")
 
     def on_save_clicked(self, application):
         """Fonction appelée lorsque le bouton sauvegarder est cliqué.
@@ -147,7 +138,7 @@ class BottomButtons:
         """
         # Ouvre la fenêtre de sauvegarde et enregegistre le fichier si un nom a été donné
         file_path = QFileDialog.getSaveFileName(caption="Sauvegarder un fichier de configuration",
-                                                directory=PROJECT_DIR + "settings\\general_settings",
+                                                directory=f"{PROJECT_DIR}settings\\general_settings",
                                                 filter="Fichiers de configuration Sardine (*.settings)")
 
         # Si un fichier a bien été sélectionné
@@ -156,12 +147,12 @@ class BottomButtons:
             log.change_log_prefix("Sauvegarde des données")
 
             # Récupère les paramètres de l'application d'initialisation, les stockes et les enregistres dans le fichier
-            data = sd.SettingsDictionnary()
+            data = sd.SettingsDictionary()
             data.update(application.get_values())
             data.save(file_path[0])
 
             # Remet le préfixe de registre de la page active
-            log.change_log_prefix("page_rb" + str(application.active_settings_page))
+            log.change_log_prefix(f"page_rb{application.active_settings_page}")
 
     def change_language(self, application, translation_data):
         """Permet à partir d'un dictionnaire de traduction de traduire le textes des 4 boutons inférieurs.
