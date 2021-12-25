@@ -20,6 +20,8 @@ Item {
     //Propriétés liés au texte du DMI_text
     property string text: ""
     property int font_size: 12
+    readonly property int default_text_height: text_metrics.tightBoundingRect.height / root.ratio
+    readonly property int default_text_width: text_metrics.tightBoundingRect.width / root.ratio
 
     //Propriétés liés à l'état du texte
     property bool is_dark_grey: false  //si le bouton peut être activée
@@ -42,5 +44,13 @@ Item {
         font.pixelSize: root.font_size * root.ratio
         color: root.is_dark_grey ? root.dark_grey : root.grey
         text: root.text
+    }
+
+    //Permet de connaitre la taille du texte
+    TextMetrics {
+        id: text_metrics
+
+        font: body.font
+        text: body.text
     }
 }
