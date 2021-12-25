@@ -94,6 +94,10 @@ Item{
             color: root.dark_blue
         }
 
+        validator: RegExpValidator{
+            regExp: /^[^*|\":<>[\]{}`\\'\/]+$/
+        }
+
         //détecte quand le texte entrée est changé et vérifie si la valeur entrée est valide
         onDisplayTextChanged: {
             text_changed()
