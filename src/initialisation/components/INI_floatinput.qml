@@ -29,6 +29,7 @@ Item{
     //Propriétés liés aux valeurs limites et la valeur actuellement sélectionnée
     property double minimum_value: 0
     property double maximum_value: 1
+    property int decimals: 1000
     readonly property double value: body.text != "" ? parseFloat(body.text.replace(",", ".")) > root.minimum_value ? parseFloat(body.text.replace(",", ".")) : root.minimum_value : (is_max_default ? root.maximum_value : root.minimum_value)   //Valeur actuelle
     property double previous_value: root.is_max_default ? root.maximum_value : root.minimum_value    //Ancienne valeur ; nécessaire pour détecter le changement de valeur et appeler value_changed()
 
@@ -87,6 +88,14 @@ Item{
 
     //Signal détectant quand la valeur minimale est changée
     onMinimum_valueChanged: {
+        //Cas où la valeur minimale est inférieure à 0
+        if(root.minimum_value < 0){
+            root.minimum_value = 0
+        }
+        //Cas où la valeur minimale est supérieure à la valeur maximale
+        if(root.minimum_value > root.maximum_value){
+            root.minimum_value = root.maximum_value
+        }
         //cas où la valeur actuelle rentrée est inférieure à la nouvelle valeur minimale
         if(body.text != "" && parseFloat(body.text.replace(",", ".")) < root.minimum_value){
             body.text = root.is_max_default ? root.minimum_value.toString() : ""
@@ -102,6 +111,10 @@ Item{
 
     //Signal détectant quand la valeur maximale est changée
     onMaximum_valueChanged: {
+        //cas où la valeur maximale est inférieure à la valeur minimale
+        if(root.maximum_value < root.minimum_value){
+            root.maximum_value = root.minimum_value
+        }
         //cas où la valeur actuelle rentrée est supériere à la nouvelle valeur maximale
         if(body.text != "" && parseFloat(body.text.replace(",", ".")) > root.maximum_value){
             body.text = root.is_max_default ? "" : root.maximum_value.toString()
@@ -137,7 +150,10 @@ Item{
 
         //indique que seul des valeurs entières peuvent être entrées
         validator: DoubleValidator {
+
             locale: "RejectGroupSeparator"
+
+            decimals: root.decimals
             bottom: root.minimum_value
             top: root.maximum_value
         }

@@ -102,6 +102,18 @@ Item{
 
     //Signal détectant quand la valeur maximale est changée
     onMaximum_valueChanged: {
+        //Cas où la valeur minimale est inférieure à 0
+        if(root.minimum_value < 0){
+            root.minimum_value = 0
+        }
+        //Cas où la valeur minimale est supérieure à la valeur maximale
+        if(root.minimum_value > root.maximum_value){
+            root.minimum_value = root.maximum_value
+        }
+        //cas où la valeur maximale est inférieure à la valeur minimale
+        if(root.maximum_value < root.minimum_value){
+            root.maximum_value = root.minimum_value
+        }
         //cas où la valeur actuelle rentrée est supériere à la nouvelle valeur maximale
         if(body.text != "" && parseInt(body.text) > root.maximum_value){
             body.text = root.is_max_default ? "" : root.maximum_value.toString()
