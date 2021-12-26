@@ -26,6 +26,7 @@ Item {
     //Constantes permettant de controller la taille et la position des différents éléments de la page
     readonly property int input_width: 80
     readonly property int input_height: 24
+    readonly property int checkbutton_box_length : 18
     readonly property int x_offset: 140
     readonly property int y_offset: 44
 
@@ -769,37 +770,83 @@ Item {
 
 
     //Tous les composants reliés au paramétrage des systèmes d'alimentation
-    //checkbutton pour indiquer si le train a des pantographes (en mode simplifié on le considère compatible avec toutes les tensions
-    INI_checkbutton{
-        id: pantograph_checkbutton
-        objectName: pantograph_checkbutton
+    INI_button {
+        id: alimentation_data_box
+        objectName: "alimentation_data_box"
 
-        default_x: 54
-        default_y: 226
-        box_length: 20
+        default_x: train_name_stringinput.default_x
+        default_y: dynamic_data_box.default_y + dynamic_data_box.default_height
+        default_width: train_name_stringinput.default_width
+        default_height: 1*50 - 12
 
-        text: "pantographe ?"
-
-        is_checked: false
-        is_activable: true
-        is_positive: true
-        is_visible: false
+        is_activable: false
+        is_positive: dynamic_data_box.is_positive
+        is_visible: true
     }
 
+    INI_text {
+        id: alimentation_data_name
+        objectName: "alimentation_data_name"
+
+        default_x: alimentation_data_box.default_x + 1 + (alimentation_data_box.is_positive)
+        default_y: alimentation_data_box.default_y + 1 + (alimentation_data_box.is_positive)
+
+        text: "Systèmes d'alimentation"
+        font_size: 12
+
+        is_dark_grey: motorized_axles_count_integerinput.value == 0
+        is_visible: true
+    }
+
+
+
+    //checkbutton pour indiquer si le train a des pantographes (en mode simplifié on le considère compatible avec toutes les tensions
     INI_checkbutton{
-        id: thermic_checkbutton
-        objectName: thermic_checkbutton
+        id: pantograph_check
+        objectName: pantograph_check
 
-        default_x: pantograph_checkbutton.default_x + 240
-        default_y: pantograph_checkbutton.default_y
-        box_length: pantograph_checkbutton.box_length
+        default_x: alimentation_data_box.default_x + 1 + (alimentation_data_box.is_positive)
+        default_y: alimentation_data_box.default_y + 1 + (alimentation_data_box.is_positive) + 1.5 * alimentation_data_name.font_size
+        box_length: page_rb2.checkbutton_box_length
 
-        text: "thermique ?"
+        text: "Pantographe ?"
 
         is_checked: false
-        is_activable: true
+        is_activable: motorized_axles_count_integerinput.value != 0
         is_positive: true
-        is_visible: false
+        is_visible: true
+
+        // Si le nombre d'essieux moteurs repasse à 0 décoche la case
+        onIs_activableChanged: {
+            if(!pantograph_check.is_activable){
+                pantograph_check.is_checked = false
+            }
+        }
+    }
+
+
+    //checkbutton pour indiquer si le train a un système d'alimentation thermique
+    INI_checkbutton{
+        id: thermic_check
+        objectName: thermic_check
+
+        default_x: pantograph_check.default_x + 2 * page_rb2.x_offset
+        default_y: pantograph_check.default_y
+        box_length: pantograph_check.box_length
+
+        text: "Thermique ?"
+
+        is_checked: false
+        is_activable: motorized_axles_count_integerinput.value != 0
+        is_positive: pantograph_check.is_positive
+        is_visible: true
+
+        // Si le nombre d'essieux moteurs repasse à 0 décoche la case
+        onIs_activableChanged: {
+            if(!thermic_check.is_activable){
+                thermic_check.is_checked = false
+            }
+        }
     }
 
 
