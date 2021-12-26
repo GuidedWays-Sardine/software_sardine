@@ -206,14 +206,14 @@ Item {
         anchors.fill: parent
 
         hoverEnabled: false
-        enabled: root.is_activable
+        enabled: true
 
 
         //Détecte quand la zone (le bouton) commence à être appuyé
         onPressed: {
             //force le focus sur ce bouton pour qu'il soit prioritaire et indique que le bouton est cliqué
             forceActiveFocus()
-            root.button_pressed = true
+            root.button_pressed = root.is_activable
         }
 
         //Détecte quand la zone (le bouton) est relaché
@@ -227,7 +227,7 @@ Item {
 
         //Fonction qui détecte lorsque l'utilisateur sort ou rentre sa souris du bouton alors qu'il clique dessus
         onContainsMouseChanged: {
-            root.button_pressed = area.containsMouse
+            root.button_pressed = area.containsMouse && root.is_activable
         }
     }
 }
