@@ -36,10 +36,11 @@ Item {
         default_x: train_name_stringinput.default_x + 2
         default_y: train_name_stringinput.default_y - 2 * font_size
 
-        text: "Nom du train (utilisé pour le nom du fichier)"
+        text: "Configuration du train"
         font_size: 12
 
         is_dark_grey: false
+        is_visible: true
     }
 
     INI_stringinput{
@@ -52,8 +53,7 @@ Item {
         default_height: 26
 
         max_text_length: 48
-        placeholder_text: "A compléter!"
-
+        placeholder_text: "Nom du train (utilisé pour le nom du fichier)"
         is_activable: true
         is_positive: true
         is_visible: true
@@ -115,8 +115,8 @@ Item {
         text: "t"
         font_size: 6
 
-        default_x: weight_floatinput.default_x + weight_floatinput.default_width - default_text_width - 2
-        default_y: weight_floatinput.default_y - 4 - font_size
+        default_x: weight_floatinput.default_x + weight_floatinput.default_width + 2
+        default_y: weight_floatinput.default_y + weight_floatinput.default_height - 2 - font_size
 
         is_dark_grey: true
         is_visible: true
@@ -164,8 +164,8 @@ Item {
         text: "m"
         font_size: 6
 
-        default_x: length_floatinput.default_x + length_floatinput.default_width - default_text_width - 2
-        default_y: length_floatinput.default_y - 4 - font_size
+        default_x: length_floatinput.default_x + length_floatinput.default_width + 2
+        default_y: length_floatinput.default_y + length_floatinput.default_height - 2 - font_size
 
         is_dark_grey: true
         is_visible: true
@@ -312,8 +312,8 @@ Item {
         id: motorized_axle_weight_unit_text
         objectName: "motorized_axle_weight_unit_text"
 
-        default_x: motorized_axle_weight_floatinput.default_x + motorized_axle_weight_floatinput.default_width - default_text_width - 2
-        default_y: motorized_axle_weight_floatinput.default_y - 4 - font_size
+        default_x: motorized_axle_weight_floatinput.default_x + motorized_axle_weight_floatinput.default_width + 2
+        default_y: motorized_axle_weight_floatinput.default_y + motorized_axle_weight_floatinput.default_height - 2 - font_size
 
         text: "t"
         font_size: 6
@@ -427,8 +427,8 @@ Item {
         text: "kW"
         font_size: 6
 
-        default_x: axle_power_floatinput.default_x + axle_power_floatinput.default_width - default_text_width - 2
-        default_y: axle_power_floatinput.default_y - 4 - font_size
+        default_x: axle_power_floatinput.default_x + axle_power_floatinput.default_width + 2
+        default_y: axle_power_floatinput.default_y + axle_power_floatinput.default_height - 2 - font_size
 
         is_dark_grey: true
         is_visible: true
@@ -493,8 +493,8 @@ Item {
         text: "kW"
         font_size: 6
 
-        default_x: power_floatinput.default_x + power_floatinput.default_width - default_text_width - 2
-        default_y: power_floatinput.default_y - 4 - font_size
+        default_x: power_floatinput.default_x + power_floatinput.default_width + 2
+        default_y: power_floatinput.default_y + power_floatinput.default_height - 2 - font_size
 
         is_dark_grey: true
         is_visible: true
@@ -566,8 +566,8 @@ Item {
         text: "kN"
         font_size: 6
 
-        default_x: a_floatinput.default_x + a_floatinput.default_width - default_text_width - 2
-        default_y: a_floatinput.default_y - 4 - font_size
+        default_x: a_floatinput.default_x + a_floatinput.default_width + 2
+        default_y: a_floatinput.default_y + a_floatinput.default_height - 2 - font_size
 
         is_dark_grey: true
     }
@@ -623,8 +623,8 @@ Item {
         text: "kN/(km/h)"
         font_size: a_unit_text.font_size
 
-        default_x: b_floatinput.default_x + b_floatinput.default_width - default_text_width - 2
-        default_y: b_floatinput.default_y - 4 - font_size
+        default_x: b_floatinput.default_x + b_floatinput.default_width + 2
+        default_y: b_floatinput.default_y + b_floatinput.default_height - 2 - font_size
 
         is_dark_grey: a_unit_text.is_dark_grey
     }
@@ -680,8 +680,8 @@ Item {
         text: "kN/(km/h)²"
         font_size: b_unit_text.font_size
 
-        default_x: c_floatinput.default_x + c_floatinput.default_width - default_text_width - 2
-        default_y: c_floatinput.default_y - 4 - font_size
+        default_x: c_floatinput.default_x + c_floatinput.default_width + 2
+        default_y: c_floatinput.default_y + c_floatinput.default_height - 2 - font_size
 
         is_dark_grey: b_unit_text.is_dark_grey
     }
