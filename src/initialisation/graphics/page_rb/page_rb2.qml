@@ -17,11 +17,15 @@ Item {
     readonly property int max_axles_per_bogies: 1e1
     readonly property double max_motor_power: 1e6       //kW
     readonly property double max_power: max_motor_power * motorized_axles_count_integerinput.value      //NE PAS CHANGER
+    readonly property double a_max: 1e3                 //kN
+    readonly property double b_max: 1e3                 //kN/(km/h)
+    readonly property double c_max: 1e3                 //kM/(km/h)²
+    readonly property int abc_decimals: 8
 
 
     //Constantes permettant de controller la taille et la position des différents éléments de la page
-    readonly property int input_height: 80
-    readonly property int input_width: 24
+    readonly property int input_width: 80
+    readonly property int input_height: 24
     readonly property int x_offset: 140
     readonly property int y_offset: 44
 
@@ -128,8 +132,8 @@ Item {
 
         default_x: general_data_box.default_x + 1 + (general_data_box.is_positive)
         default_y: general_data_box.default_y + 1 + (general_data_box.is_positive) + 3 * general_data_name.font_size
-        default_width: page_rb2.input_height
-        default_height: page_rb2.input_width
+        default_width: page_rb2.input_width
+        default_height: page_rb2.input_height
 
         maximum_value: page_rb2.max_weight
         minimum_value: 0.001 * bogies_count_integerinput.value * axles_per_bogies_integerinput.value
@@ -544,7 +548,37 @@ Item {
 
 
 
-    //Tous les composants reliés au paramétrage de la dynamique du train
+    //Tous les composants reliés au paramétrage des informations dynamiques (efforts résistants) du train
+    INI_button {
+        id: dynamic_data_box
+        objectName: "dynamic_data_box"
+
+        default_x: train_name_stringinput.default_x
+        default_y: general_data_box.default_y + general_data_box.default_height
+        default_width: train_name_stringinput.default_width
+        default_height: 1*50 + 12
+
+        is_activable: false
+        is_positive: general_data_box.is_positive
+        is_visible: true
+    }
+
+    INI_text {
+        id: dynamic_data_name
+        objectName: "dynamic_data_name"
+
+        default_x: dynamic_data_box.default_x + 1 + (dynamic_data_box.is_positive)
+        default_y: dynamic_data_box.default_y + 1 + (dynamic_data_box.is_positive)
+
+        text: "Dynamique du train (Rav)"
+        font_size: 12
+
+        is_dark_grey: false
+        is_visible: true
+    }
+
+
+
     //floatinput pour le coefficient A
     INI_text {
         id: a_text
@@ -557,6 +591,7 @@ Item {
         default_y: a_floatinput.default_y - 4 - font_size
 
         is_dark_grey: false
+        is_visible: true
     }
 
     INI_text {
@@ -570,22 +605,26 @@ Item {
         default_y: a_floatinput.default_y + a_floatinput.default_height - 2 - font_size
 
         is_dark_grey: true
+        is_visible: true
     }
 
     INI_floatinput{
         id: a_floatinput
         objectName: "a_floatinput"
 
-        default_x: 54
-        default_y: 271
-        default_width: 66
-        default_height: 24
+        default_x: dynamic_data_box.default_x + 1 + (dynamic_data_box.is_positive)
+        default_y: dynamic_data_box.default_y + 1 + (dynamic_data_box.is_positive) + 3 * font_size
+        default_width: page_rb2.input_width
+        default_height: page_rb2.input_height
 
-        maximum_value: Infinity
+        maximum_value: page_rb2.a_max
         minimum_value: 0
-        decimals: 8
+        decimals: page_rb2.abc_decimals
 
         is_max_default: false
+        is_activable: true
+        is_positive: false
+        is_visible: true
     }
 
     INI_text{
@@ -596,9 +635,10 @@ Item {
         font_size: 12
 
         default_x: (a_floatinput.default_x + a_floatinput.default_width + b_floatinput.default_x - default_text_width) * 0.5
-        default_y: a_floatinput.default_y + (a_floatinput.default_height - font_size) * 0.5 - 2
+        default_y: a_floatinput.default_y + (a_floatinput.default_height - font_size) * 0.5 - 4
 
         is_dark_grey: false
+        is_visible: true
     }
 
 
@@ -614,6 +654,7 @@ Item {
         default_y: b_floatinput.default_y - 4 - font_size
 
         is_dark_grey: a_text.is_dark_grey
+        is_visible: true
     }
 
     INI_text {
@@ -627,35 +668,40 @@ Item {
         default_y: b_floatinput.default_y + b_floatinput.default_height - 2 - font_size
 
         is_dark_grey: a_unit_text.is_dark_grey
+        is_visible: true
     }
 
     INI_floatinput{
         id: b_floatinput
         objectName: "b_floatinput"
 
-        default_x: a_floatinput.default_x + 100
+        default_x: a_floatinput.default_x + page_rb2.x_offset
         default_y: a_floatinput.default_y
         default_width: a_floatinput.default_width
         default_height: a_floatinput.default_height
 
-        maximum_value: Infinity
+        maximum_value: page_rb2.b_max
         minimum_value: 0
-        decimals: 8
+        decimals: page_rb2.abc_decimals
 
         is_max_default: false
+        is_activable: a_floatinput.is_activable
+        is_positive: a_floatinput.is_positive
+        is_visible: true
     }
 
     INI_text{
         id: v1
         objectName: "v1"
 
-        text: "V + "
+        text: "V  + "
         font_size: v0.font_size
 
         default_x: (b_floatinput.default_x + b_floatinput.default_width + c_floatinput.default_x - default_text_width) * 0.5
-        default_y: b_floatinput.default_y + (b_floatinput.default_height - font_size) * 0.5 - 2
+        default_y: b_floatinput.default_y + (b_floatinput.default_height - font_size) * 0.5 - 4
 
         is_dark_grey: v0.is_dark_grey
+        is_visible: true
     }
 
 
@@ -671,6 +717,7 @@ Item {
         default_y: c_floatinput.default_y - 4 - font_size
 
         is_dark_grey: b_text.is_dark_grey
+        is_visible: true
     }
 
     INI_text {
@@ -684,22 +731,26 @@ Item {
         default_y: c_floatinput.default_y + c_floatinput.default_height - 2 - font_size
 
         is_dark_grey: b_unit_text.is_dark_grey
+        is_visible: true
     }
 
     INI_floatinput{
         id: c_floatinput
         objectName: "c_floatinput"
 
-        default_x: b_floatinput.default_x + 100
+        default_x: b_floatinput.default_x + page_rb2.x_offset
         default_y: b_floatinput.default_y
         default_width: b_floatinput.default_width
         default_height: b_floatinput.default_height
 
-        maximum_value: 100
+        maximum_value: page_rb2.c_max
         minimum_value: 0
-        decimals: 8
+        decimals: page_rb2.abc_decimals
 
-        is_max_default: true//false
+        is_max_default: false
+        is_activable: b_floatinput.is_activable
+        is_positive: b_floatinput.is_positive
+        is_visible: true
     }
 
     INI_text{
@@ -714,10 +765,6 @@ Item {
 
         is_dark_grey: v1.is_dark_grey
     }
-
-
-
-
 
 
 
@@ -736,6 +783,7 @@ Item {
         is_checked: false
         is_activable: true
         is_positive: true
+        is_visible: false
     }
 
     INI_checkbutton{
@@ -751,6 +799,7 @@ Item {
         is_checked: false
         is_activable: true
         is_positive: true
+        is_visible: false
     }
 
 
