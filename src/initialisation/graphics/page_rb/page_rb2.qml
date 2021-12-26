@@ -383,6 +383,26 @@ Item {
         is_activable: true
         is_positive: false
         is_visible: true
+
+        onValue_changed: {
+            // Si le dernier élément mis à jour est la puissance des moteurs, mets à jour la puissance du train
+            power_floatinput.is_modified = true
+            axle_power_floatinput.is_modified = true
+            if(axle_power_floatinput.last_changed && !power_floatinput.last_changed){
+                power_floatinput.change_value(axle_power_floatinput.value * motorized_axles_count_integerinput.value)
+            }
+            // Si le dernier élément mis à jour est la puissance du train, mets à jour la puissance des moteurs
+            else{
+                if(motorized_axles_count_integerinput.value != 0) {
+                    axle_power_floatinput.change_value(power_floatinput.value / motorized_axles_count_integerinput.value)
+                }
+                else{
+                    axle_power_floatinput.change_value(0)
+                }
+            }
+            axle_power_floatinput.is_modified = false
+            power_floatinput.is_modified = false
+        }
     }
 
     //floatinput pour connaitre la puissance de chaque essieux moteurs (relié à la puissance générale
@@ -418,6 +438,11 @@ Item {
         id: axle_power_floatinput
         objectName: "axle_power_floatinput"
 
+        //propriété permettant de se souvenir si la puissance du train ou la puissance moteur a été changée en dernier
+        //Utile pour savoir quelle puissance mettre à jour lorsque le nombre d'essieux moteurs est changé
+        property bool last_changed: false
+        property bool is_modified: false
+
         default_x: axles_per_bogies_integerinput.default_x
         default_y: motorized_axles_count_integerinput.default_y
         default_width: axles_per_bogies_integerinput.default_width
@@ -433,7 +458,16 @@ Item {
         is_visible: true
 
         onValue_changed: {
-            //TODO : fonction pour mettre à jour la puissance
+            //Met à jour la puissance générale du train
+            if(!power_floatinput.is_modified){
+                power_floatinput.is_modified = true
+                power_floatinput.change_value(axle_power_floatinput.value * motorized_axles_count_integerinput.value)
+                power_floatinput.is_modified = false
+
+                //Indique qu'il était le dernier à être modifié
+                axle_power_floatinput.last_changed = true
+                power_floatinput.last_changed = false
+            }
         }
     }
 
@@ -470,6 +504,11 @@ Item {
         id: power_floatinput
         objectName: "power_floatinput"
 
+        //propriété permettant de se souvenir si la puissance du train ou la puissance moteur a été changée en dernier
+        //Utile pour savoir quelle puissance mettre à jour lorsque le nombre d'essieux moteurs est changé
+        property bool last_changed: true
+        property bool is_modified: false
+
         default_x: motorized_axle_weight_floatinput.default_x
         default_y: axle_power_floatinput.default_y
         default_width: motorized_axle_weight_floatinput.default_width
@@ -485,7 +524,21 @@ Item {
         is_visible: true
 
         onValue_changed: {
-            //TODO: fonction permettant de...
+            //Met à jour la puissance par essieux du train
+            if(!axle_power_floatinput.is_modified){
+                power_floatinput.is_modified = true
+                if(motorized_axles_count_integerinput.value != 0) {
+                    axle_power_floatinput.change_value(power_floatinput.value / motorized_axles_count_integerinput.value)
+                }
+                else{
+                    axle_power_floatinput.change_value(0)
+                }
+                power_floatinput.is_modified = false
+
+                //Indique qu'il était le dernier à être modifié
+                axle_power_floatinput.last_changed = false
+                power_floatinput.last_changed = true
+            }
         }
     }
 
