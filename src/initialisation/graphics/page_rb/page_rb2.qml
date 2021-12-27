@@ -303,6 +303,63 @@ Item {
         is_visible: true
     }
 
+    //integerinput pour connaitre le nombre d'essieux moteurs
+    INI_text {
+        id: motorized_axles_count_text
+        objectName: "motorized_axles_count_text"
+
+        text: "Nessieux moteurs"
+        font_size: 12
+
+        default_x: motorized_axles_count_integerinput.default_x + 2
+        default_y: motorized_axles_count_integerinput.default_y - 4 - font_size
+
+        is_dark_grey: false
+        is_visible: true
+    }
+
+    INI_integerinput{
+        id: motorized_axles_count_integerinput
+        objectName: "motorized_axles_count_integerinput"
+
+
+        default_x: coaches_integerinput.default_x
+        default_y: axles_per_bogies_integerinput.default_y
+        default_width: coaches_integerinput.default_width
+        default_height: axles_per_bogies_integerinput.default_height
+
+        maximum_value: bogies_count_integerinput.value * axles_per_bogies_integerinput.value
+        minimum_value: 0
+
+        is_max_default: false
+        is_activable: true
+        is_positive: false
+        is_visible: true
+
+        onValue_changed: {
+            // Si le dernier élément mis à jour est la puissance des moteurs, mets à jour la puissance du train
+            power_floatinput.is_modified = true
+            axle_power_floatinput.is_modified = true
+            if(axle_power_floatinput.last_changed && !power_floatinput.last_changed){
+                power_floatinput.change_value(axle_power_floatinput.value * motorized_axles_count_integerinput.value)
+            }
+            // Si le dernier élément mis à jour est la puissance du train, mets à jour la puissance des moteurs
+            else{
+                if(motorized_axles_count_integerinput.value != 0) {
+                    axle_power_floatinput.change_value(power_floatinput.value / motorized_axles_count_integerinput.value)
+                }
+                else{
+                    axle_power_floatinput.change_value(0)
+                }
+            }
+            axle_power_floatinput.is_modified = false
+            power_floatinput.is_modified = false
+        }
+    }
+
+
+
+    //Tous les composants reliés au paramétrage de la puissance moteur
     //integerinput pour connaitre le nombre d'essieux par bogies
     INI_text {
         id: motorized_axle_weight_text
@@ -336,10 +393,12 @@ Item {
         id: motorized_axle_weight_floatinput
         objectName: "motorized_axle_weight_floatinput"
 
-        default_x: coaches_integerinput.default_x
-        default_y: axles_per_bogies_integerinput.default_y
-        default_width: coaches_integerinput.default_width
-        default_height: axles_per_bogies_integerinput.default_height
+        default_x: bogies_count_integerinput.default_x
+        default_y: bogies_count_integerinput.default_y + page_rb2.y_offset
+        default_width: bogies_count_integerinput.default_width
+        default_height: bogies_count_integerinput.default_height
+
+        //TODO: Changer comment ça se passe (garder la valeur mais changer le min et max
 
         maximum_value: motorized_axles_count_integerinput.value != 0
                        ? // Cas où le nombre d'essieux motorisés est différent de 0 (propose de telle sorte à ce que la masse totale sur les essieux moteur ne dépasse pas celle du train)
@@ -357,62 +416,6 @@ Item {
         is_positive: false
         is_activable: motorized_axles_count_integerinput.value != 0
         is_visible: true
-    }
-
-
-
-    //Tous les composants reliés au paramétrage de la puissance moteur
-    //integerinput pour connaitre le nombre d'essieux moteurs
-    INI_text {
-        id: motorized_axles_count_text
-        objectName: "motorized_axles_count_text"
-
-        text: "Nessieux moteurs"
-        font_size: 12
-
-        default_x: motorized_axles_count_integerinput.default_x + 2
-        default_y: motorized_axles_count_integerinput.default_y - 4 - font_size
-
-        is_dark_grey: false
-        is_visible: true
-    }
-
-    INI_integerinput{
-        id: motorized_axles_count_integerinput
-        objectName: "motorized_axles_count_integerinput"
-
-        default_x: bogies_count_integerinput.default_x
-        default_y: bogies_count_integerinput.default_y + page_rb2.y_offset
-        default_width: bogies_count_integerinput.default_width
-        default_height: bogies_count_integerinput.default_height
-
-        maximum_value: bogies_count_integerinput.value * axles_per_bogies_integerinput.value
-        minimum_value: 0
-
-        is_max_default: false
-        is_activable: true
-        is_positive: false
-        is_visible: true
-
-        onValue_changed: {
-            // Si le dernier élément mis à jour est la puissance des moteurs, mets à jour la puissance du train
-            power_floatinput.is_modified = true
-            axle_power_floatinput.is_modified = true
-            if(axle_power_floatinput.last_changed && !power_floatinput.last_changed){
-                power_floatinput.change_value(axle_power_floatinput.value * motorized_axles_count_integerinput.value)
-            }
-            // Si le dernier élément mis à jour est la puissance du train, mets à jour la puissance des moteurs
-            else{
-                if(motorized_axles_count_integerinput.value != 0) {
-                    axle_power_floatinput.change_value(power_floatinput.value / motorized_axles_count_integerinput.value)
-                }
-                else{
-                    axle_power_floatinput.change_value(0)
-                }
-            }
-            axle_power_floatinput.is_modified = false
-            power_floatinput.is_modified = false
-        }
     }
 
     //floatinput pour connaitre la puissance de chaque essieux moteurs (relié à la puissance générale
@@ -454,7 +457,7 @@ Item {
         property bool is_modified: false
 
         default_x: axles_per_bogies_integerinput.default_x
-        default_y: motorized_axles_count_integerinput.default_y
+        default_y: motorized_axle_weight_floatinput.default_y
         default_width: axles_per_bogies_integerinput.default_width
         default_height: motorized_axles_count_integerinput.default_height
 
@@ -519,7 +522,7 @@ Item {
         property bool last_changed: true
         property bool is_modified: false
 
-        default_x: motorized_axle_weight_floatinput.default_x
+        default_x: motorized_axles_count_integerinput.default_x
         default_y: axle_power_floatinput.default_y
         default_width: motorized_axle_weight_floatinput.default_width
         default_height: axle_power_floatinput.default_height
