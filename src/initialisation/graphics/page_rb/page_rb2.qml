@@ -337,6 +337,14 @@ Item {
         is_visible: true
 
         onValue_changed: {
+            //Commence par changer la valeur de la masse à l'essieu
+            if(motorized_axles_count_integerinput.value != 0){
+                motorized_axle_weight_floatinput.change_value(weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogies_integerinput.value))
+            }
+            else {
+                motorized_axle_weight_floatinput.clear()
+            }
+
             // Si le dernier élément mis à jour est la puissance des moteurs, mets à jour la puissance du train
             power_floatinput.is_modified = true
             axle_power_floatinput.is_modified = true
@@ -397,8 +405,6 @@ Item {
         default_y: bogies_count_integerinput.default_y + page_rb2.y_offset
         default_width: bogies_count_integerinput.default_width
         default_height: bogies_count_integerinput.default_height
-
-        //TODO: Changer comment ça se passe (garder la valeur mais changer le min et max
 
         maximum_value: motorized_axles_count_integerinput.value != 0
                        ? // Cas où le nombre d'essieux motorisés est différent de 0 (propose de telle sorte à ce que la masse totale sur les essieux moteur ne dépasse pas celle du train)
