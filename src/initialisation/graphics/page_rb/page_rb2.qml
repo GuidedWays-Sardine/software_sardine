@@ -915,7 +915,7 @@ Item {
 
         is_max_default: false
         is_activable: true
-        is_positive: true
+        is_positive: false
         is_visible: true
     }
 
@@ -1064,16 +1064,68 @@ Item {
 
 
 
-    //Boutons permettant d'ouvrir, d'enregistrer et de passer en mode complexe
+    //Bouton permettant de changer le mode de paramétrage (simple ou complexe)
+    INI_text {
+        id: mode_text
+        objectName: "mode_text"
+
+        text: "Paramétrage"
+        font_size: 12
+
+        default_x: mode.default_x + 2
+        default_y: mode.default_y - 4 - font_size
+
+        is_dark_grey: mode.is_activable
+        is_visible: true
+    }
+
+    INI_button{
+        id: mode
+        objectName: "mode"
+
+        default_x: 480
+        default_y: train_name_stringinput.default_y
+        default_width: 100
+        default_height: train_name_stringinput.default_height
+
+        text: "Simple"
+
+        is_activable: false     //Changé lorsque logique initialisée
+        is_positive: is_activable
+        is_visible: true
+    }
+
+
+
+    //Combobox permettant de choisir le type de missions réalisés par le matériel roulant
+    INI_combobox{
+        id: mission_type_combo
+        objectName: "mission_type_combo"
+
+        default_x: mode.default_x
+        default_y: 65
+        default_width: mode.default_width
+        default_height: 50
+
+        elements: ["Voyageurs", "Fret"]
+
+        is_positive: true
+        is_activable: true
+        is_visible: true
+    }
+
+
+
+    //Boutons permettant d'ouvrir et d'enregistrer le fichier train
     //Bouton ouvrir
     INI_button{
         id: open
         objectName: "open"
 
-        default_x: 480
-        default_y: 15
-        default_height: 50
-        default_width: 100
+        default_x: mission_type_combo.default_x
+        default_y: mission_type_combo.default_y + 2* 50
+        default_width: mission_type_combo.default_width
+        default_height: mission_type_combo.default_height
 
         text: "Ouvrir"
 
@@ -1087,57 +1139,29 @@ Item {
         id: save
         objectName: "save"
 
-        default_x: 480
-        default_y: 65
-        default_height: 50
-        default_width: 100
+        default_x: open.default_x
+        default_y: open.default_y + 50
+        default_width: open.default_width
+        default_height: open.default_height
 
         text: "Sauvegarder"
 
-        is_activable: name_stringinput.text != ""
-        is_positive: name_stringinput.text != ""
+        is_activable: train_name_stringinput.text != ""
+        is_positive: train_name_stringinput.text != ""
         is_visible: true
     }
 
-    //Bouton mode de paramétrage
-    INI_text {
-        id: mode_text
-        objectName: "mode_text"
 
-        text: "paramétrage"
-        font_size: 12
-
-        default_x: mode.default_x + 2
-        default_y: mode.default_y - 4 - font_size
-
-        is_dark_grey: false
-    }
-
-    INI_button{
-        id: mode
-        objectName: "mode"
-
-        default_x: 480
-        default_y: 135
-        default_height: 30
-        default_width: 100
-
-        text: "Simple"
-
-        is_activable: name_stringinput.text != ""
-        is_positive: name_stringinput.text != ""
-        is_visible: true
-    }
 
     //Bouton de configuration freinage
     INI_button{
         id: brake_configuration
         objectName: "brake_configuration"
 
-        default_x: 480
-        default_y: 316
-        default_height: 50
-        default_width: 100
+        default_x: save.default_x
+        default_height: save.default_height
+        default_y: brake_data_box.default_y
+        default_width: save.default_width
 
         text: "Configuration\nfreinage"
 
