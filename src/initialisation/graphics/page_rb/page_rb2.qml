@@ -21,6 +21,11 @@ Item {
     readonly property double b_max: 1e3                 //kN/(km/h)
     readonly property double c_max: 1e3                 //kM/(km/h)²
     readonly property int abc_decimals: 8
+    //Par défautl on considèrera : 2 roues (et donc plaquettes) par essieux ; 4 disques par essieux ; 2 patins magnétiques ou de fouccault par bogies
+    readonly property int max_brake_pad: 2 * bogies_count_integerinput.value * axles_per_bogies_integerinput.value * 1      //Uniquement changer la dernière constante
+    readonly property int max_brake_disk:4 * bogies_count_integerinput.value * axles_per_bogies_integerinput.value * 1      //Uniquement changer la dernière constante
+    readonly property int max_brake_magnetic: -fouccault_brake_integerinput.value + 2 * bogies_count_integerinput.value * 1 //Uniquement changer la dernière constante
+    readonly property int max_brake_fouccault: -magnetic_brake_integerinput.value + 2 * bogies_count_integerinput.value * 1 //Uniquement changer la dernière constante
 
 
     //Constantes permettant de controller la taille et la position des différents éléments de la page
@@ -852,33 +857,66 @@ Item {
 
 
     //Tous les composants permettant la paramétrabilité des systèmes de freinage
+    INI_button {
+        id: brake_data_box
+        objectName: "brake_data_box"
+
+        default_x: train_name_stringinput.default_x
+        default_y: alimentation_data_box.default_y + alimentation_data_box.default_height
+        default_width: train_name_stringinput.default_width
+        default_height: 2*50
+
+        is_activable: false
+        is_positive: alimentation_data_box.is_positive
+        is_visible: true
+    }
+
+    INI_text {
+        id: brake_data_name
+        objectName: "brake_data_name"
+
+        default_x: brake_data_box.default_x + 1 + (brake_data_box.is_positive)
+        default_y: brake_data_box.default_y + 1 + (brake_data_box.is_positive)
+
+        text: "Systèmes de freinage"
+        font_size: 12
+
+        is_dark_grey: false
+        is_visible: true
+    }
+
+
     //integerinput pour connaitre le nombre de roues utilisant des plaquettes de frein
     INI_text {
-        id: wheel_brake_text
-        objectName: "wheel_brake_text"
+        id: pad_brake_text
+        objectName: "pad_brake_text"
 
         text: "Nplaquettes"
         font_size: 12
 
-        default_x: wheel_brake_integerinput.default_x + 2
-        default_y: wheel_brake_integerinput.default_y - 4 - font_size
+        default_x: pad_brake_integerinput.default_x + 2
+        default_y: pad_brake_integerinput.default_y - 4 - font_size
 
         is_dark_grey: false
+        is_visible: true
     }
 
     INI_integerinput{
-        id: wheel_brake_integerinput
-        objectName: "wheel_brake_integerinput"
+        id: pad_brake_integerinput
+        objectName: "pad_brake_integerinput"
 
-        default_x: 54
-        default_y: 321
-        default_width: 80
-        default_height: 24
+        default_x: brake_data_box.default_x + 1 + (brake_data_box.is_positive)
+        default_y: brake_data_box.default_y + 1 + (brake_data_box.is_positive) + 3 * brake_data_name.font_size - 2
+        default_width: page_rb2.input_width
+        default_height: page_rb2.input_height
 
-        maximum_value: 4e4
+        maximum_value: page_rb2.max_brake_pad
         minimum_value: 0
 
         is_max_default: false
+        is_activable: true
+        is_positive: true
+        is_visible: true
     }
 
     //integerinput pour connaitre le nombre de Patins magnétiques
@@ -892,67 +930,81 @@ Item {
         default_x: magnetic_brake_integerinput.default_x + 2
         default_y: magnetic_brake_integerinput.default_y - 4 - font_size
 
-        is_dark_grey: false
+        is_dark_grey: (axles_per_bogies_integerinput.value <= 1)
+        is_visible: true
     }
 
     INI_integerinput{
         id: magnetic_brake_integerinput
         objectName: "magnetic_brake_integerinput"
 
-        default_x: wheel_brake_integerinput.default_x + 120
-        default_y: wheel_brake_integerinput.default_y
-        default_width: wheel_brake_integerinput.default_width
-        default_height: wheel_brake_integerinput.default_height
+        default_x: pad_brake_integerinput.default_x + page_rb2.x_offset
+        default_y: pad_brake_integerinput.default_y
+        default_width: pad_brake_integerinput.default_width
+        default_height: pad_brake_integerinput.default_height
 
-        maximum_value: 4e4
+        maximum_value: page_rb2.max_brake_magnetic
         minimum_value: 0
 
         is_max_default: false
+        is_activable: (axles_per_bogies_integerinput.value > 1)
+        is_positive: pad_brake_integerinput.is_positive
+        is_visible: true
     }
 
     //checkbutton pour savoir si le freinage par récupération est activé ?
     INI_checkbutton{
-        id: regenerative_checkbutton
-        objectName: "regenerative_checkbutton"
+        id: regenerative_check
+        objectName: "regenerative_check"
 
-        default_x: magnetic_brake_integerinput.default_x + 120
-        default_y: magnetic_brake_integerinput.default_y
-        box_length: magnetic_brake_integerinput.default_height
+        default_x: magnetic_brake_integerinput.default_x + page_rb2.x_offset
+        default_y: magnetic_brake_integerinput.default_y + (page_rb2.input_height - page_rb2.checkbutton_box_length) * 0.5
+        box_length: page_rb2.checkbutton_box_length
 
-        text: "récupération ?"
+        text: "Récupération ?"
 
-        is_checked: true
-        is_activable: true
+        is_checked: false
+        is_activable: pantograph_check.is_checked
         is_positive: true
+
+        onIs_activableChanged: {
+            if(!regenerative_check.is_activable){
+                is_checked = false
+            }
+        }
     }
 
     //integerinput pour connaitre le nombre de disques
     INI_text {
-        id: dic_brake_text
-        objectName: "disc_brake_text"
+        id: disk_brake_text
+        objectName: "disk_brake_text"
 
         text: "Ndisques"
         font_size: 12
 
-        default_x: disc_brake_integerinput.default_x + 2
-        default_y: disc_brake_integerinput.default_y - 4 - font_size
+        default_x: disk_brake_integerinput.default_x + 2
+        default_y: disk_brake_integerinput.default_y - 4 - font_size
 
         is_dark_grey: false
+        is_visible: true
     }
 
     INI_integerinput{
-        id: disc_brake_integerinput
-        objectName: "disc_brake_integerinput"
+        id: disk_brake_integerinput
+        objectName: "disk_brake_integerinput"
 
-        default_x: wheel_brake_integerinput.default_x
-        default_y: wheel_brake_integerinput.default_y + 50
-        default_width: wheel_brake_integerinput.default_width
-        default_height: wheel_brake_integerinput.default_height
+        default_x: pad_brake_integerinput.default_x
+        default_y: pad_brake_integerinput.default_y + page_rb2.y_offset - 4
+        default_width: pad_brake_integerinput.default_width
+        default_height: pad_brake_integerinput.default_height
 
-        maximum_value: 4e4
+        maximum_value: page_rb2.max_brake_disk
         minimum_value: 0
 
         is_max_default: false
+        is_activable: true
+        is_positive: pad_brake_integerinput.is_positive
+        is_visible: true
     }
 
     //integerinput pour connaitre le nombre de systèmes de freinage de fouccault
@@ -966,38 +1018,48 @@ Item {
         default_x: fouccault_brake_integerinput.default_x + 2
         default_y: fouccault_brake_integerinput.default_y - 4 - font_size
 
-        is_dark_grey: false
+        is_dark_grey: (axles_per_bogies_integerinput.value <= 1)
+        is_visible: true
     }
 
     INI_integerinput{
         id: fouccault_brake_integerinput
         objectName: "fouccault_brake_integerinput"
 
-        default_x: magnetic_brake_integerinput.default_x
-        default_y: magnetic_brake_integerinput.default_y + 50
+        default_x: disk_brake_integerinput.default_x + page_rb2.x_offset
+        default_y: disk_brake_integerinput.default_y
         default_width: magnetic_brake_integerinput.default_width
         default_height: magnetic_brake_integerinput.default_height
 
-        maximum_value: 4e4
+        maximum_value: page_rb2.max_brake_foucault
         minimum_value: 0
 
         is_max_default: false
+        is_activable: (axles_per_bogies_integerinput.value > 1)
+        is_positive: disk_brake_integerinput.is_positive
+        is_visible: true
     }
 
     //checkbutton pour savoir si le freinage par récupération est activé ?
     INI_checkbutton{
-        id: dynamic_checkbutton
-        objectName: "dynamic_checkbutton"
+        id: dynamic_check
+        objectName: "dynamic_check"
 
-        default_x: regenerative_checkbutton.default_x
-        default_y: regenerative_checkbutton.default_y + 50
-        box_length: regenerative_checkbutton.box_length
+        default_x: fouccault_brake_integerinput.default_x + page_rb2.x_offset
+        default_y: fouccault_brake_integerinput.default_y + (page_rb2.input_height - page_rb2.checkbutton_box_length) * 0.5
+        box_length: regenerative_check.box_length
 
-        text: "rhéostatique ?"
+        text: "Rhéostatique ?"
 
-        is_checked: true
-        is_activable: true
+        is_checked: false
+        is_activable: motorized_axles_count_integerinput.value != 0
         is_positive: true
+        
+        onIs_activableChanged: {
+            if(!dynamic_check.is_activable){
+                 dynamic_break.is_checked = false
+            }
+        }
     }
 
 
