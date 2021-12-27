@@ -76,7 +76,7 @@ Item{
             body.text = root.is_max_default ? "" : root.maximum_value.toString()
         }
         else {
-            body.text = new_value.toFixed(root.decimals).toString()
+            body.text = (Math.floor(new_value * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)).toString()
         }
 
         if(root.value !== root.previous_value){
@@ -139,7 +139,7 @@ Item{
         readOnly: !root.is_activable
         echoMode: TextInput.Normal
 
-        placeholderText: root.is_max_default ? root.maximum_value.toFixed(root.decimals).toString() : root.minimum_value.toFixed(root.decimals).toString()
+        placeholderText: root.is_max_default ? (Math.floor(root.maximum_value * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)).toString() : (Math.floor(root.minimum_value * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)).toString()
         placeholderTextColor: root.is_dark_grey ? root.dark_grey : root.medium_grey
 
         //rectangle de fond
