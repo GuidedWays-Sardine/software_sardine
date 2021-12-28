@@ -59,7 +59,7 @@ Item {
 
         default_x: 54
         default_y: 38
-        default_width: save.default_x - default_x
+        default_width: save_button.default_x - default_x
         default_height: 26
 
         max_text_length: 48
@@ -817,7 +817,7 @@ Item {
     //checkbutton pour indiquer si le train a des pantographes (en mode simplifié on le considère compatible avec toutes les tensions
     INI_checkbutton{
         id: pantograph_check
-        objectName: pantograph_check
+        objectName: "pantograph_check"
 
         default_x: alimentation_data_box.default_x + 1 + (alimentation_data_box.is_positive)
         default_y: alimentation_data_box.default_y + 1 + (alimentation_data_box.is_positive) + 1.5 * alimentation_data_name.font_size
@@ -842,7 +842,7 @@ Item {
     //checkbutton pour indiquer si le train a un système d'alimentation thermique
     INI_checkbutton{
         id: thermic_check
-        objectName: thermic_check
+        objectName: "thermic_check"
 
         default_x: pantograph_check.default_x + 2 * page_rb2.x_offset
         default_y: pantograph_check.default_y
@@ -1081,16 +1081,16 @@ Item {
         text: "Paramétrage"
         font_size: 12
 
-        default_x: mode.default_x + 2
-        default_y: mode.default_y - 4 - font_size
+        default_x: mode_button.default_x + 2
+        default_y: mode_button.default_y - 4 - font_size
 
-        is_dark_grey: mode.is_activable
+        is_dark_grey: mode_button.is_activable
         is_visible: true
     }
 
     INI_button{
-        id: mode
-        objectName: "mode"
+        id: mode_button
+        objectName: "mode_button"
 
         default_x: 480
         default_y: train_name_stringinput.default_y
@@ -1111,9 +1111,9 @@ Item {
         id: mission_type_combo
         objectName: "mission_type_combo"
 
-        default_x: mode.default_x
+        default_x: mode_button.default_x
         default_y: 65
-        default_width: mode.default_width
+        default_width: mode_button.default_width
         default_height: 50
 
         elements: ["Voyageurs", "Fret"]
@@ -1128,8 +1128,8 @@ Item {
     //Boutons permettant d'ouvrir et d'enregistrer le fichier train
     //Bouton ouvrir
     INI_button{
-        id: open
-        objectName: "open"
+        id: open_button
+        objectName: "open_button"
 
         default_x: mission_type_combo.default_x
         default_y: mission_type_combo.default_y + 2* 50
@@ -1145,13 +1145,13 @@ Item {
 
     //Bouton sauvegarder
     INI_button{
-        id: save
-        objectName: "save"
+        id: save_button
+        objectName: "save_button"
 
-        default_x: open.default_x
-        default_y: open.default_y + 50
-        default_width: open.default_width
-        default_height: open.default_height
+        default_x: open_button.default_x
+        default_y: open_button.default_y + 50
+        default_width: open_button.default_width
+        default_height: open_button.default_height
 
         text: "Sauvegarder"
 
@@ -1167,10 +1167,10 @@ Item {
         id: brake_configuration
         objectName: "brake_configuration"
 
-        default_x: save.default_x
-        default_height: save.default_height
+        default_x: save_button.default_x
+        default_height: save_button.default_height
         default_y: brake_data_box.default_y
-        default_width: save.default_width
+        default_width: save_button.default_width
 
         text: "Configuration\nfreinage"
 

@@ -7,7 +7,7 @@ import sys
 from PyQt5.QtCore import QObject
 
 
-#Librairies SARDINE
+# Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.initialisation.initialisation_window as ini
@@ -15,11 +15,12 @@ import src.misc.settings_dictionary.settings as sd
 import src.misc.translation_dictionary.translation as td
 import src.misc.log.log as log
 
+
 class PageRB1:
     """Classe pour la page de paramètres 1"""
 
     # variables nécessaire au bon fonctionnement de la page
-    index = 1   # Attention dans les tableaux l'index commence à 0
+    index = 1  # Attention dans les tableaux l'index commence à 0
     name = "Général"
     engine = None
     page = None
@@ -211,8 +212,8 @@ class PageRB1:
         self.current_button.setProperty("text", translation_data[self.current_button.property("text")])
 
         # Essaye de traduire chaque textes au dessus des widgets et check_button
-        for widget_id in ["command_board_text", "dmi_text", "log_text", "language_text",
-                          "renard_check", "camera_check", "pcc_check", "data_check", "dashboard_check", "data_save_check"]:
+        for widget_id in ["command_board_text", "dmi_text", "log_text", "language_text", "renard_check", "camera_check",
+                          "pcc_check", "data_check", "dashboard_check", "data_save_check"]:
             widget = self.page.findChild(QObject, widget_id)
             widget.setProperty("text", translation_data[widget.property("text")])
 
@@ -232,12 +233,11 @@ class PageRB1:
                                    }
 
         # Modification du changeur de niveau de log
-        self.next_log_level = \
-            {translation_data[keys[0]]: translation_data[self.next_log_level[keys[0]]],
-             translation_data[keys[1]]: translation_data[self.next_log_level[keys[1]]],
-             translation_data[keys[2]]: translation_data[self.next_log_level[keys[2]]],
-             translation_data[keys[3]]: translation_data[self.next_log_level[keys[3]]]
-             }
+        self.next_log_level = {translation_data[keys[0]]: translation_data[self.next_log_level[keys[0]]],
+                               translation_data[keys[1]]: translation_data[self.next_log_level[keys[1]]],
+                               translation_data[keys[2]]: translation_data[self.next_log_level[keys[2]]],
+                               translation_data[keys[3]]: translation_data[self.next_log_level[keys[3]]]
+                               }
 
         # Change la langue du registre indiqué sur le bouton
         log_button = self.page.findChild(QObject, "log_button")

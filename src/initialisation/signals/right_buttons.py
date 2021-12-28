@@ -68,8 +68,8 @@ class RightButtons:
         if not any(application.is_fully_loaded):
             log.error(f"""Aucune des pages n'a été correctement chargée. Les valeurs par défaut seront utilisés.
                       \t\tSeuls les boutons quitter et lancer sont fonctionnels.\n""")
-            application.win.findChild(QObject, "save").setProperty("is_visible", False)
-            application.win.findChild(QObject, "open").setProperty("is_visible", False)
+            application.win.findChild(QObject, "save_button").setProperty("is_visible", False)
+            application.win.findChild(QObject, "open_button").setProperty("is_visible", False)
 
     def initialise_page(self, application, engine, index, page_path, current_button):
         """Fonction permettant d'initialiser une des pages de l'application d'initialisation lié à un bouton de droite.
