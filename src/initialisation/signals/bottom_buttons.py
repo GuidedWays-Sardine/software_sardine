@@ -32,13 +32,13 @@ class BottomButtons:
         log.info("Tentative de chargement des boutons inférieurs.\n")
 
         # Boutons quitter/lancer (obligatoires pour le lancement de l'application)
-        application.win.findChild(QObject, "quit").clicked.connect(lambda: self.on_quit_clicked(application))
-        application.win.findChild(QObject, "launch").clicked.connect(lambda: self.on_launch_clicked(application))
+        application.win.findChild(QObject, "quit_button").clicked.connect(lambda: self.on_quit_clicked(application))
+        application.win.findChild(QObject, "launch_button").clicked.connect(lambda: self.on_launch_clicked(application))
 
         # Boutons sauvegarder/ouvrir (non obligatoire pour le lancement de l'application)
         try:
-            application.win.findChild(QObject, "open").clicked.connect(lambda: self.on_open_clicked(application))
-            application.win.findChild(QObject, "save").clicked.connect(lambda: self.on_save_clicked(application))
+            application.win.findChild(QObject, "open_button").clicked.connect(lambda: self.on_open_clicked(application))
+            application.win.findChild(QObject, "save_button").clicked.connect(lambda: self.on_save_clicked(application))
         except Exception as error:
             log.warning(f"Problème lors du chargement du signal du bouton sauvegarder ou ouvrir.\n",
                         exception=error)
@@ -165,7 +165,7 @@ class BottomButtons:
             dictionaire contenant les traductions
         """
         # Pour chaque boutons : récupère le texte, prend sa traduction dans translation_data et change son texte
-        for button_id in ["quit", "launch", "open", "save"]:
+        for button_id in ["quit_button", "launch_button", "open_button", "save_button"]:
             # Récupère le bouton associé à l'id et change son texte
             button = application.win.findChild(QObject, button_id)
             button.setProperty("text", translation_data[button.property("text")])
