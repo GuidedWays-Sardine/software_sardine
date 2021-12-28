@@ -90,8 +90,8 @@ class SettingsDictionary(dict):
         try:
             page.findChild(QObject, widget_id).setProperty(property, self[key])
         except KeyError:
-            log.debug(f"""Impossible de changer le paramètre : {property} du composant {widget_id}
-                      \t\tPas de valeurs pour le paramètre : {key} dans le fichier ouvert.\n""")
+            log.debug(f"Impossible de changer le paramètre : {property} du composant {widget_id}\n" +
+                      f"\t\tPas de valeurs pour le paramètre : {key} dans le fichier ouvert.\n")
 
     def save(self, path):
         """Méthode permettant de sauvegarder les paramètres dans un fichier
@@ -108,7 +108,7 @@ class SettingsDictionary(dict):
                     file.write(f"{key};{self[key]}\n")
         except Exception as error:
             # Cas où le fichier ouvert n'est pas accessible
-            log.warning(f"Impossible d'enregistrer le fichier : {path}.\n",
+            log.warning(f"Impossible d'enregistrer le fichier : {path}\n",
                         exception=error, prefix="dictionaire de données")
 
     def open(self, path):
@@ -138,7 +138,7 @@ class SettingsDictionary(dict):
 
         except Exception as error:
             # Cas où le fichier ouvert n'existe pas ou qu'il n'est pas accessible
-            log.warning(f"Impossible d'ouvrir le fichier : {path}.\n",
+            log.warning(f"Impossible d'ouvrir le fichier : {path}\n",
                         exception=error, prefix="dictionaire de données")
         else:
             # Indique en debug le nombre d'éléments récupérés

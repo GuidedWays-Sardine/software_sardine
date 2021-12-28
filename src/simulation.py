@@ -32,7 +32,7 @@ class Simulation:
 
     # Informations sur la mise à jour, utile surtout du point de vue pratique et debug
     update_count = 0
-    update_average_time = 0
+    update_average_time = 0     # s
 
     #Différentes bases de données utiles au fonctionnement du simulateur
     train_database = None
@@ -150,7 +150,7 @@ class Simulation:
                     else:
                         # Sinon laisse un message de debug pour inciter à l'optimisation du code ou au changement du délai
                         log.debug(f"Attention mise à jour de l'application en {(update_time * 1000):.2f} millisecondes" +
-                                  f"ms, au lieu des {self.DELAY * 1000:.2f} millisecondes demandées.\n" +
+                                  f"ms, au lieu des {(self.DELAY * 1000):.2f} millisecondes demandées.\n" +
                                   "\t\tPrévoir une optimisation du code ou un délai plus long si le soucis persiste.\n",
                                   prefix="simulation : update()")
 
@@ -167,7 +167,7 @@ class Simulation:
         log.info("Fermeture de l'initialisation de la simulation.\n\n")
 
         # Indique le nombre de mises à jours réussies et le temps moyen de mise à jour
-        log.info(f"Simulation mises à jour {self.update_count} fois avec un temps moyen de {self.update_average_time}.\n")
+        log.info(f"Simulation mises à jour {self.update_count} fois avec un temps moyen de {(self.update_average_time * 1000):.2f} millisecondes.\n")
 
         # Appelle les différentes fonctions de fermetures
         # FEATURE : ajouter les différents appels de fonctions de fermetures ici

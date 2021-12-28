@@ -68,7 +68,7 @@ class LineGenerator:
         # Vérifie que la ligne qu'on essaye de charger existe, sinon arrête le chargement de la ligne
         line_name = list(self.lines.df.loc[self.lines.df["CODE_LIGNE"] == line_code, "LIB_LIGNE"])
         if not line_name:
-            log.warning(f"Aucune ligne existance avec le code_ligne : {line_code}.\n\n")
+            log.warning(f"Aucune ligne existance avec le code_ligne : {line_code}\n\n")
             return
         else:
             # Sinon indique le nom et les informations clés de la ligne en question

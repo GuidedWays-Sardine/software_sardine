@@ -25,7 +25,7 @@ class TranslationDictionary(dict):
         if isinstance(key, str):
             super(TranslationDictionary, self).__setitem__(key.lower(), value)
         else:
-            log.debug(f"la clé : {key}, n'est pas de type string : {type(key)}.\n")
+            log.debug(f"la clé : {key}, n'est pas de type string : {type(key)}\n")
 
     def __getitem__(self, key):
         """Opérateur value = self["key"] permettant de lire des valeurs du dictionnaire de traduction
@@ -43,7 +43,7 @@ class TranslationDictionary(dict):
         try:
             return super(TranslationDictionary, self).__getitem__(key.lower())
         except KeyError:
-            log.debug(f"Aucune traduction pour : {key}.\n")
+            log.debug(f"Aucune traduction pour : {key}\n")
             return key
 
     def create_translation(self, file_path, current_language, new_language):
@@ -95,7 +95,7 @@ class TranslationDictionary(dict):
                                   prefix="dictionaire de traduction")
         except Exception as error:
             # Cas où le fichier ouvert n'est pas accessible
-            log.warning(f"Impossible d'ouvrir le fichier de traduction : {file_path}.\n",
+            log.warning(f"Impossible d'ouvrir le fichier de traduction : {file_path}\n",
                         exception=error,  prefix="dictionaire de traduction")
         else:
             # Indique en debug le nombre d'éléments récupérées

@@ -53,7 +53,7 @@ class RightButtons:
             current_button = self.right_buttons.findChild(QObject, f"rb{index}")
 
             initial_time = time.perf_counter()
-            log.info(f"Tentative du chargement de la page {index}.\n")
+            log.info(f"Tentative du chargement de la page_rb{index}.\n")
 
             # Essaye d'initialiser la page et si elle est correctement initialisé, tente de charger les signals
             if self.initialise_page(application, engine, index, page_path, current_button):
