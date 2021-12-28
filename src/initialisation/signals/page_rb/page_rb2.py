@@ -25,6 +25,10 @@ class PageRB2:
     page = None
     current_button = None
 
+    #Variables utiles au fonctionnement de la page:
+    mode_switch = {"Simple": "Complexe",
+                   "Complexe": "Simple"}
+
     def __init__(self, application, engine, index, current_button):
         """Fonction d'initialisation de la page de paramtètres 1 (page paramètres général)
 
@@ -45,3 +49,73 @@ class PageRB2:
         self.current_button.setProperty("text", self.name)
         self.page = engine.rootObjects()[0]
         self.engine = engine
+
+    def get_values(self, translation_data):
+        """Récupère les paramètres de la page de paramètres page_rb1
+
+        Parameters
+        ----------
+        translation_data: `td.TranslationDictionary`
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
+
+        Returns
+        -------
+        parameters : `sd.SettingsDictionary`
+            un dictionaire de paramètres de la page de paramètres page_rb1
+        """
+        page_parameters = sd.SettingsDictionary()
+
+
+
+        return page_parameters
+
+    def set_values(self, data, translation_data):
+        """A partir d'un dictionnaire de valeur, essaye de changer les settings des différentes pages
+
+        Parameters
+        ----------
+        data: `sd.SettingsDictionary`
+            Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
+        translation_data: `td.TranslationDictionary`
+            Un dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
+        """
+        pass
+
+    def change_language(self, translation_data):
+        """Permet à partir d'un dictionaire de traduction, de traduire les textes de la page de paramètres
+
+        Parameters
+        ----------
+        translation_data: `td.TranslationDictionary`
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitiv
+        """
+        # Traduit le nom de la catégorie
+        self.current_button.setProperty("text", translation_data[self.current_button.property("text")])
+
+        # Traduit le placeholder texte pour le stringinput du nom du train
+        widget = self.page.findChild(QObject, "train_name_stringinput")
+        widget.setProperty("placeholder_text", translation_data[widget.property("placeholder_text")])
+
+        # Essaye de traduire chaque textes au dessus des widgets et check_button
+        for widget_id in ["train_name_text",  "general_data_name", "weight_text", "length_text", "coaches_text",
+                          "bogies_count_text", "axles_per_bogies_text", "motorized_axles_count_text", "axle_power_text",
+                          "motorized_axle_weight_text", "power_text", "dynamic_data_name", "alimentation_data_name",
+                          "pantograph_check", "thermic_check", "brake_data_name", "pad_brake_text",
+                          "magnetic_brake_text", "regenerative_check", "disk_brake_text", "fouccault_brake_text",
+                          "dynamic_check", "mode_text", "open_button", "save_button", "brake_configuration"]:
+            widget = self.page.findChild(QObject, widget_id)
+            widget.setProperty("text", translation_data[widget.property("text")])
+
+        # Traduction pour les modes de paramétrages (simple et complex) (mode_switch et texte du bouton)
+        keys = list(self.mode_switch)
+        self.mode_switch = {translation_data[keys[0]]: translation_data[self.mode_switch[keys[0]]],
+                            translation_data[keys[1]]: translation_data[self.mode_switch[keys[1]]]
+                            }
+        mode_button = self.page.findChild(QObject, "mode_button")
+        mode_button.setProperty("text", translation_data[mode_button.property("text")])
+
+        # Traduction de la combobox des différents types de trains
+        widget = self.page.findChild(QObject, "mission_type_combo")
+        selection_index = widget.property("selection_index")
+        widget.setProperty("elements", list(translation_data[e] for e in widget.property("elements").toVariant()))
+        widget.change_selection(selection_index)
