@@ -287,9 +287,9 @@ class PageRB8:
         self.page.setProperty("screen_list", screen_list)
 
         # Pour chaque catégories
-        for category_key in self.screen_default:
+        for category_key in list(self.screen_default):
             # Pour chaque écrans de chaques catégories
-            for screen_key in self.screen_default[category_key]:
+            for screen_key in list(self.screen_default[category_key]):
                 # Traduit la clé d'écran pour le dictionaire de paramètres choisis et de paramètres par défaut
                 self.screen_default[category_key][translation_data[screen_key]] = self.screen_default[category_key][screen_key]
                 self.screen_settings[category_key][translation_data[screen_key]] = self.screen_settings[category_key][screen_key]
