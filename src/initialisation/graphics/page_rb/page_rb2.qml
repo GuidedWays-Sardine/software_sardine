@@ -13,7 +13,7 @@ Item {
     readonly property double max_weight: 1e9            //t
     readonly property double max_length: 1e9            //mf
     readonly property int max_coaches: 1e3
-    readonly property int max_bogies: 1e3
+    readonly property int max_bogies: 2 * coaches_integerinput.value
     readonly property int max_axles_per_bogies: 1e1
     readonly property double max_motor_power: 1e6       //kW
     readonly property double max_power: max_motor_power * motorized_axles_count_integerinput.value      //NE PAS CHANGER
@@ -262,9 +262,9 @@ Item {
         default_height: weight_floatinput.default_height
 
         maximum_value: page_rb2.max_bogies
-        minimum_value: 1
+        minimum_value: 2
 
-        is_max_default: false
+        is_max_default: true
         is_positive: false
         is_activable: true
         is_visible: true
@@ -379,7 +379,7 @@ Item {
         text: "masse/essieu moteur"
         font_size: 12
 
-        is_dark_grey: false
+        is_dark_grey: motorized_axles_count_integerinput.value == 0
         is_visible: true
     }
 
@@ -393,7 +393,7 @@ Item {
         text: "t"
         font_size: 6
 
-        is_dark_grey: motorized_axles_count_integerinput.value == 0
+        is_dark_grey: true
         is_visible: true
     }
 
