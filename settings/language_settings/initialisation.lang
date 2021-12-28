@@ -39,6 +39,47 @@ Sauvegarder les données ?; Save data ?
 
 
 
+#page_rb2
+Train;Train
+
+Configuration du train;Train configuration
+Nom du train(utilisé pour le nom du fichier);Train name(used for the file name)
+
+Informations générales;General informations
+Mconvoi;Mconvoy
+Lconvoi;Lconvoy
+Nvoitures;Ncoaches
+Nbogies;Nbogies
+Nessieux/bogies;Naxles/bogies
+Nessieux moteurs;Nmotorized axles
+masse/essieu moteur;weight/axle
+Pmoteur;Pmotor
+Ptrain;Ptrain
+
+Dynamique du train (Rav);Train's dynamic(Rav)
+
+Systèmes d'alimentation;Alimentation systems
+Pantographe ?;Pantograph ?
+Thermique ?;Thermic ?
+
+Systèmes de freinage;Braking systems
+Nplaquettes;Npads
+Npatins magnétiques;Nmagnetic brakes
+Récupération ?;Regenerative brake?
+Ndisques;Ndisks
+Nfouccault;Nfouccault
+Rhéostatique ?; Dynamic brake?
+
+Paramétrage;Configuration
+Simple;Simple
+Complexe;Complex
+Voyageurs;Passengers
+Fret;Freight
+Sauvegarder;Save
+Configuration\nfreinage;Braking\nconfiguration
+
+
+
 #page_rb8
 Écrans;Screens
 
@@ -67,4 +108,3 @@ Insuffisance/Excès de dévers;Cant deficiency/excess
 Diagramme Effort-Vitesse;Effort-Speed Diagram
 Puissance (traction/freinage);Power (traction/braking)
 Courbes de freinage (EVC);Braking curves (EVC)
-
