@@ -7,7 +7,16 @@ import os
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src\\")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 
-class static:
+class Static:
+
+    A = 0
+    B = 0
+    C = 0
+    MuO = 0
+    k = 0
+    type = 0
+
+
     def __init__(self):
         self.A = 0
         self.B = 0

@@ -1,7 +1,7 @@
 # Librairies par défaut python
 import sys
 import os
-import Dynamic.dynamic_data
+import Dynamic.dynamic
 
 
 # Librairies SARDINE
@@ -10,13 +10,21 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
 
 
+import src.train.train_database.Dynamic.dynamic as dynamic
+import src.train.train_database.Static.static as static
+import src.train.train_database.System.system as system
+
 class TrainDatabase:
     # Données du train
 
+    dynamic = None
+    static = None
+    system = None
+
+    def __init__(self):
+        self.dynamic = dynamic.Dynamic()
+        self.static = static.Static()
+        self.system = system.System()
 
 
-    # TODO : travailler la structure et rajouter tous les
 
-
-    def __init__(self, train_data):
-        pass
