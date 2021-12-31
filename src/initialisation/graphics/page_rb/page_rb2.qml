@@ -8,6 +8,9 @@ Item {
     objectName: "page_rb2"
 
 
+    //Information permettant de savoir si le mode complex a été activé
+    property bool generated: false
+
 
     //Constantes permettant de controller les différentes valeurs maximales de chacun des trains
     readonly property double max_weight: 1e9            //t
@@ -96,7 +99,7 @@ Item {
         text: "Informations générales"
         font_size: 12
 
-        is_dark_grey: false
+        is_dark_grey: page_rb2.generated
         is_visible: true
     }
 
@@ -114,7 +117,7 @@ Item {
         default_x: weight_floatinput.default_x + 2
         default_y: weight_floatinput.default_y - 4 - font_size
 
-        is_dark_grey: false
+        is_dark_grey: page_rb2.generated
         is_visible: true
     }
 
@@ -146,7 +149,7 @@ Item {
         decimals: 3
 
         is_max_default: false
-        is_activable: true
+        is_activable: !page_rb2.generated
         is_positive: false
         is_visible: true
     }
@@ -163,7 +166,7 @@ Item {
         default_x: length_floatinput.default_x + 2
         default_y: length_floatinput.default_y - 4 - font_size
 
-        is_dark_grey: false
+        is_dark_grey: page_rb2.generated
         is_visible: true
     }
 
@@ -195,7 +198,7 @@ Item {
         decimals: 3
 
         is_max_default: false
-        is_activable: true
+        is_activable: !page_rb2.generated
         is_positive: false
         is_visible: true
     }
@@ -212,7 +215,7 @@ Item {
         default_x: coaches_integerinput.default_x + 2
         default_y: coaches_integerinput.default_y - 4 - font_size
 
-        is_dark_grey: false
+        is_dark_grey: page_rb2.generated
         is_visible: true
     }
 
@@ -229,7 +232,7 @@ Item {
         minimum_value: 1
 
         is_max_default: false
-        is_activable: true
+        is_activable: !page_rb2.generated
         is_positive: false
         is_visible: true
     }
@@ -248,7 +251,7 @@ Item {
         text: "Nbogies"
         font_size: 12
 
-        is_dark_grey: false
+        is_dark_grey: page_rb2.generated
         is_visible: true
     }
 
@@ -265,8 +268,8 @@ Item {
         minimum_value: 2
 
         is_max_default: true
+        is_activable: !page_rb2.generated
         is_positive: false
-        is_activable: true
         is_visible: true
     }
 
@@ -281,7 +284,7 @@ Item {
         text: "Nessieux/bogies"
         font_size: 12
 
-        is_dark_grey: false
+        is_dark_grey: page_rb2.generated
         is_visible: true
     }
 
@@ -298,8 +301,8 @@ Item {
         minimum_value: 1
 
         is_max_default: false
+        is_activable: !page_rb2.generated
         is_positive: false
-        is_activable: true
         is_visible: true
     }
 
@@ -314,7 +317,7 @@ Item {
         default_x: motorized_axles_count_integerinput.default_x + 2
         default_y: motorized_axles_count_integerinput.default_y - 4 - font_size
 
-        is_dark_grey: false
+        is_dark_grey: page_rb2.generated
         is_visible: true
     }
 
@@ -332,7 +335,7 @@ Item {
         minimum_value: 0
 
         is_max_default: false
-        is_activable: true
+        is_activable: !page_rb2.generated
         is_positive: false
         is_visible: true
 
@@ -379,7 +382,7 @@ Item {
         text: "masse/essieu moteur"
         font_size: 12
 
-        is_dark_grey: motorized_axles_count_integerinput.value == 0
+        is_dark_grey: motorized_axles_count_integerinput.value == 0 || page_rb2.generated
         is_visible: true
     }
 
@@ -420,7 +423,7 @@ Item {
 
         is_max_default: false
         is_positive: false
-        is_activable: motorized_axles_count_integerinput.value != 0
+        is_activable: motorized_axles_count_integerinput.value != 0 && !page_rb2.generated
         is_visible: true
     }
 
@@ -435,7 +438,7 @@ Item {
         default_x: axle_power_floatinput.default_x + 2
         default_y: axle_power_floatinput.default_y - 4 - font_size
 
-        is_dark_grey: motorized_axles_count_integerinput.value == 0
+        is_dark_grey: motorized_axles_count_integerinput.value == 0 || page_rb2.generated
         is_visible: true
     }
 
@@ -472,7 +475,7 @@ Item {
         decimals: 3
 
         is_max_default: false
-        is_activable: motorized_axles_count_integerinput.value != 0
+        is_activable: motorized_axles_count_integerinput.value != 0 && !page_rb2.generated
         is_positive: false
         is_visible: true
 
@@ -501,7 +504,7 @@ Item {
         default_x: power_floatinput.default_x + 2
         default_y: power_floatinput.default_y - 4 - font_size
 
-        is_dark_grey: motorized_axles_count_integerinput.value == 0
+        is_dark_grey: motorized_axles_count_integerinput.value == 0 || page_rb2.generated
         is_visible: true
     }
 
@@ -538,7 +541,7 @@ Item {
         decimals: 3
 
         is_max_default: false
-        is_activable: motorized_axles_count_integerinput.value != 0
+        is_activable: motorized_axles_count_integerinput.value != 0 && !page_rb2.generated
         is_positive: false
         is_visible: true
 
@@ -588,7 +591,7 @@ Item {
         text: "Dynamique du train (Rav)"
         font_size: 12
 
-        is_dark_grey: false
+        is_dark_grey: page_rb2.generated
         is_visible: true
     }
 
@@ -605,7 +608,7 @@ Item {
         default_x: a_floatinput.default_x + 2
         default_y: a_floatinput.default_y - 4 - font_size
 
-        is_dark_grey: false
+        is_dark_grey: page_rb2.generated
         is_visible: true
     }
 
@@ -637,7 +640,7 @@ Item {
         decimals: page_rb2.abc_decimals
 
         is_max_default: false
-        is_activable: true
+        is_activable: !page_rb2.generated
         is_positive: false
         is_visible: true
     }
@@ -652,7 +655,7 @@ Item {
         default_x: (a_floatinput.default_x + a_floatinput.default_width + b_floatinput.default_x - default_text_width) * 0.5
         default_y: a_floatinput.default_y + (a_floatinput.default_height - font_size) * 0.5 - 4
 
-        is_dark_grey: false
+        is_dark_grey: page_rb2.generated
         is_visible: true
     }
 
@@ -808,7 +811,7 @@ Item {
         text: "Systèmes d'alimentation"
         font_size: 12
 
-        is_dark_grey: motorized_axles_count_integerinput.value == 0
+        is_dark_grey: motorized_axles_count_integerinput.value == 0 || page_rb2.generated
         is_visible: true
     }
 
@@ -826,7 +829,7 @@ Item {
         text: "Pantographe ?"
 
         is_checked: false
-        is_activable: motorized_axles_count_integerinput.value != 0
+        is_activable: motorized_axles_count_integerinput.value != 0 && !page_rb2.generated
         is_positive: true
         is_visible: true
 
@@ -851,7 +854,7 @@ Item {
         text: "Thermique ?"
 
         is_checked: false
-        is_activable: motorized_axles_count_integerinput.value != 0
+        is_activable: motorized_axles_count_integerinput.value != 0 && !page_rb2.generated
         is_positive: pantograph_check.is_positive
         is_visible: true
 
@@ -890,7 +893,7 @@ Item {
         text: "Systèmes de freinage"
         font_size: 12
 
-        is_dark_grey: false
+        is_dark_grey: page_rb2.generated
         is_visible: true
     }
 
@@ -906,7 +909,7 @@ Item {
         default_x: pad_brake_integerinput.default_x + 2
         default_y: pad_brake_integerinput.default_y - 4 - font_size
 
-        is_dark_grey: false
+        is_dark_grey: page_rb2.generated
         is_visible: true
     }
 
@@ -923,7 +926,7 @@ Item {
         minimum_value: 0
 
         is_max_default: false
-        is_activable: true
+        is_activable: !page_rb2.generated
         is_positive: false
         is_visible: true
     }
@@ -939,7 +942,7 @@ Item {
         default_x: magnetic_brake_integerinput.default_x + 2
         default_y: magnetic_brake_integerinput.default_y - 4 - font_size
 
-        is_dark_grey: (axles_per_bogies_integerinput.value <= 1)
+        is_dark_grey: (axles_per_bogies_integerinput.value <= 1) || page_rb2.generated
         is_visible: true
     }
 
@@ -956,7 +959,7 @@ Item {
         minimum_value: 0
 
         is_max_default: false
-        is_activable: (axles_per_bogies_integerinput.value > 1)
+        is_activable: (axles_per_bogies_integerinput.value > 1) && !page_rb2.generated
         is_positive: pad_brake_integerinput.is_positive
         is_visible: true
     }
@@ -973,7 +976,7 @@ Item {
         text: "Récupération ?"
 
         is_checked: false
-        is_activable: pantograph_check.is_checked
+        is_activable: pantograph_check.is_checked && !page_rb2.generated
         is_positive: true
 
         onIs_activableChanged: {
@@ -994,7 +997,7 @@ Item {
         default_x: disk_brake_integerinput.default_x + 2
         default_y: disk_brake_integerinput.default_y - 4 - font_size
 
-        is_dark_grey: false
+        is_dark_grey: page_rb2.generated
         is_visible: true
     }
 
@@ -1011,7 +1014,7 @@ Item {
         minimum_value: 0
 
         is_max_default: false
-        is_activable: true
+        is_activable: !page_rb2.generated
         is_positive: pad_brake_integerinput.is_positive
         is_visible: true
     }
@@ -1027,7 +1030,7 @@ Item {
         default_x: fouccault_brake_integerinput.default_x + 2
         default_y: fouccault_brake_integerinput.default_y - 4 - font_size
 
-        is_dark_grey: (axles_per_bogies_integerinput.value <= 1)
+        is_dark_grey: (axles_per_bogies_integerinput.value <= 1) || page_rb2.generated
         is_visible: true
     }
 
@@ -1044,7 +1047,7 @@ Item {
         minimum_value: 0
 
         is_max_default: false
-        is_activable: (axles_per_bogies_integerinput.value > 1)
+        is_activable: (axles_per_bogies_integerinput.value > 1) && !page_rb2.generated
         is_positive: disk_brake_integerinput.is_positive
         is_visible: true
     }
@@ -1061,7 +1064,7 @@ Item {
         text: "Rhéostatique ?"
 
         is_checked: false
-        is_activable: motorized_axles_count_integerinput.value != 0
+        is_activable: motorized_axles_count_integerinput.value != 0 && !page_rb2.generated
         is_positive: true
         
         onIs_activableChanged: {
@@ -1119,7 +1122,7 @@ Item {
         elements: ["Voyageurs", "Fret"]
 
         is_positive: true
-        is_activable: true
+        is_activable: !page_rb2.generated
         is_visible: true
     }
 
