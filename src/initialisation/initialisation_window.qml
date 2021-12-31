@@ -9,7 +9,7 @@ Window {
     id: window
     minimumWidth: 640
     minimumHeight: 480
-    visible: true
+    visible: false
     color: "#031122"
     title: "Initialisation Sardine"
 
