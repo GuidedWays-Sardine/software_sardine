@@ -60,4 +60,47 @@ Window{
         is_positive: true
         is_visible: complex_popup.generated
     }
+
+    // Série de textes permettant d'indiquer le fonctionnement de la génération du train
+    INI_text {
+        id: generate_l1
+        objectName: "generate_l1"
+
+        default_x: 54
+        default_y: 65
+
+        text: "Avant de générer le fichier il est important de compléter le paramétrage simple."
+        font_size: 12
+
+        is_dark_grey: false
+        is_visible: !complex_popup.generated
+    }
+
+    INI_text {
+        id: generate_l2
+        objectName: "generate_l2"
+
+        default_x: generate_l1.default_x
+        default_y: generate_l1.default_y + 2 * font_size
+
+        text: "Une fois le train générer, il sera impossible ou long de changer certains paramètres."
+        font_size: general_l1.font_size
+
+        is_dark_grey: false
+        is_visible: !complex_popup.generated
+    }
+
+    INI_text {
+        id: generate_l3
+        objectName: "generate_l3"
+
+        default_x: generate_l2.default_x + 2 * font_size
+        default_y: generate_l2.default_y + font_size
+
+        text: "(nombre de voitures et type du train)"
+        font_size: general_l2.font_size
+
+        is_dark_grey: false
+        is_visible: !complex_popup.generated
+    }
 }
