@@ -69,6 +69,41 @@ class PageRB2:
         self.page = engine.rootObjects()[0]
         self.engine = engine
 
+        # Commence par associer chaque widget à son widget_id (permettant une optimisation surtout en mode complex) :
+        for widget_id in ["weight_floatinput", "length_floatinput", "coaches_integerinput",
+                          "bogies_count_integerinput", "axles_per_bogies_integerinput", "motorized_axles_count_integerinput",
+                          "motorized_axle_weight_floatinput", "axle_power_floatinput", "power_floatinput",
+                          "a_floatinput", "b_floatinput", "c_floatinput",
+                          "pad_brake_integerinput", "magnetic_brake_integerinput",
+                          "disk_brake_integerinput", "fouccault_brake_integerinput"]:
+            self.valueinput[widget_id] = self.page.findChild(QObject, widget_id)
+
+        # Initialise la combobox avec les types de trains
+        # TODO : importer complex data et utiliser les valeurs dans mission_type
+
+        # Initialise la popup de paramétrage complex
+        self.complex_popup = complex.ComplexPopup(self)
+
+        # Si la fenêtre a été chargée
+        if self.complex_popup.loaded:
+            # Rend le bouton mode_button activable et le connecte à son signal
+            mode_button = self.page.findChild(QObject, "mode_button")
+            mode_button.setProperty("is_activable", True)
+            mode_button.clicked.connect(self.on_mode_button_clicked)
+        else:
+            # Rend le bouton mode_button non activabl
+            self.page.findChild(QObject, "mode_button").setProperty("is_activable", False)
+
+        # Connecte le bouton ouvrir et sauvegarder (d'un fichier de paramètres de train
+        self.page.findChild(QObject, "open_button").clicked.connect(self.on_open_button_clicked)
+        self.page.findChild(QObject, "save_button").clicked.connect(self.on_save_button_clicked)
+
+        # Connecte le bouton de configuration de freinage
+        #TODO : le connecter et créer la popup de freinage
+
+        # Définit la page comme validée (toutes les valeurs par défaut suffisent)
+        application.is_completed_by_default[self.index - 1] = "is_page_valid" not in dir(self)
+
     def get_values(self, translation_data):
         """Récupère les paramètres de la page de paramètres page_rb1
 
@@ -149,3 +184,26 @@ class PageRB2:
         """
         # Retourne vrai si le nom du fichier a été complété (autre variables complétés par défaut)
         return self.page.findChild(QObject, "train_name_stringinput").property("text")
+
+    def on_mode_button_clicked(self):
+        """signal appelé lorsque le bouton du choix du mode de paramétrage est cliqué.
+        S'occupe ou non d'afficher et de cacher la fenêtre de popup"""
+        mode_button = self.page.findChild(QObject, "mode_button")
+
+        # Inverse le mode du bouton
+        mode_button.setProperty("text", self.mode_switch[mode_button.property("text")])
+
+        # Distingue deux cas : quand le mode est passé en mode complexe et en mode simple
+        if mode_button.property("text") == list(self.mode_switch.keys())[1]:    # Mode complexe activé
+            # Si la fenêtre de paramètres complex existe, la montrer (une page permettant de générer
+            if self.complex_popup.loaded:
+                self.complex_popup.win.show()
+                self.complex_popup.win.setProperty("generated", (self.current_mode == self.Mode.COMPLEX))
+        else:       # Mode simple activé
+            # Si  la popup complex existe, la cache et dégénère les paramètres complexe
+            if self.complex_popup.loaded:
+                self.complex_popup.win.hide()
+                self.complex_popup.win.setProperty("generated", False)
+                self.page.setProperty("generated", False)
+
+                # TODO : réinitialiser les données
