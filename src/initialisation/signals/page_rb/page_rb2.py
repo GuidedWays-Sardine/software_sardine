@@ -159,6 +159,7 @@ class PageRB2:
                           "dynamic_check", "mode_text", "open_button", "save_button", "brake_configuration"]:
             widget = self.page.findChild(QObject, widget_id)
             widget.setProperty("text", translation_data[widget.property("text")])
+            #FIXME : voir pour la traduction de la configuration freinage (contenant \n)
 
         # Traduction pour les modes de paramétrages (simple et complex) (mode_switch et texte du bouton)
         keys = list(self.mode_switch)
@@ -184,6 +185,74 @@ class PageRB2:
         """
         # Retourne vrai si le nom du fichier a été complété (autre variables complétés par défaut)
         return self.page.findChild(QObject, "train_name_stringinput").property("text")
+
+    def on_save_button_clicked(self):
+        """Signal activé lorsque le bouton sauvegardé (de la page de paramètres train) est activé.
+        Demande à l'utilisateur de confirmer le nom du fichier, puis le sauvegarde
+        """
+        # Commence par créer le chemin vers le fichier
+        train_name_widget = self.page.findChild(QObject, "train_name_stringinput")
+        file_name = train_name_widget.property("text")
+        file_name += ".train" if file_name and not file_name.lower().endswith(".train") else ""
+
+        # Ouvre la boite de dialoque pour confirmer l'enregistrement du fichier
+        file_path = QFileDialog.getSaveFileName(caption="Sauvegarder un fichier de configuration train",
+                                                directory=f"{PROJECT_DIR}settings\\train_settings\\{file_name}",
+                                                filter="Fichiers de configuration train (*.train)")
+        if file_path[0] != "":
+            print(file_path)
+
+            # Dans le cas où le nom du fichier a été changé à la sauvegarder, récupère le nouveau nom de fichier
+            file_name = file_path[0].rsplit("/", maxsplit=1)[1][:-6]
+            train_name_widget.change_text(file_name)
+
+            # Sauvegarde le fichier de paramètres train
+            self.save_train_data_file(file_path[0])
+
+    def save_train_data_file(self, file_path):
+        """Fonction permettant de sauvegarder les données du train"""
+        train_parameters = sd.SettingsDictionary()
+
+        # Commence par ajouter le mode de paramétrage
+        train_parameters["mode"] = str(self.current_mode)
+
+        # Ajoute les paramètres simples (à ajouter même en mode complex)
+        train_parameters.update(self.get_simple_mode_values())
+
+        # Si le mode complexe est activé, sauvegarde aussi les données complexes
+        if self.current_mode == self.Mode.COMPLEX:
+            train_parameters.update(self.complex_popup.get_complex_mode_values())
+
+        train_parameters.save(file_path)
+
+    def get_simple_mode_values(self):
+        """Fonction permettant de récupérer toutes les informations de la configuration simple
+
+        Returns
+        ----------
+        train_parameters: `sd.SettingsDictionary`
+            Dictionaire de paramètre avec tous les paramètres simples du train
+        """
+        parameters = sd.SettingsDictionary()
+
+        initial_time = time.perf_counter()
+
+        # Récupère chacune des données stockées dans un floatinput ou integerinput
+        for widget_id in ["weight_floatinput", "length_floatinput", "coaches_integerinput",
+                          "bogies_count_integerinput", "axles_per_bogies_integerinput", "motorized_axles_count_integerinput",
+                          "motorized_axle_weight_floatinput", "axle_power_floatinput", "power_floatinput",
+                          "a_floatinput", "b_floatinput", "c_floatinput",
+                          "pad_brake_integerinput", "magnetic_brake_integerinput",
+                          "disk_brake_integerinput", "fouccault_brake_integerinput"]:
+            parameters[widget_id.rsplit("_", maxsplit=1)[0]] = self.valueinput[widget_id].property("value")
+
+        # Récupère chacune des données stockées dans un checkbutton
+        for widget_id in ["regenerative_check", "dynamic_check", "pantograph_check", "thermic_check"]:
+            parameters[widget_id.replace("_check", "")] = self.page.findChild(QObject, widget_id).property("is_checked")
+
+        print((time.perf_counter() - initial_time) * 1000)
+
+        return parameters
 
     def on_mode_button_clicked(self):
         """signal appelé lorsque le bouton du choix du mode de paramétrage est cliqué.
