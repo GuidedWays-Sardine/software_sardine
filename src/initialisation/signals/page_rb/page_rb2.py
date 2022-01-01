@@ -15,7 +15,8 @@ from PyQt5.QtWidgets import QFileDialog
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.initialisation.initialisation_window as ini
-import src.initialisation.signals.page_rb.pagerb2.complex_popup as complex
+import src.initialisation.signals.page_rb.pagerb2.complex_popup as cp
+import src.initialisation.signals.page_rb.pagerb2.complex_data as cd
 import src.misc.settings_dictionary.settings as sd
 import src.misc.translation_dictionary.translation as td
 import src.misc.log.log as log
@@ -79,10 +80,10 @@ class PageRB2:
             self.valueinput[widget_id] = self.page.findChild(QObject, widget_id)
 
         # Initialise la combobox avec les types de trains
-        # TODO : importer complex data et utiliser les valeurs dans mission_type
+        self.page.findChild(QObject, "mission_type_combo").setProperty("elements", [key.value for key in cd.MissionType])
 
         # Initialise la popup de paramétrage complex
-        self.complex_popup = complex.ComplexPopup(self)
+        self.complex_popup = cp.ComplexPopup(self)
 
         # Si la fenêtre a été chargée
         if self.complex_popup.loaded:
