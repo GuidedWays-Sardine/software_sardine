@@ -191,6 +191,36 @@ class PageRB2:
         widget.setProperty("elements", list(translation_data[e] for e in widget.property("elements").toVariant()))
         widget.change_selection(selection_index)
 
+
+    def on_page_opened(self, application):
+        """Fonction appelée lorsque la page de paramètres 8 est chargée.
+        Permet d'afficher les fenêtre d'index et actualise les paramètres des écrans visibles
+
+        Parameters
+        ----------
+        application: `ini.InitialisationWindow`
+            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+        """
+        # Dans le cas où le mode complex a été activé, montre la fenêtre
+        if self.page.findChild(QObject, "mode_button").property("text") == list(self.mode_switch.keys())[1] \
+                and self.complex_popup.loaded:
+            self.complex_popup.win.show()
+
+    def on_page_closed(self, application):
+        """Fonction appelée quand la page de paramètres 8 est fermée.
+        Permet de cacher les différentes fenêtres d'index
+
+        Parameters
+        ----------
+        application: `ini.InitialisationWindow`
+            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+        """
+        # Cache la popup de paramétrage complexe
+        if self.complex_popup.loaded:
+            self.complex_popup.win.hide()
+
+        # TODO : cacher la popup de paramétrage de freinage
+
     def is_page_valid(self):
         """Méthode permettant d'indiquer si la pagede paramètre est complétés
 
@@ -201,6 +231,12 @@ class PageRB2:
         """
         # Retourne vrai si le nom du fichier a été complété (autre variables complétés par défaut)
         return self.page.findChild(QObject, "train_name_stringinput").property("text")
+
+    def on_open_button_clicked(self):
+        pass
+
+    def open_train_data_file(self):
+        pass
 
     def on_save_button_clicked(self):
         """Signal activé lorsque le bouton sauvegardé (de la page de paramètres train) est activé.
