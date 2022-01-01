@@ -110,7 +110,7 @@ class PageRB2:
         Parameters
         ----------
         translation_data: `td.TranslationDictionary`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
+            dictionaire de traduction (clés = langue actuelle -> valeurs = anglais)
 
         Returns
         -------
@@ -119,7 +119,23 @@ class PageRB2:
         """
         page_parameters = sd.SettingsDictionary()
 
+        # Change le préfix de registre le temps de la sauvegarde du fichier paramètres train
+        log.change_log_prefix("Sauvegarde des données train")
 
+        # Vérifie si le fichier a eu un nom donné
+        file_name = self.page.findChild(QObject, "train_name_stringinput").property("text")
+        if file_name:
+            # Rajoute l'extension si nécessaire et appelle la fonction de sauvegarde (definit plus bas)
+            file_name += ".train" if file_name and not file_name.lower().endswith(".train") else ""
+            self.save_train_data_file(f"{PROJECT_DIR}settings\\train_settings\\{file_name}")
+        else:
+            log.warning("Impossible de sauvegarder le fichier de paramètres train, aucun nom de fichier entré.\n")
+
+        # Rechange le prefix pour la sauvegarde générale des données
+        log.change_log_prefix("Sauvegarde des données")
+
+        # Ajoute le nom du fichier dans le dictionnaire de paramètres
+        page_parameters["train_data"] = self.page.findChild(QObject, 'train_name_text').property('text')
 
         return page_parameters
 
