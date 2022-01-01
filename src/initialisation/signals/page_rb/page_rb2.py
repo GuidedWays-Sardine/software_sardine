@@ -1,22 +1,28 @@
 # Librairies par défaut
 import os
 import sys
+import time
+from enum import Enum
 
 
 # Librairies graphiques
 from PyQt5.QtCore import QObject
+from PyQt5.QtQml import QQmlApplicationEngine
+from PyQt5.QtWidgets import QFileDialog
 
 
 #Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.initialisation.initialisation_window as ini
+import src.initialisation.signals.page_rb.pagerb2.complex_popup as complex
 import src.misc.settings_dictionary.settings as sd
 import src.misc.translation_dictionary.translation as td
 import src.misc.log.log as log
 
+
 class PageRB2:
-    """Classe pour la page de paramètres 1"""
+    """Classe pour la page de paramètres 2"""
 
     # variables nécessaire au bon fonctionnement de la page
     index = 2   # Attention dans les tableaux l'index commence à 0
@@ -25,12 +31,25 @@ class PageRB2:
     page = None
     current_button = None
 
-    #Variables utiles au fonctionnement de la page:
+    # Page de paramètres complexes (situé dans pagerb2/complex_popup.py)
+    complex_popup = None
+
+    # Dictionnaire contenant tous les valueinput (ceux-ci seront beaucoup utilisés. Ceci est par soucis d'optimisation
+    valueinput = {}
+
+    # Variables utiles au fonctionnement de la page:
+    class Mode(Enum):
+        SIMPLE = False
+        COMPLEX = True
     mode_switch = {"Simple": "Complexe",
-                   "Complexe": "Simple"}
+                   "Complexe": "Simple"
+                   }
+
+    # Paramètre permettant de sauvegarder si le mode complexe a été initialisé ou non
+    current_mode = Mode.SIMPLE
 
     def __init__(self, application, engine, index, current_button):
-        """Fonction d'initialisation de la page de paramtètres 1 (page paramètres général)
+        """Fonction d'initialisation de la page de paramtètres 2 (page paramètres train)
 
         Parameters
         ----------
