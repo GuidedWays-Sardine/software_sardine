@@ -265,7 +265,7 @@ Item {
         default_height: weight_floatinput.default_height
 
         maximum_value: page_rb2.max_bogies
-        minimum_value: coaches_integerinput.value + 1
+        minimum_value: 2 //coaches_integerinput.value + 1
 
         is_max_default: true
         is_activable: !page_rb2.generated
