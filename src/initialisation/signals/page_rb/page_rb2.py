@@ -138,3 +138,14 @@ class PageRB2:
         selection_index = widget.property("selection_index")
         widget.setProperty("elements", list(translation_data[e] for e in widget.property("elements").toVariant()))
         widget.change_selection(selection_index)
+
+    def is_page_valid(self):
+        """Méthode permettant d'indiquer si la pagede paramètre est complétés
+
+        Returns
+        -------
+        is_page_valid: `bool`
+            Est ce que la page de paramètre est complétée ?
+        """
+        # Retourne vrai si le nom du fichier a été complété (autre variables complétés par défaut)
+        return self.page.findChild(QObject, "train_name_stringinput").property("text")
