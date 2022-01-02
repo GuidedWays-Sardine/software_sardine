@@ -265,7 +265,7 @@ Item {
         default_height: weight_floatinput.default_height
 
         maximum_value: page_rb2.max_bogies
-        minimum_value: 2 //coaches_integerinput.value + 1
+        minimum_value: coaches_integerinput.value + 1
 
         is_max_default: true
         is_activable: !page_rb2.generated
@@ -1167,8 +1167,8 @@ Item {
 
     //Bouton de configuration freinage
     INI_button{
-        id: brake_configuration
-        objectName: "brake_configuration"
+        id: brake_configuration_button
+        objectName: "brake_configuration_button"
 
         default_x: save_button.default_x
         default_height: save_button.default_height
@@ -1177,7 +1177,7 @@ Item {
 
         text: "Configuration\nfreinage"
 
-        is_activable: true
+        is_activable: false
         is_positive: true
         is_visible: true
     }

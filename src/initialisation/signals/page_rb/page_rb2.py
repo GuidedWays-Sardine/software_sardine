@@ -31,12 +31,7 @@ class PageRB2:
     engine = None
     page = None
     current_button = None
-
-    # Page de paramètres complexes (situé dans pagerb2/complex_popup.py)
-    complex_popup = None
-
-    # Dictionnaire contenant tous les valueinput (ceux-ci seront beaucoup utilisés. Ceci est par soucis d'optimisation
-    valueinput = {}
+    valueinput = {}     # Dictionaire avec tous les valueinput (par soucis d'optimisation)
 
     # Variables nécessaires à l'indication du mode de paramétrage actuel
     class Mode(Enum):
@@ -46,6 +41,12 @@ class PageRB2:
                    "Complexe": "Simple"
                    }
     current_mode = Mode.SIMPLE      # /!\ Le mode complexe est activé quand le train a été généré
+
+    # Page de paramètres complexes (situé dans pagerb2/complex_popup.py)
+    complex_popup = None
+
+    # Page de paramètres de freinage (situé dans pagerb2/braking_popup.py)
+    # FEATURE : ajouter la classe les import et les fichiers graphiques et logiques nécessaires
 
     def __init__(self, application, engine, index, current_button):
         """Fonction d'initialisation de la page de paramtètres 2 (page paramètres train)
@@ -98,7 +99,8 @@ class PageRB2:
         self.page.findChild(QObject, "save_button").clicked.connect(self.on_save_button_clicked)
 
         # Connecte le bouton de configuration de freinage
-        #TODO : le connecter et créer la popup de freinage
+        #FEATURE : Créer la page de paramètrages des systèmes de freinages (puis la rendre activable)
+        self.page.findChild(QObject, "brake_configuration_button").setProperty("is_activable", False)
 
         # Définit la page comme validée (toutes les valeurs par défaut suffisent)
         application.is_completed_by_default[self.index - 1] = "is_page_valid" not in dir(self)
@@ -156,9 +158,11 @@ class PageRB2:
             train_data.update(self.get_simple_mode_values())
             if self.current_mode == self.Mode.COMPLEX:
                 train_data.update(self.complex_popup.get_complex_mode_values())
+
+            #FEATURE : Ajouter la récupération des valeurs de freinage ici
         except Exception as error:
             # Dans le cas où une erreur se produit, laisse un message d'erreur (et sauvegarde le fichier tout de même
-            log.warning("Erreur lors de la sauvegarde des données train.\n",
+            log.warning("Erreur lors de la sauvegarde des données train. Le fichier de paramètres sera incomplet.\n",
                         exception=error, prefix="Sauvegarde des données train")
         finally:
             # Sauvegarde le fichier et indique le temps nécessaire pour la récupération et la sauvegarde des données
@@ -217,12 +221,15 @@ class PageRB2:
             if self.current_mode == self.Mode.COMPLEX:
                 # Passe en mode complex et indique que le train a été généré
                 self.page.findChild(QObject, "mode_button").setProperty("text", list(self.mode_switch.keys())[1])
-                self.page.setProperty("generated", True)
                 if self.complex_popup.loaded:
-                    self.complex_popup.win.setProperty("generated", True)
-
-                    # Mets à jour les paramètres sur la popup complexe
+                    # Mets à jour la visibilité des fenêtres et change les valeurs
+                    self.complex_popup.win.show()
                     self.complex_popup.set_complex_mode_values(train_data)
+
+                    self.complex_popup.win.setProperty("generated", True)
+                    self.page.setProperty("generated", True)
+
+            # FEATURE : changer les valeurs de la fenêtre de paramétrage
             else:
                 # Sinon désactive le mode simple et dé-génère le fichier train
                 self.page.findChild(QObject, "mode_button").setProperty("text", list(self.mode_switch.keys())[0])
@@ -280,6 +287,13 @@ class PageRB2:
         widget.setProperty("elements", list(translation_data[e] for e in widget.property("elements").toVariant()))
         widget.change_selection(selection_index)
 
+        # Traduit la fenêtre de paramétrage complexe
+        if self.complex_popup.loaded:
+            self.complex_popup.change_language(translation_data)
+
+        # Traduit la fenêtre de paramétrage de freinage
+        # FEATURE : faire la fonction de changement de langue de la fenêtre de paramétrage du freinage
+
     def on_page_opened(self, application):
         """Fonction appelée lorsque la page de paramètres 8 est chargée.
         Permet d'afficher les fenêtre d'index et actualise les paramètres des écrans visibles
@@ -307,7 +321,7 @@ class PageRB2:
         if self.complex_popup.loaded:
             self.complex_popup.win.hide()
 
-        # TODO : cacher la popup de paramétrage de freinage
+        # FEATURE : cacher la popup de paramétrage de freinage
 
     def is_page_valid(self):
         """Méthode permettant d'indiquer si la pagede paramètre est complétés
@@ -423,3 +437,5 @@ class PageRB2:
                 self.page.setProperty("generated", False)
 
                 # TODO : réinitialiser les données
+
+    # FEATURE : faire la fonction connectée au bouton pour ouvrir la fenêtre de paramétrage
