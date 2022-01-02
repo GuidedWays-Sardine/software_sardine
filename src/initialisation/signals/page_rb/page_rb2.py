@@ -38,16 +38,14 @@ class PageRB2:
     # Dictionnaire contenant tous les valueinput (ceux-ci seront beaucoup utilisés. Ceci est par soucis d'optimisation
     valueinput = {}
 
-    # Variables utiles au fonctionnement de la page:
+    # Variables nécessaires à l'indication du mode de paramétrage actuel
     class Mode(Enum):
         SIMPLE = False
         COMPLEX = True
     mode_switch = {"Simple": "Complexe",
                    "Complexe": "Simple"
                    }
-
-    # Paramètre permettant de sauvegarder si le mode complexe a été initialisé ou non
-    current_mode = Mode.SIMPLE
+    current_mode = Mode.SIMPLE      # /!\ Le mode complexe est activé quand le train a été généré
 
     def __init__(self, application, engine, index, current_button):
         """Fonction d'initialisation de la page de paramtètres 2 (page paramètres train)
