@@ -180,7 +180,127 @@ class Train:
     bogies_list = []
     coaches_list = []
 
+    class Train:
+        """classe contenant les informations trains (et des fonctions de récupération de données"""
+        # Propriétés principales (liste de bogies et de voitures
+        general_mission = None
+        bogies_list = []
+        coaches_list = []
 
+    def __init__(self, train_data=None):
+        """Fonction d'initialisation de la classe des données train (pour la popup complex).
+        Si des données sont envoyés la fonction génèrera automatiquement un train.
+
+        Parameters
+        ----------
+        train_data: `sd.SettingsDictionary`
+            Dictionnaire de paramètre du train (si non envoyé -> retourne un train vide)
+
+        Raises
+        ------
+        KeyError
+            Soulevé dans le cas où un paramètre nécessaire manque au dictionnaire de paramètres train
+        """
+        # L'appel de la fonction d'initialisation va dépendre de la présence ou non du mode.
+        # Celui-ci ne sera pas présent lors de la génération mais uniquement lors d'ouverture de fichier
+        if train_data is not None:
+            try:
+                train_data["mode"]
+            except KeyError:
+                self.generate(train_data)
+            else:
+                self.read_train(train_data)
+
+    def generate(self, train_data):
+        """Cette fonction permet de générer un train lors du paramétrage simple du train.
+        Certaines conditions seront prises en comptes :
+        - Les bogies classiques seront mis de préférence à l'avant et à l'arrière du train
+        - Les bogies articulés seront mis de préférence en milieu de train
+        - Le train sera considéré comme une unité simple (cela peut facilement être modifié)
+        - Les essieux moteurs seront mis à l'extérieur du train
+        - Les systèmes de freinages seront mis de préférence à l'avant et à l'arrière du train (magnétique puis fouccault)
+
+        Parameters
+        ----------
+        train_data: `sd.SettingsDictionary`
+            Toutes les données du train
+
+        Raises
+        ------
+        KeyError
+            Soulevé dans le cas où un paramètre nécessaire manque au dictionnaire de paramètres train
+        """
+        # Informations sur le nombre de rames entièrement non articulées et le nomre d'essieux moteurs
+        # Dans le cas d'un nombre impaire de bogies supplémentaires ou d'essieux moteurs, le mets à gauche
+        left_non_articulated = int(((train_data["bogies_count"] - (train_data["coaches"] + 1)) + 1) / 2.0)
+        left_motorized_axles = int((train_data["motorized_axles_count"] + 1)/2.0)
+        right_non_articulated = int((train_data["bogies_count"] - (train_data["coaches"] + 1)) / 2.0)
+        right_motorized_axles = int(train_data["motorized_axles_count"]/2.0)
+        motorized_axle_weight = train_data["motorized_axle_weight"]
+        non_motorized_axle_weight = (train_data["weight"] - (motorized_axle_weight * (left_motorized_axles + right_motorized_axles)))/((train_data["bogies_count"] * train_data["axles_per_bogies"]) - (left_motorized_axles + right_motorized_axles))
+        previous_axles_count = 0
+        next_axles_count = train_data["bogies_count"] * train_data["axles_per_bogies"]
+
+
+        # Commence par indiquer le type de mission générale du train
+        self.general_mission = MissionType[train_data.get_value("mission", "MissionType.PASSENGER")[12:]]
+
+        # Passe par toutes les voitures
+        for car_index in range(train_data["coaches"]):
+            # Commence par déterminer quels bogies sont articulés et combien de motorisation y a t'il
+            previous_articulated = left_non_articulated < car_index <= train_data["coaches"] - right_non_articulated -1
+            next_articulated = left_non_articulated <= car_index < train_data["coaches"] - right_non_articulated - 1
+            axles_count = ((not previous_articulated) + 1) * train_data["axles_per_bogies"]
+            next_axles_count -= axles_count
+            still_to_motorize = ((left_motorized_axles - previous_axles_count) * (left_motorized_axles > previous_axles_count) +
+                                 (right_motorized_axles - next_axles_count) * (right_motorized_axles > next_axles_count))
+            motorized_count = axles_count if axles_count < still_to_motorize else still_to_motorize
+            left_motorized_count = ((train_data["axles_per_bogies"] if train_data["axles_per_bogies"] < motorized_count else motorized_count)
+                                    if not previous_articulated else
+                                    (self.get_bogies([car_index - 1, car_index])[0].get_motorized_axles_count()))
+            left_weight = (left_motorized_count * motorized_axle_weight + (train_data["axles_per_bogies"] - left_motorized_count) * non_motorized_axle_weight) * (0.5 + 0.5 * (not previous_articulated))
+            right_motorized_count = (((motorized_count - train_data["axles_per_bogies"]) if motorized_count > train_data["axles_per_bogies"] else 0)
+                                     if not previous_articulated else motorized_count)
+            right_weight = (right_motorized_count * motorized_axle_weight + (train_data["axles_per_bogies"] - right_motorized_count) * non_motorized_axle_weight) * (0.5 + 0.5 * (not next_articulated))
+            weight = left_weight + right_weight
+            previous_axles_count += axles_count
+
+            # si le bogie arrière n'est pas articulé le rajoute
+            if not previous_articulated:
+                self.bogies_list.append(Bogie(position=Position.FRONT,
+                                              linked_coaches=car_index,
+                                              axles_count=train_data["axles_per_bogies"],
+                                              motorized_axles_count=left_motorized_count,
+                                              axle_power=train_data["axle_power"],
+                                              braking_systems_count=[0, 0, 0, 0]))  # TODO : modifier
+
+            # Ajouter le bogie avant (dans tous les cas)
+            self.bogies_list.append(Bogie(position=Position.BACK,
+                                          linked_coaches=car_index if not next_articulated else [car_index, car_index+1],
+                                          axles_count=train_data["axles_per_bogies"],
+                                          motorized_axles_count=right_motorized_count,
+                                          axle_power=train_data["axle_power"],
+                                          braking_systems_count=[0, 0, 0, 0]))  # TODO : modifier
+
+            # Commence par générer la voiture associé à l'index
+            self.coaches_list.append(Coaches(mission_type=self.general_mission,
+                                             position_type=Position.FRONT if car_index == 0 else
+                                                           Position.BACK if car_index == (train_data["coaches"] - 1)
+                                                           else Position.MIDDLE,
+                                             position_index=car_index,
+                                             levels=1 if self.general_mission == MissionType.PASSENGER else 0,
+                                             doors=2 if self.general_mission == MissionType.PASSENGER else 0,
+                                             Mtare=weight,
+                                             Mfull=weight,
+                                             length=train_data["length"]/train_data["coaches"],
+                                             ABCempty=[train_data["a"], train_data["b"], train_data["c"]],
+                                             multiply_mass_empty=False,
+                                             ABCfull=[train_data["a"], train_data["b"], train_data["c"]],
+                                             multiply_mass_full=False))
+
+
+    def read_train(self, train_data):
+        pass
 
     def clear(self):
         """Fonction permettant de vider les données train. Attention : Toutes réinitialisation est définitive."""
