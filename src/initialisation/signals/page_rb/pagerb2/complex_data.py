@@ -26,3 +26,33 @@ class MissionType(Enum):
     FREIGHT = "freight"
 
 
+class Coaches:
+    """classe cotenant toutes les informations sur la voiture"""
+    # Toutes les informations générale
+    mission_type = None
+    position_type = None
+    position_index = None   # Index de 0 à Ncoaches - 1
+
+    # Autres informations générales
+    levels = 0
+    doors = 0
+
+    # Informations reliées à la masse et la longueur
+    Mtare = 0
+    Mfull = 0
+    length = 0
+
+    # Informations reliées aux facteurs A,B,C à vide
+    Aempty = 0
+    Bempty = 0
+    Cempty = 0
+    multiply_mass_empty = False
+
+    # Informations reliées aux facteurs A, B, C chargé
+    Afull = 0
+    Bfull = 0
+    Cfull = 0
+    multiply_mass_full = False
+
+
+
