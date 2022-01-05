@@ -179,3 +179,38 @@ class Train:
     general_mission = None
     bogies_list = []
     coaches_list = []
+
+
+
+
+
+    def get_bogies(self, position_index, position_type=None):
+        """Fonction permettant d'avoir un bogie avec les index indiqués
+
+        Parameters
+        ----------
+        position_index: `Union[int, list]`
+            Les voitures auxquelles le bogie est connecté (int ou liste de int) doit aller de 0 à Nvoitures - 1
+        position_type: `Position`
+            La position des bogies dans la voiture (Position.FRONT ; Position.MIDDLE ; Position.BACK) si cela est vital
+
+        Returns
+        -------
+        bogies_list: `list`
+            liste des bogies suivant les conditions envoyés
+        """
+        if isinstance(position_index, int):
+            # Vérification si coaches_index est un int
+            return [b for b in self.bogies_list if ((position_index in b.linked_coaches
+                                                    and (position_index is None or b.position == position_type))
+                                                or (position_type is not None and not Position.MIDDLE
+                                                    and (position_index + (position_type == Position.BACK) - (position_type == Position.FRONT)) in b.linked_coaches)
+                                                    and ((position_type == Position.BACK and b.position == Position.FRONT)
+                                                         or (position_type == Position.FRONT and b.position == Position.BACK)))]
+        elif isinstance(position_index, list):
+            # Vérification si coaches_index est une liste
+            return [b for b in self.bogies_list if all(p_i in b.linked_coaches for p_i in position_index)
+                                                and (position_type is None or b.position == position_type)]
+        else:
+            # Cas où le position_index est invalide
+            return []
