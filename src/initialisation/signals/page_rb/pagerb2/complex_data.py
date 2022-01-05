@@ -182,7 +182,10 @@ class Train:
 
 
 
-
+    def clear(self):
+        """Fonction permettant de vider les données train. Attention : Toutes réinitialisation est définitive."""
+        self.bogies_list = []
+        self.coaches_list = []
 
     def get_bogies(self, position_index, position_type=None):
         """Fonction permettant d'avoir un bogie avec les index indiqués
