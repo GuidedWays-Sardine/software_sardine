@@ -121,3 +121,44 @@ class Bogie:
     disk_brake_count = 0
     magnetic_brake_count = 0
     fouccault_brake_count = 0
+
+    def __init__(self, position, linked_coaches, axles_count, motorized_axles_count, axle_power, braking_systems_count):
+        """Fonction permettant d'initialiser un bogie
+
+        Parameters
+        ----------
+        position: `Position`
+            La position du bogie sur la voiture (Position.FRONT ; Position.MIDDLE ; Position.BACK)
+        linked_coaches: `Union[int, list]`
+            Liste des voitures auxquelles le bogie est connecté
+        axles_count: `int`
+            nombre d'essieux
+        motorized_axles_count: `Union[list, int]`
+            list[bool] -> liste de la position des essieux moteurs (doit être de taille axles_count)
+            int -> nombre d'essieux moteurs (doit être inférieur à axles_count)
+        axle_power: `float`
+            puissance de chacun des moteurs
+        braking_systems_count: `list`
+            list[int] -> [pad_brake, disk_brake, magnetic_brake, fouccault_brake]
+        """
+        self.position = position
+        if isinstance(linked_coaches, list):
+            self.linked_coaches = linked_coaches
+        elif isinstance(linked_coaches, int):
+            self.linked_coaches = [linked_coaches]
+        self.axles_count = axles_count
+        self.axle_power = axle_power
+
+        if isinstance(motorized_axles_count, list):
+            # Pour chacun des essieux -> lit la motorisation si elle est indiquée sinon la met à False
+            self.motorisation = [False if i >= len(motorized_axles_count) else bool(motorized_axles_count[i]) for i in
+                                 range(self.axles_count)]
+        elif isinstance(motorized_axles_count, int):
+            # Motorise les "motorized_axles_count" premier essieux et laissent les autres porteurs
+            self.motorisation = [True if i < motorized_axles_count else False for i in range(self.axles_count)]
+
+        if isinstance(braking_systems_count, list):
+            self.pad_brake_count = 0 if len(braking_systems_count) <= 0 else braking_systems_count[0]
+            self.disk_brake_count = 0 if len(braking_systems_count) <= 1 else braking_systems_count[1]
+            self.magnetic_brake_count = 0 if len(braking_systems_count) <= 2 else braking_systems_count[2]
+            self.fouccault_brake_count = 0 if len(braking_systems_count) <= 3 else braking_systems_count[3]
