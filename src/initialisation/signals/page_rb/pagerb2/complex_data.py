@@ -55,4 +55,17 @@ class Coaches:
     multiply_mass_full = False
 
 
+class Bogie:
+    """classe contenant toutes les informations sur le bogie"""
+    # Informations générales (masse non stockée car dépendante de la masse voiture)
+    position = None
+    axles_count = 1
+    linked_coaches = []
+    motorisation = []
+    axle_power = 0.0
 
+    # Informations sur le freinage
+    pad_brake_count = 0
+    disk_brake_count = 0
+    magnetic_brake_count = 0
+    fouccault_brake_count = 0
