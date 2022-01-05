@@ -26,6 +26,9 @@ class MissionType(Enum):
     FREIGHT = "freight"
 
 
+mission_getter = {i: key for i, key in enumerate(MissionType)}
+
+
 class Coaches:
     """classe cotenant toutes les informations sur la voiture"""
     # Toutes les informations générale
@@ -151,8 +154,7 @@ class Bogie:
 
         if isinstance(motorized_axles_count, list):
             # Pour chacun des essieux -> lit la motorisation si elle est indiquée sinon la met à False
-            self.motorisation = [False if i >= len(motorized_axles_count) else bool(motorized_axles_count[i]) for i in
-                                 range(self.axles_count)]
+            self.motorisation = [False if i >= len(motorized_axles_count) else bool(motorized_axles_count[i]) for i in range(self.axles_count)]
         elif isinstance(motorized_axles_count, int):
             # Motorise les "motorized_axles_count" premier essieux et laissent les autres porteurs
             self.motorisation = [True if i < motorized_axles_count else False for i in range(self.axles_count)]
@@ -173,19 +175,13 @@ class Bogie:
         """
         return self.motorisation.count(True)
 
+
 class Train:
     """classe contenant les informations trains (et des fonctions de récupération de données"""
     # Propriétés principales (liste de bogies et de voitures
     general_mission = None
     bogies_list = []
     coaches_list = []
-
-    class Train:
-        """classe contenant les informations trains (et des fonctions de récupération de données"""
-        # Propriétés principales (liste de bogies et de voitures
-        general_mission = None
-        bogies_list = []
-        coaches_list = []
 
     def __init__(self, train_data=None):
         """Fonction d'initialisation de la classe des données train (pour la popup complex).
@@ -337,3 +333,19 @@ class Train:
         else:
             # Cas où le position_index est invalide
             return []
+
+
+def main():
+    log.initialise(save=False)
+
+    train_data = sd.SettingsDictionary()
+    train_data.open(f"{PROJECT_DIR}\\settings\\train_settings\\default.train")
+
+    initial_time = time.perf_counter()
+    train_database = Train()
+    train_database.generate(train_data)
+    log.debug(f"Train généré en {(time.perf_counter() - initial_time) * 1000} millisecondes")
+
+
+if __name__ == "__main__":
+    main()
