@@ -172,3 +172,10 @@ class Bogie:
             Nombre d'essieux motorisés du bogie
         """
         return self.motorisation.count(True)
+
+class Train:
+    """classe contenant les informations trains (et des fonctions de récupération de données"""
+    # Propriétés principales (liste de bogies et de voitures
+    general_mission = None
+    bogies_list = []
+    coaches_list = []
