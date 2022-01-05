@@ -162,3 +162,13 @@ class Bogie:
             self.disk_brake_count = 0 if len(braking_systems_count) <= 1 else braking_systems_count[1]
             self.magnetic_brake_count = 0 if len(braking_systems_count) <= 2 else braking_systems_count[2]
             self.fouccault_brake_count = 0 if len(braking_systems_count) <= 3 else braking_systems_count[3]
+
+    def get_motorized_axles_count(self):
+        """Fonction permettant de retourner le nombre d'essieux moteurs
+
+        Returns
+        ----------
+        Motorized_axles_count: `int`
+            Nombre d'essieux motorisés du bogie
+        """
+        return self.motorisation.count(True)
