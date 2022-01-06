@@ -274,7 +274,7 @@ class Train:
 
 
         # Commence par indiquer le type de mission générale du train
-        self.general_mission = MissionType[train_data.get_value("mission", "MissionType.PASSENGER")[12:]]
+        self.general_mission = MissionType[str(train_data.get_value("mission", "MissionType.PASSENGER"))[12:]]
 
         # Passe par toutes les voitures
         for car_index in range(train_data["coaches"]):
