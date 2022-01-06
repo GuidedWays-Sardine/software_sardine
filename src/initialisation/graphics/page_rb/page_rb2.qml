@@ -1175,7 +1175,7 @@ Item {
         default_y: brake_data_box.default_y
         default_width: save_button.default_width
 
-        text: "Configuration\nfreinage"
+        text: "Freinage"
 
         is_activable: false
         is_positive: true

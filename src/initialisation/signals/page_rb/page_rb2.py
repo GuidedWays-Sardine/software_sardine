@@ -131,7 +131,7 @@ class PageRB2:
                         prefix="Sauvegarde des données train")
 
         # Ajoute le nom du fichier dans le dictionnaire de paramètres
-        page_parameters["train_name"] = self.page.findChild(QObject, 'train_name_text').property('text')
+        page_parameters["train_name"] = self.page.findChild(QObject, 'train_name_stringinput').property('text')
 
         return page_parameters
 
@@ -167,7 +167,7 @@ class PageRB2:
         finally:
             # Sauvegarde le fichier et indique le temps nécessaire pour la récupération et la sauvegarde des données
             train_data.save(file_path)
-            log.info(f"Récupération et sauvegarde de {len(train_data)} paramètres en " +
+            log.info(f"Récupération et sauvegarde de {len(train_data)} paramètres train en " +
                      f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n",
                      prefix="Sauvegarde des données train")
 
@@ -185,13 +185,13 @@ class PageRB2:
         train_name = data.get_value("train_name")
         if train_name is not None:
             # Vérifie que le fichier de paramètres existe
-            if os.path.exists(f"{PROJECT_DIR}\\settings\\train_settings\\{train_name}.train"):
+            if os.path.exists(f"{PROJECT_DIR}settings\\train_settings\\{train_name}.train"):
                 # Si c'est le cas, l'ouvre et change les différentes valeurs du paramétrage train sur la page
-                self.open_train_data_file(f"{PROJECT_DIR}\\settings\\train_settings\\{train_name}.train")
+                self.open_train_data_file(f"{PROJECT_DIR}settings\\train_settings\\{train_name}.train")
             else:
                 # Sinon laisse un message d'erreur
                 log.warning(f"le fichier de paramètres : {train_name}.train , n'existe plus.\n" +
-                            f"\t\t{PROJECT_DIR}\\settings\\train_settings\\{train_name}.train",
+                            f"\t\t{PROJECT_DIR}settings\\train_settings\\{train_name}.train",
                             prefix="Ouverture des données train")
 
     def open_train_data_file(self, file_path):
@@ -271,7 +271,6 @@ class PageRB2:
                           "dynamic_check", "mode_text", "open_button", "save_button", "brake_configuration"]:
             widget = self.page.findChild(QObject, widget_id)
             widget.setProperty("text", translation_data[widget.property("text")])
-            #FIXME : voir pour la traduction de la configuration freinage (contenant \n)
 
         # Traduction pour les modes de paramétrages (simple et complex) (mode_switch et texte du bouton)
         keys = list(self.mode_switch)
@@ -430,13 +429,12 @@ class PageRB2:
                 self.complex_popup.win.show()
                 self.complex_popup.win.setProperty("generated", (self.current_mode == self.Mode.COMPLEX))
         else:       # Mode simple activé
-            # Si  la popup complex existe, la cache et dégénère les paramètres complexe
+            # Si  la popup complex existe, la cache et dégénère les paramètres complexe et réinitialise les données
             self.current_mode = self.Mode.SIMPLE
             if self.complex_popup.loaded:
                 self.complex_popup.win.hide()
                 self.complex_popup.win.setProperty("generated", False)
                 self.page.setProperty("generated", False)
+                self.complex_popup.train.clear()
 
-                # TODO : réinitialiser les données
-
-    # FEATURE : faire la fonction connectée au bouton pour ouvrir la fenêtre de paramétrage
+    # FEATURE : faire la fonction connectée au bouton "Freinage" pour ouvrir la fenêtre de paramétrage freinage
