@@ -66,7 +66,7 @@ Item {
 
         //S'assure que l'index montre bien un train de cette page
         if(root.current_index >= (root.current_page + 1) * root.visible_count || root.current_index < root.current_page * root.visible_count) {
-            root.current_index = root.current_index < root.current_page * root.visible_count ? root.current_page * root.visible_count - 1 : (root.current_page + 1) * root.visible_count
+            root.current_index = (root.current_index < (root.current_page * root.visible_count)) ? (root.current_page * root.visible_count) : ((root.current_page + 1) * root.visible_count - 1)
         }
         // Le signal sera appelé dans onCurrent_indexChanged si la valeur a été changée
     }
@@ -113,7 +113,6 @@ Item {
 
         onClicked: {
             root.current_page = root.current_page - 1
-            clicked()
         }
     }
 
@@ -136,7 +135,6 @@ Item {
 
         onClicked: {
             root.current_page = root.current_page + 1
-            clicked()
         }
     }
 
@@ -150,7 +148,7 @@ Item {
         default_width: (root.default_width - 2 * root.default_height) / (root.visible_count + 2.0)
         default_height: root.default_height * 0.5
 
-        text: index > 0 ? "..." : ""
+        text: root.current_page > 0 ? "..." : ""
 
         is_positive: root.coaches_buttons_positive
         is_activable: false
@@ -169,7 +167,7 @@ Item {
         default_width: (root.default_width - 2 * root.default_height) / (root.visible_count + 2)
         default_height: root.default_height * 0.5
 
-        text: index < root.pages_count - 1 ? "..." : ""
+        text: root.current_page < root.pages_count - 1 ? "..." : ""
 
         is_positive: root.coaches_buttons_positive
         is_dark_grey: false
@@ -194,11 +192,18 @@ Item {
             //TODO : trouver comment changer l'image
             //image_activable: ""
             //image_not_activable: ""
-            text: index.toString()
+            text: is_activable ? (root.current_page * root.visible_count + index + 1).toString() : ""
+            font_size: 8
 
             is_positive: root.coaches_buttons_positive
-            is_activable: false
+            is_activable: (root.current_page * root.visible_count + index) < root.train_length
+            is_dark_grey: (root.current_page * root.visible_count + index) != root.current_index
             is_visible: root.is_visible
+
+            //Fonction qui change l'index lorsque l'une des icones en bas est cliquée
+            onClicked: {
+                root.current_index = root.current_page * root.visible_count + index
+            }
         }
     }
 
