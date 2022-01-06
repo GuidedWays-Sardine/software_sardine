@@ -109,6 +109,41 @@ class Coaches:
             self.Cfull = 0 if len(ABCfull) <= 2 else ABCfull[2]
         self.multiply_mass_full = multiply_mass_full
 
+    def get_qml_values(self):
+        """Fonction permettant de retourner les valeurs au format qml
+
+        Returns
+        -------
+        qml_values: `list`
+            [levels, doors, Mtare, Mfull, length, Aempty, Bempty, Cempty, multiply_mass_empty, Afull, Bfull, Cfull, multiply_mass_full]
+        """
+        return [self.levels, self.doors, self.Mtare, self.Mfull, self.length,
+                self.Aempty, self.Bempty, self.Cempty, self.multiply_mass_empty,
+                self.Afull, self.Bfull, self.Cfull, self.multiply_mass_full]
+
+    def read_qml_values(self, qml_values):
+        """Fonction permettant de lire les valeurs au format qml
+
+        Parameters
+        ----------
+        qml_values: `list`
+            [levels, doors, Mtare, Mfull, length, Aempty, Bempty, Cempty, multiply_mass_empty, Afull, Bfull, Cfull, multiply_mass_full]
+        """
+        # Rajoute une vérification pour s'assurer que  la taille du tableau de valeurs est dans les bonnes dimensions
+        if isinstance(qml_values, list) and len(qml_values) == 13:
+            self.levels = qml_values[0]
+            self.doors = qml_values[1]
+            self.Mtare = qml_values[2]
+            self.Mfull = qml_values[3]
+            self.length = qml_values[4]
+            self.Aempty = qml_values[5]
+            self.Bempty = qml_values[6]
+            self.Cempty = qml_values[7]
+            self.multiply_mass_empty = qml_values[8]
+            self.Afull = qml_values[9]
+            self.Bfull = qml_values[10]
+            self.Cfull = qml_values[11]
+            self.multiply_mass_full = qml_values[12]
 
 class Bogie:
     """classe contenant toutes les informations sur le bogie"""
