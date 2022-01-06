@@ -339,11 +339,12 @@ def main():
     log.initialise(save=False)
 
     train_data = sd.SettingsDictionary()
+    if "mode" in train_data:
+        train_data.pop("mode")
     train_data.open(f"{PROJECT_DIR}\\settings\\train_settings\\default.train")
 
     initial_time = time.perf_counter()
-    train_database = Train()
-    train_database.generate(train_data)
+    train_database = Train(train_data)
     log.debug(f"Train généré en {(time.perf_counter() - initial_time) * 1000} millisecondes")
 
 
