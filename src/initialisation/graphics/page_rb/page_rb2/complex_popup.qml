@@ -14,6 +14,10 @@ Window{
     title: "Initialisation Sardine"
 
 
+    // Différentes propriétés sur le train complex
+    property var type_list: []      // Liste contenant le type de chacune des voitures (fret, passager, ...)
+    property var position_list: []  // Liste contenant la position de chacune des voitures (avant, arrière, milieu)
+
 
     // Propriété permettant de savoir si la fenêtre a été générée
     property bool generated: false
@@ -43,22 +47,6 @@ Window{
         is_activable: true
         is_positive: true
         is_visible: !complex_popup.generated
-    }
-
-    INI_button {
-        id: save_button
-        objectName: "save_button"
-
-        default_x: generate_button.default_x
-        default_y: generate_button.default_y
-        default_width: generate_button.default_width
-        default_height: generate_button.default_height
-
-        text: "Sauvegarder"
-
-        is_activable: true
-        is_positive: true
-        is_visible: complex_popup.generated
     }
 
     // Série de textes permettant d'indiquer le fonctionnement de la génération du train
@@ -102,5 +90,24 @@ Window{
 
         is_dark_grey: false
         is_visible: !complex_popup.generated
+    }
+
+
+    // trainpreview pour montrer un apperçu des différentes voitures du train
+    INI_trainpreview {
+        id: train_preview
+        objectName: "train_preview"
+
+        default_x: 0
+        default_y: 480 - default_height
+        default_width: 640
+        default_height: 32
+
+        type_list: ["freight", "freight", "freight", "passenger", "freight", "passenger", "freight", "passenger", "passenger", "freight", "passenger", "passenger"]
+        position_list: ["front", "middle", "middle", "back", 'front', "middle", "middle", "middle", "middle", "middle", "middle", "back"]
+
+        is_visible: complex_popup.generated
+        visible_count: 10
+        is_activable: true
     }
 }
