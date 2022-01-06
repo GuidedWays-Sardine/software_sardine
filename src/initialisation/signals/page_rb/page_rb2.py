@@ -431,6 +431,7 @@ class PageRB2:
                 self.complex_popup.win.setProperty("generated", (self.current_mode == self.Mode.COMPLEX))
         else:       # Mode simple activé
             # Si  la popup complex existe, la cache et dégénère les paramètres complexe
+            self.current_mode = self.Mode.SIMPLE
             if self.complex_popup.loaded:
                 self.complex_popup.win.hide()
                 self.complex_popup.win.setProperty("generated", False)
