@@ -95,14 +95,16 @@ Item{
             root.mimimum_value = root.maximum_value
         }
         //cas où la valeur actuelle rentrée est inférieure à la nouvelle valeur minimale
-        if(body.text != "" && parseInt(body.text) < root.minimum_value){
-            body.text = root.is_max_default ? root.minimum_value.toString() : ""
+        if(body.text != "" && parseInt(body.text) <= root.minimum_value){
+            body.text = (root.is_max_default && root.maximum_value !== root.minimum_value) ? root.minimum_value.toString() : ""
             value_changed()
             root.previous_value = root.minimum_value
         }
         //cas où aucune valeur n'est entrée et que is_max_default faux
         else if(body.text === "" && !root.is_max_default){
+            body.text = root.minimum_value.toString()
             value_changed()
+            body.text = ""
             root.previous_value = root.minimum_value
         }
     }
@@ -118,14 +120,16 @@ Item{
             root.maximum_value = root.minimum_value
         }
         //cas où la valeur actuelle rentrée est supériere à la nouvelle valeur maximale
-        if(body.text != "" && parseInt(body.text) > root.maximum_value){
-            body.text = root.is_max_default ? "" : root.maximum_value.toString()
+        if(body.text != "" && parseInt(body.text) >= root.maximum_value){
+            body.text = (root.is_max_default || root.maximum_value === root.minimum_value) ? "" : root.maximum_value.toString()
             value_changed()
             root.previous_value = root.maximum_value
         }
         //cas où aucune valeur n'est entrée et que is_max_default vrai
-        else if(body.text === "" && root.ix_max_default) {
+        else if(body.text === "" && root.is_max_default) {
+            body.text = root.maximum_value.toString()
             value_changed()
+            body.text = ""
             root.previous_value = root.maximum_value
         }
     }
