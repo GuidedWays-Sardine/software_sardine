@@ -20,13 +20,19 @@ Item {
 
     //Données par défaut pour les bogies
     property int default_axle_count: 2
-    property double motorized_axle_power: 750.0
+    property double default_axle_power: 750.0
+    property int default_pad_brake_count: 0
+    property int default_disk_brake_count: 0
+    property int default_magnetic_brake_count: 0
+    property int default_fouccault_brake_count: 0
 
     // Valeurs limites pour les bogies
     property int max_central_bogies: (root.position == "front" || root.position == "back") ? 1 : 10
     property int max_axles_per_bogies: 10
     property int max_axle_power: 1e4
+    property int max_pad_per_axle: 2
     property int max_disk_per_axle: 4
+    property int max_magnetic_between_axle: 2 // Toujours identique pour le fouccault pour des raisons de symmétries
 
     //Données sur les bogies
     property bool any: false
@@ -289,6 +295,7 @@ Item {
                 root.current_axle_index = axles_count_integerinput.value - 1
             }
 
+            // Change le nombre de moteurs paramétrables pour le bogie (selon le nombre d'essieux disponibles
             motorisation.model = root.motorized_axles[root.current_bogie_index].length
 
             //Mets à jour si l'essieu est motorisé pour tous les essieux
@@ -339,7 +346,7 @@ Item {
                  text = root.motorized_axles[root.current_bogie_index][index] ? "x" : ""
 
                  // Change la valeur de la puissance moteur à 0 si la motorisation est enlevée et à la valeur par défaut
-                 root.motorized_axles_powers[root.current_bogie_index][index] = root.motorized_axles[root.current_bogie_index][index] ? root.motorized_axle_power : 0
+                 root.motorized_axles_powers[root.current_bogie_index][index] = root.motorized_axles[root.current_bogie_index][index] ? root.default_axle_power : 0
 
                 // Active/désactive le valueinput de la puissance si l'index correspond
                 if(index === root.current_axle_index) {
@@ -472,7 +479,7 @@ Item {
         default_width: 2 * plus_minus_button.default_width
         default_height: 12
 
-        maximum_value: 2 * axles_count_integerinput.value
+        maximum_value: root.max_pad_per_axle * axles_count_integerinput.value
         minimum_value: 0
         font_size: 6
 
@@ -545,7 +552,7 @@ Item {
         default_height: disk_brake_integerinput.default_height
 
         minimum_value: 0
-        maximum_value: -fouccault_brake_integerinput.value + 2 * (axles_per_bogies_integerinput.value - 1)
+        maximum_value: -fouccault_brake_integerinput.value + root.max_magnetic_between_axle * (axles_count_integerinput.value - 1)
         font_size: 6
 
         is_visible: root.generated && root.any
@@ -581,7 +588,7 @@ Item {
         default_height: magnetic_brake_integerinput.default_height
 
         minimum_value: 0
-        maximum_value: -magnetic_brake_integerinput.value + 2 * (axles_per_bogies_integerinput.value - 1)
+        maximum_value: -magnetic_brake_integerinput.value + root.max_magnetic_between_axle * (axles_count_integerinput.value - 1)
         font_size: 6
 
         is_visible: root.generated && root.any
