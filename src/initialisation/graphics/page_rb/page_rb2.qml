@@ -27,8 +27,8 @@ Item {
     //Par défautl on considèrera : 2 roues (et donc plaquettes) par essieux ; 4 disques par essieux ; 2 patins magnétiques ou de fouccault par bogies
     readonly property int max_brake_pad: 2 * bogies_count_integerinput.value * axles_per_bogies_integerinput.value * 1      //Uniquement changer la dernière constante
     readonly property int max_brake_disk:4 * bogies_count_integerinput.value * axles_per_bogies_integerinput.value * 1      //Uniquement changer la dernière constante
-    readonly property int max_brake_magnetic: -fouccault_brake_integerinput.value + 2 * bogies_count_integerinput.value * 1 //Uniquement changer la dernière constante
-    readonly property int max_brake_fouccault: -magnetic_brake_integerinput.value + 2 * bogies_count_integerinput.value * 1 //Uniquement changer la dernière constante
+    readonly property int max_brake_magnetic: -fouccault_brake_integerinput.value + 2 * bogies_count_integerinput.value * (axles_per_bogies_integerinput.value - 1) * 1 //Uniquement changer la dernière constante
+    readonly property int max_brake_fouccault: -magnetic_brake_integerinput.value + 2 * bogies_count_integerinput.value * (axles_per_bogies_integerinput.value - 1) * 1 //Uniquement changer la dernière constante
 
 
     //Constantes permettant de controller la taille et la position des différents éléments de la page
