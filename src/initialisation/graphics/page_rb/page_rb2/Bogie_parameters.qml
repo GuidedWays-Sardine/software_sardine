@@ -8,6 +8,12 @@ Item {
 
     //Tous les textes nécessitant une traduction
     property string articulated_text: "Articulé ?"
+    property string axle_text: "Nessieux"
+    property string motor_text: "Pmoteur"
+    property string pad_text: "Nplaquettes"
+    property string disk_text: "Ndisques"
+    property string magnetic_text: "Npatins"
+    property string fouccault_text: "Nfouccault"
 
     //propriétés quant à la position
     property int default_x: 0
@@ -63,7 +69,7 @@ Item {
         id: plus_minus_button
         objectName: "plus_minus_button"
 
-        default_x: root.default_x   // FIXME : problème de positionnement
+        default_x: root.default_x
         default_y: root.default_y
         default_width: 16
         default_height: 16
@@ -318,7 +324,7 @@ Item {
         default_x: axles_count_integerinput.default_x + axles_count_integerinput.default_width + font_size * 0.5
         default_y: axles_count_integerinput.default_y + (axles_count_integerinput.default_height - font_size) * 0.5 - 1
 
-        text: "Nessieux"
+        text: root.axle_text
         font_size: 8
 
         is_dark_grey: false
@@ -455,7 +461,7 @@ Item {
         default_x: axle_power_floatinput.default_x + axle_power_floatinput.default_width + font_size * 0.5
         default_y: axle_power_floatinput.default_y + (axle_power_floatinput.default_height - font_size) * 0.5 - 1
 
-        text: "Pmoteur"
+        text: root.motor_text
         font_size: 8
 
         is_dark_grey: false
@@ -505,7 +511,7 @@ Item {
         default_x: pad_brake_integerinput.default_x + pad_brake_integerinput.default_width + font_size * 0.5
         default_y: pad_brake_integerinput.default_y + (pad_brake_integerinput.default_height - font_size) * 0.5 - 1
 
-        text: "Nplaquettes"
+        text: root.pad_text
         font_size: 8
 
         is_dark_grey: false
@@ -541,7 +547,7 @@ Item {
         default_x: disk_brake_integerinput.default_x + disk_brake_integerinput.default_width + font_size * 0.5
         default_y: disk_brake_integerinput.default_y + (disk_brake_integerinput.default_height - font_size) * 0.5 - 1
 
-        text: "Ndisques"
+        text: root.disk_text
         font_size: 8
 
         is_dark_grey: false
@@ -577,7 +583,7 @@ Item {
         default_x: magnetic_brake_integerinput.default_x + magnetic_brake_integerinput.default_width + font_size * 0.5
         default_y: magnetic_brake_integerinput.default_y + (magnetic_brake_integerinput.default_height - font_size) * 0.5 - 1
 
-        text: "Npatins"
+        text: root.magnetic_text
         font_size: 8
 
         is_dark_grey: false
@@ -613,7 +619,7 @@ Item {
         default_x: fouccault_brake_integerinput.default_x + fouccault_brake_integerinput.default_width + font_size * 0.5
         default_y: fouccault_brake_integerinput.default_y + (fouccault_brake_integerinput.default_height - font_size) * 0.5 - 1
 
-        text: "Nfouccault"
+        text: root.fouccault_text
         font_size: 8
 
         is_dark_grey: false
