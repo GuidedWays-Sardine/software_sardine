@@ -154,6 +154,9 @@ Item {
             if(bogies_count_integerinput.value !== 0) {
                 pad_brake_integerinput.change_value(root.brakes_counts[root.current_bogie_index][0])
                 disk_brake_integerinput.change_value(root.brakes_counts[root.current_bogie_index][1])
+                // Pour les freinages magnétiques, comme ceux-ci sont liés, les passes d'abord à 0 pour éviter des erreurs lors des changement de valeurs
+                magnetic_brake_integerinput.clear()
+                fouccault_brake_integerinput.clear()
                 magnetic_brake_integerinput.change_value(root.brakes_counts[root.current_bogie_index][2])
                 fouccault_brake_integerinput.change_value(root.brakes_counts[root.current_bogie_index][3])
             }
@@ -210,7 +213,10 @@ Item {
                 root.axles_count.push(root.default_axle_count)
                 root.motorized_axles.push(Array(root.default_axle_count).fill(0))
                 root.motorized_axles_powers.push(Array(root.default_axle_count).fill(0.0))
-                root.brakes_counts.push(Array(4).fill(0))
+                root.brakes_counts.push([default_pad_brake_count <= pad_brake_integerinput.maximum_value ? default_pad_brake_count : pad_brake_integerinput.maximum_value,
+                                         default_disk_brake_count <= disk_brake_integerinput.maximum_value ? default_disk_brake_count : disk_brake_integerinput.maximum_value,
+                                         (default_magnetic_brake_count + default_fouccault_brake_count) <= root.max_magnetic_between_axle * (root.default_axle_count - 1) ? default_magnetic_brake_count : (default_magnetic_brake_count >= default_fouccault_brake_count ? root.max_magnetic_between_axle * (root.default_axle_count - 1) : 0),
+                                         (default_magnetic_brake_count + default_fouccault_brake_count) <= root.max_magnetic_between_axle * (root.default_axle_count - 1) ? default_fouccault_brake_count : (default_magnetic_brake_count >= default_fouccault_brake_count ? 0 : root.max_magnetic_between_axle * (root.default_axle_count - 1))])
             }
 
             axles_count_integerinput.change_value(root.axles_count[root.current_bogie_index])
