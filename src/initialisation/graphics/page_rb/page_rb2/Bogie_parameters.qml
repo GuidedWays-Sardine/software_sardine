@@ -57,12 +57,40 @@ Item {
 
     //Fonction pour réinitialiser le module
     function clear() {
-        root.any = false
         root.axles_count = []
         root.motorized_axles = []
         root.motorized_axles_powers = []
+        root.brakes_counts = []
         root.current_bogie_index = 0
         root.previous_index = 0
+        root.articulated = false
+        root.any = false
+    }
+
+    function change_values(axles_count, motorized_axles, motorized_axles_powers, brakes_counts, articulated=false) {
+        if(axles_count.length != 0) {
+            root.axles_count = axles_count
+            root.motorized_axles = motorized_axles
+            root.motorized_axles_powers = motorized_axles_powers
+            root.brakes_counts = brakes_counts
+            bogies_count_integerinput.change_value(axles_count.length)
+            root.current_bogie_index = 0
+            root.previous_index = 0
+            root.articulated = false
+            root.any = false
+        }
+        else {
+            clear()
+        }
+    }
+
+    function get_values() {
+        if(root.any) {
+            return [root.position, root.articulated, root.axles_count, root.motorized_axles, root.motorized_axes_powers, root.brakes_counts]
+        }
+        else {
+            return false
+        }
     }
 
     INI_button {
@@ -569,7 +597,7 @@ Item {
 
         is_visible: root.generated && root.any
         is_positive: false
-        is_activable: true
+        is_activable: maximum_value != 0
 
         onValue_changed: {
             root.brakes_counts[root.current_bogie_index][2] = magnetic_brake_integerinput.value
@@ -586,7 +614,7 @@ Item {
         text: root.magnetic_text
         font_size: 8
 
-        is_dark_grey: false
+        is_dark_grey: magnetic_brake_integerinput.maximum_value == 0
         is_visible: root.generated && root.any
     }
 
@@ -605,7 +633,7 @@ Item {
 
         is_visible: root.generated && root.any
         is_positive: false
-        is_activable: true
+        is_activable: maximum_value != 0
 
         onValue_changed: {
             root.brakes_counts[root.current_bogie_index][3] = fouccault_brake_integerinput.value
@@ -622,7 +650,7 @@ Item {
         text: root.fouccault_text
         font_size: 8
 
-        is_dark_grey: false
+        is_dark_grey: fouccault_brake_integerinput.maximum_value == 0
         is_visible: root.generated && root.any
     }
 }
