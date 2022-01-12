@@ -242,7 +242,7 @@ class PageRB2:
                         exception=error, prefix="Ouverture des données train")
         else:
             # Change le nom du fichier train dans le train_name_stringinput et indique le temps de chargement
-            self.page.findChild(QObject, "train_name_stringinput").setProperty("text", file_path.rsplit("/", maxsplit=1)[1][:-6])
+            self.page.findChild(QObject, "train_name_stringinput").setProperty("text", file_path.replace("\\", "/").rsplit("/", maxsplit=1)[1][:-6])
             log.info(f"Lecture et changement {len(train_data)} paramètres en " +
                      f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n",
                      prefix="Ouverture des données train")
