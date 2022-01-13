@@ -6,23 +6,44 @@ import "../../../components"
 Item {
     id: root
 
-    //Tous les textes nécessitant une traduction
-    property string articulated_text: "Articulé ?"
-    property string axle_text: "Nessieux"
-    property string motor_text: "Pmoteur"
-    property string pad_text: "Nplaquettes"
-    property string disk_text: "Ndisques"
-    property string magnetic_text: "Npatins"
-    property string fouccault_text: "Nfouccault"
-
-    //propriétés quant à la position
+    //propriétés sur la position ddu composant
     property int default_x: 0
     property int default_y: 0
-    property bool generated: false
     anchors.fill: parent
 
-    // Propriété quant à la position (changeant légèrement le format) entre middle, left, right
+    // Propriétés pour savoir si la fenêtre est générée et s'il y a un bogie à paramétrer
+    property bool generated: false
+    property bool any: false
+    // Signal activé quand l'élément any est changé, permet de montrer/de cacher le widget et de l'initialiser/le vider
+    onAnyChanged: {
+            // Just pour changer les valeurs dans le bon ordre
+            if(root.any){
+                bogies_count_integerinput.maximum_value = root.max_central_bogies
+                bogies_count_integerinput.minimum_value = 1
+
+                axle_power_floatinput.is_activable = root.motorized_axles[root.current_bogie_index][root.current_axle_index]
+                axle_power_floatinput.change_value(root.motorized_axles_powers[root.current_bogie_index][root.current_axle_index])
+            }
+            else {
+                bogies_count_integerinput.minimum_value = 0
+                bogies_count_integerinput.maximum_value = 0
+
+                axle_power_floatinput.change_value(0)
+            }
+        }
+    
+    //propriétés du bogie
+    readonly property bool articulated: root.any && (root.position == "front" || root.position == "back") && articulated_check.is_checked
+    function set_articulated(articulated) {articulated_check.is_checked = articulated;} //fonction pour correctement indiquer si le bogie est articulé ou non
+    property var axles_count: []
+    property var motorized_axles: []
+    property var motorized_axles_powers: []
+    property var brakes_counts: []
+
+    //propriétés sur le bogie et l'essieu paramétré et sa position dans la voiture
     property string position: "middle"
+    property int current_bogie_index: 0
+    property int current_axle_index: 0
 
     //Données par défaut pour les bogies
     property int default_axle_count: 2
@@ -38,19 +59,16 @@ Item {
     property int max_axle_power: 1e4
     property int max_pad_per_axle: 2
     property int max_disk_per_axle: 4
-    property int max_magnetic_between_axle: 2 // Toujours identique pour le fouccault pour des raisons de symmétries
+    property int max_magnetic_between_axle: 2       //Identique pour le freinage de fouccault
 
-    //Données sur les bogies
-    property bool any: false
-    property int previous_index: 0
-    property int current_bogie_index: 0
-    property int current_axle_index: 0
-    readonly property bool articulated: root.any && (root.position == "front" || root.position == "back") && articulated_check.is_checked
-    function set_articulated(articulated) {articulated_check.is_checked = articulated;} //fonction pour correctement indiquer si le bogie est articulé ou non
-    property var axles_count: []
-    property var motorized_axles: []
-    property var motorized_axles_powers: []
-    property var brakes_counts: []
+    //Tous les textes nécessitant une traduction
+    property string articulated_text: "Articulé ?"
+    property string axle_text: "Nessieux"
+    property string motor_text: "Pmoteur"
+    property string pad_text: "Nplaquettes"
+    property string disk_text: "Ndisques"
+    property string magnetic_text: "Npatins"
+    property string fouccault_text: "Nfouccault"
 
     //signal appelé à chaque fois que
     signal updated()
