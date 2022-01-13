@@ -56,7 +56,7 @@ Item {
     // Valeurs limites pour les bogies
     property int max_central_bogies: (root.position == "front" || root.position == "back") ? 1 : 10
     property int max_axles_per_bogies: 10
-    property int max_axle_power: 1e4
+    property double max_axle_power: 1e4
     property int max_pad_per_axle: 2
     property int max_disk_per_axle: 4
     property int max_magnetic_between_axle: 2       //Identique pour le freinage de fouccault
@@ -105,7 +105,7 @@ Item {
     function get_values() {
         if(root.any) {
             // retourne un tableau avec toutes les informations sur le bogie
-            return [root.position, root.articulated, root.axles_count, root.motorized_axles, root.motorized_axes_powers, root.brakes_counts]
+            return [root.axles_count, root.motorized_axles, root.motorized_axles_powers, root.brakes_counts, root.articulated]
         }
         else {
             // Si aucune valeur n'est inscrite retourne faux
