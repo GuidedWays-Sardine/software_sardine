@@ -149,8 +149,8 @@ Window{
         default_width: 640
         default_height: 32
 
-        type_list: ["freight", "freight", "freight", "passenger", "freight", "passenger", "freight", "passenger", "passenger", "freight", "passenger", "passenger"]
-        position_list: ["front", "middle", "middle", "back", 'front', "middle", "middle", "middle", "middle", "middle", "middle", "back"]
+        type_list: complex_popup.type_list
+        position_list: complex_popup.position_list
 
         is_visible: complex_popup.generated
         visible_count: 10
