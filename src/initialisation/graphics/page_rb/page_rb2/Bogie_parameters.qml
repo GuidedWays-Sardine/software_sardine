@@ -70,43 +70,45 @@ Item {
     property string magnetic_text: "Npatins"
     property string fouccault_text: "Nfouccault"
 
-    //signal appelé à chaque fois que
-    signal updated()
 
     //Fonction pour réinitialiser le module
     function clear() {
-        root.axles_count = []
-        root.motorized_axles = []
-        root.motorized_axles_powers = []
-        root.brakes_counts = []
-        root.current_bogie_index = 0
-        root.previous_index = 0
-        root.articulated = false
+        articulated_check.is_checked = false
         root.any = false
     }
 
+
+    //Fonction permettant de changer les valeurs du module
     function change_values(axles_count, motorized_axles, motorized_axles_powers, brakes_counts, articulated=false) {
         if(axles_count.length != 0) {
+            // Change le nombre de bogies selon la taille des tableaux
+            bogies_count_integerinput.change_value(axles_count.length)
+
+            //Change la valeur pour chacun des tableaux
             root.axles_count = axles_count
             root.motorized_axles = motorized_axles
             root.motorized_axles_powers = motorized_axles_powers
             root.brakes_counts = brakes_counts
-            bogies_count_integerinput.change_value(axles_count.length)
+            articulated_check.is_checked = articulated
+
+            //Réinitialise les index
             root.current_bogie_index = 0
-            root.previous_index = 0
-            root.articulated = false
-            root.any = false
         }
         else {
+            // Si les tableaux de valeurs sont vides, réinitialise le module
             clear()
         }
     }
 
+
+    //Fonction permettant de récupérer les valeurs
     function get_values() {
         if(root.any) {
+            // retourne un tableau avec toutes les informations sur le bogie
             return [root.position, root.articulated, root.axles_count, root.motorized_axles, root.motorized_axes_powers, root.brakes_counts]
         }
         else {
+            // Si aucune valeur n'est inscrite retourne faux
             return false
         }
     }
