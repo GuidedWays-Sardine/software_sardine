@@ -2,19 +2,17 @@
 import os
 import sys
 import time
-from enum import Enum
 
 
 # Librairies graphiques
 from PyQt5.QtCore import QObject
 from PyQt5.QtQml import QQmlApplicationEngine
-from PyQt5.QtWidgets import QFileDialog
 
 
 #Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
-import src.initialisation.initialisation_window as ini
+import src.initialisation.signals.page_rb.pagerb2.complex_data as cd
 import src.misc.settings_dictionary.settings as sd
 import src.misc.translation_dictionary.translation as td
 import src.misc.log.log as log
@@ -28,8 +26,9 @@ class ComplexPopup:
     app = None
     engine = None
     win = None
-    parent = None
 
+    # Base de données train utile au paramétrage
+    train = None
 
     def __init__(self, page_rb):
         """Fonction d'initialisation de la popup de paramétrage complexe train (reliée à la page_rb2)
@@ -40,7 +39,6 @@ class ComplexPopup:
             La page de paramètres train (permettant d'accéder aux widgets du mode simple
         """
         log.change_log_prefix("Initialisation popup train")
-        self.parent = page_rb
 
         # Initialise la popup de paramétrage complexe
         self.engine = QQmlApplicationEngine()
@@ -56,7 +54,7 @@ class ComplexPopup:
             self.win.closed.connect(lambda: self.win.hide())
 
             # Connecte tous les boutons nécessaires au fonctionnement de la popup de paramétrage complex
-            self.win.findChild(QObject, "generate_button").clicked.connect(self.on_complex_generate_clicked)
+            self.win.findChild(QObject, "generate_button").clicked.connect(lambda p=page_rb: self.on_complex_generate_clicked(p))
 
             # TODO : connecter tous les autres boutons
 
@@ -71,14 +69,39 @@ class ComplexPopup:
 
         log.change_log_prefix("Initialisation")
 
-    def on_complex_generate_clicked(self):
-        """Fonction activée lorsque le bouton généré est cliqué"""
-        # Indique aux différentes pages que le mode complexe de paramétrage a été activé
-        self.parent.current_mode = self.parent.Mode.COMPLEX
-        self.parent.page.setProperty("generated", True)
-        self.parent.setProperty("generated", True)
+    def on_complex_generate_clicked(self, parent):
+        """Fonction activée lorsque le bouton généré est cliqué
 
-        #TODO  générer une structure de train
+        Parameters
+        ----------
+        page_rb: `PageRB2`
+            La page de paramètres train (permettant d'accéder aux widgets du mode simple
+        """
+
+
+        try:
+            # Génère le train à partir des données simples
+            simple_parameters = parent.get_simple_mode_values()
+            self.train = cd.Train(simple_parameters)
+        except Exception as error:
+            # S'il y a une erreur, désactive le mode complex et laisse un message d'erreur et désactive le mode complexe
+            log.error("Impossible de correctement générer le train, mode complexe désactivé.\n",
+                      exception=error, prefix="Génération train complexe")
+            self.win.hide()
+            mode_button = parent.page.findChild(QObject, "mode_button")
+            mode_button.setProperty("text", parent.mode_switch[mode_button.property("text")])
+            mode_button.setProperty("is_activable", False)
+            self.loaded = False
+        else:
+            # Sinon indique aux différentes pages que le mode complexe de paramétrage a été activé
+            parent.current_mode = parent.Mode.COMPLEX
+            self.win.setProperty("generated", True)
+            parent.page.setProperty("generated", True)
+
+            # Récupère la liste des types et des positions de chacunes des voitures
+            self.win.setProperty("type_list", [c.mission_type.value for c in self.train.coaches_list])
+            self.win.setProperty("position_list", [c.position_type.value for c in self.train.coaches_list])
+
 
     def get_complex_mode_values(self):
         """Fonction permettant de récupérer toutes les informations de la configuration simple
@@ -93,3 +116,15 @@ class ComplexPopup:
         # TODO : sauvegarder les données
 
         return parameters
+
+    def set_complex_mode_values(self, train_data):
+        pass
+
+    def change_language(self, translation_data):
+        """Fonction permettant de traduire la page de paramétrage train complet (appelé dans la page_rb2
+
+        Parameters
+        ----------
+        translation_data: `td.TranslationData`
+            Didcionnaire de traduction contenant toutes les traductions nécessaires"""
+        pass
