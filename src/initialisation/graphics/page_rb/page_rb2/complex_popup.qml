@@ -138,6 +138,85 @@ Window{
         is_visible: !complex_popup.generated
     }
 
+    //Paramètres pour le bogie avant du train
+    Bogie_parameters {
+        id: front_bogie
+        objectName: "front_bogie"
+
+        default_x: 16
+        default_y: train_preview.default_y - 104
+        generated: complex_popup.generated
+
+        position: "front"
+
+        default_axle_count: complex_popup.default_axle_count
+        default_axle_power: complex_popup.default_axle_power
+        default_pad_brake_count: complex_popup.default_pad_brake_count
+        default_disk_brake_count: complex_popup.default_disk_brake_count
+        default_magnetic_brake_count: complex_popup.default_magnetic_brake_count
+        default_fouccault_brake_count: complex_popup.default_fouccault_brake_count
+
+        max_central_bogies: complex_popup.max_bogies_per_coaches - 2
+        max_axles_per_bogies: complex_popup.max_axles_per_bogies
+        max_axle_power: complex_popup.max_axle_power
+        max_pad_per_axle: complex_popup.max_pad_per_axle
+        max_disk_per_axle: complex_popup.max_disk_per_axle
+        max_magnetic_between_axle: complex_popup.max_magnetic_between_axle
+    }
+
+
+    //Paramètres pour les différents bogies du train
+    Bogie_parameters {
+        id: middle_bogie
+        objectName: "middle_bogie"
+
+        default_x: (640 - 120) * 0.5
+        default_y: train_preview.default_y - 104
+        generated: complex_popup.generated
+
+        position: "middle"
+
+        default_axle_count: complex_popup.default_axle_count
+        default_axle_power: complex_popup.default_axle_power
+        default_pad_brake_count: complex_popup.default_pad_brake_count
+        default_disk_brake_count: complex_popup.default_disk_brake_count
+        default_magnetic_brake_count: complex_popup.default_magnetic_brake_count
+        default_fouccault_brake_count: complex_popup.default_fouccault_brake_count
+
+        max_central_bogies: complex_popup.max_bogies_per_coaches - 2
+        max_axles_per_bogies: complex_popup.max_axles_per_bogies
+        max_axle_power: complex_popup.max_axle_power
+        max_pad_per_axle: complex_popup.max_pad_per_axle
+        max_disk_per_axle: complex_popup.max_disk_per_axle
+        max_magnetic_between_axle: complex_popup.max_magnetic_between_axle
+    }
+
+    //Paramètres pour les différents bogies du train
+    Bogie_parameters {
+        id: back_bogie
+        objectName: "back_bogie"
+
+        default_x: 640 - 120 - 16
+        default_y: train_preview.default_y - 104
+        generated: complex_popup.generated
+
+        position: "front"
+
+        default_axle_count: complex_popup.default_axle_count
+        default_axle_power: complex_popup.default_axle_power
+        default_pad_brake_count: complex_popup.default_pad_brake_count
+        default_disk_brake_count: complex_popup.default_disk_brake_count
+        default_magnetic_brake_count: complex_popup.default_magnetic_brake_count
+        default_fouccault_brake_count: complex_popup.default_fouccault_brake_count
+
+        max_central_bogies: complex_popup.max_bogies_per_coaches - 2
+        max_axles_per_bogies: complex_popup.max_axles_per_bogies
+        max_axle_power: complex_popup.max_axle_power
+        max_pad_per_axle: complex_popup.max_pad_per_axle
+        max_disk_per_axle: complex_popup.max_disk_per_axle
+        max_magnetic_between_axle: complex_popup.max_magnetic_between_axle
+    }
+
 
     // trainpreview pour montrer un apperçu des différentes voitures du train
     INI_trainpreview {
