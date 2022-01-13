@@ -47,7 +47,7 @@ Item {
     readonly property int pages_count: (((root.train_length % root.visible_count) != 0) + (root.train_length - root.train_length % root.visible_count) / root.visible_count)
     onTrain_lengthChanged: {
         //S'assure que l'index montre bien une page contenant des voitures
-        if(root.current_index < root.train_length){
+        if(root.current_index >= root.train_length){
             root.current_index = root.train_length - 1
         }
         // S'occupe de mettre à jour la page et d'appeler les différents signaux dans onCurrent_indexChanged
