@@ -27,6 +27,7 @@ Window{
         else {
             front_bogie.clear()
         }
+    }
     property var middle_bogie_data: []
     onMiddle_bogie_dataChanged: {
         if(complex_popup.middle_bogie_data.length != 0) {
@@ -39,7 +40,7 @@ Window{
     property var back_bogie_data: []
     onBack_bogie_dataChanged: {
     if(complex_popup.back_bogie_data.length != 0){
-            back_bogie.change_values(back_bogie_data[0], back_bogie_data[1], back_bogie_data[2], back_bogie_data[3], back_bogie_data[4])}
+            back_bogie.change_values(back_bogie_data[0], back_bogie_data[1], back_bogie_data[2], back_bogie_data[3], back_bogie_data[4])
         }
         else {
             back_bogie.clear()
