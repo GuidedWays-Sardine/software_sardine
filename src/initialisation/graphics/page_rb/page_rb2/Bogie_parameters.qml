@@ -113,6 +113,24 @@ Item {
         }
     }
 
+
+
+    // Bouton permettant de donner des limites visibles au composant
+    INI_button {
+        id: body
+        objectName: "body"
+
+        default_x: root.default_x
+        default_y: root.default_y
+        default_height: root.any ? 104 : 16
+        default_width: root.any ? 120 : 16
+
+        is_activable: false
+        is_positive: false
+        is_visible: root.generated
+    }
+
+    // Bouton permettant de cacher ou de montrer l'entièreté des paramétrages
     INI_button {
         id: plus_minus_button
         objectName: "plus_minus_button"
