@@ -14,21 +14,20 @@ Item {
 
     //Constantes permettant de controller les différentes valeurs maximales de chacun des trains
     readonly property double max_weight: 1e9            //t
-    readonly property double max_length: 1e9            //mf
+    readonly property double max_length: 1e9            //m
     readonly property int max_coaches: 1e3
-    readonly property int max_bogies: 2 * coaches_integerinput.value
+    readonly property int max_bogies_per_coaches: 1e1   //Utilisé uniquement dans la popup complex
     readonly property int max_axles_per_bogies: 1e1
-    readonly property double max_motor_power: 1e6       //kW
-    readonly property double max_power: max_motor_power * motorized_axles_count_integerinput.value      //NE PAS CHANGER
+    readonly property double max_axle_power: 1e6        //kW
     readonly property double a_max: 1e3                 //kN
     readonly property double b_max: 1e3                 //kN/(km/h)
     readonly property double c_max: 1e3                 //kM/(km/h)²
     readonly property int abc_decimals: 8
     //Par défautl on considèrera : 2 roues (et donc plaquettes) par essieux ; 4 disques par essieux ; 2 patins magnétiques ou de foucault par bogies
-    readonly property int max_brake_pad: 2 * bogies_count_integerinput.value * axles_per_bogies_integerinput.value * 1      //Uniquement changer la dernière constante
-    readonly property int max_brake_disk:4 * bogies_count_integerinput.value * axles_per_bogies_integerinput.value * 1      //Uniquement changer la dernière constante
-    readonly property int max_brake_magnetic: -foucault_brake_integerinput.value + 2 * bogies_count_integerinput.value * (axles_per_bogies_integerinput.value - 1) * 1 //Uniquement changer la dernière constante
-    readonly property int max_brake_foucault: -magnetic_brake_integerinput.value + 2 * bogies_count_integerinput.value * (axles_per_bogies_integerinput.value - 1) * 1 //Uniquement changer la dernière constante
+    //Pour changer ces valeurs merci de uniquement changer la valeur après le *
+    property int max_pad_per_axle: 2 * 1
+    property int max_disk_per_axle: 4 * 1
+    property int max_magnetic_between_axle: 2 * 1       //Identique pour le freinage de foucault
 
 
     //Constantes permettant de controller la taille et la position des différents éléments de la page
@@ -483,7 +482,7 @@ Item {
         default_width: axles_per_bogies_integerinput.default_width
         default_height: motorized_axles_count_integerinput.default_height
 
-        maximum_value: motorized_axles_count_integerinput.value != 0 ? page_rb2.max_motor_power : 0     //Met la valeur ax à celle indiqué sauf si le train a aucun essieu motorisé (auquel cas à 0)
+        maximum_value: motorized_axles_count_integerinput.value != 0 ? page_rb2.max_axle_power : 0     //Met la valeur ax à celle indiqué sauf si le train a aucun essieu motorisé (auquel cas à 0)
         minimum_value: 0
         decimals: 3
 
@@ -549,7 +548,7 @@ Item {
         default_width: motorized_axle_weight_floatinput.default_width
         default_height: axle_power_floatinput.default_height
 
-        maximum_value: motorized_axles_count_integerinput.value != 0 ? page_rb2.max_power : 0     //Met la valeur ax à celle indiqué sauf si le train a aucun essieu motorisé (auquel cas à 0)
+        maximum_value: motorized_axles_count_integerinput.value != 0 ? max_axle_power * motorized_axles_count_integerinput.value : 0     //Met la valeur ax à celle indiqué sauf si le train a aucun essieu motorisé (auquel cas à 0)
         minimum_value: 0
         decimals: 3
 
@@ -935,7 +934,7 @@ Item {
         default_width: page_rb2.input_width
         default_height: page_rb2.input_height
 
-        maximum_value: page_rb2.max_brake_pad
+        maximum_value: page_rb2.max_pad_per_axle * bogies_count_integerinput.value * axles_per_bogies_integerinput.value
         minimum_value: 0
 
         is_max_default: false
@@ -968,7 +967,7 @@ Item {
         default_width: pad_brake_integerinput.default_width
         default_height: pad_brake_integerinput.default_height
 
-        maximum_value: page_rb2.max_brake_magnetic
+        maximum_value: -foucault_brake_integerinput.value + page_rb2.max_magnetic_between_axle * bogies_count_integerinput.value * (axles_per_bogies_integerinput.value - 1)
         minimum_value: 0
 
         is_max_default: false
@@ -1023,7 +1022,7 @@ Item {
         default_width: pad_brake_integerinput.default_width
         default_height: pad_brake_integerinput.default_height
 
-        maximum_value: page_rb2.max_brake_disk
+        maximum_value: page_rb2.max_disk_per_axle * bogies_count_integerinput.value * axles_per_bogies_integerinput.value
         minimum_value: 0
 
         is_max_default: false
@@ -1056,7 +1055,7 @@ Item {
         default_width: magnetic_brake_integerinput.default_width
         default_height: magnetic_brake_integerinput.default_height
 
-        maximum_value: page_rb2.max_brake_foucault
+        maximum_value: -magnetic_brake_integerinput.value + page_rb2.max_magnetic_between_axle * bogies_count_integerinput.value * (axles_per_bogies_integerinput.value - 1)
         minimum_value: 0
 
         is_max_default: false
