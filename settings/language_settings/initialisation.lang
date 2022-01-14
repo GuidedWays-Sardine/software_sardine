@@ -43,7 +43,7 @@ Sauvegarder les données ?; Save data ?
 Train;Train
 
 Configuration du train;Train configuration
-Nom du train(utilisé pour le nom du fichier);Train name(used for the file name)
+Nom du train (utilisé pour le nom du fichier);Train name (used for the file name)
 
 Informations générales;General informations
 Mconvoi;Mconvoy
@@ -78,6 +78,17 @@ Fret;Freight
 Sauvegarder;Save
 Freinage;Brakes
 
+# Popup de paramétrage complexe
+Générer;Generate
+Avant de générer le fichier il est important de compléter le paramétrage simple.;Before generating the file, it is important to complete the simple parametrization.
+Une fois le train généré, Certains paramètres seront inchangeables ou utilisés comme valeurs par défaut.;Once the train generated, Some parameters will be impossible to change or used for default values.
+Articulé ?;Jacob ?
+Nessieux;Naxles
+Pmoteur;Pmotor
+Nplaquettes;Npads
+Npatins magnétiques;Nmagnetic brakes
+Ndisques;Ndisks
+Nfoucault;Nfoucault
 
 
 #page_rb8

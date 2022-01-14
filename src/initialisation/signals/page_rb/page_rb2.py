@@ -268,7 +268,7 @@ class PageRB2:
                           "motorized_axle_weight_text", "power_text", "dynamic_data_name", "alimentation_data_name",
                           "pantograph_check", "thermic_check", "brake_data_name", "pad_brake_text",
                           "magnetic_brake_text", "regenerative_check", "disk_brake_text", "foucault_brake_text",
-                          "dynamic_check", "mode_text", "open_button", "save_button", "brake_configuration"]:
+                          "dynamic_check", "mode_text", "open_button", "save_button", "brake_configuration_button"]:
             widget = self.page.findChild(QObject, widget_id)
             widget.setProperty("text", translation_data[widget.property("text")])
 

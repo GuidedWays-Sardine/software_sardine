@@ -126,5 +126,17 @@ class ComplexPopup:
         Parameters
         ----------
         translation_data: `td.TranslationData`
-            Didcionnaire de traduction contenant toutes les traductions nécessaires"""
-        pass
+            Dicionnaire de traduction contenant toutes les traductions nécessaires"""
+        # Commence par traduire les différents textes visibles (fenêtre de génération)
+        for widget_id in ["generate_button", "generate_l1", "generate_l2"]:
+            widget = self.win.findChild(QObject, widget_id)
+            widget.setProperty("text", translation_data[widget.property("text")])
+
+        # Continue par traduire les textes des paramètres bogies
+        for widget_id in ["front_bogie", "middle_bogie", "back_bogie"]:
+            widget = self.win.findChild(QObject, widget_id)
+
+            # Traduit chacuns des mots contenue dans le widget bogie parameters
+            for parameter in ["articulated_text", "axle_text", "motor_text",
+                              "pad_text", "disk_text", "magnetic_text", "foucault_text"]:
+                widget.setProperty(parameter, translation_data[widget.property(parameter)])

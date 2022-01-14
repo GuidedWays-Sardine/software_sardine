@@ -67,7 +67,7 @@ Item {
     property string motor_text: "Pmoteur"
     property string pad_text: "Nplaquettes"
     property string disk_text: "Ndisques"
-    property string magnetic_text: "Npatins"
+    property string magnetic_text: "Npatins magnétiques"
     property string foucault_text: "Nfoucault"
 
 

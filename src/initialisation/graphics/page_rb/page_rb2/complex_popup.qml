@@ -84,8 +84,8 @@ Window{
         id: generate_button
         objectName: "generate_button"
 
-        default_x: 520
-        default_y: 0
+        default_x: (640 - default_width)/2
+        default_y: 300
         default_width: 120
         default_height: 50
 
@@ -118,26 +118,14 @@ Window{
         default_x: generate_l1.default_x
         default_y: generate_l1.default_y + 2 * font_size
 
-        text: "Une fois le train générer, il sera impossible ou long de changer certains paramètres."
+        text: "Une fois le train généré, Certains paramètres seront inchangeables ou utilisés comme valeurs par défaut."
         font_size: general_l1.font_size
 
         is_dark_grey: false
         is_visible: !complex_popup.generated
     }
 
-    INI_text {
-        id: generate_l3
-        objectName: "generate_l3"
 
-        default_x: generate_l2.default_x + 2 * font_size
-        default_y: generate_l2.default_y + font_size
-
-        text: "(nombre de voitures et type du train)"
-        font_size: general_l2.font_size
-
-        is_dark_grey: false
-        is_visible: !complex_popup.generated
-    }
 
     //Paramètres pour le bogie avant du train
     Bogie_parameters {
