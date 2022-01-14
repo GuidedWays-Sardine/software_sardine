@@ -235,6 +235,19 @@ Item {
         is_activable: !page_rb2.generated
         is_positive: false
         is_visible: true
+
+        //Signal appelé lorsque la valeur augmente. Permet de changer le nombre de bogie de façon sécurisée
+        onValue_changed: {
+            //Dans le cas où la nouvelle valeur est supérieure
+            if(bogies_count_integerinput.maximum_value > 2 * value) {
+                bogies_count_integerinput.minimum_value = value + 1
+                bogies_count_integerinput.maximum_value = 2 * value
+            }
+            else {
+                bogies_count_integerinput.maximum_value = 2 * value
+                bogies_count_integerinput.minimum_value = value + 1
+            }
+        }
     }
 
 
@@ -264,8 +277,8 @@ Item {
         default_width: weight_floatinput.default_width
         default_height: weight_floatinput.default_height
 
-        maximum_value: page_rb2.max_bogies
-        minimum_value: coaches_integerinput.value + 1
+        maximum_value: 2
+        minimum_value: 2
 
         is_max_default: true
         is_activable: !page_rb2.generated
