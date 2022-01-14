@@ -132,6 +132,17 @@ Item{
         }
     }
 
+    //Signal détectact lorsque is_max_default est changé
+    onIs_max_defaultChanged: {
+        //Dans le cas où aucune valeur n'est entrée et que la valeur min et max diffèrent (la valeur va changer de borne)
+        if(body.text == "" && root.maximum_value > root.minimum_value) {
+            root.value = root.is_max_default ? root.maximum_value : root.minimum_value
+            value_changed()
+        }
+    }
+
+
+
     //Zone d'entrée de texte
     TextField {
         id: body
