@@ -221,7 +221,7 @@ Item {
 
                 //Mets à jour les boutons de motorisations pour chacun des essieux
                 for (let i = 0; i < root.motorized_axles[root.current_bogie_index].length; i++) {
-                    motorisation.itemAt(i).text = root.motorized_axles[root.current_bogie_index][i] ? "x" : ""
+                    motorisation.itemAt(i).background_color = root.motorized_axles[root.current_bogie_index][i] ? dark_grey : ""
                 }
 
                 //Repasse l'index de l'essieu à 0
@@ -372,7 +372,7 @@ Item {
 
             //Mets à jour si l'essieu est motorisé pour tous les essieux
             for (let i = 0; i < root.motorized_axles[root.current_bogie_index].length; i++) {
-                motorisation.itemAt(i).text = root.motorized_axles[root.current_bogie_index][i] ? "x" : ""
+                motorisation.itemAt(i).background_color = root.motorized_axles[root.current_bogie_index][i] ? dark_grey : ""
             }
         }
     }
@@ -417,7 +417,7 @@ Item {
                  root.motorized_axles[root.current_bogie_index][index] = !root.motorized_axles[root.current_bogie_index][index]
 
                  // Mets une croix ou non selon si l'essieu est maintenant motorisé ou non
-                 text = root.motorized_axles[root.current_bogie_index][index] ? "x" : ""
+                 background_color = root.motorized_axles[root.current_bogie_index][index] ? dark_grey : ""
 
                  // Change la valeur de la puissance moteur à 0 si la motorisation est enlevée et à la valeur par défaut
                  root.motorized_axles_powers[root.current_bogie_index][index] = root.motorized_axles[root.current_bogie_index][index] ? root.default_axle_power : 0

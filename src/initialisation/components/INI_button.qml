@@ -41,11 +41,16 @@ Item {
     property bool is_visible: true           //si le bouton est visible
     visible: root.is_visible
 
+    //Propriétés sur les couleurs dans le cas où il faut les changer
+    property string background_color: ""
+    property string light_shadow_color: ""
+    property string dark_shadow_color: ""
+
     //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
     readonly property string dark_blue : "#031122"  //partie 5.2.1.3.3  Nr 6
     readonly property string black: "#000000"       //partie 5.2.1.3.3  Nr 2
     readonly property string grey: "#C3C3C3"        //partie 5.2.1.3.3  Nr 3
-    readonly property string dark_grey: "#555555"   //partie 5.2.1.3.3  Nr 4
+    readonly property string dark_grey: "#555555"   //partie 5.2.1.3.3  Nr 5
     readonly property string shadow: "#08182F"      //partie 5.2.1.3.3  Nr 7
 
     //Chemin d'accès vers les icones utiles pour le check_button
@@ -63,7 +68,7 @@ Item {
 
         anchors.fill: parent
 
-        color: root.dark_blue
+        color: (root.background_color == "" ? root.dark_blue : root.background_color)
     }
 
     //Image visible sur le bouton
@@ -110,7 +115,7 @@ Item {
         anchors.bottom: body.bottom
         anchors.left: body.left
 
-        color: !root.button_pressed ? root.shadow : "transparent"
+        color: !root.button_pressed ? (root.light_shadow_color == "" ? root.shadow : root.light_shadow_color) : "transparent"
     }
 
     //Rectangle pour l'ombre extérieure droite
@@ -122,7 +127,7 @@ Item {
         anchors.bottom: body.bottom
         anchors.top: body.top
 
-        color: !root.button_pressed ? root.shadow : "transparent"
+        color: !root.button_pressed ? (root.light_shadow_color == "" ? root.shadow : root.light_shadow_color) : "transparent"
     }
 
     //Rectangle pour l'ombre extérieure supérieure
@@ -134,7 +139,7 @@ Item {
         anchors.left: body.left
         anchors.right: out_right_shadow.left
 
-        color: !root.button_pressed ? root.black : "transparent"
+        color: !root.button_pressed ? (root.dark_shadow_color == "" ? root.black : root.dark_shadow_color) : "transparent"
     }
 
     //Rectangle pour l'ombre extérieure gauche
@@ -146,7 +151,7 @@ Item {
         anchors.left: body.left
         anchors.bottom: out_bottom_shadow.top
 
-        color: !root.button_pressed ? root.black : "transparent"
+        color: !root.button_pressed ? (root.dark_shadow_color == "" ? root.black : root.dark_shadow_color) : "transparent"
     }
 
 
@@ -160,7 +165,7 @@ Item {
         anchors.left: out_left_shadow.right
         anchors.right: out_right_shadow.left
 
-        color: is_positive && !root.button_pressed ? root.black : "transparent"
+        color: is_positive && !root.button_pressed ? (root.dark_shadow_color == "" ? root.black : root.dark_shadow_color) : "transparent"
     }
 
     //Rectangle pour l'ombre intérieure droite
@@ -172,7 +177,7 @@ Item {
         anchors.bottom: out_bottom_shadow.top
         anchors.top: out_top_shadow.bottom
 
-        color: is_positive && !root.button_pressed ? root.black : "transparent"
+        color: is_positive && !root.button_pressed ? (root.dark_shadow_color == "" ? root.black : root.dark_shadow_color) : "transparent"
     }
 
     //Rectangle pour l'ombre intérieure supérieure
@@ -184,7 +189,7 @@ Item {
         anchors.left: out_left_shadow.right
         anchors.right: in_right_shadow.left
 
-        color: is_positive && !root.button_pressed ? root.shadow : "transparent"
+        color: is_positive && !root.button_pressed ? (root.light_shadow_color == "" ? root.shadow : root.light_shadow_color) : "transparent"
     }
 
     //Rectangle pour l'ombre intérieure gauche
@@ -196,7 +201,7 @@ Item {
         anchors.top: out_top_shadow.bottom
         anchors.bottom: in_bottom_shadow.top
 
-        color: is_positive && !root.button_pressed ? root.shadow : "transparent"
+        color: is_positive && !root.button_pressed ? (root.light_shadow_color == "" ? root.shadow : root.light_shadow_color) : "transparent"
     }
 
     //Zone de détection de souris (utile pour détecter les cliques)
