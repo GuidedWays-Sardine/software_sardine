@@ -188,7 +188,7 @@ Item{
                 // On vérifira que la valeur entrée est supérieur à la valeur minimale dans onCursorVisibleChanged
 
                 //vérifie si la nouvelle valeur est différente de l'ancienne, si oui appelle le signal value_changed et la change
-                if(root.value !== input_value){
+                if(root.value !== input_value && input_value >= root.minimum_value){
                     root.value = input_value
                     value_changed()
                 }
@@ -205,7 +205,7 @@ Item{
             //Dans le cas où une valeur a été entrée
             if(body.text != "") {
                 //Récupère la valeur
-                input_value = parseFloat(body.text.replace(",", "."))
+                var input_value = parseFloat(body.text.replace(",", "."))
 
                 //S'assure que la valeur actuelle n'est pas trop faible
                 if(input_value < root.minimum_value) {
