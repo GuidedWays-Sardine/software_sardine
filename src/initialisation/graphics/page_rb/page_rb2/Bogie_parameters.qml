@@ -140,7 +140,7 @@ Item {
         default_width: 16
         default_height: 16
 
-        default_image: root.any ? "grey_minus.bmp" : "grey_plus.bmp"
+        default_image: root.any ? "Navigation/grey_minus.bmp" : "Navigation/grey_plus.bmp"
 
         is_activable: true
         is_positive: false
@@ -181,8 +181,8 @@ Item {
         default_height: plus_minus_button.default_height
         default_width: plus_minus_button.default_width
 
-        image_activable: "grey_left_arrow.bmp"
-        image_not_activable: "dark_grey_left_arrow.bmp"
+        image_activable: "Navigation/grey_left_arrow.bmp"
+        image_not_activable: "Navigation/dark_grey_left_arrow.bmp"
 
         is_activable: root.current_bogie_index > 0
         is_positive: false
@@ -314,8 +314,8 @@ Item {
         default_height: plus_minus_button.default_height
         default_width: plus_minus_button.default_width
 
-        image_activable: "grey_right_arrow.bmp"
-        image_not_activable: "dark_grey_right_arrow.bmp"
+        image_activable: "Navigation/grey_right_arrow.bmp"
+        image_not_activable: "Navigation/dark_grey_right_arrow.bmp"
 
         is_activable: root.current_bogie_index < (bogies_count_integerinput.value - 1)
         is_positive: false
@@ -442,8 +442,8 @@ Item {
         default_height: plus_minus_button.default_height
         default_width: plus_minus_button.default_width
 
-        image_activable: "grey_left_arrow.bmp"
-        image_not_activable: "dark_grey_left_arrow.bmp"
+        image_activable: "Navigation/grey_left_arrow.bmp"
+        image_not_activable: "Navigation/dark_grey_left_arrow.bmp"
 
         is_activable: root.current_axle_index > 0
         is_positive: false
@@ -491,8 +491,8 @@ Item {
         default_height: axle_index_button.default_height
         default_width: axle_index_button.default_width
 
-        image_activable: "grey_right_arrow.bmp"
-        image_not_activable: "dark_grey_right_arrow.bmp"
+        image_activable: "Navigation/grey_right_arrow.bmp"
+        image_not_activable: "Navigation/dark_grey_right_arrow.bmp"
 
         is_activable: root.current_axle_index < (axles_count_integerinput.value - 1)
         is_positive: false

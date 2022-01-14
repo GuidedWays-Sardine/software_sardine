@@ -104,8 +104,8 @@ Item {
         default_width: root.default_height
         default_height: root.default_height
 
-        image_activable: "grey_left_arrow.bmp"
-        image_not_activable: "dark_grey_left_arrow.bmp"
+        image_activable: "Navigation/grey_left_arrow.bmp"
+        image_not_activable: "Navigation/dark_grey_left_arrow.bmp"
 
         is_positive: root.side_buttons_positive
         is_activable: root.current_page > 0 && root.is_activable
@@ -126,8 +126,8 @@ Item {
         default_width: root.default_height
         default_height: root.default_height
 
-        image_activable: "grey_right_arrow.bmp"
-        image_not_activable: "dark_grey_right_arrow.bmp"
+        image_activable: "Navigation/grey_right_arrow.bmp"
+        image_not_activable: "Navigation/dark_grey_right_arrow.bmp"
 
         is_positive: root.side_buttons_positive
         is_activable: root.current_page < root.pages_count - 1 && root.is_activable
