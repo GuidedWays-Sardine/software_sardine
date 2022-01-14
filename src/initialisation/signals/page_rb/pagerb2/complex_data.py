@@ -158,7 +158,7 @@ class Bogie:
     pad_brake_count = 0
     disk_brake_count = 0
     magnetic_brake_count = 0
-    fouccault_brake_count = 0
+    foucault_brake_count = 0
 
     def __init__(self, position, linked_coaches, axles_count, motorized_axles_count, axle_power, braking_systems_count):
         """Fonction permettant d'initialiser un bogie
@@ -177,7 +177,7 @@ class Bogie:
         axle_power: `float`
             puissance de chacun des moteurs
         braking_systems_count: `list`
-            list[int] -> [pad_brake, disk_brake, magnetic_brake, fouccault_brake]
+            list[int] -> [pad_brake, disk_brake, magnetic_brake, foucault_brake]
         """
         self.position = position
         if isinstance(linked_coaches, list):
@@ -198,7 +198,7 @@ class Bogie:
             self.pad_brake_count = 0 if len(braking_systems_count) <= 0 else braking_systems_count[0]
             self.disk_brake_count = 0 if len(braking_systems_count) <= 1 else braking_systems_count[1]
             self.magnetic_brake_count = 0 if len(braking_systems_count) <= 2 else braking_systems_count[2]
-            self.fouccault_brake_count = 0 if len(braking_systems_count) <= 3 else braking_systems_count[3]
+            self.foucault_brake_count = 0 if len(braking_systems_count) <= 3 else braking_systems_count[3]
 
     def get_motorized_axles_count(self):
         """Fonction permettant de retourner le nombre d'essieux moteurs
@@ -249,7 +249,7 @@ class Train:
         - Les bogies articulés seront mis de préférence en milieu de train
         - Le train sera considéré comme une unité simple (cela peut facilement être modifié)
         - Les essieux moteurs seront mis à l'extérieur du train
-        - Les systèmes de freinages seront mis de préférence à l'avant et à l'arrière du train (magnétique puis fouccault)
+        - Les systèmes de freinages seront mis de préférence à l'avant et à l'arrière du train (magnétique puis foucault)
 
         Parameters
         ----------

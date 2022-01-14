@@ -53,7 +53,7 @@ Window{
     property int default_pad_brake_count: 0
     property int default_disk_brake_count: 0
     property int default_magnetic_brake_count: 0
-    property int default_fouccault_brake_count: 0
+    property int default_foucault_brake_count: 0
 
     //Propriétés sur les différentes limites de paramétrabilité
     property int max_bogies_per_coaches: 1e1
@@ -62,7 +62,7 @@ Window{
     property double max_axle_power: 1e4
     property int max_pad_per_axle: 2
     property int max_disk_per_axle: 4
-    property int max_magnetic_between_axle: 2       //Identique pour le freinage de fouccault
+    property int max_magnetic_between_axle: 2       //Identique pour le freinage de foucault
 
 
 
@@ -155,7 +155,7 @@ Window{
         default_pad_brake_count: complex_popup.default_pad_brake_count
         default_disk_brake_count: complex_popup.default_disk_brake_count
         default_magnetic_brake_count: complex_popup.default_magnetic_brake_count
-        default_fouccault_brake_count: complex_popup.default_fouccault_brake_count
+        default_foucault_brake_count: complex_popup.default_foucault_brake_count
 
         max_central_bogies: complex_popup.max_bogies_per_coaches - 2
         max_axles_per_bogies: complex_popup.max_axles_per_bogies
@@ -182,7 +182,7 @@ Window{
         default_pad_brake_count: complex_popup.default_pad_brake_count
         default_disk_brake_count: complex_popup.default_disk_brake_count
         default_magnetic_brake_count: complex_popup.default_magnetic_brake_count
-        default_fouccault_brake_count: complex_popup.default_fouccault_brake_count
+        default_foucault_brake_count: complex_popup.default_foucault_brake_count
 
         max_central_bogies: complex_popup.max_bogies_per_coaches - 2
         max_axles_per_bogies: complex_popup.max_axles_per_bogies
@@ -208,7 +208,7 @@ Window{
         default_pad_brake_count: complex_popup.default_pad_brake_count
         default_disk_brake_count: complex_popup.default_disk_brake_count
         default_magnetic_brake_count: complex_popup.default_magnetic_brake_count
-        default_fouccault_brake_count: complex_popup.default_fouccault_brake_count
+        default_foucault_brake_count: complex_popup.default_foucault_brake_count
 
         max_central_bogies: complex_popup.max_bogies_per_coaches - 2
         max_axles_per_bogies: complex_popup.max_axles_per_bogies

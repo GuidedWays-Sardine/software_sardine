@@ -24,11 +24,11 @@ Item {
     readonly property double b_max: 1e3                 //kN/(km/h)
     readonly property double c_max: 1e3                 //kM/(km/h)²
     readonly property int abc_decimals: 8
-    //Par défautl on considèrera : 2 roues (et donc plaquettes) par essieux ; 4 disques par essieux ; 2 patins magnétiques ou de fouccault par bogies
+    //Par défautl on considèrera : 2 roues (et donc plaquettes) par essieux ; 4 disques par essieux ; 2 patins magnétiques ou de foucault par bogies
     readonly property int max_brake_pad: 2 * bogies_count_integerinput.value * axles_per_bogies_integerinput.value * 1      //Uniquement changer la dernière constante
     readonly property int max_brake_disk:4 * bogies_count_integerinput.value * axles_per_bogies_integerinput.value * 1      //Uniquement changer la dernière constante
-    readonly property int max_brake_magnetic: -fouccault_brake_integerinput.value + 2 * bogies_count_integerinput.value * (axles_per_bogies_integerinput.value - 1) * 1 //Uniquement changer la dernière constante
-    readonly property int max_brake_fouccault: -magnetic_brake_integerinput.value + 2 * bogies_count_integerinput.value * (axles_per_bogies_integerinput.value - 1) * 1 //Uniquement changer la dernière constante
+    readonly property int max_brake_magnetic: -foucault_brake_integerinput.value + 2 * bogies_count_integerinput.value * (axles_per_bogies_integerinput.value - 1) * 1 //Uniquement changer la dernière constante
+    readonly property int max_brake_foucault: -magnetic_brake_integerinput.value + 2 * bogies_count_integerinput.value * (axles_per_bogies_integerinput.value - 1) * 1 //Uniquement changer la dernière constante
 
 
     //Constantes permettant de controller la taille et la position des différents éléments de la page
@@ -1019,24 +1019,24 @@ Item {
         is_visible: true
     }
 
-    //integerinput pour connaitre le nombre de systèmes de freinage de fouccault
+    //integerinput pour connaitre le nombre de systèmes de freinage de foucault
     INI_text {
-        id: fouccault_brake_text
-        objectName: "fouccault_brake_text"
+        id: foucault_brake_text
+        objectName: "foucault_brake_text"
 
-        text: "Nfouccault"
+        text: "Nfoucault"
         font_size: 12
 
-        default_x: fouccault_brake_integerinput.default_x + 2
-        default_y: fouccault_brake_integerinput.default_y - 4 - font_size
+        default_x: foucault_brake_integerinput.default_x + 2
+        default_y: foucault_brake_integerinput.default_y - 4 - font_size
 
         is_dark_grey: (axles_per_bogies_integerinput.value <= 1) || page_rb2.generated
         is_visible: true
     }
 
     INI_integerinput{
-        id: fouccault_brake_integerinput
-        objectName: "fouccault_brake_integerinput"
+        id: foucault_brake_integerinput
+        objectName: "foucault_brake_integerinput"
 
         default_x: disk_brake_integerinput.default_x + page_rb2.x_offset
         default_y: disk_brake_integerinput.default_y
@@ -1057,8 +1057,8 @@ Item {
         id: dynamic_check
         objectName: "dynamic_check"
 
-        default_x: fouccault_brake_integerinput.default_x + page_rb2.x_offset
-        default_y: fouccault_brake_integerinput.default_y + (page_rb2.input_height - page_rb2.checkbutton_box_length) * 0.5
+        default_x: foucault_brake_integerinput.default_x + page_rb2.x_offset
+        default_y: foucault_brake_integerinput.default_y + (page_rb2.input_height - page_rb2.checkbutton_box_length) * 0.5
         box_length: regenerative_check.box_length
 
         text: "Rhéostatique ?"

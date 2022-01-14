@@ -75,7 +75,7 @@ class PageRB2:
                           "motorized_axle_weight_floatinput", "axle_power_floatinput", "power_floatinput",
                           "a_floatinput", "b_floatinput", "c_floatinput",
                           "pad_brake_integerinput", "magnetic_brake_integerinput",
-                          "disk_brake_integerinput", "fouccault_brake_integerinput"]:
+                          "disk_brake_integerinput", "foucault_brake_integerinput"]:
             self.valueinput[widget_id] = self.page.findChild(QObject, widget_id)
 
         # Initialise la combobox avec les types de trains
@@ -267,7 +267,7 @@ class PageRB2:
                           "bogies_count_text", "axles_per_bogies_text", "motorized_axles_count_text", "axle_power_text",
                           "motorized_axle_weight_text", "power_text", "dynamic_data_name", "alimentation_data_name",
                           "pantograph_check", "thermic_check", "brake_data_name", "pad_brake_text",
-                          "magnetic_brake_text", "regenerative_check", "disk_brake_text", "fouccault_brake_text",
+                          "magnetic_brake_text", "regenerative_check", "disk_brake_text", "foucault_brake_text",
                           "dynamic_check", "mode_text", "open_button", "save_button", "brake_configuration"]:
             widget = self.page.findChild(QObject, widget_id)
             widget.setProperty("text", translation_data[widget.property("text")])
