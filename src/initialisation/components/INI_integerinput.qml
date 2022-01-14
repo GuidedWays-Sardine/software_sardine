@@ -29,8 +29,7 @@ Item{
     //Propriétés liés aux valeurs limites et la valeur actuellement sélectionnée
     property int minimum_value: 0
     property int maximum_value: 1
-    readonly property int value: body.text != "" ? parseInt(body.text) > root.minimum_value ? parseInt(body.text) : root.minimum_value : (is_max_default ? root.maximum_value : root.minimum_value)   //Valeur actuelle
-    property int previous_value: root.is_max_default ? root.maximum_value : root.minimum_value    //Ancienne valeur ; nécessaire pour détecter le changement de valeur et appeler value_changed()
+    property int value: 0
 
     property int font_size: 12
 
@@ -59,28 +58,27 @@ Item{
         // Vérifie si la valeur actuellement visible est différente que la valeur quand vidé, change la valeur et appelle le signal value_changed si c'est le cas
         var changed = root.is_max_default ? root.value !== root.maximum_value : root.value !== root.minimum_value
         body.text = ""
+        
         if(changed){
+            root.value = root.is_max_default ? root.maximum_value : root.minimum_value
             value_changed()
-            root.previous_value = root.is_max_default ? root.maximum_value : root.minimum_value
         }
     }
 
     //Fonction permettant de changer la valeur du valueinput (de manière sécurisée)
     function change_value(new_value){
         //Si la valeur n'est pas valide (trop grand ou trop petite) la change
-        if(new_value <= root.minimum_value){
-            body.text = root.is_max_default ? root.minimum_value.toString() : ""
+        if(new_value < root.minimum_value || new_value > root.maximum_value) {
+            new_value = new_value < root.minimum_value ? root.minimum_value: root.maximum_value
         }
-        else if(new_value >= root.maximum_value){
-            body.text = root.is_max_default ? "" : root.maximum_value.toString()
-        }
-        else {
-            body.text = new_value.toString()
-        }
+        
+        // Si la valeur vaut la valeur min sans is_max_default ou max avec is_max_default, vide la zone de texte, sinon met la valeur envoyée
+        body.text = ((new_value === root.minimum_value && !root.is_max_default) || (new_value === root.maximum_value && root.is_max_default)) ? "" : new_value.toString()
 
-        if(root.value !== root.previous_value){
+        //Si la valeur a été changée, appelle le signal value_changed
+        if(value !== new_value){
+            root.value = new_value
             value_changed()
-            root.previous_value = new_value
         }
     }
 
@@ -91,21 +89,23 @@ Item{
         if(root.minimum_value < 0){
             root.minimum_value = 0
         }
+
+        //Cas où la valeur minimale est supérieure à la valeur maximale
         if(root.minimum_value > root.maximum_value){
             root.mimimum_value = root.maximum_value
         }
+
         //cas où la valeur actuelle rentrée est inférieure à la nouvelle valeur minimale
         if(body.text != "" && parseInt(body.text) <= root.minimum_value){
+            root.value = root.minimum_value
             body.text = (root.is_max_default && root.maximum_value !== root.minimum_value) ? root.minimum_value.toString() : ""
             value_changed()
-            root.previous_value = root.minimum_value
         }
         //cas où aucune valeur n'est entrée et que is_max_default faux
         else if(body.text === "" && !root.is_max_default){
-            body.text = root.minimum_value.toString()
-            value_changed()
+            root.value = root.minimum_value
             body.text = ""
-            root.previous_value = root.minimum_value
+            value_changed()
         }
     }
 
@@ -115,22 +115,23 @@ Item{
         if(root.maximum_value < root.minimum_value){
             root.maximum_value = root.minimum_value
         }
+
         //cas où la valeur maximale est inférieure à la valeur minimale
         if(root.maximum_value < root.minimum_value){
             root.maximum_value = root.minimum_value
         }
+
         //cas où la valeur actuelle rentrée est supériere à la nouvelle valeur maximale
         if(body.text != "" && parseInt(body.text) >= root.maximum_value){
+            root.value = root.maximum_value
             body.text = (root.is_max_default || root.maximum_value === root.minimum_value) ? "" : root.maximum_value.toString()
             value_changed()
-            root.previous_value = root.maximum_value
         }
         //cas où aucune valeur n'est entrée et que is_max_default vrai
         else if(body.text === "" && root.is_max_default) {
-            body.text = root.maximum_value.toString()
-            value_changed()
+            root.value = root.maximum_value
             body.text = ""
-            root.previous_value = root.maximum_value
+            value_changed()
         }
     }
 
@@ -162,38 +163,48 @@ Item{
 
         //détecte quand le texte entrée est changé et vérifie si la valeur entrée est valide
         onDisplayTextChanged: {
+            //Dans le cas où une valeur a été entrée
             if(body.text != ""){
+                //Récupère la valeur
                 var input_value = parseInt(body.text)
-                //cas où la valeur entrée est supérieur à la valeur maximale (remet la valeur dans les limites)
-                if((input_value > root.maximum_value && root.is_max_default) || (input_value < root.minimum_value && !root.is_max_default)){
-                    body.text = ""
-                }
-                else if(parseInt(body.text) > root.maximum_value) {
+
+                //Si la valeur est supérieur à la valeur maximale (s'occupe de remettre la valeur dans les limites
+                if(input_value > root.maximum_value) {
+                    input_value = root.maximum_value
                     body.text = root.is_max_default ? "" : root.maximum_value.toString()
                 }
-                // On vérifiera que la valeur entrée est supérieur à la valeur minimale dans onCursorVisibleChanged
+                // On vérifira que la valeur entrée est supérieur à la valeur minimale dans onCursorVisibleChanged
 
-                //vérifie si la nouvelle valeur est différente de l'ancienne, si oui appelle le signal value_changed
-                if(root.value !== root.previous_value){
+                //vérifie si la nouvelle valeur est différente de l'ancienne, si oui appelle le signal value_changed et la change
+                if(root.value !== input_value){
+                    root.value = input_value
                     value_changed()
-                    root.previous_value = parseInt(body.text)
                 }
             }
-            else if((root.is_max_default && root.previous_value != root.maximum_value) || (!root.is_max_default && root.previous_value != root.minimum_value)) {
+            //Dans le cas où la case a été vidée
+            else if((root.is_max_default && root.value != root.maximum_value) || (!root.is_max_default && root.value != root.minimum_value)) {
+                root.value = root.is_max_default ? root.maximum_value : root.minimum_value
                 value_changed()
-                root.previous_value = root.is_max_default ? root.maximum_value : root.minimum_value
             }
         }
 
+        //Détecte lorsque le composant perd le focus (lorsque la barre clignotante disparait de l'encadré)
         onCursorVisibleChanged: {
-            // Lorsque le valueinput n'est plus sélectionné, s'assure que la valeur entrée n'est pas trop faible
-            if(parseInt(body.text) < root.minimum_value) {
-                body.text = root.is_max_default ? root.minimum_value.toString() : ""
+            //Dans le cas où une valeur a été entrée
+            if(body.text != ""){
+                //Récupère la valeur
+                input_value = parseInt(body.text)
 
-                //Si la valeur entrée était plus faible et que celle-ci à changée
-                if(root.previous_value !== root.minimum_value){
+                //S'assure que la valeur actuelle n'est pas trop faible
+                if(input_value < root.minimum_value) {
+                    input_value = root.minimum_value
+                    body.text = root.is_max_default ? root.minimum_value.toString() : ""
+                }
+
+                //vérifie si la nouvelle valeur est différente de l'ancienne, si oui appelle le signal value_changed et la change
+                if(root.value !== input_value){
+                    root.value = input_value
                     value_changed()
-                    root.previous_value = root.minimum_value
                 }
             }
         }
