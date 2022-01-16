@@ -10,8 +10,8 @@ Item {
     id: root
 
     //Propriétés sur la position et la taille du trainpreview
-    property int default_x: 100
-    property int default_y: 100
+    property int default_x: 0
+    property int default_y: 0
     property int default_width: 640
     property int default_height: 40
     property int visible_count: 10
@@ -33,8 +33,7 @@ Item {
     //propriétés relié à la visibilité et la présentation de la barre
     property bool is_visible: true
     property bool is_activable: true
-    property bool side_buttons_positive: false
-    property bool coaches_buttons_positive: false
+    properyty bool is_positive: false
 
 
     //Propriété sur la liste des voitures
@@ -107,7 +106,7 @@ Item {
         image_activable: "Navigation/grey_left_arrow.bmp"
         image_not_activable: "Navigation/dark_grey_left_arrow.bmp"
 
-        is_positive: root.side_buttons_positive
+        is_positive: root.is_positive
         is_activable: root.current_page > 0 && root.is_activable
         is_visible: root.is_visible
 
@@ -129,7 +128,7 @@ Item {
         image_activable: "Navigation/grey_right_arrow.bmp"
         image_not_activable: "Navigation/dark_grey_right_arrow.bmp"
 
-        is_positive: root.side_buttons_positive
+        is_positive: root.is_positive
         is_activable: root.current_page < root.pages_count - 1 && root.is_activable
         is_visible: root.is_visible
 
@@ -150,7 +149,7 @@ Item {
 
         text: root.current_page > 0 ? "..." : ""
 
-        is_positive: root.coaches_buttons_positive
+        is_positive: root.is_positive
         is_activable: false
         is_dark_grey: false
         is_visible: root.is_visible
@@ -169,7 +168,7 @@ Item {
 
         text: root.current_page < root.pages_count - 1 ? "..." : ""
 
-        is_positive: root.coaches_buttons_positive
+        is_positive: root.is_positive
         is_dark_grey: false
         is_activable: false
         is_visible: root.is_visible
@@ -184,20 +183,20 @@ Item {
         model: root.visible_count
 
         INI_button {
+            property int button_index: root.current_page * root.visible_count + index
+
             default_x: root.default_x + root.default_height + right_dots_button.default_width * (index + 1)
             default_y: root.default_y
             default_width: (root.default_width - 2 * root.default_height) / (root.visible_count + 2)
             default_height: root.default_height * 0.5
 
-            //TODO : trouver comment changer l'image
-            //image_activable: ""
-            //image_not_activable: ""
-            text: is_activable ? (root.current_page * root.visible_count + index + 1).toString() : ""
+            default_image: is_activable ? ("Train_icons/" + (is_dark_grey ? "dark_" : "") + "grey_" + root.type_list[button_index] + "_" + root.position_list[button_index] + ".png") : ""
+            text: is_activable ? (button_index + 1).toString() : ""
             font_size: 8
 
-            is_positive: root.coaches_buttons_positive
-            is_activable: (root.current_page * root.visible_count + index) < root.train_length
-            is_dark_grey: (root.current_page * root.visible_count + index) != root.current_index
+            is_positive: root.is_positive
+            is_activable: button_index < root.train_length
+            is_dark_grey: button_index != root.current_index
             is_visible: root.is_visible
 
             //Fonction qui change l'index lorsque l'une des icones en bas est cliquée
@@ -219,7 +218,7 @@ Item {
 
         text: `${root.current_index + (root.train_length != 0)}/${root.train_length}    ${root.current_page + (root.pages_count != 0)}/${root.pages_count}`
 
-        is_positive: root.coaches_buttons_positive
+        is_positive: root.is_positive
         is_activable: false
         is_dark_grey: false
         is_visible: root.is_visible
