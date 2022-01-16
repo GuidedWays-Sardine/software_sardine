@@ -393,7 +393,7 @@ class PageRB2:
         if file_path[0] != "":
             # Dans le cas où le nom du fichier a été changé à la sauvegarder, récupère le nouveau nom de fichier
             file_name = file_path[0].rsplit("/", maxsplit=1)[1][:-6]
-            train_name_widget.change_text(file_name)
+            train_name_widget.change_value(file_name)
 
             # Sauvegarde le fichier de paramètres train
             self.save_train_data_file(file_path[0])
@@ -409,7 +409,7 @@ class PageRB2:
         if file_path[0] != "":
             # Dans le cas où le nom du fichier a été changé à la sauvegarder, récupère le nouveau nom de fichier
             file_name = file_path[0].rsplit("/", maxsplit=1)[1][:-6]
-            self.page.findChild(QObject, "train_name_stringinput").change_text(file_name)
+            self.page.findChild(QObject, "train_name_stringinput").change_value(file_name)
 
             # Sauvegarde le fichier de paramètres train
             self.open_train_data_file(file_path[0])
