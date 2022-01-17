@@ -33,7 +33,7 @@ Item {
     //propriétés relié à la visibilité et la présentation de la barre
     property bool is_visible: true
     property bool is_activable: true
-    properyty bool is_positive: false
+    property bool is_positive: false
 
 
     //Propriété sur la liste des voitures
@@ -82,7 +82,7 @@ Item {
 
         //S'assure que la l'index montre bien un train qui se situe dans la page actuelle
         if(root.current_index >= (root.current_page + 1) * root.visible_count || root.current_index < root.current_page * root.visible_count) {
-            root.current_page = ((root.current_index - root.current_index) % root.visible_count) / root.visible_count
+            root.current_page = (root.current_index - (root.current_index % root.visible_count)) / root.visible_count
         }
         //Le signal sera appelé dans onCurrent_page_Changed si la valeur a été changée
     }
