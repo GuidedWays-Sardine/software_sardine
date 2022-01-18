@@ -198,5 +198,194 @@ Item {
         is_activable: false
     }
 
+    //floatinput pour le coefficient A
+    INI_text {
+        id: a_empty_text
+        objectName: "a_empty_text"
 
+        text: "A(vide)"
+        font_size: 6
+
+        default_x: a_empty_floatinput.default_x + 2
+        default_y: a_empty_floatinput.default_y - 4 - font_size
+
+        is_dark_grey: false
+        is_visible: root.generated
+    }
+
+    INI_text {
+        id: a_empty_unit_text
+        objectName: "a_empty_unit_text"
+
+        text: "kN"
+        font_size: 4
+
+        default_x: a_empty_floatinput.default_x + a_empty_floatinput.default_width + 2
+        default_y: a_empty_floatinput.default_y + a_empty_floatinput.default_height - 2 - font_size
+
+        is_dark_grey: true
+        is_visible: root.generated
+    }
+
+    INI_floatinput{
+        id: a_empty_floatinput
+        objectName: "a_empty_floatinput"
+
+        default_x: dynamic_data_box.default_x + 1
+        default_y: dynamic_data_box.default_y + 1 + font_size
+        default_width: 3 * default_height
+        default_height: 16
+
+        maximum_value: root.a_max
+        minimum_value: 0
+        decimals: root.abc_decimals
+        font_size: 10
+
+        is_max_default: false
+        is_activable: true
+        is_positive: false
+        is_visible: root.generated
+    }
+
+    INI_text{
+        id: v0_empty
+        objectName: "v0_empty"
+
+        text: " + "
+        font_size: 10
+
+        default_x: (a_empty_floatinput.default_x + a_empty_floatinput.default_width + b_empty_floatinput.default_x - default_text_width) * 0.5
+        default_y: a_empty_floatinput.default_y + (a_empty_floatinput.default_height - font_size) * 0.5 - 4
+
+        is_dark_grey: false
+        is_visible: root.generated
+    }
+
+
+    //floatinput pour le coefficient B
+    INI_text {
+        id: b_empty_text
+        objectName: "b_empty_text"
+
+        text: "B(vide)"
+        font_size: a_empty_text.font_size
+
+        default_x: b_empty_floatinput.default_x + 2
+        default_y: b_empty_floatinput.default_y - 4 - font_size
+
+        is_dark_grey: a_empty_text.is_dark_grey
+        is_visible: root.generated
+    }
+
+    INI_text {
+        id: b_empty_unit_text
+        objectName: "b_empty_unit_text"
+
+        text: "kN/(km/h)"
+        font_size: a_empty_unit_text.font_size
+
+        default_x: b_empty_floatinput.default_x + b_empty_floatinput.default_width + 2
+        default_y: b_empty_floatinput.default_y + b_empty_floatinput.default_height - 2 - font_size
+
+        is_dark_grey: a_empty_unit_text.is_dark_grey
+        is_visible: root.generated
+    }
+
+    INI_floatinput{
+        id: b_empty_floatinput
+        objectName: "b_empty_floatinput"
+
+        default_x: a_empty_floatinput.default_x + 80
+        default_y: a_empty_floatinput.default_y
+        default_width: a_empty_floatinput.default_width
+        default_height: a_empty_floatinput.default_height
+
+        maximum_value: root.b_max
+        minimum_value: 0
+        decimals: root.abc_decimals
+        font_size: 10
+
+        is_max_default: false
+        is_activable: true
+        is_positive: false
+        is_visible: root.generated
+    }
+
+    INI_text{
+        id: v1_empty
+        objectName: "v1_empty"
+
+        text: "V + "
+        font_size: v0_empty.font_size
+
+        default_x: (b_empty_floatinput.default_x + b_empty_floatinput.default_width + c_empty_floatinput.default_x - default_text_width) * 0.5
+        default_y: b_empty_floatinput.default_y + (b_empty_floatinput.default_height - font_size) * 0.5 - 4
+
+        is_dark_grey: false
+        is_visible: root.generated
+    }
+
+
+    //floatinput pour le coefficient C
+    INI_text {
+        id: c_empty_text
+        objectName: "c_empty_text"
+
+        text: "C(vide)"
+        font_size: b_empty_text.font_size
+
+        default_x: c_empty_floatinput.default_x + 2
+        default_y: c_empty_floatinput.default_y - 4 - font_size
+
+        is_dark_grey: false
+        is_visible: root.generated
+    }
+
+    INI_text {
+        id: c_empty_unit_text
+        objectName: "c_empty_unit_text"
+
+        text: "kN/(km/h)²"
+        font_size: b_empty_unit_text.font_size
+
+        default_x: c_empty_floatinput.default_x + c_empty_floatinput.default_width + 2
+        default_y: c_empty_floatinput.default_y + c_empty_floatinput.default_height - 2 - font_size
+
+        is_dark_grey: true
+        is_visible: root.generated
+    }
+
+    INI_floatinput{
+        id: c_empty_floatinput
+        objectName: "c_empty_floatinput"
+
+        default_x: b_empty_floatinput.default_x + 80
+        default_y: b_empty_floatinput.default_y
+        default_width: b_empty_floatinput.default_width
+        default_height: b_empty_floatinput.default_height
+
+        maximum_value: root.c_max
+        minimum_value: 0
+        decimals: root.abc_decimals
+        font_size: 10
+
+        is_max_default: false
+        is_activable: true
+        is_positive: false
+        is_visible: root.generated
+    }
+
+    INI_text{
+        id: v2_empty
+        objectName: "v2_empty"
+
+        text: "V²"
+        font_size: v1_empty.font_size
+
+        default_x: c_empty_floatinput.default_x + c_empty_floatinput.default_width + (default_text_width) * 0.5
+        default_y: c_empty_floatinput.default_y + (c_empty_floatinput.default_height - font_size) * 0.5 - 2
+
+        is_dark_grey: false
+        is_visible: root.generated
+    }
 }
