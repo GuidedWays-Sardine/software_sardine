@@ -80,6 +80,7 @@ Window{
 
 
 
+    //Bouton permettant de générer le train (et donc de commencer le paramétrage complexe)
     INI_button {
         id: generate_button
         objectName: "generate_button"
@@ -126,6 +127,18 @@ Window{
     }
 
 
+
+
+    //paramètres généraux sur la voiture (masse, longueur, type, niveaux, mission, portes, paramètres dynamiques)
+    General_parameters {
+        id: general_data
+        objectName: "general_data"
+
+        default_x: 0
+        default_y: front_bogie.default_y - 66
+
+        generated: complex_popup.generated
+    }
 
     //Paramètres pour le bogie avant du train
     Bogie_parameters {
