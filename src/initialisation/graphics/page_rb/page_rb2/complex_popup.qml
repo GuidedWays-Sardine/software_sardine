@@ -127,7 +127,50 @@ Window{
     }
 
 
+    //Flèches permettant de naviguer dans les voitures
+    INI_button {
+        id: left_arrow
+        objectName: "left_arrow"
 
+        default_x: 0
+        default_y: general_data.default_y - default_height - 12
+        default_width: 30
+        default_height: 180
+
+        image_activable: "Navigation/grey_left_arrow.bmp"
+        image_not_activable: "Navigation/dark_grey_left_arrow.bmp"
+
+        is_activable: train_preview.current_index > 0
+        is_positive: false
+        is_visible: complex_popup.generated
+
+        //Signal activé lorsque le bouton est cliqué et permettant d'incrémenter
+        onClicked: {
+            train_preview.current_index = train_preview.current_index - 1
+        }
+    }
+
+    INI_button {
+        id: right_arrow
+        objectName: "right_arrow"
+
+        default_x: 640 - default_width
+        default_y: left_arrow.default_y
+        default_width: 30
+        default_height: 180
+
+        image_activable: "Navigation/grey_right_arrow.bmp"
+        image_not_activable: "Navigation/dark_grey_right_arrow.bmp"
+
+        is_activable: train_preview.current_index < train_preview.train_length - 1
+        is_positive: false
+        is_visible: complex_popup.generated
+
+        //Signal activé lorsque le bouton est cliqué et permettant d'incrémenter
+        onClicked: {
+            train_preview.current_index = train_preview.current_index + 1
+        }
+    }
 
     //paramètres généraux sur la voiture (masse, longueur, type, niveaux, mission, portes, paramètres dynamiques)
     General_parameters {
