@@ -10,12 +10,12 @@ Item {
     id:root
 
     //Propriétés liés à la position et à la taille de l'objet
-    property int default_x: 0          //Position du texte
-    property int default_y: 0
+    property double default_x: 0          //Position du texte
+    property double default_y: 0
+    anchors.fill: parent
 
     //permet à partir des valeurs de positions et dimensions par défauts de calculer
-    readonly property real ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
-    visible: root.is_visible
+    readonly property double ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
 
     //Propriétés liés au texte du DMI_text
     property string text: ""
@@ -26,6 +26,7 @@ Item {
     //Propriétés liés à l'état du texte
     property bool is_dark_grey: false  //si le bouton peut être activée
     property bool is_visible: true     //si le bouton est visible
+    visible: root.is_visible
 
     //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
     readonly property string grey: "#C3C3C3"        //partie 5.2.1.3.3  Nr 3
