@@ -13,6 +13,17 @@ Item {
     id: root
 
 
+    //Propriétés liés à la position et à la taille du MouseArea permettant de récupérer le focus
+    property double default_x: 0               //position du bouton pour les dimensions minimales de la fenêtre (640*480)
+    property double default_y: 0
+    property double default_width: 0           //dimensions du bouton pour les dimensions minimales de la fenêtre (640*480)
+    property double default_height: 0
+    anchors.fill: parent
+
+    //permet à partir des valeurs de positions et dimensions par défauts de calculer la position et la taille peu importe la dimension de la fenêtre
+    readonly property double ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
+
+
     //Fonction à appeler en python pour changer la page active
     function set_active_page(page){
         body.clear()
@@ -20,11 +31,28 @@ Item {
     }
 
 
-    //Un DMI_stackview peut contenir des widgets, il doit donc toujours recouvrir
-    anchors.fill: parent
+
+    //MouseArea permettant de récupérer le focus lorsque le fond de l'application est cliqué (utile pour mettre à jour les valueinput)
+    //La MouseArea doit rester avant le stackview au risque de rendre tous les composants inutilisables
+    MouseArea{
+        id: area
+
+        x: root.default_x * root.ratio
+        y: root.default_y * root.ratio
+        width: root.default_width * root.ratio
+        height: root.default_height * root.ratio
+
+        hoverEnabled: false
+        enabled: true
 
 
-    //stackview permettant de superposer les différentes pages
+        //Signal permettant de faire perdre le focus au composant édité lorsque le fond est cliqué
+        onPressed: {
+            forceActiveFocus()
+        }
+    }
+
+    //stackview permettant de rendre la série de composants insérée visible
     StackView {
         id: body
 
