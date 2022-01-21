@@ -190,7 +190,7 @@ Item {
             default_width: (root.default_width - 2 * root.default_height) / (root.visible_count + 2)
             default_height: root.default_height * 0.5
 
-            default_image: is_activable ? ("Train_icons/" + (is_dark_grey ? "dark_" : "") + "grey_" + root.type_list[button_index] + "_" + root.position_list[button_index] + ".png") : ""
+            image: is_activable ? ("Train_icons/" + (is_dark_grey ? "dark_" : "") + "grey_" + root.type_list[button_index] + "_" + root.position_list[button_index] + ".png") : ""
             text: is_activable ? (button_index + 1).toString() : ""
             font_size: 8
 

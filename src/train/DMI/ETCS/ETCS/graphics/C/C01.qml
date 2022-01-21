@@ -19,7 +19,7 @@ Item {
         default_width: 54
         default_height: 50/2
 
-        default_image: "Level/" + (root.ertms_level.toUpperCase() === "NTC" ? "LE_02" : (!isNaN(parseInt(root.ertms_level)) && root.ertms_level != "0" ? ("LE_0" + (parseInt(root.ertms_level) + 2).toString()) : "LE_01")) + ".bmp"
+        image: "Level/" + (root.ertms_level.toUpperCase() === "NTC" ? "LE_02" : (!isNaN(parseInt(root.ertms_level)) && root.ertms_level != "0" ? ("LE_0" + (parseInt(root.ertms_level) + 2).toString()) : "LE_01")) + ".bmp"
 
         is_activable: false
         is_positive: false
@@ -34,7 +34,7 @@ Item {
         default_width: 54
         default_height: 50/2
 
-        default_image: emergency_brake ? "Status/ST_01.bmp" : ""
+        image: emergency_brake ? "Status/ST_01.bmp" : ""
 
         is_activable: false
         is_positive: false

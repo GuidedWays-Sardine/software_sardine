@@ -140,7 +140,7 @@ Item {
         default_width: 16
         default_height: 16
 
-        default_image: root.any ? "Navigation/grey_minus.bmp" : "Navigation/grey_plus.bmp"
+        image: root.any ? "Navigation/grey_minus.bmp" : "Navigation/grey_plus.bmp"
 
         is_activable: true
         is_positive: false

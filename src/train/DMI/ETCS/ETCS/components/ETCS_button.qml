@@ -30,7 +30,7 @@ Item {
     height: root.default_height * root.ratio
 
     //Propriétés liés à l'image et au texte que l'utilisateur peut rajouter sur le bouton
-    property string default_image: ""       //image à afficher en tout temps sur le bouton si image_activable et image_not_activable sont vides (peut rester vide)
+    property string image: ""       //image à afficher en tout temps sur le bouton si image_activable et image_not_activable sont vides (peut rester vide)
     property string image_activable: ""     //image à afficher quand le bouton est cliquable (peut rester vide)
     property string image_not_activable: "" //image à afficher quand le bouton n'est pas cliquable (peut rester vide)
     property string text: ""                //texte à afficher
@@ -85,7 +85,7 @@ Item {
         anchors.leftMargin: (1 + root.is_positive) * root.ratio
         fillMode: Image.PreserveAspectFit
 
-        source: (root.image_activable != "" || root.image_not_activable != "") ? root.symbols_path + (root.is_activable ? image_activable : image_not_activable) : root.symbols_path + root.default_image
+        source: (root.image_activable != "" || root.image_not_activable != "") ? root.symbols_path + (root.is_activable ? image_activable : image_not_activable) : root.symbols_path + root.image
     }
 
     //Texte visible sur le bouton
