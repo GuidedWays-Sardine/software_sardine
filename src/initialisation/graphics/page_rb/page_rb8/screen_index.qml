@@ -6,7 +6,7 @@ import "../../../components"
 
 
 Window {
-    id: screen_window
+    id: screen_index_window
 
     minimumWidth: 288
     minimumHeight: 162
@@ -22,7 +22,10 @@ Window {
         id: screen_index
         objectName: "screen_index"
 
-        anchors.fill: parent
+        default_x: 0
+        default_y: 0
+        default_width: screen_index_window.width < 640 ? screen_index_window.width : 640        //Prise en compte des écrans aux résolutions pétés (8K)
+        default_height: screen_index_window.height < 480 ? screen_index_window.height : 480
 
         text: index
         font_size: 128
