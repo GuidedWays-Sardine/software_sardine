@@ -31,7 +31,11 @@ Item{
     property int maximum_value: 1
     property int value: 0
 
+    //propriétés sur les textes d'habillages
+    property string text: ""
+    property string unit_text: ""
     property int font_size: 12
+    property int unit_font_size: root.font_size / 2
 
     //Propriétés liés à l'état du valueinput
     property bool is_max_default: false      //définit si la valeur par défaut (dans le placeholder) est la valeur max (ou mini si mis sur false)
@@ -222,6 +226,40 @@ Item{
     }
 
 
+    //Texte contenant le titre de l'integerinput
+    Text {
+        id: integerinput_text
+        objectName: "integerinput_text"
+
+        text: root.text
+        font.pixelSize: root.font_size * root.ratio
+        font.family: "Verdana"
+
+        x: 2 * root.ratio
+        y: - font.pixelSize - 4 * root.ratio
+
+        color: root.is_dark_grey ? root.dark_grey : root.grey
+        visible: root.is_visible
+    }
+
+
+    //Texte contenant les unités de l'integerinput
+    Text {
+        id: integerinput_unit
+        objectName: "integerinput_unit"
+
+        text: root.unit_text
+        font.pixelSize: root.unit_font_size * root.ratio
+        font.family: "Verdana"
+
+        x: (root.default_width + 2) * root.ratio
+        y: (root.default_height - 2) * root.ratio - font_size
+
+        color: root.dark_grey
+        visible: root.is_visible
+    }
+
+
     //Ombre extérieure
     //Rectangle pour l'ombre extérieure inférieure
     Rectangle {
@@ -321,8 +359,3 @@ Item{
         color: is_positive ? root.shadow : "transparent"
     }
 }
-
-
-
-
-

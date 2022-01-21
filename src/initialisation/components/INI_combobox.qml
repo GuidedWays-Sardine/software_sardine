@@ -32,7 +32,7 @@ Item {
     property int elements_displayed: 4      //définit le nombre d'éléments visibles dans la popup
     readonly property string selection_text: combo.displayText //retient le texte et l'index de la sélection actuelle et précédente
     readonly property int selection_index: combo.currentIndex
-    //FEATURE : enregistres l'élément précédent sélectionné
+    property string text: ""        //texte à afficher au dessus du composant
     property int font_size: 12
 
     //Propriétés liés à l'état de la combobox
@@ -212,6 +212,23 @@ Item {
                 font: combo.font
             }
         }
+    }
+
+
+    //Texte contenant le titre du combobox
+    Text {
+        id: combobox_text
+        objectName: "combobo_text"
+
+        text: root.text
+        font.pixelSize: root.font_size * root.ratio
+        font.family: "Verdana"
+
+        x: 2 * root.ratio
+        y: - font.pixelSize - 4 * root.ratio
+
+        color: (root.elements_count <= 1 || root.is_dark_grey) ? root.dark_grey : root.grey
+        visible: root.is_visible
     }
 
 
