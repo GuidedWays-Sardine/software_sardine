@@ -13,20 +13,18 @@ import QtQuick.Controls 2.15
 Item {
     id: root
 
+
     //Propriétés liés à la position et à la taille de l'objet
-    property int box_length: 20              //dimensions de la partie cochable du checkbutton quand la fenêtre fait du 640x480
     property int default_x: 0                //position du bouton pour les dimensions minimales (640x480)
     property int default_y: 0
+    property int box_length: 20              //dimensions de la partie cochable du checkbutton quand la fenêtre fait du 640x480
+    anchors.fill: parent
 
     //permet à partir des valeurs de positions et dimensions par défauts de calculer
     readonly property real ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
-    x: root.default_x * root.ratio
-    y: root.default_y * root.ratio
-    width: root.box_length * root.ratio
-    height: root.box_length * root.ratio
 
     //Propriétés liés à l'image et au texte que l'utilisateur peut rajouter sur le checkbutton
-    property string text: ""                 //texte à afficher
+    property string title: ""                //texte à afficher à côté du corp du checkbutton
     property int font_size: 12               //police du texte
 
     //Propriétés liés à l'état de la combobox
@@ -45,9 +43,6 @@ Item {
     readonly property string dark_grey: "#555555"   //partie 5.2.1.3.3  Nr 5
     readonly property string shadow: "#08182F"      //partie 5.2.1.3.3  Nr 7
 
-    //Chemin d'accès vers les icones utiles pour le check_button
-    readonly property string symbols_path : "../assets/"
-
 
     //Différents signal handlers (à écrire en python)
     signal clicked()                         //détecte quand le bouton est cliqué (après que l'état ait été changé)
@@ -55,198 +50,51 @@ Item {
 
 
 
-    //Rectangle pour la couleur du fond du checkbouton
-    Rectangle{
+    //INI_button permettant de créer le corp du checkbutton
+    INI_button {
         id: body
 
-        anchors.fill: root
+        default_x: root.default_x
+        default_y: root.default_y
+        default_width: root.box_length
+        default_height: root.box_length
 
-        color: root.dark_blue
-    }
+        image_activable: root.is_checked ? "Navigation/grey_cross.bmp" : ""
+        image_not_activable: root.is_checked ? "Navigation/dark_grey_cross.bmp" : ""
 
-    //Texte visible à côté du checkbutton
-    Rectangle {
-        id: text_rectangle
+        is_activable: root.is_activable
+        is_dark_grey: root.is_dark_grey
+        is_positive: root.is_positive
 
-        width: text_metrics.tightBoundingRect.width
-        height: text_metrics.tightBoundingRect.height
-        anchors.verticalCenter: body.verticalCenter
-        anchors.left: body.right
-        anchors.leftMargin: root.font_size * ratio
 
-        color: "transparent"
-
-        //Permet d'afficher le texte
-        Text{
-            id: checkbutton_text
-
-            anchors.verticalCenter: text_rectangle.verticalCenter
-
-            text: root.text
-            font.pixelSize: root.font_size * ratio
-            font.family: "Verdana"
-            color: root.is_dark_grey ? root.dark_grey : root.grey
-        }
-
-        //Permet de connaitre la taille du texte afin de pouvoir placer une MouseArea dessus pour pouvoir sélectioner l'option en cliquant sur le text
-        TextMetrics {
-            id: text_metrics
-
-            font: checkbutton_text.font
-            text: checkbutton_text.text
+        //signal permettant de détecter quand le corp du checkbutton est cliqué pour changer l'état de celui-ci et appeler le signal associé
+        onClicked: {
+            root.is_checked = !root.is_checked
+            root.clicked()
+            //Le signal value_changed est appelé grâce à onIs_checkedChanged
         }
     }
 
-    //Image permettant d'indiquer à l'utilisateur si le checkbutton est actif ou non (visible avec un croix)
-    Image {
-        id: image
 
-        anchors.bottom: body.bottom
-        anchors.bottomMargin: (1 + root.is_positive) * root.ratio
-        anchors.right: body.right
-        anchors.rightMargin: (1 + root.is_positive) * root.ratio
-        anchors.top: body.top
-        anchors.topMargin: (1 + root.is_positive) * root.ratio
-        anchors.left: body.left
-        anchors.leftMargin: (1 + root.is_positive) * root.ratio
+    //text permettant d'afficher le texte du checkbutton
+    INI_text {
+        id: title_text
 
-        source: root.is_checked ? root.symbols_path + (root.is_dark_grey ? "Navigation/dark_grey_cross.bmp" : "Navigation/grey_cross.bmp") : ""
-    }
+        default_x: root.default_x + root.box_length + root.font_size
+        default_y: root.default_y + (root.box_length - root.font_size) * 0.5 - 2
 
-    //Variable stockant si  le bouton est dans l'état appuyé (et donc si les bordures doivent êtres cachées
-    property bool checkbutton_pressed: false
+        text: root.title
+        font_size: root.font_size
 
-    //Ombre extérieure
-    //Rectangle pour l'ombre extérieure inférieure
-    Rectangle {
-        id: out_bottom_shadow
-
-        height: 1 * root.ratio
-        anchors.right: body.right
-        anchors.bottom: body.bottom
-        anchors.left: body.left
-
-        color: !root.checkbutton_pressed ? root.shadow : "transparent"
-    }
-
-    //Rectangle pour l'ombre extérieure droite
-    Rectangle {
-        id: out_right_shadow
-
-        width: 1 * root.ratio
-        anchors.right: body.right
-        anchors.bottom: body.bottom
-        anchors.top: body.top
-
-        color: !root.checkbutton_pressed ? root.shadow : "transparent"
-    }
-
-    //Rectangle pour l'ombre extérieure supérieure
-    Rectangle {
-        id: out_top_shadow
-
-        height: 1 * root.ratio
-        anchors.top: body.top
-        anchors.left: body.left
-        anchors.right: out_right_shadow.left
-
-        color: !root.checkbutton_pressed ? root.black : "transparent"
-    }
-
-    //Rectangle pour l'ombre extérieure gauche
-    Rectangle {
-        id: out_left_shadow
-
-        width: 1 * root.ratio
-        anchors.top: body.top
-        anchors.left: body.left
-        anchors.bottom: out_bottom_shadow.top
-
-        color: !root.checkbutton_pressed ? root.black : "transparent"
-    }
+        is_dark_grey: root.is_dark_grey
+        is_clickable: true
 
 
-    //Ombre intérieure
-    //Rectangle pour l'ombre intérieure inférieure
-    Rectangle {
-        id: in_bottom_shadow
-
-        height: 1 * root.ratio
-        anchors.bottom: out_bottom_shadow.top
-        anchors.left: out_left_shadow.right
-        anchors.right: out_right_shadow.left
-
-        color: is_positive && !root.checkbutton_pressed ? root.black : "transparent"
-    }
-
-    //Rectangle pour l'ombre intérieure droite
-    Rectangle {
-        id: in_right_shadow
-
-        width: 1 * root.ratio
-        anchors.right: out_right_shadow.left
-        anchors.bottom: out_bottom_shadow.top
-        anchors.top: out_top_shadow.bottom
-
-        color: is_positive && !root.checkbutton_pressed ? root.black : "transparent"
-    }
-
-    //Rectangle pour l'ombre intérieure supérieure
-    Rectangle {
-        id: in_top_shadow
-
-        height: 1 * root.ratio
-        anchors.top: out_top_shadow.bottom
-        anchors.left: out_left_shadow.right
-        anchors.right: in_right_shadow.left
-
-        color: is_positive && !root.checkbutton_pressed ? root.shadow : "transparent"
-    }
-
-    //Rectangle pour l'ombre intérieure gauche
-    Rectangle {
-        id: in_left_shadow
-
-        width: 1 * root.ratio
-        anchors.left: out_left_shadow.right
-        anchors.top: out_top_shadow.bottom
-        anchors.bottom: in_bottom_shadow.top
-
-        color: is_positive && !root.checkbutton_pressed ? root.shadow : "transparent"
-    }
-
-    MouseArea{
-        id: area
-
-        anchors.top: body.top
-        anchors.left: body.left
-        anchors.bottom: body.bottom
-        anchors.right: text_rectangle.right
-        
-        hoverEnabled: false
-        enabled: root.is_activable
-        
-        
-        //Détecte quand le checkbutton commence à être pressé pour cacher les bordures de celui-ci s'il est activable
-        onPressed: {
-            //Récupère le focus et indique que le checkbutton est pressé
-            forceActiveFocus()
-            root.checkbutton_pressed = true
-        }
-
-        //détecte quand le checkbutton est relaché
-        onReleased: {
-            //Si le clic est valide (fait sur la zone) change l'état du checkbutton et appelle le signal clicked
-            if(root.checkbutton_pressed){
-                root.is_checked = !root.is_checked
-                root.clicked()
-                root.checkbutton_pressed = false
-            }
-        }
-
-        //Fonction qui détecte lorsque l'utilisateur sort ou rentre sa souris du checkbouton alors qu'il clique dessus
-        onContainsMouseChanged: {
-            root.button_pressed = area.containsMouse
+        //signal permettant de détecter quand le corp du checkbutton est cliqué pour changer l'état de celui-ci et appeler le signal associé
+        onClicked: {
+            root.is_checked = !root.is_checked
+            root.clicked()
+            //Le signal value_changed est appelé grâce à onIs_checkedChanged
         }
     }
 }
