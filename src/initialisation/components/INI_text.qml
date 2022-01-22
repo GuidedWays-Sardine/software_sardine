@@ -24,8 +24,9 @@ Item {
     readonly property int default_text_width: text_metrics.tightBoundingRect.width / root.ratio
 
     //Propriétés liés à l'état du texte
-    property bool is_dark_grey: false  //si le bouton peut être activée
-    property bool is_visible: true     //si le bouton est visible
+    property bool is_dark_grey: false  //si le texte est à afficher en gris foncé
+    property bool is_clickable: false  //si le texte est cliquable
+    property bool is_visible: true     //si le text est visible
     visible: root.is_visible
 
     //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
@@ -33,6 +34,33 @@ Item {
     readonly property string dark_grey: "#555555"   //partie 5.2.1.3.3  Nr 5
 
 
+    //Signal appelé lorsque le texte est cliqué (uniquement si is_clickable à true)
+    signal clicked()
+
+
+
+    //MouseArea permettant de cliquer sur le texte (utilisé par exemple dans le widget INI_checkbutton
+    MouseArea {
+        id: area
+
+        anchors.horizontalCenter: body.horizontalCenter
+        anchors.bottom: body.bottom
+        width: text_metrics.tightBoundingRect.width
+        height: text_metrics.tightBoundingRect.height$
+
+        color: root.dark_grey
+
+        enabled: root.is_clickable
+
+
+        //signal appelé lorsque la zone est relachée (après être cliquée), permet d'appeler le signal clicked du composant si la souris est encore sur la zone
+        onReleased: {
+            //Appelle le signal clicked dans le cas où le bouton est relaché sur la zone et indique qu'il n'est plus appuyé
+            if(area.containsMouse) {
+                root.clicked()
+            }
+        }
+    }
 
     //Texte à afficher
     Text {
