@@ -18,7 +18,7 @@ Item {
     readonly property double ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
 
     //Propriétés liés au texte du DMI_text
-    property string text: "test"
+    property string text: ""
     property int font_size: 12
     readonly property int default_text_height: text_metrics.tightBoundingRect.height / root.ratio
     readonly property int default_text_width: text_metrics.tightBoundingRect.width / root.ratio
