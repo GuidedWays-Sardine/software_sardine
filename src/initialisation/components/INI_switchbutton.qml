@@ -99,7 +99,6 @@ Item {
     //floatinput pour connaitre la puissance totale du train (relié à la puissance moteur)
     INI_text {
         id: title_text
-        objectName: "title_text"
 
         text: root.title
         font_size: root.font_size
