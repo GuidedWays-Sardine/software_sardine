@@ -10,10 +10,13 @@ Item {
     id: root
 
     //Propriétés sur la position et la taille du trainpreview
-    property int default_x: 0
-    property int default_y: 0
-    property int default_width: 640
-    property int default_height: 40
+    property double default_x: 0
+    property double default_y: 0
+    property double default_width: 640
+    property double default_height: 40
+    anchors.fill: parent
+
+    //Propriétés reliés au nombre d'éléments maximum visible dans chacune des divisions
     property int visible_count: 10
     onVisible_countChanged: {
         //S'assure que le nombre de voitures visible est supérieur à 1
@@ -27,19 +30,15 @@ Item {
         }
         // Les signaux associés seront appelés dans la fonction onCurrent_pageChanged si la page a été changée
     }
-    anchors.fill: parent
-
-
-    //propriétés relié à la visibilité et la présentation de la barre
-    property bool is_visible: true
-    property bool is_activable: true
-    property bool is_positive: false
-
 
     //Propriété sur la liste des voitures
     property var type_list: []      // Liste contenant le type de chacune des voitures (fret, passager, ...)
     property var position_list: []  // Liste contenant la position de chacune des voitures (avant, arrière, milieu)
 
+    //propriétés relié à la visibilité et la présentation de la barre
+    property bool is_visible: true
+    property bool is_activable: true
+    property bool is_positive: false
 
     //Propriétés permettant de connaitre la taille du train (et donc l'index maximal) et le nombre de pages possibles
     readonly property int train_length: type_list.length > position_list.length ? position_list.length : type_list.length     //La longueur du train se base toujours sur la liste la plus courte
