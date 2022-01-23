@@ -10,8 +10,8 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 class Freinage:
     # Define attributes
    def __init__(self):
-       self.type = 0
-       self.Nbr_frein = 0
+       self.type = None
+       self.Nbr_frein = None
 
        print("enter values")
        self.type = input()
