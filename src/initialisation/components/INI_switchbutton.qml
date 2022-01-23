@@ -26,6 +26,7 @@ Item {
             root.value_changed
         }
     }
+    readonly property int elements_count: elements.length
 
     //Propriétés sur les textes valides (texte visible sur le switchbutton et titre)
     readonly property string selection_text: body.text
