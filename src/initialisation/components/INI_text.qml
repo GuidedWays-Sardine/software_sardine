@@ -69,7 +69,7 @@ Item {
         width: text_metrics.tightBoundingRect.width
         height: text_metrics.tightBoundingRect.height
 
-        enabled: root.is_clickable
+        enabled: root.is_clickable && root.is_visible
 
 
         //signal appelé lorsque la zone est relachée (après être cliquée), permet d'appeler le signal clicked du composant si la souris est encore sur la zone
