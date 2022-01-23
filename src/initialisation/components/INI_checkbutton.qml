@@ -15,9 +15,9 @@ Item {
 
 
     //Propriétés liés à la position et à la taille de l'objet
-    property int default_x: 0                //position du bouton pour les dimensions minimales (640x480)
-    property int default_y: 0
-    property int box_length: 20              //dimensions de la partie cochable du checkbutton quand la fenêtre fait du 640x480
+    property double default_x: 0                //position du bouton pour les dimensions minimales (640x480)
+    property double default_y: 0
+    property double box_length: 20              //dimensions de la partie cochable du checkbutton quand la fenêtre fait du 640x480
     anchors.fill: parent
 
     //permet à partir des valeurs de positions et dimensions par défauts de calculer
@@ -87,7 +87,7 @@ Item {
         font_size: root.font_size
 
         is_dark_grey: root.is_dark_grey
-        is_clickable: true
+        is_clickable: root.is_activable
 
 
         //signal permettant de détecter quand le corp du checkbutton est cliqué pour changer l'état de celui-ci et appeler le signal associé
