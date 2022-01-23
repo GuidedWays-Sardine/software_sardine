@@ -33,8 +33,8 @@ Item{
     property int font_size: 12
 
     //Propriétés liés à l'état du valueinput
-    property bool is_dark_grey: !is_activable//est ce que le texte doit-être en gris foncé ?
     property bool is_activable: true         //si le valueinput peut être activée
+    property bool is_dark_grey: !is_activable//est ce que le texte doit-être en gris foncé ?
     property bool is_positive: false         //si le valueinput doit-être visible en couche positive (sinon négatif)
     property bool is_visible: true           //si le valueinput est visible
     visible: root.is_visible
@@ -49,7 +49,7 @@ Item{
 
 
     //Différents signal handlers (à écrire en python)
-    signal text_changed()
+    signal value_changed()
 
 
     //Fonction pour remettre la valeur par défaut dans le valueinput (maximum_calue si is_max_default est vrai sinon minimum_value)
@@ -58,16 +58,16 @@ Item{
         var changed = body.text != ""
         body.text = ""
         if(changed){
-            text_changed()
+            value_changed()
         }
     }
 
     //Fonction permettant de changer la valeur du valueinput (de manière sécurisée)
-    function change_value(new_text){
+    function change_value(new_value){
         var changed = new_text != body.text
         body.text = new_text
         if(changed){
-            text_changed()
+            value_changed()
         }
     }
 
@@ -101,7 +101,7 @@ Item{
 
         //détecte quand le texte entrée est changé et vérifie si la valeur entrée est valide
         onDisplayTextChanged: {
-            text_changed()
+            value_changed()
         }
     }
 
