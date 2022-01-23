@@ -13,18 +13,14 @@ Item{
     id: root
 
     //Propriétés liés à la position et à la taille de l'objet
-    property int default_width: 100          //dimensions du bouton quand la fenêtre fait du 640x480
-    property int default_height: 40
-    property int default_x: 0                //position du bouton pour les dimensions quand la fenêtre fait du 640x480
-    property int default_y: 0
+    property double default_x: 0                //position du bouton pour les dimensions quand la fenêtre fait du 640x480
+    property double default_y: 0
+    property double default_width: 100          //dimensions du bouton quand la fenêtre fait du 640x480
+    property double default_height: 40
+    anchors.fill: parent
 
     //permet à partir des valeurs de positions et dimensions par défauts de calculer
     readonly property real ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
-    x: root.default_x * root.ratio
-    y: root.default_y * root.ratio
-    width: root.default_width * root.ratio
-    height: root.default_height * root.ratio
-    visible: root.is_visible
 
     //Propriétés liés aux valeurs limites et la valeur actuellement sélectionnée
     property int minimum_value: 0
@@ -32,8 +28,8 @@ Item{
     property int value: 0
 
     //propriétés sur les textes d'habillages
-    property string text: ""
-    property string unit_text: ""
+    property string title: ""
+    property string unit: ""
     property int font_size: 12
     property int unit_font_size: root.font_size / 2
 
@@ -43,6 +39,7 @@ Item{
     property bool is_activable: true         //si le valueinput peut être activée
     property bool is_positive: false         //si le valueinput doit-être visible en couche positive (sinon négatif)
     property bool is_visible: true           //si le valueinput est visible
+    visible: root.is_visible
 
     //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
     readonly property string dark_blue: "#031122"   //partie 5.2.1.3.3  Nr 6
@@ -154,7 +151,10 @@ Item{
     TextField {
         id: body
 
-        anchors.fill: parent
+        x: root.default_x * root.ratio
+        y: root.default_y * root.ratio
+        width: root.default_width * root.ratio
+        height: root.default_height * root.ratio
 
         color: root.is_dark_grey ? root.dark_grey : (body.text != "" ? root.grey : root.medium_grey)
         font.pixelSize: root.font_size * root.ratio
@@ -226,37 +226,30 @@ Item{
     }
 
 
-    //Texte contenant le titre de l'integerinput
-    Text {
-        id: integerinput_text
-        objectName: "integerinput_text"
+    //Titre du integerinput
+    INI_text {
+        id: title_text
 
-        text: root.text
-        font.pixelSize: root.font_size * root.ratio
-        font.family: "Verdana"
+        default_x: root.default_x + 2
+        default_y: root.default_y - 4 - font_size
 
-        x: 2 * root.ratio
-        y: - font.pixelSize - 4 * root.ratio
+        text: root.title
+        font_size: root.font_size
 
-        color: root.is_dark_grey ? root.dark_grey : root.grey
-        visible: root.is_visible
+        is_dark_grey: root.is_dark_grey
     }
 
+    //Unité du integerinput
+    INI_text {
+        id: unit_text
 
-    //Texte contenant les unités de l'integerinput
-    Text {
-        id: integerinput_unit
-        objectName: "integerinput_unit"
+        default_x: root.default_x + root.default_width + 2
+        default_y: root.default_y + root.default_height - 2 - font_size
 
-        text: root.unit_text
-        font.pixelSize: root.unit_font_size * root.ratio
-        font.family: "Verdana"
+        text: root.unit
+        font_size: root.unit_font_size
 
-        x: (root.default_width + 2) * root.ratio
-        y: (root.default_height - 2) * root.ratio - font_size
-
-        color: root.dark_grey
-        visible: root.is_visible
+        is_dark_grey: true
     }
 
 
@@ -265,10 +258,10 @@ Item{
     Rectangle {
         id: out_bottom_shadow
 
-        height: 1 * root.ratio
         anchors.right: body.right
         anchors.bottom: body.bottom
         anchors.left: body.left
+        height: 1 * root.ratio
 
         color: root.shadow
     }
@@ -277,10 +270,10 @@ Item{
     Rectangle {
         id: out_right_shadow
 
-        width: 1 * root.ratio
         anchors.right: body.right
         anchors.bottom: body.bottom
         anchors.top: body.top
+        width: 1 * root.ratio
 
         color: root.shadow
     }
@@ -289,10 +282,10 @@ Item{
     Rectangle {
         id: out_top_shadow
 
-        height: 1 * root.ratio
         anchors.top: body.top
         anchors.left: body.left
         anchors.right: out_right_shadow.left
+        height: 1 * root.ratio
 
         color: root.black
     }
@@ -301,10 +294,10 @@ Item{
     Rectangle {
         id: out_left_shadow
 
-        width: 1 * root.ratio
         anchors.top: body.top
         anchors.left: body.left
         anchors.bottom: out_bottom_shadow.top
+        width: 1 * root.ratio
 
         color: root.black
     }
@@ -315,10 +308,10 @@ Item{
     Rectangle {
         id: in_bottom_shadow
 
-        height: 1 * root.ratio
         anchors.bottom: out_bottom_shadow.top
         anchors.left: out_left_shadow.right
         anchors.right: out_right_shadow.left
+        height: 1 * root.ratio
 
         color: is_positive ? root.black : "transparent"
     }
@@ -327,10 +320,10 @@ Item{
     Rectangle {
         id: in_right_shadow
 
-        width: 1 * root.ratio
         anchors.right: out_right_shadow.left
         anchors.bottom: out_bottom_shadow.top
         anchors.top: out_top_shadow.bottom
+        width: 1 * root.ratio
 
         color: is_positive ? root.black : "transparent"
     }
@@ -339,10 +332,10 @@ Item{
     Rectangle {
         id: in_top_shadow
 
-        height: 1 * root.ratio
         anchors.top: out_top_shadow.bottom
         anchors.left: out_left_shadow.right
         anchors.right: in_right_shadow.left
+        height: 1 * root.ratio
 
         color: is_positive ? root.shadow : "transparent"
     }
@@ -351,10 +344,10 @@ Item{
     Rectangle {
         id: in_left_shadow
 
-        width: 1 * root.ratio
         anchors.left: out_left_shadow.right
         anchors.top: out_top_shadow.bottom
         anchors.bottom: in_bottom_shadow.top
+        width: 1 * root.ratio
 
         color: is_positive ? root.shadow : "transparent"
     }
