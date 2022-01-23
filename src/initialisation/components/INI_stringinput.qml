@@ -13,26 +13,23 @@ Item{
     id: root
 
 
-
     //Propriétés liés à la position et à la taille de l'objet
-    property int default_width: 100          //dimensions du bouton quand la fenêtre fait du 640x480
-    property int default_height: 40
-    property int default_x: 0                //position du bouton pour les dimensions quand la fenêtre fait du 640x480
-    property int default_y: 0
+    property double default_x: 0                //position du bouton pour les dimensions quand la fenêtre fait du 640x480
+    property double default_y: 0
+    property double default_width: 100          //dimensions du bouton quand la fenêtre fait du 640x480
+    property double default_height: 40
+    anchors.fill: parent
 
     //permet à partir des valeurs de positions et dimensions par défauts de calculer
     readonly property real ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
-    x: root.default_x * root.ratio
-    y: root.default_y * root.ratio
-    width: root.default_width * root.ratio
-    height: root.default_height * root.ratio
-    visible: root.is_visible
 
     //Propriétés liés aux valeurs limites et la valeur actuellement sélectionnée
     property string placeholder_text: ""
     property int max_text_length: 1000
     readonly property string text: body.text
 
+    //Propriétés sur le titre et le texte
+    property string title: ""
     property int font_size: 12
 
     //Propriétés liés à l'état du valueinput
@@ -40,6 +37,7 @@ Item{
     property bool is_activable: true         //si le valueinput peut être activée
     property bool is_positive: false         //si le valueinput doit-être visible en couche positive (sinon négatif)
     property bool is_visible: true           //si le valueinput est visible
+    visible: root.is_visible
 
     //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
     readonly property string dark_blue: "#031122"   //partie 5.2.1.3.3  Nr 6
@@ -77,7 +75,10 @@ Item{
     TextField {
         id: body
 
-        anchors.fill: parent
+        x: root.default_x * root.ratio
+        y: root.default_y * root.ratio
+        width: root.default_width * root.ratio
+        height: root.default_height * root.ratio
 
         color: root.is_dark_grey ? root.dark_grey : (body.text != "" ? root.grey : root.medium_grey)
         font.pixelSize: root.font_size * root.ratio
@@ -105,15 +106,30 @@ Item{
     }
 
 
+
+    //Titre du stringinput
+    INI_text {
+        id: title_text
+
+        default_x: root.default_x + 2
+        default_y: root.default_y - 4 - font_size
+
+        text: root.title
+        font_size: root.font_size
+
+        is_dark_grey: root.is_dark_grey
+    }
+
+
     //Ombre extérieure
     //Rectangle pour l'ombre extérieure inférieure
     Rectangle {
         id: out_bottom_shadow
 
-        height: 1 * root.ratio
         anchors.right: body.right
         anchors.bottom: body.bottom
         anchors.left: body.left
+        height: 1 * root.ratio
 
         color: root.shadow
     }
@@ -122,10 +138,10 @@ Item{
     Rectangle {
         id: out_right_shadow
 
-        width: 1 * root.ratio
         anchors.right: body.right
         anchors.bottom: body.bottom
         anchors.top: body.top
+        width: 1 * root.ratio
 
         color: root.shadow
     }
@@ -134,10 +150,10 @@ Item{
     Rectangle {
         id: out_top_shadow
 
-        height: 1 * root.ratio
         anchors.top: body.top
         anchors.left: body.left
         anchors.right: out_right_shadow.left
+        height: 1 * root.ratio
 
         color: root.black
     }
@@ -146,10 +162,10 @@ Item{
     Rectangle {
         id: out_left_shadow
 
-        width: 1 * root.ratio
         anchors.top: body.top
         anchors.left: body.left
         anchors.bottom: out_bottom_shadow.top
+        width: 1 * root.ratio
 
         color: root.black
     }
@@ -160,10 +176,10 @@ Item{
     Rectangle {
         id: in_bottom_shadow
 
-        height: 1 * root.ratio
         anchors.bottom: out_bottom_shadow.top
         anchors.left: out_left_shadow.right
         anchors.right: out_right_shadow.left
+        height: 1 * root.ratio
 
         color: is_positive ? root.black : "transparent"
     }
@@ -172,10 +188,10 @@ Item{
     Rectangle {
         id: in_right_shadow
 
-        width: 1 * root.ratio
         anchors.right: out_right_shadow.left
         anchors.bottom: out_bottom_shadow.top
         anchors.top: out_top_shadow.bottom
+        width: 1 * root.ratio
 
         color: is_positive ? root.black : "transparent"
     }
@@ -184,10 +200,10 @@ Item{
     Rectangle {
         id: in_top_shadow
 
-        height: 1 * root.ratio
         anchors.top: out_top_shadow.bottom
         anchors.left: out_left_shadow.right
         anchors.right: in_right_shadow.left
+        height: 1 * root.ratio
 
         color: is_positive ? root.shadow : "transparent"
     }
@@ -196,16 +212,11 @@ Item{
     Rectangle {
         id: in_left_shadow
 
-        width: 1 * root.ratio
         anchors.left: out_left_shadow.right
         anchors.top: out_top_shadow.bottom
         anchors.bottom: in_bottom_shadow.top
+        width: 1 * root.ratio
 
         color: is_positive ? root.shadow : "transparent"
     }
 }
-
-
-
-
-
