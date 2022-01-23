@@ -96,7 +96,7 @@ Item {
         }
     }
 
-    //floatinput pour connaitre la puissance totale du train (relié à la puissance moteur)
+    //titre du switchbutton
     INI_text {
         id: title_text
 
