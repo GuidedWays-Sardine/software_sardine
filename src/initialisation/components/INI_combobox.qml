@@ -13,10 +13,10 @@ Item {
     id:root
 
     //Propriétés liés à la position et à la taille de l'objet
-    property int default_width: 100         //dimensions de la combobox quand celle-ci est fermée et que la fenêtre fait du 640x480
-    property int default_height: 40
-    property int default_x: 0               //position du bouton pour les dimensions quand la fenêtre fait du 640x480
-    property int default_y: 0
+    property double default_x: 0               //position du bouton pour les dimensions quand la fenêtre fait du 640x480
+    property double default_y: 0
+    property double default_width: 100         //dimensions de la combobox quand celle-ci est fermée et que la fenêtre fait du 640x480
+    property double default_height: 40
 
     //permet à partir des valeurs de positions et dimensions par défauts de calculer le ratio à appliquer aux dimensions
     readonly property real ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
@@ -24,7 +24,6 @@ Item {
     y: root.default_y * root.ratio
     width: root.default_width * root.ratio
     height: root.default_height * root.ratio
-    visible: is_visible
 
     //Propriétés liés aux donnés de la combobox
     property var elements: ["NaN"]          //définit les éléments sélectionables de la combobox
@@ -32,7 +31,7 @@ Item {
     property int elements_displayed: 4      //définit le nombre d'éléments visibles dans la popup
     readonly property string selection_text: combo.displayText //retient le texte et l'index de la sélection actuelle et précédente
     readonly property int selection_index: combo.currentIndex
-    property string text: ""        //texte à afficher au dessus du composant
+    property string title: ""        //texte à afficher au dessus du composant
     property int font_size: 12
 
     //Propriétés liés à l'état de la combobox
@@ -40,6 +39,7 @@ Item {
     property bool is_dark_grey: !is_activable//est ce que le texte doit-être en gris foncé ?
     property bool is_positive: false        //si la combobox doit-être visible en couche positive (sinon négative)
     property bool is_visible: true          //si le bouton est visible
+    visible: is_visible
 
     //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
     readonly property string dark_blue : "#031122"  //partie 5.2.1.3.3  Nr 6
@@ -215,20 +215,17 @@ Item {
     }
 
 
-    //Texte contenant le titre du combobox
-    Text {
-        id: combobox_text
-        objectName: "combobo_text"
+    //titre du combobox
+    INI_text {
+        id: title_text
 
-        text: root.text
-        font.pixelSize: root.font_size * root.ratio
-        font.family: "Verdana"
+        text: root.title
+        font_size: root.font_size * root.ratio
 
-        x: 2 * root.ratio
-        y: - font.pixelSize - 4 * root.ratio
+        default_x: 2 * root.ratio
+        default_y: - (root.font_size + 4) * root.ratio
 
-        color: (root.elements_count <= 1 || root.is_dark_grey) ? root.dark_grey : root.grey
-        visible: root.is_visible
+        is_dark_grey: root.is_dark_grey
     }
 
 
@@ -237,10 +234,10 @@ Item {
     Rectangle {
         id: out_top_shadow
 
-        height: 1 * root.ratio
         anchors.left: combo.left
         anchors.top: combo.top
         anchors.right: out_right_shadow.left
+        height: 1 * root.ratio
 
         color: root.black
     }
@@ -249,10 +246,10 @@ Item {
     Rectangle {
         id: out_right_shadow
 
-        width: 1 * root.ratio
         height: combo.popup.visible && is_activable && combo.count > 1 ? combo.height*((combo.count < root.elements_displayed ? combo.count : root.elements_displayed) + 1) + 7 * root.ratio : combo.height
         anchors.right: combo.right
         anchors.top: combo.top
+        width: 1 * root.ratio
 
         color: root.shadow
     }
@@ -261,10 +258,10 @@ Item {
     Rectangle {
         id: out_left_shadow
 
-        width: 1 * root.ratio
         anchors.top: combo.top
         anchors.left: combo.left
         anchors.bottom: out_bottom_shadow.top
+        width: 1 * root.ratio
 
         color: root.black
     }
@@ -273,10 +270,10 @@ Item {
     Rectangle {
         id: out_bottom_shadow
 
-        height: 1 * root.ratio
         anchors.right: combo.right
         anchors.bottom: out_right_shadow.bottom
         anchors.left: combo.left
+        height: 1 * root.ratio
 
         color: root.shadow
     }
@@ -287,10 +284,10 @@ Item {
     Rectangle {
         id: in_bottom_shadow
 
-        height: 1 * root.ratio
         anchors.bottom: out_bottom_shadow.top
         anchors.left: out_left_shadow.right
         anchors.right: out_right_shadow.left
+        height: 1 * root.ratio
 
         color: root.is_positive ? root.black : "transparent"
     }
@@ -299,10 +296,10 @@ Item {
     Rectangle {
         id: in_right_shadow
 
-        width: 1 * root.ratio
         anchors.right: out_right_shadow.left
         anchors.bottom: out_bottom_shadow.top
         anchors.top: out_top_shadow.bottom
+        width: 1 * root.ratio
 
         color: root.is_positive ? root.black : "transparent"
     }
@@ -311,22 +308,10 @@ Item {
     Rectangle {
         id: in_top_shadow
 
-        height: 1 * root.ratio
         anchors.top: out_top_shadow.bottom
         anchors.left: out_left_shadow.right
         anchors.right: in_right_shadow.left
-
-        color: root.is_positive ? root.shadow : "transparent"
-    }
-
-    //Rectangle pour l'ombre extérieure gauche
-    Rectangle {
-        id: in_left_shadow
-
-        width: 1 * root.ratio
-        anchors.left: out_left_shadow.right
-        anchors.top: out_top_shadow.bottom
-        anchors.bottom: in_bottom_shadow.top
+        height: 1 * root.ratio
 
         color: root.is_positive ? root.shadow : "transparent"
     }
