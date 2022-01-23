@@ -30,7 +30,7 @@ Item {
     readonly property int elements_count: combo.count //retient le nombre d'éléments sélectionables dans la combobox
     property int elements_displayed: 4      //définit le nombre d'éléments visibles dans la popup
     readonly property string selection_text: combo.displayText //retient le texte et l'index de la sélection actuelle et précédente
-    readonly property int selection_index: combo.currentIndex
+    readonly property int selection_index: root.elements_count !== 0 ? combo.currentIndex : -1
     property string title: ""        //texte à afficher au dessus du composant
     property int font_size: 12
 
