@@ -16,14 +16,14 @@ Item {
     //Propriétés liés à l'image et au texte que l'utilisateur peut rajouter sur le bouton
     property var elements: []
     onElementsChanged: {
-        //Cas où la nouvelle liste est vide (vide le texte et n'appelle pas le signal value_changed)
+        //Cas où la nouvelle liste est vide (vide le texte et n'appelle pas le signal selection_changed)
         if(root.elements.length === 0) {
             body.text = ""
         }
-        //Cas où la valeur actuelle n'est pas dans la nouvelle liste (met le texte au premier élément et appelle le signal value_changed)
+        //Cas où la valeur actuelle n'est pas dans la nouvelle liste (met le texte au premier élément et appelle le signal selection_changed)
         else if(!root.elements.includes(body.text)) {
             body.text = root.elements[0]
-            root.value_changed
+            root.selection_changed()
         }
     }
     readonly property int elements_count: elements.length
@@ -45,16 +45,16 @@ Item {
 
     //Différents signal handlers (à écrire en python)
     signal clicked()                        //détecte quand le bouton est cliqué
-    signal text_changed()                  //détecte si la valeur a été changée
+    signal selection_changed()                  //détecte si la valeur a été changée
 
 
 
     //Fonction permettant de changer la valeur active (peut prendre l'index de l'élément ou sa valeur)
-    function change_active(new_active){
+    function change_selection(new_selection){
         // Si la nouvelle sélection est un int et que la valeur à l'index n'est pas la même que celle déjà visible, change la valeur et appelle le signal associé
         if(typeof new_active === typeof root.font_size && new_active < root.elements.length && root.elements[new_active].toUpperCase() !== body.text.toUpperCase()){
             body.text = root.elements[new_active]
-            root.value_changed()
+            root.selection_changed()
         }
         //Si la nouvelle sélection est un string et que la valeur ne correspond pas à celle déjà entrée, cherche l'élément avec le même index (recherche sans prendre en compte les majuscules et minuscules)
         else if(typeof new_active === typeof root.selection_text && new_active.toUpperCase() !== body.text.toUpperCase()){
@@ -63,7 +63,7 @@ Item {
             if(uppercased.includes(new_active.toUpperCase())) {
                 var new_index = uppercased.indexOf(new_active.toUpperCase())
                 body.text = root.elements[new_index]
-                root.value_changed()
+                root.selection_changed()
             }
         }
     }
@@ -94,7 +94,7 @@ Item {
 
             //Appelle les signaux reliés au switchbutton
             root.clicked()
-            root.text_changed()
+            root.selection_changed()
         }
     }
 
