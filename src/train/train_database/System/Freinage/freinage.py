@@ -9,10 +9,11 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 
 class Freinage:
     # Define attributes
+
+    type = 0
+    Nbr_frein = 0
+
    def __init__(self):
        self.type = None
        self.Nbr_frein = None
 
-       print("enter values")
-       self.type = input()
-       self.Nbr_frein = input()

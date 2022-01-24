@@ -9,22 +9,46 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 
 class coaches:
 
-    mass = 0
-    position = None
-    nombre_essieux = 0
-    longueur = 0
-    largeur = 0
+    axle_number = 0
+
+    levels = 0
+    doors = 0
+
+    Mtare = 0
+    Mfull = 0
+    length = 0
+
+    mission_type = None
+    position_type = None
+    position_index = None
+
+    Aempty = 0
+    Bempty = 0
+    Cempty = 0
+
+    Afull = 0
+    Bfull = 0
+    Cfull = 0
+
 
     def __init__(self):
-        self.mass = 0
-        self.position = None
-        self.nombre_essieux = 0
-        self.longueur = 0
-        self.largeur = 0
+        self.axle_number = 0
 
-        print("enter values: ")
-        self.mass = input()
-        self.position = input()
-        self.nombre_essieux = input()
-        self.longueur = input()
-        self.largeur = input()
+        self.levels = 0
+        self.doors = 0
+
+        self.Mtare = 0
+        self.Mfull = 0
+        self.length = 0
+
+        self.mission_type = None
+        self.position_type = None
+        self.position_index = None
+
+        self.Aempty = 0
+        self.Bempty = 0
+        self.Cempty = 0
+
+        self.Afull = 0
+        self.Bfull = 0
+        self.Cfull = 0

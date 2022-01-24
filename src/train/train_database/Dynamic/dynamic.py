@@ -39,20 +39,6 @@ class Dynamic:
         self.V = 0
         self.Pk = 0
 
-        print("Value for Mtranporte : ")
-        self.Mtransporte = input()
-        self.i = input()
-        self.Pconso = input()
-        self.Mumax = input()
-        self.Musol = input()
-        self.V = input()
-        self.Pk = input()
-        self.Along = input()
-        self.Atrans = input()
-        self.Avert = input()
-        self.Jlong = input()
-        self.Jtrans = input()
-        self.Jvert = input()
 
 
 

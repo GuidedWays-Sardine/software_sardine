@@ -25,10 +25,3 @@ class Static:
         self.k = 0
         self.type = 0
 
-        print("enter values: ")
-        self.A = input()
-        self.B = input()
-        self.C = input()
-        self.Musol = input()
-        self.k = input()
-        self.type = input()
