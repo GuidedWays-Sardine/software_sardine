@@ -10,18 +10,20 @@ Item {
     id: page_rb8
     objectName: "page_rb8"
 
-    //Propriété pour avoir la liste des écrans et leurs dimensions
-    property var screen_list: ["Aucun"]
-    property var screen_size: []
+    //Propriété pour avoir la dimension des écrans (la liste sera mise à jour automatiquement)
+    property var screens_size: []
 
     //propriétés sur le nom, les dimensions minimales de chaque écran
-    property var screen_names: []
-    property var screen_activable: []
+    property var windows_name: []
+    property var windows_activable: []
     property var minimum_wh: []
-
-    //propriété pour les informations lors de l'initialisation d'une nouvelle série de paramètres écrans
     property var initial_settings: []
+
+    //Propriétés sur les textes à traduire
+    property string none_text: "Aucun"
     property string fullscreen_text: "Plein écran ?"
+    property string window_index_text: "Index écran :"
+    property string immersion_text: "Eteindre les écrans qui ne sont pas utilisés ?"
 
 
     //fonction permettant de récupérer les différentes valeurs des pages
@@ -42,8 +44,6 @@ Item {
         }
         return values
     }
-
-
 
     //Flèche de droite pour naviguer à gauche sur les catégories d'écrans
     INI_button {
@@ -76,7 +76,7 @@ Item {
 
         is_activable: false
         is_positive: true
-        is_dark_grey: true
+        is_dark_grey: initial_settings.length > 0
     }
 
     //Flèche de droite pour naviguer à droite sur les catégories d'écran
@@ -121,13 +121,13 @@ Item {
 
     //checkbutton pour savoir si l'application doit éteindre les écrans qui ne sont pas utilisés
     INI_checkbutton {
-        id: black_screens_check
-        objectName: "black_screens_check"
+        id: immersion_check
+        objectName: "immersion_check"
 
         default_x: 15
         default_y: 379
         box_length: 20
-        text: "Eteindre les écrans qui ne sont pas utilisés ?"
+        title: page_rb8.immersion_text
 
         is_activable: true
         is_positive: false
@@ -136,8 +136,8 @@ Item {
 
     //Flèche de droite pour naviguer sur la liste des écrans d'une même catégorie
     INI_button {
-        id: left_screen_button
-        objectName: "left_screen_button"
+        id: left_window_button
+        objectName: "left_window_button"
 
         default_x: 54 + 46 + 380 - 46
         default_y: 400 - 41
@@ -154,8 +154,8 @@ Item {
 
     //Flèche de droite pour naviguer sur la liste des écrans d'une même catégorie
     INI_button {
-        id: right_screen_button
-        objectName: "right_screen_button"
+        id: right_window_button
+        objectName: "right_window_button"
 
         default_x: 54 + 46 + 380
         default_y: 400 - 41
