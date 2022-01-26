@@ -7,14 +7,14 @@ Item {
     id: root
 
     //information sur le positionnement de l'encadré et sur son utilisabilité
-    property int index: 0
+    property int position_index: 0
     anchors.fill: parent
 
     //informations sur la validité de l'écran sélectionné (s'il est suffisament grand), et si l'écran sera activé
     property bool screen_valid: false
     property bool is_activable: true
     onIs_activableChanged: { //fonction permettant de changer l'activabilité de l'écran si demandé
-        //Cas où l'écran a été mis comme activable : change la sélection de l'écran à aucun et rend le window non valide (tous lew widgets sont grisés et désactivés automatiquement)
+        //Cas où l'écran a été mis comme non activable : change la sélection de l'écran à aucun et rend le window non valide (tous les widgets sont grisés et désactivés automatiquement)
         if(!root.is_activable){
             window_index_combo.change_selection(0)
             root.screen_valid = false
@@ -24,23 +24,24 @@ Item {
     //Informations et fonctions sur l'écran affiché et fonction pour mettre à jour l'encadré de paramètres
     property var initial_settings: [] //Format [window_index, fullscreen_on_check, [x, y], [width, height]]
     onInitial_settingsChanged: {
-        //Si une sélection d'un écran spécifique a été donnée
+        //Si au moins un argument a été donné, change la sélection pour l'écran sélectionné
         if(root.is_activable && initial_settings.length >= 1) {
-            body.window_index_combo.change_selection(initial_settings[0])
+            window_index_combo.change_selection(initial_settings[0])
 
-            //Si un écran particulier a été sélectionné et que plus d'informations ont été données
+            //Si un écran particulier a été sélectionné et que plus d'informations ont été données, change si l'écran est en plein écran
             if(window_index_combo.selection_index > 0 && initial_settings.length >= 2) {
-                body.fullscreen_on_check.is_checked = initial_settings[1]
+                fullscreen_on_check.is_checked = initial_settings[1]
 
-                //Si l'écran n'est pas en fullscreen et que des données ont été fournis pour la position et la taille de l'écran
+                //Si la fenêtre n'est pas en plein écran et que des données ont été fournis pour la position et la taille de l'écran
                 if(!initial_settings[1] && initial_settings.length >= 4 && initial_settings[2].length >= 2 && initial_settings[3].length >= 2){
-                    body.x_input.change_value(initial_settings[2][0])
-                    body.y_input.change_value(initial_settings[2][1])
-                    body.width_input.change_value(initial_settings[3][0])
-                    body.height_input.change_value(initial_settings[3][1])
+                    x_input.change_value(initial_settings[2][0])
+                    y_input.change_value(initial_settings[2][1])
+                    width_input.change_value(initial_settings[3][0])
+                    height_input.change_value(initial_settings[3][1])
                 }
             }
         }
+        //Si les informations par défaut ne sont pas valides, réinitialise les arguments par défaut
         else {
             window_index_combo.change_selection(0)
         }
@@ -69,16 +70,18 @@ Item {
     property int minimum_height: 0
 
     //Valeur à récupérer (les dimensions, la position, l'écran sélectionné)
-    property int selected_window: body.window_index_combo.selection_index
-    property bool is_fullscreen: body.fullscreen_on_check.is_checked
-    property int input_x: body.x_input.value
-    property int input_y: body.y_input.value
-    property int input_width: body.width_input.value
-    property int input_height: body.height_input.value
+    property int selected_window: window_index_combo.selection_index
+    property bool is_fullscreen: fullscreen_on_check.is_checked
+    property int input_x: x_input.value
+    property int input_y: y_input.value
+    property int input_width: width_input.value
+    property int input_height: height_input.value
 
     // propriétés permettant de mettre à jour les différents texts communs de la page (ici que le texte du fullscreen_on_check)
     property string fullscreen_text: "Plein écran ?"
-    property string window_text: "Index écran :"
+    property string window_index_text: "Index écran :"
+    property string none_text: "Aucun"
+    onNone_textChanged: {screens_list[0] = root.none_text}
 
 
     //Bouton permettant de créer l'encadré du combobox et contenant tous les éléments de paramétrage
@@ -86,7 +89,7 @@ Item {
         id: body
 
         default_x: 54
-        default_y: 15 + 40 + (root.index - 1) * body.default_height
+        default_y: 15 + 40 + root.position_index * body.default_height
         default_width: 380 + 2*46
         default_height: 76
 
@@ -97,7 +100,7 @@ Item {
 
         //Texte affichant l'utilisation de l'écran
         INI_text{
-            id: window_text
+            id: window_index_text
 
             default_x: body.default_x + 2 + root.font_size
             default_y: body.default_y - 2 + root.font_size
@@ -122,7 +125,7 @@ Item {
 
             elements: root.screens_list
             elements_displayed: 3
-            title: root.window_text
+            title: root.window_index_text
             font_size: root.font_size 
 
             is_positive: false
@@ -164,13 +167,14 @@ Item {
             }
         }
 
+
         //Checkbutton pour savoir si l'écran sera en fullscreen
         INI_checkbutton {
             id: fullscreen_on_check
 
             box_length: 16
             default_x: 396
-            default_y: window_text.default_y - (box_length - root.font_size) * 0.5
+            default_y: window_index_text.default_y - (box_length - root.font_size) * 0.5
 
             title: root.fullscreen_text
             font_size: root.font_size
@@ -189,6 +193,7 @@ Item {
                 height_input.clear()
             }
         }
+
 
         //integerinput pour la position x de la fenêtre
         INI_integerinput {
@@ -245,6 +250,7 @@ Item {
                 }
             }
         }
+
 
         //integerinput pour la hauteur de la fenêtre
         INI_integerinput {
