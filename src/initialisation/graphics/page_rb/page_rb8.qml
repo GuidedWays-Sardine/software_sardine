@@ -27,33 +27,18 @@ Item {
     //fonction permettant de récupérer les différentes valeurs des pages
     function get_values() {
         var values = []
-        if(screen1.screen_name != "") {
-             values.push([screen1.screen_name,
-                          [screen1.selected_screen,
-                           screen1.is_fullscreen,
-                           [screen1.input_x, screen1.input_y],
-                           [screen1.input_width, screen1.input_height]]])
-        }
-        if(screen2.screen_name != "") {
-             values.push([screen2.screen_name,
-                          [screen2.selected_screen,
-                           screen2.is_fullscreen,
-                           [screen2.input_x, screen2.input_y],
-                           [screen2.input_width, screen2.input_height]]])
-        }
-        if(screen3.screen_name != "") {
-             values.push([screen3.screen_name,
-                          [screen3.selected_screen,
-                           screen3.is_fullscreen,
-                           [screen3.input_x, screen3.input_y],
-                           [screen3.input_width, screen3.input_height]]])
-        }
-        if(screen4.screen_name != "") {
-             values.push([screen4.screen_name,
-                          [screen4.selected_screen,
-                           screen4.is_fullscreen,
-                           [screen4.input_x, screen4.input_y],
-                           [screen4.input_width, screen4.input_height]]])
+        
+        for(let i = 0; i < Math.min(windows_name.length , 4); i++) {
+            //Récupère le composant de paramètre à l'index actuel (entre 0 et 4)
+            var window = windows.itemAt(i)
+            
+            //Récupère tous les paramètres et les rajoutes méthodiquement à la liste de paramètres
+            //Format : [window_name, [window_index, fullscreen_on_check, [x, y], [width, height]]]
+            values.push([window.window_name,
+                         [window.selected_window,
+                          window.is_fullscreen,
+                          [window.input_x, window.input_y],
+                          [window.input_height, window.input_width]]])
         }
         return values
     }
@@ -111,68 +96,27 @@ Item {
         is_positive: true
     }
 
-    Screen_Parameters_Item {
-        id: screen4
-        index: 4
+    Repeater {
+        id: windows
+        
+        model : page_rb8.windows_name.length
+        
+        Window_parameters {
+            //Propriété permetant d'inverser l'index pour charger les zones de paramètres dans le désordre
+            //(pour ne pas cacher les bordures du combobox par le composant du dessous) mais pour charger les données dans le bon ordre
+            property int real_index: page_rb8.windows_name.length - index - 1
 
-        screen_list: page_rb8.screen_list
-        screen_size: page_rb8.screen_size
+            position_index: real_index
 
-        screen_name: screen_names.length >= index ? screen_names[index - 1].toString() : ""
-        initial_settings: page_rb8.initial_settings.length >= index ? page_rb8.initial_settings[index - 1] : []
-        minimum_width: page_rb8.screen_names.length >= index && page_rb8.minimum_wh.length >= index && page_rb8.minimum_wh[index - 1].length >= 2 ? page_rb8.minimum_wh[index - 1][0] : 0
-        minimum_height: page_rb8.screen_names.length >= index && page_rb8.minimum_wh.length >= index && page_rb8.minimum_wh[index - 1].length >= 2 ? page_rb8.minimum_wh[index - 1][1] : 0
-        fullscreen_text: page_rb8.fullscreen_text
+            screens_size: page_rb8.screens_size
 
-        is_activable: page_rb8.screen_activable.length >= index && page_rb8.screen_name != "" ? page_rb8.screen_activable[index - 1] : false
-    }
+            window_name : page_rb8.windows_name.length > real_index ? windows_name[real_index].toString() : ""
+            minimum_width: page_rb8.minimum_wh.length > real_index && page_rb8.minimum_wh[real_index].length >= 2 ? page_rb8.minimum_wh[real_index][0] : 0
+            minimum_height: page_rb8.minimum_wh.length > real_index && page_rb8.minimum_wh[real_index].length >= 2 ? page_rb8.minimum_wh[real_index][1] : 0
+            initial_settings: page_rb8.initial_settings.length > real_index ? page_rb8.initial_settings[real_index] : []
 
-    Screen_Parameters_Item {
-        id: screen3
-        index: 3
-
-        screen_list: page_rb8.screen_list
-        screen_size: page_rb8.screen_size
-
-        screen_name: screen_names.length >= index ? screen_names[index - 1].toString() : ""
-        initial_settings: page_rb8.initial_settings.length >= index ? page_rb8.initial_settings[index - 1] : []
-        minimum_width: page_rb8.screen_names.length >= index && page_rb8.minimum_wh.length >= index && page_rb8.minimum_wh[index - 1].length >= 2 ? page_rb8.minimum_wh[index - 1][0] : 0
-        minimum_height: page_rb8.screen_names.length >= index && page_rb8.minimum_wh.length >= index && page_rb8.minimum_wh[index - 1].length >= 2 ? page_rb8.minimum_wh[index - 1][1] : 0
-        fullscreen_text: page_rb8.fullscreen_text
-
-        is_activable: page_rb8.screen_activable.length >= index ? page_rb8.screen_activable[index - 1] : false
-    }
-
-    Screen_Parameters_Item {
-        id: screen2
-        index: 2
-
-        screen_list: page_rb8.screen_list
-        screen_size: page_rb8.screen_size
-
-        screen_name: page_rb8.screen_names.length >= index ? page_rb8.screen_names[index - 1].toString() : ""
-        initial_settings: page_rb8.initial_settings.length >= index ? page_rb8.initial_settings[index - 1] : []
-        minimum_width: page_rb8.screen_names.length >= index && page_rb8.minimum_wh.length >= index && page_rb8.minimum_wh[index - 1].length >= 2 ? page_rb8.minimum_wh[index - 1][0] : 0
-        minimum_height: page_rb8.screen_names.length >= index && page_rb8.minimum_wh.length >= index && page_rb8.minimum_wh[index - 1].length >= 2 ? page_rb8.minimum_wh[index - 1][1] : 0
-        fullscreen_text: page_rb8.fullscreen_text
-
-        is_activable: page_rb8.screen_activable.length >= index && page_rb8.screen_name != "" ? page_rb8.screen_activable[index - 1] : false
-    }
-
-    Screen_Parameters_Item {
-        id: screen1
-        index: 1
-
-        screen_list: page_rb8.screen_list
-        screen_size: page_rb8.screen_size
-
-        screen_name: page_rb8.screen_names.length >= index ? page_rb8.screen_names[index - 1].toString() : ""
-        initial_settings: page_rb8.initial_settings.length >= index ? page_rb8.initial_settings[index - 1] : []
-        minimum_width: page_rb8.screen_names.length >= index && page_rb8.minimum_wh.length >= index && page_rb8.minimum_wh[index - 1].length >= 2 ? page_rb8.minimum_wh[index - 1][0] : 0
-        minimum_height: page_rb8.screen_names.length >= index && page_rb8.minimum_wh.length >= index && page_rb8.minimum_wh[index - 1].length >= 2 ? page_rb8.minimum_wh[index - 1][1] : 0
-        fullscreen_text: page_rb8.fullscreen_text
-
-        is_activable: page_rb8.screen_activable.length >= index && page_rb8.screen_name != "" ? page_rb8.screen_activable[index - 1] : false
+            is_activable : page_rb8.windows_activable.length > real_index && page_rb8.window_name != "" ? page_rb8.windows_activable[real_index] : false
+        }
     }
 
     //checkbutton pour savoir si l'application doit éteindre les écrans qui ne sont pas utilisés
