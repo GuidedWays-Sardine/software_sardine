@@ -23,6 +23,14 @@ Item {
         is_checked: false
         is_activable: true
         is_positive: false
+
+
+        //Signal appelé lorsque la valeur du combobox change (par un clic ou par une commande
+        onValue_changed: {
+            //Si les données en direct sont activés, active le dashboard par défaut (dashboard_check)
+            //Si les données en direct sont désactivés, désactive le dashboard
+            dashboard_check.is_checked = is_checked
+        }
     }
 
     //Checkbutton pour savoir si l'utilisateur veut afficher les données avec le tableau de bord (sinon en fenêtré)
