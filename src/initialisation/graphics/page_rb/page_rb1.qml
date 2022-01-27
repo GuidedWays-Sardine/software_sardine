@@ -73,30 +73,21 @@ Item {
         is_positive: false
     }
 
-    //Bouton registre
-    INI_text {
-        id: log_text
-        objectName: "log_text"
-
-        text: "Niveau de registre"
-
-        default_x: log_button.default_x + 2
-        default_y: log_button.default_y - 2 * font_size
-    }
-
-    INI_button{
-        id: log_button
-        objectName: "log_button"
-        text: "Complet"
+    //switchbutton registre
+    INI_switchbutton{
+        id: log_switchbutton
+        objectName: "log_switchbutton"
 
         default_x: 55
         default_y: 260
-        default_height: 50
         default_width: 111
+        default_height: 50
+
+        elements: ["Complet"]
+        title: "Niveau de registre"
 
         is_activable: true
         is_positive: false
-        is_visible: true
     }
 
     //Combobox langue
