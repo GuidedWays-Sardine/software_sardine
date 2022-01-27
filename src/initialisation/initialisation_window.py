@@ -97,37 +97,42 @@ class InitialisationWindow:
             default_settings.open(f"{PROJECT_DIR}settings\\general_settings\\default.settings")
             self.set_values(default_settings)
 
-            # De plus si les paramètres pour la taille et la position de la fenêtre existe, essaye de les récupérer
-            dimensions = [None] * 4  # x, y, w, h
-            try:
-                # Récupère l'écran et calcule la position relative de la fenêtre
-                screen = default_settings["initialisation.screen_index"]
-                screen_dimensions = QDesktopWidget().screenGeometry(screen - 1).getCoords()
-                dimensions[0] = screen_dimensions[0] + default_settings["initialisation.x"]
-                dimensions[1] = screen_dimensions[1] + default_settings["initialisation.y"]
+            # De plus si les paramètres pour la taille et la position de la fenêtre existent, essaye de les récupérer
+            if all([(f"initialisation.{p}" in default_settings) for p in ["screen_index", "x", "y", "w", "h"]]):
+                try:
+                    # Calcule les tailles théoriques des fenêtres (pour ne pas qu'elles dépassent de l'écran
+                    screen_index = default_settings["initialisation.screen_index"] - 1
 
-                # Pour les deux dimensiosn des fenêtres vérifie si :
-                # La taille indiqué rentre dans l'écran sur lequel on se situe
-                # Sinon si la dimensions restant de la fenêtre est suffisant pour faire rentrer la fenêtre
-                if dimensions[0] + default_settings["initialisation.w"] + 1 <= screen_dimensions[2]:
-                    dimensions[2] = default_settings["initialisation.w"]
-                elif screen_dimensions[2] - dimensions[0] + 1 >= self.win.property("minimumWidth"):
-                    dimensions[2] = screen_dimensions[2] - dimensions[0] + 1
-                if dimensions[1] + default_settings["initialisation.h"] + 1 <= screen_dimensions[3]:
-                    dimensions[3] = default_settings["initialisation.h"]
-                elif screen_dimensions[3] - dimensions[1] + 1 >= self.win.property("minimumHeight"):
-                    dimensions[3] = screen_dimensions[3] - dimensions[1] + 1
+                    # Vérifie que l'index écran est bien un index valide, sinon laisse un warning
+                    if 0 <= screen_index < len(self.screens_dimensions) :
+                        # Commence par calculer la taille théorique maximale selon la position de la fenêtre et la taille écran
+                        max_window_size = [self.screens_dimensions[screen_index][1][0] - default_settings["initialisation.x"],
+                                           self.screens_dimensions[screen_index][1][1] - default_settings["initialisation.y"]]
 
-                # Si la position et la taille de la fenêtre a été calculé avec succès, place et dimensionne la fenêtre
-                if not list(x for x in dimensions if x is None):
-                    self.win.setPosition(dimensions[0], dimensions[1])
-                    self.win.resize(dimensions[2],  dimensions[3])
-                else:
-                    log.debug(f"Les données pour la position et taille de la fenêtre d'initialisation sont incorect.\n\n")
-            except KeyError:
-                log.debug(f"Aucune information stocké sur la taille par défaut de la fenêtre d'initialisation.\n\n")
-        else:
-            log.info(f"Aucun fichier paramètres default.settings. Tous les éléments par défaut seront pris.\n\n")
+                        # Puis garde la dimensions la plus faible entre sa taille demandée et la taille maximale possible
+                        window_size = [min(max_window_size[0], default_settings["initialisation.w"]),
+                                       min(max_window_size[1], default_settings["initialisation.h"])]
+
+                        # S'assure que la fenêtre (de taille minimale 640*480) rentre bien là où elle doit être placée
+                        if window_size[0] >= 640 and window_size[1] >= 480:
+                            # Repositione et redimensionne la fenêtre
+                            self.win.setPosition(self.screens_dimensions[screen_index][0][0] + default_settings["initialisation.x"],
+                                                 self.screens_dimensions[screen_index][0][1] + default_settings["initialisation.y"])
+                            self.win.resize(window_size[0], window_size[1])
+                        else:
+                            log.debug(f"La fenêtre a positioner ne rentre pas à l'écran." +
+                                      f"Elle ferait {window_size} au lieu de [640, 480] minimum.\n")
+                    # Sinon laisse un warning pour que l'utilisateur change la valeur manuellement sur le default.settings
+                    else:
+                        log.warning(f"{screen_index + 1}, n'est pas un index d'écran valide\n\t\t" +
+                                    f"initialisation.screen_index doit être entre 1 et {len(self.screens_dimensions)}\n")
+                # Récupère une exception en cas d'urgence (par exemple si l'un des paramètres n'est pas au bon format
+                except Exception as error:
+                    log.warning("Erreur lors du redimensionement de la fenêtre d'initialisation (surement dû aux paramètres)",
+                                exception=error)
+            # Sinon laisse un message de debug indiquant que certaines données sont manquantes
+            else:
+                log.debug(f"Aucune information stocké sur la taille par défaut de la fenêtre d'initialisation.\n")
 
         # Indique le temps de chargement de l'application
         log.info(f"Application d'initialisation chargée en " +
