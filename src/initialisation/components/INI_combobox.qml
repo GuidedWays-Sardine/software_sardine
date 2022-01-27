@@ -225,7 +225,7 @@ Item {
         default_x: 2 * root.ratio
         default_y: - (root.font_size + 4) * root.ratio
 
-        is_dark_grey: root.is_dark_grey
+        is_dark_grey: root.is_dark_grey || root.elements.length <= 1
     }
 
 
