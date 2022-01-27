@@ -27,8 +27,10 @@ class PageRB8:
     engine = None
     page = None
     current_button = None
-    screen_count = 0
-    screen_index = []
+
+    # Eléments nécessaire au stockage des popup d'index
+    screen_index_engine = None
+    screen_index_windows = []
 
     # Informations par défauts des écrans {"nom écran": [sera utilisé ?, longuer minimum, hauteur minimum]}
     screen_default = {}
@@ -57,31 +59,20 @@ class PageRB8:
         self.current_button = current_button
         self.current_button.setProperty("text", self.name)
 
-        # Récupère le nombre d'écrans présents
-        self.screen_count = QDesktopWidget().screenCount()
-        self.screen_index = [None] * self.screen_count
-        log.info(str(self.screen_count) + " écrans détectés.\n")
+        # Passe sur chacun des écrans connectés à l'ordinateur et génère la fenêtre graphique associée
+        self.screen_index_engine = QQmlApplicationEngine()
+        self.screen_index_windows = [QObject()] * len(application.screens_dimensions)
+        for screen_index in range(0, len(self.screen_index_windows)):
+            # Charge une fenêtre d'index et mets le bon index et la place au bon endroit
+            self.screen_index_engine.load(f"{PROJECT_DIR}src\\initialisation\\graphics\\page_rb\\page_rb8\\screen_index_window.qml")
+            print(len(self.screen_index_engine.rootObjects()))
+            self.screen_index_windows[screen_index] = self.screen_index_engine.rootObjects()[-1]
+            self.screen_index_windows[screen_index].setProperty("index", screen_index + 1)
+            self.screen_index_windows[screen_index].setPosition(application.screens_dimensions[screen_index][0][0],
+                                                                application.screens_dimensions[screen_index][0][1])
 
-        # Charge autant de fenêtres d'index d'écrans qu'il y a d'écrans
-        for screen_index in range(0, self.screen_count):
-            application.engine.load(f"{PROJECT_DIR}src\\initialisation\\graphics\\page_rb\\page_rb8\\screen_index.qml")
-            self.screen_index[screen_index] = application.engine.rootObjects()[len(application.engine.rootObjects()) - 1]
-            self.screen_index[screen_index].hide()
-
-        # Puis récupère les tailles des écrans et places les différentes fenêtres d'index en haut à gauche des écrans
-        # Et dans le même temps initialise la liste de choix des écrans
-        screen_list = ["Aucun"]
-        screen_dimensions = []
-        for screen_index in range(0, self.screen_count):
-            sg = QDesktopWidget().screenGeometry(screen_index).getCoords()
-            self.screen_index[screen_index].setPosition(sg[0] + sg[2] - self.screen_index[0].property("minimumWidth") + 1, sg[1])
-            screen_dimensions.append([sg[2] - sg[0] + 1, sg[3] - sg[1] + 1])
-            self.screen_index[screen_index].findChild(QObject, "screen_index").setProperty("text", str(screen_index + 1))
-            screen_list.append(str(screen_index + 1))
-
-        # Envoie liste des fenètre et de leurs dimensions à la graphique de la page*
-        self.page.setProperty("screen_list", screen_list)
-        self.page.setProperty("screen_size", screen_dimensions)
+        # Envoie la dimension des fenêtre à la partie graphique de la page
+        self.page.setProperty("screens_size", [sd[1] for sd in application.screens_dimensions])
 
         # Charge la traduction pour le nom des fichiers et des catégories (Anglais -> langue actuelle)
         translation_data = td.TranslationDictionary()
@@ -202,7 +193,7 @@ class PageRB8:
         """
         # Initialise les paramètres récupérés et récupère le paramètre sur si les écrans sont éteins
         page_parameters = sd.SettingsDictionary()
-        page_parameters["immersion"] = self.page.findChild(QObject, "black_screens_check").property("is_checked")
+        page_parameters["immersion"] = self.page.findChild(QObject, "immersion_check").property("is_checked")
 
         # Récupère les valeurs actuellement sur l'écran
         old_screens_values = self.page.get_values().toVariant()
@@ -238,7 +229,7 @@ class PageRB8:
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
         """
         # Change la valeur pour les écrans noirs
-        data.update_parameter(self.page, "black_screens_check", "is_checked", "immersion")
+        data.update_parameter(self.page, "immersion_check", "is_checked", "immersion")
 
         # Inverse les données de traduction pour avoir un dictionnaire langue actuelle -> Français
         invert_translation = td.TranslationDictionary()
@@ -254,7 +245,7 @@ class PageRB8:
 
                 # Essaye de récupérer les donnés reliées à l'écran
                 try:
-                    if int(data[screen_settings_key + "screen_index"]) <= self.screen_count:
+                    if int(data[screen_settings_key + "screen_index"]) <= len(self.screen_index_windows):
                         self.screen_settings[category_key][screen_key][0] = data[screen_settings_key + "screen_index"]
                         self.screen_settings[category_key][screen_key][1] = data[screen_settings_key + "full_screen"]
                         self.screen_settings[category_key][screen_key][2][0] = data[screen_settings_key + "x"]
@@ -312,10 +303,6 @@ class PageRB8:
             if self.category_active == category_key:
                 self.category_active = translation_data[self.category_active]
 
-        # Traduit le texte devant le DMI_checkbutton pour savoir
-        black_screens_check = self.page.findChild(QObject, "black_screens_check")
-        black_screens_check.setProperty("text", translation_data[black_screens_check.property("text")])
-
         # Remets à jour la page actuelle et le titre de la catégorie
         self.page.findChild(QObject, "category_title").setProperty("text", self.category_active)
         self.change_visible_screen_list()
@@ -356,8 +343,8 @@ class PageRB8:
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
         # Rend visible tous les écrans d'index
-        for screen_index in self.screen_index:
-            screen_index.show()
+        for screen_index_window in self.screen_index_windows:
+            screen_index_window.show()
 
         # Remets à jour la page actuelle
         self.change_visible_screen_list()
@@ -372,8 +359,8 @@ class PageRB8:
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
         # Cache toutes les fenêtres d'index
-        for screen_index in self.screen_index:
-            screen_index.hide()
+        for screen_index_window in self.screen_index_windows:
+            screen_index_window.hide()
 
         # récupère les valeurs des écrans actuels et les sauvegarde
         screens_values = self.page.get_values().toVariant()
@@ -436,7 +423,7 @@ class PageRB8:
         if new_index == len(self.screen_default) - 1:
             right_category_button.setProperty("is_activable", False)
 
-    def on_left_screen_button_pressed(self):
+    def on_left_window_button_pressed(self):
         """Signal appelé quand le bouton pour passer à la série de paramétraghes d'écran de gauche d'une catégorie est cliqué.
         Attention ce signal doit être appelé uniquement si la série d'écrans de gauche existe, sous risque de crash.
         """
@@ -449,7 +436,7 @@ class PageRB8:
         self.screen_list_active -= 1
         self.change_visible_screen_list()
 
-    def on_right_screen_button_pressed(self):
+    def on_right_window_button_pressed(self):
         """Signal appelé quand le bouton pour passer à la série de paramétraghes d'écran de droite d'une catégorie est cliqué.
         Attention ce signal doit être appelé uniquement si la série d'écrans de droite existe, sous risque de crash.
         """
@@ -496,22 +483,22 @@ class PageRB8:
                 visible_screen_minimum_wh.append([0, 0])
 
         # Maintenant que toutes les valeurs ont été récupérés, les ajoutent à la partie graphique
-        self.page.setProperty("screen_names", visible_screen_names)
-        self.page.setProperty("screen_activable", visible_screen_activable)
+        self.page.setProperty("windows_name", visible_screen_names)
+        self.page.setProperty("windows_activable", visible_screen_activable)
         self.page.setProperty("minimum_wh", visible_screen_minimum_wh)
         self.page.setProperty("initial_settings", visible_screen_default_settings)
 
         # Rend visible et fonctionnel les boutons du bas pour changer de page d'écrans dans le cas
         if len(category_screen_list) > 4:
-            left_button = self.page.findChild(QObject, "left_screen_button")
+            left_button = self.page.findChild(QObject, "left_window_button")
             left_button.setProperty("is_visible", True)
             left_button.setProperty("is_activable", self.screen_list_active > 0)
-            right_button = self.page.findChild(QObject, "right_screen_button")
+            right_button = self.page.findChild(QObject, "right_window_button")
             right_button.setProperty("is_visible", True)
             right_button.setProperty("is_activable", (self.screen_list_active + 1) * 4 < len(category_screen_list))
         else:
-            self.page.findChild(QObject, "left_screen_button").setProperty("is_visible", False)
-            self.page.findChild(QObject, "right_screen_button").setProperty("is_visible", False)
+            self.page.findChild(QObject, "left_window_button").setProperty("is_visible", False)
+            self.page.findChild(QObject, "right_window_button").setProperty("is_visible", False)
 
     def on_camera_train_checked(self, application):
         """Signal appelé lorsque le checkbutton camera_check est coché ou décoché.
