@@ -25,7 +25,7 @@ Item {
         is_positive: false
 
 
-        //Signal appelé lorsque la valeur du combobox change (par un clic ou par une commande
+        //Signal appelé lorsque la valeur du combobox change (par un clic ou par une commande)
         onValue_changed: {
             //Si les données en direct sont activés, active le dashboard par défaut (dashboard_check)
             //Si les données en direct sont désactivés, désactive le dashboard
@@ -147,6 +147,15 @@ Item {
         is_checked: false
         is_activable: true
         is_positive: false
+
+
+        //Signal appelé lorsque la valeur du combobox change (par un clic ou par une commande)
+        onValue_changed: {
+            //Si le simulateur n'est pas connecté à Renard (pas coché) enlève la caméra
+            if(!is_checked) {
+                camera_check.is_checked = false
+            }
+        }
     }
 
     //Checkbutton pour savoir si Renard est connecté via la caméra (ou via un visuel direct)
