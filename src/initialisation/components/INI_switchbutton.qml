@@ -82,7 +82,7 @@ Item {
         text: ""
 
         is_activable: root.is_activable && root.elements.length > 1
-        is_dark_grey: root.is_dark_grey
+        is_dark_grey: root.is_dark_grey || root.elements.length <= 1
         is_positive: root.is_positive
 
         //signal activé lorsque le bouton est cliqué
@@ -108,6 +108,6 @@ Item {
         default_x: root.default_x + 2
         default_y: root.default_y - 4 - font_size
 
-        is_dark_grey: root.is_dark_grey
+        is_dark_grey: root.is_dark_grey || root.elements.length <= 1
     }
 }
