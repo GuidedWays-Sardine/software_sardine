@@ -8,8 +8,8 @@ import "../../../components"
 Window {
     id: screen_index_window
 
-    minimumWidth: 288
-    minimumHeight: 162
+    minimumWidth: 246
+    minimumHeight: 143
     visible: false
     color: "#031122"
     flags: Qt.FramelessWindowHint | Qt.Window | Qt.WindowStaysOnTopHint
