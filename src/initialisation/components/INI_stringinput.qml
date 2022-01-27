@@ -82,7 +82,7 @@ Item{
 
         color: root.is_dark_grey ? root.dark_grey : (body.text != "" ? root.grey : root.medium_grey)
         font.pixelSize: root.font_size * root.ratio
-        readOnly: !root.is_activable
+        readOnly: !root.is_activable || root.max_text_length <= 0
         echoMode: TextInput.Normal
         maximumLength: root.max_text_length
 
@@ -117,7 +117,7 @@ Item{
         text: root.title
         font_size: root.font_size
 
-        is_dark_grey: root.is_dark_grey
+        is_dark_grey: root.is_dark_grey || root.max_text_length <= 0
     }
 
 
