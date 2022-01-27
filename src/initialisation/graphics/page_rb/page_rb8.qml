@@ -50,7 +50,7 @@ Item {
         id: left_category_button
         objectName: "left_category_button"
 
-        default_x: 54
+        default_x: 54 + 64
         default_y: 15
         default_width: 46
         default_height: 40
@@ -67,9 +67,9 @@ Item {
         id: category_title
         objectName: "category_title"
 
-        default_x: 54 + 46
+        default_x: 54 + 46 + 64
         default_y: 15
-        default_width: 380
+        default_width: 380 - 2 * 64
         default_height: 40
 
         text: "NaN"
@@ -84,7 +84,7 @@ Item {
         id: right_category_button
         objectName: "right_category_button"
 
-        default_x: 380 + 54 + 46
+        default_x: 380 + 54 + 46 - 64
         default_y: 15
         default_width: 46
         default_height: 40
