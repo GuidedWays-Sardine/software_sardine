@@ -269,13 +269,11 @@ class PageRB8:
         # Traduit le nom de la catégorie
         self.current_button.setProperty("text", translation_data[self.current_button.property("text")])
 
-        # Change la traduction pour le texte Plein écran ? du DMI_checkbutton
+        # Change la traduction des différents textes de l'écran
+        self.page.setProperty("none_text", translation_data[self.page.property("none_text")])
         self.page.setProperty("fullscreen_text", translation_data[self.page.property("fullscreen_text")])
-
-        # Change la traduction du aucun dans la liste d'écran
-        screen_list = self.page.property("screen_list").toVariant()
-        screen_list[0] = translation_data[screen_list[0]]
-        self.page.setProperty("screen_list", screen_list)
+        self.page.setProperty("window_index_text", translation_data[self.page.property("window_index_text")])
+        self.page.setProperty("immersion_text", translation_data[self.page.property("immersion_text")])
 
         # Pour chaque catégories
         for category_key in list(self.screen_default):
