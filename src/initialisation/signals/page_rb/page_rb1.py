@@ -27,7 +27,7 @@ class PageRB1:
     current_button = None
 
     # constantes de conversion entre le text du log_switchbutton et le niveau de registre associé
-    log_type_converter = {"Complet": log.Level.DEBUG,
+    log_converter = {"Complet": log.Level.DEBUG,
                           "Suffisant": log.Level.INFO,
                           "Minimal": log.Level.WARNING,
                           "Aucun": log.Level.NOTSET
@@ -91,8 +91,8 @@ class PageRB1:
                     if os.path.isdir(os.path.join(f"{PROJECT_DIR}src\\train\\DMI", f))]
         self.page.findChild(QObject, "dmi_combo").setProperty("elements", dmi_list)
 
-        # Rend le bouton registre fonctionel (quand cliqué, indique le registre suivant)
-        self.page.findChild(QObject, "log_button").clicked.connect(self.on_log_button_clicked)
+        # Initialise la liste des niveaux de registre et l'envoie au log_switchbutton
+        self.page.findChild(QObject, "log_switchbutton").setProperty("elements", list(self.log_converter))
 
         # Définit la page comme validée (toutes les valeurs par défaut suffisent)
         application.is_completed_by_default[self.index - 1] = "is_page_valid" not in dir(self)
@@ -128,7 +128,7 @@ class PageRB1:
 
         # Paramètre niveau de logging
         log_text = self.page.findChild(QObject, "log_button").property("text")
-        page_parameters["log_level"] = self.log_type_converter[log_text]
+        page_parameters["log_level"] = self.log_converter[log_text]
 
         # Paramètre langue
         page_parameters["Langue"] = self.page.findChild(QObject, "language_combo").property("selection_text")
@@ -169,7 +169,7 @@ class PageRB1:
 
         # Paramètre niveau de registre (pour suivre les potentiels bugs lors de la simulation)
         if data.get_value("log_level") is not None:
-            new_log_level = [key for key, value in self.log_type_converter.items()
+            new_log_level = [key for key, value in self.log_converter.items()
                              if value == log.Level[data["log_level"].replace("Level.", "")]]
             if new_log_level:
                 self.page.findChild(QObject, "log_button").setProperty("text", new_log_level[0])
@@ -210,10 +210,10 @@ class PageRB1:
 
         # Traduit les clés dans le log_type converter et dans le convertiseur de niveau de registre
         keys = list(self.next_log_level)
-        self.log_type_converter = {translation_data[keys[0]]: self.log_type_converter[keys[0]],
-                                   translation_data[keys[1]]: self.log_type_converter[keys[1]],
-                                   translation_data[keys[2]]: self.log_type_converter[keys[2]],
-                                   translation_data[keys[3]]: self.log_type_converter[keys[3]]
+        self.log_converter = {translation_data[keys[0]]: self.log_converter[keys[0]],
+                                   translation_data[keys[1]]: self.log_converter[keys[1]],
+                                   translation_data[keys[2]]: self.log_converter[keys[2]],
+                                   translation_data[keys[3]]: self.log_converter[keys[3]]
                                    }
 
         # Modification du changeur de niveau de log
