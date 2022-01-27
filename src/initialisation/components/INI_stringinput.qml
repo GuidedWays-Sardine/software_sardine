@@ -26,6 +26,7 @@ Item{
     //Propriétés liés aux valeurs limites et la valeur actuellement sélectionnée
     property string placeholder_text: ""
     property int max_text_length: 1000
+    onMax_text_lengthChanged: { if(root.max_text_length < 0){ root.max_text_length = 0 } }    //S'assure que la taille maximale est toujours positive
     readonly property string text: body.text
 
     //Propriétés sur le titre et le texte
