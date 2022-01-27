@@ -34,6 +34,7 @@ class InitialisationWindow:
     visible_pages = [None] * 8     # Stocke les pages que l'utilisateur peut afficher
     is_fully_loaded = [False] * 8  # Stocke directement l'instance de la classe
     is_completed_by_default = [False] * 8     # Détecte si la page est complété (égale à self.visible_pages si tout est complété)
+    screens_dimensions = []                   # Données sur les écrans connectés : format : [[x, y], [w, h], ...]
 
     # Variable stockant la langue actuelle de l'application d'initialisation
     language = "Français"
@@ -74,9 +75,17 @@ class InitialisationWindow:
         elif not self.engine.rootObjects() and os.path.isfile(f"{PROJECT_DIR}src\\initialisation\\initialisation_window.qml"):
             raise SyntaxError(f"Le fichier .qml pour la fenêtre d\'initialisation contient des erreurs.")
 
+        # Charge tous les écrans connectés à l'ordinateur (utile pour la positionnement de certaines popup)
+        for screen_index in range(0, QDesktopWidget().screenCount()):
+            # Charge les informations de l'écran (au format [x_min, y_min, x_max, y_max]
+            sg = QDesktopWidget().screenGeometry(screen_index).getCoords()
+
+            # Les stockes au bon format [[x, y], [w, h]]
+            self.screens_dimensions.append([[sg[0], sg[1]], [sg[2] - sg[0] + 1, sg[3] - sg[1] + 1]])
+        log.info(f"Détection de {len(self.screens_dimensions)} écrans connectés à l'ordinateur.\n\n")
+
         # Si le fichier qml a été compris, récupère la fenêtre et initialise les différents boutons et pages
         self.win = self.engine.rootObjects()[0]
-        self.win.hide()
         self.bottom_buttons = bb.BottomButtons(self)
         self.right_buttons = rb.RightButtons(self)
 
