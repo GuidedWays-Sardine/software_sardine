@@ -45,7 +45,7 @@ Item {
         title: "Tableau de bord ?"
 
         is_checked: false
-        is_activable: false
+        is_activable: data_check.is_checked
         is_positive: false
     }
 
@@ -170,7 +170,7 @@ Item {
         title: "Connecté par une caméra ?"
 
         is_checked: false
-        is_activable: true
+        is_activable: renard_check.is_checked
         is_positive: false
     }
 
