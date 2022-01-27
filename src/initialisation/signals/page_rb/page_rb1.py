@@ -91,16 +91,6 @@ class PageRB1:
                     if os.path.isdir(os.path.join(f"{PROJECT_DIR}src\\train\\DMI", f))]
         self.page.findChild(QObject, "dmi_combo").setProperty("elements", dmi_list)
 
-        # Rend le checkbutton renard et le checkbutton caméra fonctionnel
-        renard = self.page.findChild(QObject, "renard_check")
-        renard.value_changed.connect(self.on_renard_selected)
-        self.on_renard_selected()
-
-        # Rend le checkbutton data, dashboard et data_save fonctionnel
-        data = self.page.findChild(QObject, "data_check")
-        data.value_changed.connect(self.on_data_selected)
-        self.on_data_selected()
-
         # Rend le bouton registre fonctionel (quand cliqué, indique le registre suivant)
         self.page.findChild(QObject, "log_button").clicked.connect(self.on_log_button_clicked)
 
@@ -248,34 +238,3 @@ class PageRB1:
         """
         # Appelle la fonction de changement de langue de l'application avec la nouvelle langue sélectionnée
         application.change_language(self.page.findChild(QObject, "language_combo").property("selection_text"))
-
-    def on_renard_selected(self):
-        """Fonction appelée lorsque le checkbutton renard_check est sélectioné.
-        Permet d'activer ou de désactiver le checkbutton pour la caméra.
-        """
-        # Récupère si le checkbutton de renard est activé ainsi que le checkbutton caméra
-        connected = self.page.findChild(QObject, "renard_check").property("is_checked")
-        camera_check = self.page.findChild(QObject, "camera_check")
-
-        # Cas où renard est activé -> le bouton est sélectionable
-        if connected:
-            camera_check.setProperty("is_activable", True)
-        # Cas où renard est désactivé -> le bouton n'est pas sélectionable et est désactivé
-        else:
-            camera_check.setProperty("is_activable", False)
-            camera_check.setProperty("is_checked", False)
-
-    def on_data_selected(self):
-        """Fonction appelée lorsque le checkbutton renard_check est sélectioné.
-        Permet d'activer ou de désactiver le checkbutton pour la caméra.
-        """
-        # Récupère si le checkbutton de la visualisation des données est activé ainsi que le checkbutton dashboard
-        connected = self.page.findChild(QObject, "data_check").property("is_checked")
-        self.page.findChild(QObject, "dashboard_check").setProperty("is_activable", connected)
-
-    def on_log_button_clicked(self):
-        """Fonction appelée lorsque le bouton log_button est cliqué.
-        Permet de changer le niveau de registre affiché sur le bouton (et récupéré).
-        """
-        log_button = self.page.findChild(QObject, "log_button")
-        log_button.setProperty("text", self.next_log_level[log_button.property("text")])
