@@ -28,10 +28,10 @@ class PageRB1:
 
     # constantes de conversion entre le text du log_switchbutton et le niveau de registre associé
     log_converter = {"Complet": log.Level.DEBUG,
-                          "Suffisant": log.Level.INFO,
-                          "Minimal": log.Level.WARNING,
-                          "Aucun": log.Level.NOTSET
-                          }
+                     "Suffisant": log.Level.INFO,
+                     "Minimal": log.Level.WARNING,
+                     "Aucun": log.Level.NOTSET
+                     }
 
     def __init__(self, application, engine, index, current_button):
         """Fonction d'initialisation de la page de paramtètres 1 (page paramètres général)
