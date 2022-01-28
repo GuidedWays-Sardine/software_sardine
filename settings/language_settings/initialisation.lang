@@ -57,6 +57,9 @@ Pmoteur;Pmotor
 Ptrain;Ptrain
 
 Dynamique du train (Rav);Train's dynamic(Rav)
+A :;A :
+B :;B :
+C :;C :
 
 Systèmes d'alimentation;Alimentation systems
 Pantographe ?;Pantograph ?
@@ -65,10 +68,10 @@ Thermique ?;Thermic ?
 Systèmes de freinage;Braking systems
 Nplaquettes;Npads
 Npatins magnétiques;Nmagnetic brakes
-Récupération ?;Regenerative brake?
+Récupération ?;Regenerative ?
 Ndisques;Ndisks
-Nfoucault;Nfoucault
-Rhéostatique ?; Dynamic brake?
+Nfoucault;Nfoucault brakes
+Rhéostatique ?; Dynamic ?
 
 Paramétrage;Configuration
 Simple;Simple
