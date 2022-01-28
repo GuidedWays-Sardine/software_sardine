@@ -55,30 +55,30 @@ class PageRB1:
         self.engine = engine
 
         try:
-            # Essaye de charger la combobox langue
-            file = open(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang", "r", encoding='utf-8-sig')
+            # Essaye de charger la combo langue
+            translation_file_path = f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang"
+            file = open(translation_file_path, "r", encoding='utf-8-sig')
         except (FileNotFoundError, OSError):
-            # Ne change charge pas  la combobox langues dans le cas ou le combobox n'est pas chargé
-            log.warning(f"Le fichier de traduction de langue de l'initialisation n'existe pas. assurez vous qu'il existe :\n\t\t" +
-                        f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang\n")
+            # Ne change charge pas  la combo langues dans le cas ou le combo n'est pas chargé
+            log.warning(f"Le fichier de traduction de langue de l'initialisation n'existe pas." +
+                        f"assurez vous qu'il existe :\n\t\t{translation_file_path}")
         # Sinon lit la première ligne pour récupérer la liste des langues
         else:
             # Récupère la liste des langues (ligne 1 du fichier initialisation.lang)
             language_list = file.readline().rstrip('\n').split(";")
 
-            # Met la liste des langues dans la combobox et connecte une fonction pour changer la langue
-            language_combobox = self.page.findChild(QObject, "language_combo")
-            language_combobox.setProperty("elements", language_list)
-            language_combobox.selection_changed.connect(lambda: self.on_language_change(application))
+            # Met la liste des langues dans la combo et connecte une fonction pour changer la langue
+            language_combo = self.page.findChild(QObject, "language_combo")
+            language_combo.setProperty("elements", language_list)
+            language_combo.selection_changed.connect(lambda: application.change_language(language_combo.property("selection_text")))
 
             # Si le premier language n'est pas le Français, traduit l'application
-            if language_combobox.property("selection_text").lower() != application.language.lower():
-                application.change_language(language_combobox.property("selection_text"))
+            if language_combo.property("selection_text").lower() != application.language.lower():
+                application.change_language(language_combo.property("selection_text"))
 
         # Récupère le dictionaire Anglais -> langue principale pour traduire les répertoires des pupitres de l'anglais
         translation_data = td.TranslationDictionary()
-        translation_data.create_translation(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang",
-                                            "English", application.language)
+        translation_data.create_translation(translation_file_path, "English", application.language)
 
         # Charge tous les dossiers dans src.train.command_board, les traduits et les indiques comme potentiels pupitres
         command_boards = [translation_data[f.replace("_", " ")] for f in os.listdir(f"{PROJECT_DIR}src\\train\\command_board")
