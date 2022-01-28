@@ -127,7 +127,7 @@ class PageRB1:
         page_parameters["dmi"] = translation_data[dmi_selection].replace(" ", "_")
 
         # Paramètre niveau de logging
-        log_text = self.page.findChild(QObject, "log_button").property("text")
+        log_text = self.page.findChild(QObject, "log_switchbutton").property("text")
         page_parameters["log_level"] = self.log_converter[log_text]
 
         # Paramètre langue
@@ -155,7 +155,8 @@ class PageRB1:
         """
         # Paramètre du pupitre (quel pupitre sera utilisé)
         if data.get_value("command_board") is not None:
-            self.page.findChild(QObject, "command_board_combo").change_selection(translation_data[str(data["command_board"])])
+            command_board = translation_data[str(data["command_board"]).replace("_", " ")]
+            self.page.findChild(QObject, "command_board_combo").change_selection(command_board)
 
         # Paramètre pour Renard (savoir si le pupitre est connecté à Renard)
         data.update_parameter(self.page, "renard_check", "is_checked", "renard")
@@ -165,14 +166,15 @@ class PageRB1:
 
         # Paramètre pour le DMI (savoir quelle Interface sera utilisée pour le pupitre
         if data.get_value("dmi") is not None:
-            self.page.findChild(QObject, "command_board_combo").change_selection(translation_data[str(data["dmi"]).replace("_", " ")])
+            dmi = translation_data[str(data["dmi"]).replace("_", " ")]
+            self.page.findChild(QObject, "command_board_combo").change_selection(dmi)
 
         # Paramètre niveau de registre (pour suivre les potentiels bugs lors de la simulation)
         if data.get_value("log_level") is not None:
             new_log_level = [key for key, value in self.log_converter.items()
-                             if value == log.Level[data["log_level"].replace("Level.", "")]]
+                             if value == log.Level[data["log_level"][6:]]]
             if new_log_level:
-                self.page.findChild(QObject, "log_button").setProperty("text", new_log_level[0])
+                self.page.findChild(QObject, "log_switchbutton").change_selection(new_log_level[0])
             else:
                 log.debug(f"Le niveau de registre du fichier de paramètre \"{data['log_level']}\" n'existe pas.\n")
 
