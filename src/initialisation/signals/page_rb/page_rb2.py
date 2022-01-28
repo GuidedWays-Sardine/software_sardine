@@ -31,21 +31,19 @@ class PageRB2:
     engine = None
     page = None
     current_button = None
-    valueinput = {}     # Dictionaire avec tous les valueinput (par soucis d'optimisation)
+    data_components = {}     # Dictionaire avec tous les composants contenant des valeurs sur le train
 
     # Variables nécessaires à l'indication du mode de paramétrage actuel
     class Mode(Enum):
         SIMPLE = False
         COMPLEX = True
-    mode_switch = {"Simple": "Complexe",
-                   "Complexe": "Simple"
-                   }
     current_mode = Mode.SIMPLE      # /!\ Le mode complexe est activé quand le train a été généré
 
     # Page de paramètres complexes (situé dans pagerb2/complex_popup.py)
     complex_popup = None
 
     # Page de paramètres de freinage (situé dans pagerb2/braking_popup.py)
+    brake_popup = None
     # FEATURE : ajouter la classe les import et les fichiers graphiques et logiques nécessaires
 
     def __init__(self, application, engine, index, current_button):
@@ -69,38 +67,46 @@ class PageRB2:
         self.page = engine.rootObjects()[0]
         self.engine = engine
 
-        # Commence par associer chaque widget à son widget_id (permettant une optimisation surtout en mode complex) :
+        # Commence par associer chaque widget à son widget_id (permettant une optimisation dû au surplus de composants)
         for widget_id in ["weight_floatinput", "length_floatinput", "coaches_integerinput",
                           "bogies_count_integerinput", "axles_per_bogies_integerinput", "motorized_axles_count_integerinput",
                           "motorized_axle_weight_floatinput", "axle_power_floatinput", "power_floatinput",
-                          "a_floatinput", "b_floatinput", "c_floatinput",
-                          "pad_brake_integerinput", "magnetic_brake_integerinput",
-                          "disk_brake_integerinput", "foucault_brake_integerinput"]:
-            self.valueinput[widget_id] = self.page.findChild(QObject, widget_id)
+                          "a_floatinput", "b_floatinput", "c_floatinput", "pantograph_check", "thermic_check",
+                          "pad_brake_integerinput", "magnetic_brake_integerinput", "regenerative_check"
+                                                                                   "disk_brake_integerinput", "foucault_brake_integerinput", "dynamic_check"]:
+            self.data_components[widget_id] = self.page.findChild(QObject, widget_id)
 
         # Initialise la combobox avec les types de trains
         self.page.findChild(QObject, "mission_type_combo").setProperty("elements", [key.value for key in cd.MissionType])
 
-        # Initialise la popup de paramétrage complex
-        self.complex_popup = cp.ComplexPopup(self)
+        # Tente d'initialiser la fenêtre de paramétrage complexe
+        try:
+            self.complex_popup = cp.ComplexPopup(self)
+        except Exception as error:
+            log.error("Erreur lors du chargement de la popup complexe (page_rb2).", exception=error)
+        finally:
+            # Vérifie que celle-ci a été chargée et si oui, active le changement de mode et le connecte à son signal
+            if self.complex_popup is not None and self.complex_popup.loaded:
+                mode_switchbutton = self.page.findChild(QObject, "mode_switchbutton")
+                mode_switchbutton.setProperty("is_activable", True)
+                mode_switchbutton.clicked.connect(self.on_mode_button_clicked)
 
-        # Si la fenêtre a été chargée
-        if self.complex_popup.loaded:
-            # Rend le bouton mode_button activable et le connecte à son signal
-            mode_button = self.page.findChild(QObject, "mode_button")
-            mode_button.setProperty("is_activable", True)
-            mode_button.clicked.connect(self.on_mode_button_clicked)
-        else:
-            # Rend le bouton mode_button non activabl
-            self.page.findChild(QObject, "mode_button").setProperty("is_activable", False)
+        # Tente d'initialiser la fenêtre de paramétrage freinage
+        try:
+            raise NotImplementedError("La fenêtre de paramétrage freinage n'a pas été implémentée")
+            # FEATURE : Créer la page de paramètrages des systèmes de freinages
+        except Exception as error:
+            log.error("Erreur lors du chargement de la popup freinage (page_rb2).", exception=error)
+        finally:
+            # Vérifie que celle-ci a été chargée et si oui, active le paramétrage des systèmes de freinages
+            if self.brake_popup is not None and self.brake_popup.loaded:
+                mode_switchbutton = self.page.findChild(QObject, "brake_configuration_button")
+                mode_switchbutton.setProperty("is_activable", True)
+                # mode_switchbutton.clicked.connect(...) # FEATURE : remplacer ... par le signal
 
         # Connecte le bouton ouvrir et sauvegarder (d'un fichier de paramètres de train
         self.page.findChild(QObject, "open_button").clicked.connect(self.on_open_button_clicked)
         self.page.findChild(QObject, "save_button").clicked.connect(self.on_save_button_clicked)
-
-        # Connecte le bouton de configuration de freinage
-        #FEATURE : Créer la page de paramètrages des systèmes de freinages (puis la rendre activable)
-        self.page.findChild(QObject, "brake_configuration_button").setProperty("is_activable", False)
 
         # Définit la page comme validée (toutes les valeurs par défaut suffisent)
         application.is_completed_by_default[self.index - 1] = "is_page_valid" not in dir(self)
