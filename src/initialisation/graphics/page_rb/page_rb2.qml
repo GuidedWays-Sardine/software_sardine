@@ -844,6 +844,6 @@ Item {
         text: "Freinage"
 
         is_activable: false     //Activé après l'initialisation de la popup de paramétrage freinage
-        is_positive: true
+        is_positive: false
     }
 }

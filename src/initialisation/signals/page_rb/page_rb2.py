@@ -92,6 +92,7 @@ class PageRB2:
             if self.complex_popup is not None and self.complex_popup.loaded:
                 mode_switchbutton = self.page.findChild(QObject, "mode_switchbutton")
                 mode_switchbutton.setProperty("is_activable", True)
+                mode_switchbutton.setProperty("is_positive", True)
                 mode_switchbutton.clicked.connect(self.on_mode_button_clicked)
 
         # Tente d'initialiser la fenêtre de paramétrage freinage
@@ -103,9 +104,10 @@ class PageRB2:
         finally:
             # Vérifie que celle-ci a été chargée et si oui, active le paramétrage des systèmes de freinages
             if self.brake_popup is not None and self.brake_popup.loaded:
-                mode_switchbutton = self.page.findChild(QObject, "brake_button")
-                mode_switchbutton.setProperty("is_activable", True)
-                # mode_switchbutton.clicked.connect(...) # FEATURE : remplacer ... par le signal
+                brake_button = self.page.findChild(QObject, "brake_button")
+                brake_button.setProperty("is_activable", True)
+                brake_button.setProperty("is_positive", True)
+                # brake_button.clicked.connect(...) # FEATURE : remplacer ... par le signal
 
         # Connecte le bouton ouvrir et sauvegarder (d'un fichier de paramètres de train
         self.page.findChild(QObject, "open_button").clicked.connect(self.on_open_button_clicked)
