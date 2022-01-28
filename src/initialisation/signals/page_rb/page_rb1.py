@@ -218,15 +218,3 @@ class PageRB1:
             selection_index = widget.property("selection_index")
             widget.setProperty("elements", [translation_data[e] for e in widget.property("elements").toVariant()])
             widget.change_selection(selection_index)
-
-    def on_language_change(self, application):
-        """Fonction permettant de changer la langue de l'application d'initialisation.
-        Permet aussi de choisir la langue pour le DMI du pupitre
-
-        Parameters
-        ----------
-        application: `ini.InitialisationWindow`
-            L'instance source de l'application d'initialisation, pour les widgets
-        """
-        # Appelle la fonction de changement de langue de l'application avec la nouvelle langue sélectionnée
-        application.change_language(self.page.findChild(QObject, "language_combo").property("selection_text"))
