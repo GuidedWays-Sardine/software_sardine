@@ -197,37 +197,27 @@ class PageRB1:
         # Traduit le nom de la catégorie
         self.current_button.setProperty("text", translation_data[self.current_button.property("text")])
 
-        # Essaye de traduire chaque textes au dessus des widgets et check_button
-        for widget_id in ["command_board_text", "dmi_text", "log_text", "language_text", "renard_check", "camera_check",
-                          "pcc_check", "data_check", "dashboard_check", "data_save_check"]:
+        # Traduit le titre de tous les widgets qui en ont un
+        for widget_id in ["data_check", "dashboard_check", "data_save_check", "pcc_check", "log_switchbutton",
+                          "language_combo", "dmi_combo", "renard_check", "camera_check", "command_board_combo"]:
             widget = self.page.findChild(QObject, widget_id)
-            widget.setProperty("text", translation_data[widget.property("text")])
+            widget.setProperty("title", translation_data[widget.property("title")])
 
-        # Pour les combobox du pupitre et du DMI, traduit chaque élément qui contient une traduction et remet la sélection
-        for combo in ["command_board_combo", "dmi_combo"]:
-            widget = self.page.findChild(QObject, combo)
-            selection_index = widget.property("selection_index")
-            widget.setProperty("elements", list(translation_data[e] for e in widget.property("elements").toVariant()))
-            widget.change_selection(selection_index)
+        # Traduit les clés du log_converter (Les valeurs sur le composant sont traduites juste en dessous)
 
-        # Traduit les clés dans le log_type converter et dans le convertiseur de niveau de registre
-        keys = list(self.next_log_level)
+        keys = list(self.log_converter)
         self.log_converter = {translation_data[keys[0]]: self.log_converter[keys[0]],
-                                   translation_data[keys[1]]: self.log_converter[keys[1]],
-                                   translation_data[keys[2]]: self.log_converter[keys[2]],
-                                   translation_data[keys[3]]: self.log_converter[keys[3]]
-                                   }
+                              translation_data[keys[1]]: self.log_converter[keys[1]],
+                              translation_data[keys[2]]: self.log_converter[keys[2]],
+                              translation_data[keys[3]]: self.log_converter[keys[3]]
+                              }
 
-        # Modification du changeur de niveau de log
-        self.next_log_level = {translation_data[keys[0]]: translation_data[self.next_log_level[keys[0]]],
-                               translation_data[keys[1]]: translation_data[self.next_log_level[keys[1]]],
-                               translation_data[keys[2]]: translation_data[self.next_log_level[keys[2]]],
-                               translation_data[keys[3]]: translation_data[self.next_log_level[keys[3]]]
-                               }
-
-        # Change la langue du registre indiqué sur le bouton
-        log_button = self.page.findChild(QObject, "log_button")
-        log_button.setProperty("text", translation_data[log_button.property("text")])
+        # Pour les combobox et switchbutton traduit chaque élément qui contient une traduction et remet la sélection
+        for widget_id in ["log_switchbutton", "command_board_combo", "dmi_combo"]:
+            widget = self.page.findChild(QObject, widget_id)
+            selection_index = widget.property("selection_index")
+            widget.setProperty("elements", [translation_data[e] for e in widget.property("elements").toVariant()])
+            widget.change_selection(selection_index)
 
     def on_language_change(self, application):
         """Fonction permettant de changer la langue de l'application d'initialisation.
