@@ -33,6 +33,9 @@ class PageRB2:
     current_button = None
     data_components = {}     # Dictionaire avec tous les composants contenant des valeurs sur le train
 
+    # Chemin vers les fichiers de paramètres train
+    train_settings_file_path = f"{PROJECT_DIR}settings\\train_settings\\"
+
     # Variables nécessaires à l'indication du mode de paramétrage actuel
     class Mode(Enum):
         SIMPLE = False
@@ -110,6 +113,7 @@ class PageRB2:
 
         # Définit la page comme validée (toutes les valeurs par défaut suffisent)
         application.is_completed_by_default[self.index - 1] = "is_page_valid" not in dir(self)
+        # TODO : changer ce fonctionnemet
 
     def get_values(self, translation_data):
         """Récupère les paramètres de la page de paramètres page_rb1
@@ -131,13 +135,13 @@ class PageRB2:
         if file_name:
             # Rajoute l'extension si nécessaire et appelle la fonction de sauvegarde (definit plus bas)
             file_name += ".train" if file_name and not file_name.lower().endswith(".train") else ""
-            self.save_train_data_file(f"{PROJECT_DIR}settings\\train_settings\\{file_name}")
+            self.save_train_data_file(f"{self.train_settings_file_path}{file_name}")
+
+            # Ajoute le nom du fichier dans le dictionnaire de paramètres
+            page_parameters["train_name"] = self.page.findChild(QObject, 'train_name_stringinput').property('text')
         else:
             log.warning("Impossible de sauvegarder le fichier de paramètres train, aucun nom de fichier entré.\n",
                         prefix="Sauvegarde des données train")
-
-        # Ajoute le nom du fichier dans le dictionnaire de paramètres
-        page_parameters["train_name"] = self.page.findChild(QObject, 'train_name_stringinput').property('text')
 
         return page_parameters
 
@@ -191,13 +195,13 @@ class PageRB2:
         train_name = data.get_value("train_name")
         if train_name is not None:
             # Vérifie que le fichier de paramètres existe
-            if os.path.exists(f"{PROJECT_DIR}settings\\train_settings\\{train_name}.train"):
+            if os.path.exists(f"{self.train_settings_file_path}{train_name}.train"):
                 # Si c'est le cas, l'ouvre et change les différentes valeurs du paramétrage train sur la page
-                self.open_train_data_file(f"{PROJECT_DIR}settings\\train_settings\\{train_name}.train")
+                self.open_train_data_file(f"{self.train_settings_file_path}{train_name}.train")
             else:
                 # Sinon laisse un message d'erreur
                 log.warning(f"le fichier de paramètres : {train_name}.train , n'existe plus.\n" +
-                            f"\t\t{PROJECT_DIR}settings\\train_settings\\{train_name}.train",
+                            f"\t\t{self.train_settings_file_path}{train_name}.train",
                             prefix="Ouverture des données train")
 
     def open_train_data_file(self, file_path):
@@ -219,39 +223,45 @@ class PageRB2:
             return
 
         try:
-            # Change les valeurs en mode simple, puis en mode complexe si le mode a été activé
+            # Change les valeurs en mode simple
             self.set_simple_mode_values(train_data)
 
-            # Change le mode actuel et vérifie si le mode complex était activé pour ce fichier de paramètres
+            # Change le mode actuel et vérifie s'il est en mode complexe et si le popup est chargé
             self.current_mode = self.Mode[train_data["mode"][5:]]
-            if self.current_mode == self.Mode.COMPLEX:
-                # Passe en mode complex et indique que le train a été généré
-                self.page.findChild(QObject, "mode_button").setProperty("text", list(self.mode_switch.keys())[1])
-                if self.complex_popup.loaded:
-                    # Mets à jour la visibilité des fenêtres et change les valeurs
-                    self.complex_popup.win.show()
-                    self.complex_popup.set_complex_mode_values(train_data)
-
-                    self.complex_popup.win.setProperty("generated", True)
-                    self.page.setProperty("generated", True)
-
-            # FEATURE : changer les valeurs de la fenêtre de paramétrage
+            if self.current_mode == self.Mode.COMPLEX and self.complex_popup is not None and self.complex_popup.loaded:
+                # Si c'est le cas, passe en mode complexe (graphiquement et logiquement), et change les valeurs complexe
+                self.page.findChild(QObject, "mode_switchbutton").change_selection(1)  # 1 représentant le mode complexe
+                self.page.setProperty("generated", True)
+                self.complex_popup.win.setProperty("generated", True)
+                self.complex_popup.win.show()
+                self.complex_popup.set_complex_mode_values(train_data)
             else:
-                # Sinon désactive le mode simple et dé-génère le fichier train
-                self.page.findChild(QObject, "mode_button").setProperty("text", list(self.mode_switch.keys())[0])
+                # Sinon repasse en mode paramétrage simple et réinitialise la popup complexe si nécessaire
+                self.page.findChild(QObject, "mode_switchbutton").change_selection(0)
                 self.page.setProperty("generated", False)
-                if self.complex_popup.loaded:
+                if self.complex_popup is not None and self.complex_popup.loaded:
                     self.complex_popup.win.setProperty("generated", False)
+                    self.complex_popup.reset()
         except Exception as error:
             # Si le changement des paramètre a eu un soucis, laisse un message d'erreur
-            log.warning("Erreur survenu lors de l'ouverture d'un fichier de paramètres train.\n",
+            log.warning("Erreur survenu lors du changement des données train.\n",
                         exception=error, prefix="Ouverture des données train")
         else:
             # Change le nom du fichier train dans le train_name_stringinput et indique le temps de chargement
             self.page.findChild(QObject, "train_name_stringinput").setProperty("text", file_path.replace("\\", "/").rsplit("/", maxsplit=1)[1][:-6])
-            log.info(f"Lecture et changement {len(train_data)} paramètres en " +
-                     f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n",
-                     prefix="Ouverture des données train")
+
+        # S'occupe pour finir du changement des paramètres de freinage
+        try:
+            raise NotImplementedError("La fenêtre de paramétrage freinage n'a pas été implémentée")
+            # FEATURE : changer les valeurs de la fenêtre de paramétrage
+        except Exception as error:
+            # Si le changement des paramètre a eu un soucis, laisse un message d'erreur
+            log.warning("Erreur survenu lors du changement des paramètres de freinage.\n",
+                        exception=error, prefix="Ouverture des données train")
+
+        log.info(f"Lecture et changement {len(train_data)} paramètres en " +
+                 f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n",
+                 prefix="Ouverture des données train")
 
     def change_language(self, translation_data):
         """Permet à partir d'un dictionaire de traduction, de traduire les textes de la page de paramètres
@@ -394,7 +404,7 @@ class PageRB2:
 
         # Ouvre la boite de dialoque pour confirmer l'enregistrement du fichier
         file_path = QFileDialog.getSaveFileName(caption="Sauvegarder un fichier de configuration train",
-                                                directory=f"{PROJECT_DIR}settings\\train_settings\\{file_name}",
+                                                directory=f"{self.train_settings_file_path}{file_name}",
                                                 filter="Fichiers de configuration train (*.train)")
         if file_path[0] != "":
             # Dans le cas où le nom du fichier a été changé à la sauvegarder, récupère le nouveau nom de fichier
@@ -410,7 +420,7 @@ class PageRB2:
         """
         # Ouvre la boite de dialoque pour l'ouverture du fichier
         file_path = QFileDialog.getOpenFileName(caption="Sauvegarder un fichier de configuration train",
-                                                directory=f"{PROJECT_DIR}settings\\train_settings\\",
+                                                directory=self.train_settings_file_path,
                                                 filter="Fichiers de configuration train (*.train)")
         if file_path[0] != "":
             # Dans le cas où le nom du fichier a été changé à la sauvegarder, récupère le nouveau nom de fichier
