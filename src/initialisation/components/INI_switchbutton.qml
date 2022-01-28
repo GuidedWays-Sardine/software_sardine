@@ -52,16 +52,16 @@ Item {
     //Fonction permettant de changer la valeur active (peut prendre l'index de l'élément ou sa valeur)
     function change_selection(new_selection){
         // Si la nouvelle sélection est un int et que la valeur à l'index n'est pas la même que celle déjà visible, change la valeur et appelle le signal associé
-        if(typeof new_active === typeof root.font_size && new_active < root.elements.length && root.elements[new_active].toUpperCase() !== body.text.toUpperCase()){
-            body.text = root.elements[new_active]
+        if(typeof new_selection === typeof root.font_size && new_selection < root.elements.length && root.elements[new_selection].toUpperCase() !== body.text.toUpperCase()){
+            body.text = root.elements[new_selection]
             root.selection_changed()
         }
         //Si la nouvelle sélection est un string et que la valeur ne correspond pas à celle déjà entrée, cherche l'élément avec le même index (recherche sans prendre en compte les majuscules et minuscules)
-        else if(typeof new_active === typeof root.selection_text && new_active.toUpperCase() !== body.text.toUpperCase()){
+        else if(typeof new_selection === typeof root.selection_text && new_selection.toUpperCase() !== body.text.toUpperCase()){
             var uppercased = root.elements.map(name => name.toUpperCase())
             //Vérifie que le texte en majuscule est dans la liste, si oui, le change et appelle le signal associé
-            if(uppercased.includes(new_active.toUpperCase())) {
-                var new_index = uppercased.indexOf(new_active.toUpperCase())
+            if(uppercased.includes(new_selection.toUpperCase())) {
+                var new_index = uppercased.indexOf(new_selection.toUpperCase())
                 body.text = root.elements[new_index]
                 root.selection_changed()
             }

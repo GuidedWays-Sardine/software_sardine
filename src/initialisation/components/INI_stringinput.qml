@@ -65,8 +65,8 @@ Item{
 
     //Fonction permettant de changer la valeur du valueinput (de manière sécurisée)
     function change_value(new_value){
-        var changed = new_text != body.text
-        body.text = new_text
+        var changed = new_value != body.text
+        body.text = new_value
         if(changed){
             value_changed()
         }
