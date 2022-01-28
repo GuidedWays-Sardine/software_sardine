@@ -833,8 +833,8 @@ Item {
 
     //Bouton de configuration freinage
     INI_button{
-        id: brake_configuration_button
-        objectName: "brake_configuration_button"
+        id: brake_button
+        objectName: "brake_button"
 
         default_x: save_button.default_x
         default_height: save_button.default_height
