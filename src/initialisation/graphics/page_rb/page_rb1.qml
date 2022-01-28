@@ -113,7 +113,6 @@ Item {
 
         is_activable: true
         is_positive: false
-        is_visible: true
     }
 
     //Combobox du choix du dmi
