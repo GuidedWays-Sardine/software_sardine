@@ -75,8 +75,8 @@ class PageRB2:
                           "bogies_count_integerinput", "axles_per_bogies_integerinput", "motorized_axles_count_integerinput",
                           "motorized_axle_weight_floatinput", "axle_power_floatinput", "power_floatinput",
                           "a_floatinput", "b_floatinput", "c_floatinput", "pantograph_check", "thermic_check",
-                          "pad_brake_integerinput", "magnetic_brake_integerinput", "regenerative_check"
-                                                                                   "disk_brake_integerinput", "foucault_brake_integerinput", "dynamic_check"]:
+                          "pad_brake_integerinput", "magnetic_brake_integerinput", "regenerative_check",
+                          "disk_brake_integerinput", "foucault_brake_integerinput", "dynamic_check"]:
             self.data_components[widget_id] = self.page.findChild(QObject, widget_id)
 
         # Initialise la combobox avec les types de trains
@@ -103,7 +103,7 @@ class PageRB2:
         finally:
             # Vérifie que celle-ci a été chargée et si oui, active le paramétrage des systèmes de freinages
             if self.brake_popup is not None and self.brake_popup.loaded:
-                mode_switchbutton = self.page.findChild(QObject, "brake_configuration_button")
+                mode_switchbutton = self.page.findChild(QObject, "brake_button")
                 mode_switchbutton.setProperty("is_activable", True)
                 # mode_switchbutton.clicked.connect(...) # FEATURE : remplacer ... par le signal
 
@@ -274,40 +274,43 @@ class PageRB2:
         # Traduit le nom de la catégorie
         self.current_button.setProperty("text", translation_data[self.current_button.property("text")])
 
-        # Traduit le placeholder texte pour le stringinput du nom du train
-        widget = self.page.findChild(QObject, "train_name_stringinput")
-        widget.setProperty("placeholder_text", translation_data[widget.property("placeholder_text")])
+        # Traduit le placeholder texte ainsi que le titre pour le stringinput du nom du train
+        train_name_input = self.page.findChild(QObject, "train_name_stringinput")
+        train_name_input.setProperty("placeholder_text", translation_data[train_name_input.property("placeholder_text")])
+        train_name_input.setProperty("title", translation_data[train_name_input.property("title")])
+
+        # Traduit le nom de chacune des catégories de paramètres
+        for category in ["general_data_text", "dynamic_data_text", "alimentation_data_text", "brake_data_text"]:
+            self.page.setProperty(category, translation_data[self.page.property(category)])
 
         # Essaye de traduire chaque textes au dessus des widgets et check_button
-        for widget_id in ["train_name_text",  "general_data_name", "weight_text", "length_text", "coaches_text",
-                          "bogies_count_text", "axles_per_bogies_text", "motorized_axles_count_text", "axle_power_text",
-                          "motorized_axle_weight_text", "power_text", "dynamic_data_name", "alimentation_data_name",
-                          "pantograph_check", "thermic_check", "brake_data_name", "pad_brake_text",
-                          "magnetic_brake_text", "regenerative_check", "disk_brake_text", "foucault_brake_text",
-                          "dynamic_check", "mode_text", "open_button", "save_button", "brake_configuration_button"]:
+        for key, widget in self.data_components.items():
+            widget.setProperty("title", translation_data[widget.property("title")])
+
+        # Traduit toutes les clés pour le switchbutton du mode ainsi que pour le combobox
+        for widget_id in ["mode_switchbutton", "mission_type_combo"]:
+            widget = self.page.findChild(QObject, widget_id)
+            selection_index = widget.property("selection_index")
+            widget.setProperty("elements", [translation_data[e] for e in widget.property("elements").toVariant()])
+            widget.change_selection(selection_index)
+            
+            #Fait un cas particulier pour le switchbutton qui a aussi un titre à traduire
+            if widget_id == "mode_switchbutton":
+                widget.setProperty("title", translation_data[widget.property("title")])
+
+        # Traduit le texte des trois boutons (ouvrir, fermer, paramétrage freinage)
+        for widget_id in ["open_button", "save_button", "brake_button"]:
             widget = self.page.findChild(QObject, widget_id)
             widget.setProperty("text", translation_data[widget.property("text")])
 
-        # Traduction pour les modes de paramétrages (simple et complex) (mode_switch et texte du bouton)
-        keys = list(self.mode_switch)
-        self.mode_switch = {translation_data[keys[0]]: translation_data[self.mode_switch[keys[0]]],
-                            translation_data[keys[1]]: translation_data[self.mode_switch[keys[1]]]
-                            }
-        mode_button = self.page.findChild(QObject, "mode_button")
-        mode_button.setProperty("text", translation_data[mode_button.property("text")])
-
-        # Traduction de la combobox des différents types de trains
-        widget = self.page.findChild(QObject, "mission_type_combo")
-        selection_index = widget.property("selection_index")
-        widget.setProperty("elements", list(translation_data[e] for e in widget.property("elements").toVariant()))
-        widget.change_selection(selection_index)
-
         # Traduit la fenêtre de paramétrage complexe
-        if self.complex_popup.loaded:
+        if self.complex_popup is not None and self.complex_popup.loaded:
             self.complex_popup.change_language(translation_data)
 
         # Traduit la fenêtre de paramétrage de freinage
-        # FEATURE : faire la fonction de changement de langue de la fenêtre de paramétrage du freinage
+        if self.brake_popup is not None and self.brake_popup.loaded:
+            pass
+            # FEATURE : faire la fonction de changement de langue de la fenêtre de paramétrage du freinage
 
     def on_page_opened(self, application):
         """Fonction appelée lorsque la page de paramètres 8 est chargée.
