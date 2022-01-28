@@ -248,7 +248,8 @@ class PageRB2:
                         exception=error, prefix="Ouverture des données train")
         else:
             # Change le nom du fichier train dans le train_name_stringinput et indique le temps de chargement
-            self.page.findChild(QObject, "train_name_stringinput").setProperty("text", file_path.replace("\\", "/").rsplit("/", maxsplit=1)[1][:-6])
+            file_name = file_path.replace("\\", "/").rsplit("/", maxsplit=1)[1][:-6]
+            self.page.findChild(QObject, "train_name_stringinput").change_value(file_name)
 
         # S'occupe pour finir du changement des paramètres de freinage
         try:
@@ -284,7 +285,7 @@ class PageRB2:
             self.page.setProperty(category, translation_data[self.page.property(category)])
 
         # Essaye de traduire chaque textes au dessus des widgets et check_button
-        for key, widget in self.data_components.items():
+        for widget_id, widget in self.data_components.items():
             widget.setProperty("title", translation_data[widget.property("title")])
 
         # Traduit toutes les clés pour le switchbutton du mode ainsi que pour le combobox
@@ -294,7 +295,7 @@ class PageRB2:
             widget.setProperty("elements", [translation_data[e] for e in widget.property("elements").toVariant()])
             widget.change_selection(selection_index)
             
-            #Fait un cas particulier pour le switchbutton qui a aussi un titre à traduire
+            # Fait un cas particulier pour le switchbutton qui a aussi un titre à traduire
             if widget_id == "mode_switchbutton":
                 widget.setProperty("title", translation_data[widget.property("title")])
 
@@ -321,9 +322,9 @@ class PageRB2:
         application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
-        # Dans le cas où le mode complex a été activé, montre la fenêtre
-        if self.page.findChild(QObject, "mode_button").property("text") == list(self.mode_switch.keys())[1] \
-                and self.complex_popup.loaded:
+        # Dans le cas où la popop de paramètre complexe a été chargée et mode complexe a été activé, montre la fenêtre
+        if self.complex_popup is not None and self.complex_popup.loaded \
+                and self.page.findChild(QObject, "mode_switchbutton").property("selection_index") == 1:
             self.complex_popup.win.show()
 
     def on_page_closed(self, application):
@@ -336,10 +337,11 @@ class PageRB2:
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
         # Cache la popup de paramétrage complexe
-        if self.complex_popup.loaded:
+        if self.complex_popup is not None and self.complex_popup.loaded:
             self.complex_popup.win.hide()
 
-        # FEATURE : cacher la popup de paramétrage de freinage
+        if self.brake_popup is not None and self.brake_popup.loaded:
+            self.brake_popup.win.hide()
 
     def is_page_valid(self):
         """Méthode permettant d'indiquer si la pagede paramètre est complétés
@@ -365,13 +367,14 @@ class PageRB2:
         # Rajoute le type de mission
         train_data["mission"] = cd.mission_getter[self.page.findChild(QObject, "mission_type_combo").property("selection_index")]
 
-        # Récupère chacune des données stockées dans un floatinput ou integerinput
-        for widget_id, widget in self.valueinput.items():
-            train_data[widget_id.rsplit("_", maxsplit=1)[0]] = widget.property("value")
-
-        # Récupère chacune des données stockées dans un checkbutton
-        for widget_id in ["regenerative_check", "dynamic_check", "pantograph_check", "thermic_check"]:
-            train_data[widget_id.replace("_check", "")] = self.page.findChild(QObject, widget_id).property("is_checked")
+        # Change les données de la fenêtre principale du paramétrage train
+        for widget_id, widget in self.data_components.items():
+            # Cas des valueinput (floatinput, integerinput), change la propriétée "value"
+            if "_integerinput" in widget_id or "_floatinput" in widget_id:
+                train_data[widget_id.rsplit("_", maxsplit=1)[0]] = widget.property("value")
+            # Cas des checkbuttons
+            elif "_check" in widget_id:
+                train_data[widget_id.rsplit("_", maxsplit=1)[0]] = widget.property("is_checked")
 
         return train_data
 
@@ -384,17 +387,17 @@ class PageRB2:
             Propriétés du train
         """
         # Change le type de mission (en récupérant l'index de l'élément sauvegardé et en le changeant sur le combobox
-        mission_combo = self.page.findChild(QObject, "mission_type_combo")
         mission_index = cd.MissionType[train_data.get_value("mission", str(cd.MissionType.PASSENGER))[12:]].value
-        mission_combo.change_selection(mission_index)
+        self.page.findChild(QObject, "mission_type_combo").change_selection(mission_index)
 
-        # Récupère chacune des données stockées dans un floatinput ou integerinput
-        for widget_id, widget in self.valueinput.items():
-            widget.change_value(train_data.get_value(widget_id.rsplit("_", maxsplit=1)[0], default=widget.property("value")))
-
-        # Récupère chacune des données stockées dans un checkbutton
-        for widget_id in ["regenerative_check", "dynamic_check", "pantograph_check", "thermic_check"]:
-            train_data.update_parameter(self.page, widget_id, "is_checked", widget_id.replace("_check", ""))
+        # Change les données de la fenêtre principale du paramétrage train
+        for widget_id, widget in self.data_components.items():
+            # Cas des valueinput (floatinput, integerinput), change la propriétée "value"
+            if "_integerinput" in widget_id or "_floatinput" in widget_id:
+                widget.change_value(train_data.get_value(widget_id.rsplit("_", maxsplit=1)[0], widget.property("value")))
+            # Cas des checkbuttons
+            elif "_check" in widget_id:
+                widget.setProperty("is_checked", train_data.get_value(widget_id.rsplit("_", maxsplit=1)[0], False))
 
     def on_save_button_clicked(self):
         """Signal activé lorsque le bouton sauvegardé (de la page de paramètres train) est activé.
