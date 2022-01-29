@@ -27,6 +27,11 @@ Window {
     INI_stackview{
         id: settings_pages
         objectName: "settings_pages"
+
+        default_x: 0
+        default_y: 15
+        default_width: 580
+        default_height: 400
     }
 
     //stoque tous les boutons à droite de la page et affichant les différentes pages de settings
