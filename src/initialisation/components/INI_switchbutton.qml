@@ -42,11 +42,22 @@ Item {
     visible: root.is_visible
 
 
+    //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
+    readonly property string white: "#FFFFFF"       //partie 5.2.1.3.3  Nr 1
+    readonly property string black: "#000000"       //partie 5.2.1.3.3  Nr 2
+    readonly property string grey: "#C3C3C3"        //partie 5.2.1.3.3  Nr 3
+    readonly property string middle_grey: "#969696" //partie 5.2.1.3.3  Nr 4
+    readonly property string dark_grey: "#555555"   //partie 5.2.1.3.3  Nr 5
+    readonly property string dark_blue : "#031122"  //partie 5.2.1.3.3  Nr 6
+    readonly property string shadow: "#08182F"      //partie 5.2.1.3.3  Nr 7
+    readonly property string yellow: "#DFDF00"      //partie 5.2.1.3.3  Nr 8
+    readonly property string orange: "#EA9100"      //partie 5.2.1.3.3  Nr 9
+    readonly property string red: "#BF0002"         //partie 5.2.1.3.3  Nr 10
+
 
     //Différents signal handlers (à écrire en python)
     signal clicked()                        //détecte quand le bouton est cliqué
     signal selection_changed()                  //détecte si la valeur a été changée
-
 
 
     //Fonction permettant de changer la valeur active (peut prendre l'index de l'élément ou sa valeur)
@@ -69,6 +80,17 @@ Item {
     }
 
 
+    //Fonction permettant de faire clignoter les bordures (pour indiquer quelque chose à faire
+    function blink(time=3, period=0.5, color=root.yellow) {
+        body.blink(time, period, color)
+    }
+
+    //Fonction permettant d'arréter le clignotement des bordures
+    function stop_blink() {
+        body.stop_blink()
+    }
+
+
 
     //INI_button permettant de réaliser le switchbutton
     INI_button {
@@ -88,6 +110,7 @@ Item {
         //signal activé lorsque le bouton est cliqué
         onClicked: {
             //récupère l'index de l'élément actuel et affiche le suivant (ou le premier s'il est au bout du tableau)
+            body.stop_blink()
             var index = root.elements.indexOf(text)
             index = (index + 1) % root.elements.length
             text = root.elements[index]
