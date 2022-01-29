@@ -93,7 +93,7 @@ class PageRB2:
                 mode_switchbutton = self.page.findChild(QObject, "mode_switchbutton")
                 mode_switchbutton.setProperty("is_activable", True)
                 mode_switchbutton.setProperty("is_positive", True)
-                mode_switchbutton.clicked.connect(self.on_mode_button_clicked)
+                mode_switchbutton.clicked.connect(self.on_mode_switchbutton_clicked)
 
         # Tente d'initialiser la fenêtre de paramétrage freinage
         try:
@@ -438,27 +438,22 @@ class PageRB2:
             # Sauvegarde le fichier de paramètres train
             self.open_train_data_file(file_path[0])
 
-    def on_mode_button_clicked(self):
+    def on_mode_switchbutton_clicked(self):
         """signal appelé lorsque le bouton du choix du mode de paramétrage est cliqué.
         S'occupe ou non d'afficher et de cacher la fenêtre de popup"""
-        mode_button = self.page.findChild(QObject, "mode_button")
-
-        # Inverse le mode du bouton
-        mode_button.setProperty("text", self.mode_switch[mode_button.property("text")])
 
         # Distingue deux cas : quand le mode est passé en mode complexe et en mode simple
-        if mode_button.property("text") == list(self.mode_switch.keys())[1]:    # Mode complexe activé
+        if self.page.findChild(QObject, "mode_switchbutton").property("selection_index") == 1:    # Mode complexe activé
             # Si la fenêtre de paramètres complex existe, la montrer (une page permettant de générer
-            if self.complex_popup.loaded:
+            if self.complex_popup is not None and self.complex_popup.loaded:
                 self.complex_popup.win.show()
-                self.complex_popup.win.setProperty("generated", (self.current_mode == self.Mode.COMPLEX))
         else:       # Mode simple activé
-            # Si  la popup complex existe, la cache et dégénère les paramètres complexe et réinitialise les données
+            # Si la popup complex existe, la cache et dégénère les paramètres complexe et réinitialise les données
             self.current_mode = self.Mode.SIMPLE
-            if self.complex_popup.loaded:
+            if self.complex_popup is not None and self.complex_popup.loaded:
                 self.complex_popup.win.hide()
                 self.complex_popup.win.setProperty("generated", False)
                 self.page.setProperty("generated", False)
-                self.complex_popup.train.clear()
+                self.complex_popup.reset()
 
-    # FEATURE : faire la fonction connectée au bouton "Freinage" pour ouvrir la fenêtre de paramétrage freinage
+        # FEATURE : faire la fonction connectée au bouton "Freinage" pour ouvrir la fenêtre de paramétrage freinage
