@@ -69,6 +69,10 @@ class ComplexPopup:
 
         log.change_log_prefix("Initialisation")
 
+    def reset(self):
+        """Fonction permettant de réinitialiser le mode complexe (supression des données)"""
+        pass # TODO : revoir avec la base de données pour finir
+
     def on_complex_generate_clicked(self, parent):
         """Fonction activée lorsque le bouton généré est cliqué
 
