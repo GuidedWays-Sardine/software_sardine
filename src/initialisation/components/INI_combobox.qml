@@ -179,6 +179,7 @@ Item {
                     canvas.requestPaint()
                     if(root.is_activable && body.count > 1 && !body.pressed && !popup.visible)
                     {
+                        root.stop_blink()
                         root.combobox_opened()
                     }
                 }
@@ -237,6 +238,7 @@ Item {
             onClosed: {
                 if(root.is_activable && body.count > 1 && !body.pressed && !popup.visible)
                 {
+                    root.stop_blink()
                     root.combobox_closed()
                 }
             }
