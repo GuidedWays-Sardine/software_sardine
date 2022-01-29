@@ -30,7 +30,7 @@ Item {
 
     //Propriétés sur les textes valides (texte visible sur le switchbutton et titre)
     readonly property string selection_text: body.text
-    readonly property string selection_index: elements.includes(body.text) ? elements.indexOf(body.text) : -1
+    readonly property int selection_index: elements.includes(body.text) ? elements.indexOf(body.text) : -1
     property string title: ""
     property int font_size: 12              //police du texte
 
