@@ -37,11 +37,16 @@ Item {
     visible : root.is_visible
 
     //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
-    readonly property string dark_blue : "#031122"  //partie 5.2.1.3.3  Nr 6
+    readonly property string white: "#FFFFFF"       //partie 5.2.1.3.3  Nr 1
     readonly property string black: "#000000"       //partie 5.2.1.3.3  Nr 2
     readonly property string grey: "#C3C3C3"        //partie 5.2.1.3.3  Nr 3
+    readonly property string middle_grey: "#969696" //partie 5.2.1.3.3  Nr 4
     readonly property string dark_grey: "#555555"   //partie 5.2.1.3.3  Nr 5
+    readonly property string dark_blue : "#031122"  //partie 5.2.1.3.3  Nr 6
     readonly property string shadow: "#08182F"      //partie 5.2.1.3.3  Nr 7
+    readonly property string yellow: "#DFDF00"      //partie 5.2.1.3.3  Nr 8
+    readonly property string orange: "#EA9100"      //partie 5.2.1.3.3  Nr 9
+    readonly property string red: "#BF0002"         //partie 5.2.1.3.3  Nr 10
 
 
     //Différents signal handlers (à écrire en python)
@@ -57,6 +62,8 @@ Item {
     function stop_blink() {
         body.stop_blink()
     }
+
+
 
     //INI_button permettant de créer le corp du checkbutton
     INI_button {
