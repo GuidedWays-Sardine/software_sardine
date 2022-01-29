@@ -49,6 +49,14 @@ Item {
     signal value_changed()                   //détecte quand la valeur a été changée
 
 
+    //Fonction permettant de faire clignoter les bordures (pour indiquer quelque chose à faire
+    function blink(time=3, period=0.5, color=root.yellow) {
+        body.blink()
+    }
+
+    function stop_blink() {
+        body.stop_blink()
+    }
 
     //INI_button permettant de créer le corp du checkbutton
     INI_button {
@@ -70,6 +78,7 @@ Item {
         //signal permettant de détecter quand le corp du checkbutton est cliqué pour changer l'état de celui-ci et appeler le signal associé
         onClicked: {
             root.is_checked = !root.is_checked
+            body.stop_blink()
             root.clicked()
             //Le signal value_changed est appelé grâce à onIs_checkedChanged
         }
@@ -93,6 +102,7 @@ Item {
         //signal permettant de détecter quand le corp du checkbutton est cliqué pour changer l'état de celui-ci et appeler le signal associé
         onClicked: {
             root.is_checked = !root.is_checked
+            body.stop_blink()
             root.clicked()
             //Le signal value_changed est appelé grâce à onIs_checkedChanged
         }
