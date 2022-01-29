@@ -111,8 +111,8 @@ class PageRB8:
             self.page.findChild(QObject, "category_title").setProperty("text", self.category_active)
 
             # Rend fonctionnel les boutons inférieurs (visibles et activable que quand nécessaire)
-            self.page.findChild(QObject, "left_screen_button").clicked.connect(self.on_left_screen_button_pressed)
-            self.page.findChild(QObject, "right_screen_button").clicked.connect(self.on_right_screen_button_pressed)
+            self.page.findChild(QObject, "left_window_button").clicked.connect(self.on_left_window_button_pressed)
+            self.page.findChild(QObject, "right_window_button").clicked.connect(self.on_right_window_button_pressed)
 
             # S'il y a plus d'une catégorie d'écrans, rend les boutons supérieurs de catégories fonctionnels
             if len(self.screen_default) > 1:
@@ -124,8 +124,6 @@ class PageRB8:
                 right_category_button.clicked.connect(self.on_right_category_button_clicked)
         else:
             # Dans le cas où la liste des écrans à paramétrer est nulle
-            self.page.findChild(QObject, "category_title").setProperty("is_dark_grey", True)
-            self.page.findChild(QObject, "category_title").setProperty("text", "Aucun écran à paramétrer")
             raise NameError("Aucun écran à paramétrer. Le dictionnaire \"screen_default\" est vide.")
 
         # connecte les différents boutons des autres pages à la paramétrabilité de certaines fenêtres
