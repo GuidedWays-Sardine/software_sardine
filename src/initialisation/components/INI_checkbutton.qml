@@ -56,9 +56,10 @@ Item {
 
     //Fonction permettant de faire clignoter les bordures (pour indiquer quelque chose à faire
     function blink(time=3, period=0.5, color=root.yellow) {
-        body.blink()
+        body.blink(time, period, color)
     }
 
+    //Fonction permettant d'arréter le clignotement des bordures
     function stop_blink() {
         body.stop_blink()
     }
