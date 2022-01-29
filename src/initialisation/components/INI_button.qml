@@ -65,7 +65,7 @@ Item {
 
 
 
-    //Fonction permettant de faire clignoter les bordures (pour indiquer quelque chose à faire
+    //Fonction permettant de faire clignoter les bordures (pour indiquer quelque chose à faire)
     function blink(time=3, period=0.5, color=root.yellow) {
         //Vérifie d'abord que la couleur envoyée est bonne, sinon la met en jaune
         var regex_color = new RegExp("^#(?:[0-9a-fA-F]{3}){1,2}$")
@@ -95,6 +95,7 @@ Item {
         }
     }
 
+    //Fonction permettant d'arréter les clignotements
     function stop_blink() {
     if (timer.time_left >= 0.1) {
             root.is_positive = false
@@ -304,8 +305,11 @@ Item {
         onPressed: {
             //force le focus sur ce bouton pour qu'il soit prioritaire et indique que le bouton est cliqué
             forceActiveFocus()
-            root.stop_blink()
-            root.button_pressed = root.is_activable
+
+            if(root.is_activable) {
+                root.stop_blink()
+                root.button_pressed = true
+            }
         }
 
         //Détecte quand la zone (le bouton) est relaché
