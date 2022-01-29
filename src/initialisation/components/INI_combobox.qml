@@ -389,4 +389,16 @@ Item {
 
         color: root.is_positive ? (timer.is_blinked ? timer.blink_color : root.shadow) : "transparent"
     }
+
+    //Rectangle pour l'ombre extérieure supérieure
+    Rectangle {
+        id: in_left_shadow
+
+        anchors.left: out_left_shadow.right
+        anchors.top: out_top_shadow.bottom
+        anchors.bottom: in_bottom_shadow.top
+        width: 1 * root.ratio
+
+        color: root.is_positive ? (timer.is_blinked ? timer.blink_color : root.shadow) : "transparent"
+    }
 }
