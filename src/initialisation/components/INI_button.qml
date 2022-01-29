@@ -98,7 +98,6 @@ Item {
     //Fonction permettant d'arréter les clignotements
     function stop_blink() {
     if (timer.time_left >= 0.1) {
-            root.is_positive = false
             timer.time_left = timer.period * 0.5
             timer.stop()
             timer.triggered()
