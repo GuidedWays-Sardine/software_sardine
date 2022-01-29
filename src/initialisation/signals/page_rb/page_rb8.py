@@ -4,7 +4,6 @@ import sys
 
 
 # Librairies graphiques
-from PyQt5.QtWidgets import QDesktopWidget
 from PyQt5.QtQml import QQmlApplicationEngine
 from PyQt5.QtCore import QObject
 
@@ -65,11 +64,12 @@ class PageRB8:
         for screen_index in range(0, len(self.screen_index_windows)):
             # Charge une fenêtre d'index et mets le bon index et la place au bon endroit
             self.screen_index_engine.load(f"{PROJECT_DIR}src\\initialisation\\graphics\\page_rb\\page_rb8\\screen_index_window.qml")
-            print(len(self.screen_index_engine.rootObjects()))
             self.screen_index_windows[screen_index] = self.screen_index_engine.rootObjects()[-1]
             self.screen_index_windows[screen_index].setProperty("index", screen_index + 1)
+            self.screen_index_windows[screen_index].show()
             self.screen_index_windows[screen_index].setPosition(application.screens_dimensions[screen_index][0][0],
                                                                 application.screens_dimensions[screen_index][0][1])
+            self.screen_index_windows[screen_index].hide()
 
         # Envoie la dimension des fenêtre à la partie graphique de la page
         self.page.setProperty("screens_size", [sd[1] for sd in application.screens_dimensions])
