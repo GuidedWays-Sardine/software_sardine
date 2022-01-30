@@ -43,13 +43,16 @@ Item{
     visible: root.is_visible
 
     //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
-    readonly property string dark_blue: "#031122"   //partie 5.2.1.3.3  Nr 6
+    readonly property string white: "#FFFFFF"       //partie 5.2.1.3.3  Nr 1
     readonly property string black: "#000000"       //partie 5.2.1.3.3  Nr 2
     readonly property string grey: "#C3C3C3"        //partie 5.2.1.3.3  Nr 3
     readonly property string medium_grey: "#969696" //partie 5.2.1.3.3  Nr 4
     readonly property string dark_grey: "#555555"   //partie 5.2.1.3.3  Nr 5
+    readonly property string dark_blue : "#031122"  //partie 5.2.1.3.3  Nr 6
     readonly property string shadow: "#08182F"      //partie 5.2.1.3.3  Nr 7
-
+    readonly property string yellow: "#DFDF00"      //partie 5.2.1.3.3  Nr 8
+    readonly property string orange: "#EA9100"      //partie 5.2.1.3.3  Nr 9
+    readonly property string red: "#BF0002"         //partie 5.2.1.3.3  Nr 10
 
     //Différents signal handlers (à écrire en python)
     signal value_changed()
@@ -85,6 +88,77 @@ Item{
         }
     }
 
+
+    //Fonction permettant de faire clignoter les bordures (pour indiquer quelque chose à faire)
+    function blink(time=3, period=0.5, color=root.yellow) {
+        //Vérifie d'abord que la couleur envoyée est bonne, sinon la met en jaune
+        var regex_color = new RegExp("^#(?:[0-9a-fA-F]{3}){1,2}$")
+        if(!regex_color.test(color)) {
+            color = root.yellow
+        }
+
+        //S'assure que la temps est au moins supérieur à la moitié de la période
+        if(time < period * 0.5) {
+            period = time * 2
+        }
+
+        if(time > 0) {
+            //Indique au timer les différentes variables
+            timer.time_left = parseInt(time * 1000)
+            timer.period = period >= 0.001 ? parseInt(period * 1000) : 1
+            timer.blink_color = color
+            timer.is_blinked = true
+
+            //Démarre la première itération du timer
+            timer.start()
+        }
+    }
+
+    //Fonction permettant d'arréter les clignotements
+    function stop_blink() {
+    if (timer.time_left >= 0.1) {
+            timer.time_left = timer.period * 0.5
+            timer.stop()
+            timer.triggered()
+        }
+    }
+
+    //Timer utile pour le fonctionnement des différents mode des boutons
+    Timer {
+        id: timer
+
+        property int time_left: 0
+        property int period: 0
+        property string light_shadow_color: ""
+        property string dark_shadow_color: ""
+        property bool is_blinked: false  //Permet de savoir aux bordures si elles doivent être de la couleur du clignotement
+        property string blink_color: ""
+
+        interval: period * 0.5
+        repeat: false
+
+        onTriggered: {
+            //Réduit le temps restant de l'interval
+            time_left = time_left - period
+
+            //Si le temps restant est inférieur à la période /2 change la période pour ne pas fausser les délais
+            if(time_left < period * 0.5){
+                period = time_left * 2
+            }
+
+            //Si le temps est fini (< 0.1ms pour éviter les problèmes de float), remet les bordures originales
+            if(time_left < 0.1){
+                is_blinked = false
+            }
+            //Sinon inverse les couleurs des bordures et redémarre le chronomètre
+            else {
+                is_blinked = !is_blinked
+                timer.start()
+            }
+        }
+    }
+    
+    
 
     //Signal détectant quand la valeur minimale est changée
     onMinimum_valueChanged: {
@@ -206,6 +280,9 @@ Item{
 
         //Détecte lorsque le composant perd le focus (lorsque la barre clignotante disparait de l'encadré
         onCursorVisibleChanged: {
+            //Commence par arréter le clignotement (s'il y en a un)
+            root.stop_blink()
+
             //Dans le cas où une valeur a été entrée
             if(body.text != "") {
                 //Récupère la valeur
@@ -264,7 +341,7 @@ Item{
         anchors.left: body.left
         height: 1 * root.ratio
 
-        color: root.shadow
+        color: timer.is_blinked ? timer.blink_color : root.shadow
     }
 
     //Rectangle pour l'ombre extérieure droite
@@ -276,7 +353,7 @@ Item{
         anchors.top: body.top
         width: 1 * root.ratio
 
-        color: root.shadow
+        color: timer.is_blinked ? timer.blink_color : root.shadow
     }
 
     //Rectangle pour l'ombre extérieure supérieure
@@ -288,7 +365,7 @@ Item{
         anchors.right: out_right_shadow.left
         height: 1 * root.ratio
 
-        color: root.black
+        color: timer.is_blinked ? timer.blink_color : root.black
     }
 
     //Rectangle pour l'ombre extérieure gauche
@@ -300,7 +377,7 @@ Item{
         anchors.bottom: out_bottom_shadow.top
         width: 1 * root.ratio
 
-        color: root.black
+        color: timer.is_blinked ? timer.blink_color : root.black
     }
 
 
@@ -314,7 +391,7 @@ Item{
         anchors.right: out_right_shadow.left
         height: 1 * root.ratio
 
-        color: is_positive ? root.black : "transparent"
+        color: is_positive ? (timer.is_blinked ? timer.blink_color : root.black) : "transparent"
     }
 
     //Rectangle pour l'ombre intérieure droite
@@ -326,7 +403,7 @@ Item{
         anchors.top: out_top_shadow.bottom
         width: 1 * root.ratio
 
-        color: is_positive ? root.black : "transparent"
+        color: is_positive ? (timer.is_blinked ? timer.blink_color : root.black) : "transparent"
     }
 
     //Rectangle pour l'ombre intérieure supérieure
@@ -338,7 +415,7 @@ Item{
         anchors.right: in_right_shadow.left
         height: 1 * root.ratio
 
-        color: is_positive ? root.shadow : "transparent"
+        color: is_positive ? (timer.is_blinked ? timer.blink_color : root.shadow) : "transparent"
     }
 
     //Rectangle pour l'ombre intérieure gauche
@@ -350,6 +427,6 @@ Item{
         anchors.bottom: in_bottom_shadow.top
         width: 1 * root.ratio
 
-        color: is_positive ? root.shadow : "transparent"
+        color: is_positive ? (timer.is_blinked ? timer.blink_color : root.shadow) : "transparent"
     }
 }
