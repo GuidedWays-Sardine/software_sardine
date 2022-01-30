@@ -33,6 +33,10 @@ class PageRB1:
                      "Aucun": log.Level.NOTSET
                      }
 
+    # Chemin vers les différents dossiers nécessaire au fonctionnement de la page
+    command_board_folder_path = f"{PROJECT_DIR}src\\train\\command_board"
+    dmi_folder_path = f"{PROJECT_DIR}src\\train\\DMI"
+
     def __init__(self, application, engine, index, current_button):
         """Fonction d'initialisation de la page de paramtètres 1 (page paramètres général)
 
@@ -56,12 +60,11 @@ class PageRB1:
 
         try:
             # Essaye de charger la combo langue
-            translation_file_path = f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang"
-            file = open(translation_file_path, "r", encoding='utf-8-sig')
+            file = open(application.translation_file_path, "r", encoding='utf-8-sig')
         except (FileNotFoundError, OSError):
             # Ne change charge pas  la combo langues dans le cas ou le combo n'est pas chargé
             log.warning(f"Le fichier de traduction de langue de l'initialisation n'existe pas." +
-                        f"assurez vous qu'il existe :\n\t\t{translation_file_path}")
+                        f"assurez vous qu'il existe :\n\t\t{application.translation_file_path}")
         # Sinon lit la première ligne pour récupérer la liste des langues
         else:
             # Récupère la liste des langues (ligne 1 du fichier initialisation.lang)
@@ -78,17 +81,17 @@ class PageRB1:
 
         # Récupère le dictionaire Anglais -> langue principale pour traduire les répertoires des pupitres de l'anglais
         translation_data = td.TranslationDictionary()
-        translation_data.create_translation(translation_file_path, "English", application.language)
+        translation_data.create_translation(application.translation_file_path, "English", application.language)
 
         # Charge tous les dossiers dans src.train.command_board, les traduits et les indiques comme potentiels pupitres
-        command_boards = [translation_data[f.replace("_", " ")] for f in os.listdir(f"{PROJECT_DIR}src\\train\\command_board")
-                          if os.path.isdir(os.path.join(f"{PROJECT_DIR}src\\train\\command_board", f))
+        command_boards = [translation_data[f.replace("_", " ")] for f in os.listdir(self.command_board_folder_path)
+                          if os.path.isdir(os.path.join(self.command_board_folder_path, f))
                           and f != "__pycache__"]
         self.page.findChild(QObject, "command_board_combo").setProperty("elements", command_boards)
 
         # Charge tous les DMI présents dans src.train.DMI, les traduits et les indiques comme DMI sélectionables
-        dmi_list = [translation_data[f.replace("_", " ")] for f in os.listdir(f"{PROJECT_DIR}src\\train\\DMI")
-                    if os.path.isdir(os.path.join(f"{PROJECT_DIR}src\\train\\DMI", f))]
+        dmi_list = [translation_data[f.replace("_", " ")] for f in os.listdir(self.dmi_folder_path)
+                    if os.path.isdir(os.path.join(self.dmi_folder_path, f))]
         self.page.findChild(QObject, "dmi_combo").setProperty("elements", dmi_list)
 
         # Initialise la liste des niveaux de registre et l'envoie au log_switchbutton

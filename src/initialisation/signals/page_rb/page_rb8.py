@@ -37,6 +37,10 @@ class PageRB8:
     category_active = ""
     screen_list_active = 0
 
+    # Chemins d'accès vers les différents fichiers nécessaires au fonctionnement de la page
+    screen_index_file_path = f"{PROJECT_DIR}src\\initialisation\\graphics\\page_rb\\page_rb8\\screen_index_window.qml"
+    screen_settings_folder_path = f"{PROJECT_DIR}settings\\screen_settings\\"
+
     def __init__(self, application, engine, index, current_button):
         """Fonction d'initialisation de la page de paramtètres 1 (page paramètres général)
 
@@ -63,7 +67,7 @@ class PageRB8:
         self.screen_index_windows = [QObject()] * len(application.screens_dimensions)
         for screen_index in range(0, len(self.screen_index_windows)):
             # Charge une fenêtre d'index et mets le bon index et la place au bon endroit
-            self.screen_index_engine.load(f"{PROJECT_DIR}src\\initialisation\\graphics\\page_rb\\page_rb8\\screen_index_window.qml")
+            self.screen_index_engine.load(self.screen_index_file_path)
             self.screen_index_windows[screen_index] = self.screen_index_engine.rootObjects()[-1]
             self.screen_index_windows[screen_index].setProperty("index", screen_index + 1)
             self.screen_index_windows[screen_index].show()
@@ -76,13 +80,13 @@ class PageRB8:
 
         # Charge la traduction pour le nom des fichiers et des catégories (Anglais -> langue actuelle)
         translation_data = td.TranslationDictionary()
-        translation_data.create_translation(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang",
+        translation_data.create_translation(application.translation_file_path,
                                             "English", application.language)
 
         # Pour chacun des fichiers dans le répertoire de paramètres d'écrans
-        for file_path in (f for f in os.listdir(f"{PROJECT_DIR}settings\\screen_settings") if f.endswith(".screens")):
+        for file_path in (f for f in os.listdir(self.screen_settings_folder_path) if f.endswith(".screens")):
             # Ouvre le fichier, et crée un dictionaire vide pour les écrans dans le fichier
-            file = open(f"{PROJECT_DIR}settings\\screen_settings\\{file_path}", "r", encoding="utf-8-sig")
+            file = open(f"{self.screen_settings_folder_path}{file_path}", "r", encoding="utf-8-sig")
             screens_default = {}
             screens_settings = {}
 
@@ -231,7 +235,7 @@ class PageRB8:
 
         # Inverse les données de traduction pour avoir un dictionnaire langue actuelle -> Français
         invert_translation = td.TranslationDictionary()
-        invert_translation.create_translation(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang",
+        invert_translation.create_translation(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang",     # FIXME : voir pour envoyer la traduction inverse directement dans le get et set_values
                                               translation_data["English"], "English")
 
         # Pour chaque catégorie d'écrans

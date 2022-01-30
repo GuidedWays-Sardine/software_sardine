@@ -34,7 +34,7 @@ class PageRB2:
     data_components = {}     # Dictionaire avec tous les composants contenant des valeurs sur le train
 
     # Chemin vers les fichiers de paramètres train
-    train_settings_file_path = f"{PROJECT_DIR}settings\\train_settings\\"
+    train_settings_folder_path = f"{PROJECT_DIR}settings\\train_settings\\"
 
     # Variables nécessaires à l'indication du mode de paramétrage actuel
     class Mode(Enum):
@@ -137,7 +137,7 @@ class PageRB2:
         if file_name:
             # Rajoute l'extension si nécessaire et appelle la fonction de sauvegarde (definit plus bas)
             file_name += ".train" if file_name and not file_name.lower().endswith(".train") else ""
-            self.save_train_data_file(f"{self.train_settings_file_path}{file_name}")
+            self.save_train_data_file(f"{self.train_settings_folder_path}{file_name}")
 
             # Ajoute le nom du fichier dans le dictionnaire de paramètres
             page_parameters["train_name"] = self.page.findChild(QObject, 'train_name_stringinput').property('text')
@@ -197,13 +197,13 @@ class PageRB2:
         train_name = data.get_value("train_name")
         if train_name is not None:
             # Vérifie que le fichier de paramètres existe
-            if os.path.exists(f"{self.train_settings_file_path}{train_name}.train"):
+            if os.path.exists(f"{self.train_settings_folder_path}{train_name}.train"):
                 # Si c'est le cas, l'ouvre et change les différentes valeurs du paramétrage train sur la page
-                self.open_train_data_file(f"{self.train_settings_file_path}{train_name}.train")
+                self.open_train_data_file(f"{self.train_settings_folder_path}{train_name}.train")
             else:
                 # Sinon laisse un message d'erreur
                 log.warning(f"le fichier de paramètres : {train_name}.train , n'existe plus.\n" +
-                            f"\t\t{self.train_settings_file_path}{train_name}.train",
+                            f"\t\t{self.train_settings_folder_path}{train_name}.train",
                             prefix="Ouverture des données train")
 
     def open_train_data_file(self, file_path):
@@ -354,7 +354,12 @@ class PageRB2:
             Est ce que la page de paramètre est complétée ?
         """
         # Retourne vrai si le nom du fichier a été complété (autre variables complétés par défaut)
-        return self.page.findChild(QObject, "train_name_stringinput").property("text")
+        train_name_widget = self.page.findChild(QObject, "train_name_stringinput")
+        if not train_name_widget.property("text"):
+            train_name_widget.blink(None, None, None)
+            return False
+
+        return True
 
     def get_simple_mode_values(self):
         """Fonction permettant de récupérer toutes les informations de la configuration simple
@@ -412,7 +417,7 @@ class PageRB2:
 
         # Ouvre la boite de dialoque pour confirmer l'enregistrement du fichier
         file_path = QFileDialog.getSaveFileName(caption="Sauvegarder un fichier de configuration train",
-                                                directory=f"{self.train_settings_file_path}{file_name}",
+                                                directory=f"{self.train_settings_folder_path}{file_name}",
                                                 filter="Fichiers de configuration train (*.train)")
         if file_path[0] != "":
             # Dans le cas où le nom du fichier a été changé à la sauvegarder, récupère le nouveau nom de fichier
@@ -428,7 +433,7 @@ class PageRB2:
         """
         # Ouvre la boite de dialoque pour l'ouverture du fichier
         file_path = QFileDialog.getOpenFileName(caption="Sauvegarder un fichier de configuration train",
-                                                directory=self.train_settings_file_path,
+                                                directory=self.train_settings_folder_path,
                                                 filter="Fichiers de configuration train (*.train)")
         if file_path[0] != "":
             # Dans le cas où le nom du fichier a été changé à la sauvegarder, récupère le nouveau nom de fichier

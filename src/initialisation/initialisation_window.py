@@ -39,6 +39,12 @@ class InitialisationWindow:
     # Variable stockant la langue actuelle de l'application d'initialisation
     language = "Français"
 
+    # Variables stockant les chemins d'accès vers le fichjier de traduction et de paramètres généraux
+    translation_file_path = f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang"
+    general_settings_folder_path = f"{PROJECT_DIR}settings\\general_settings\\"
+    default_settings_file_path = f"{general_settings_folder_path}default.settings"
+    initialisation_window_file_path = f"{PROJECT_DIR}src\\initialisation\\initialisation_window.qml"
+
     # Variable stockant l'index de la fenêtre de paramètres actuellement chargée
     active_settings_page = None       #Stocke la page de paramètres active de 1 à 8
 
@@ -67,13 +73,15 @@ class InitialisationWindow:
         # Lance l'application et cherche pour le fichier QML avec tous les éléments de la fenêtre d'initialisation
         self.app = app
         self.engine = QQmlApplicationEngine()
-        self.engine.load(f"{PROJECT_DIR}src\\initialisation\\initialisation_window.qml")
+        self.engine.load(self.initialisation_window_file_path)
 
         # Vérifie si le fichier qml de la fenêtre a bien été ouvert et compris, sinon jête une erreur
-        if not self.engine.rootObjects() and not os.path.isfile(f"{PROJECT_DIR}src\\initialisation\\initialisation_window.qml"):
-            raise FileNotFoundError(f"Le fichier .qml pour la fenêtre d\'initialisation n\'a pas été trouvé.")
-        elif not self.engine.rootObjects() and os.path.isfile(f"{PROJECT_DIR}src\\initialisation\\initialisation_window.qml"):
-            raise SyntaxError(f"Le fichier .qml pour la fenêtre d\'initialisation contient des erreurs.")
+        if not self.engine.rootObjects() and not os.path.isfile(self.initialisation_window_file_path):
+            raise FileNotFoundError(f"Le fichier .qml de la fenêtre d\'initialisation n\'a pas été trouvé.\n\t\t" +
+                                    self.initialisation_window_file_path)
+        elif not self.engine.rootObjects() and os.path.isfile(self.initialisation_window_file_path):
+            raise SyntaxError(f"Le fichier .qml pour la fenêtre d\'initialisation contient des erreurs.\n\t\t" +
+                              self.initialisation_window_file_path)
 
         # Charge tous les écrans connectés à l'ordinateur (utile pour la positionnement de certaines popup)
         for screen_index in range(0, QDesktopWidget().screenCount()):
@@ -90,11 +98,11 @@ class InitialisationWindow:
         self.right_buttons = rb.RightButtons(self)
 
         # Vérifie si un fichier de paramètres par défaut existe
-        if os.path.isfile(f"{PROJECT_DIR}settings\\general_settings\\default.settings"):
+        if os.path.isfile(self.default_settings_file_path):
             # S'il existe, l'ouvre, récupère ses données et les changent dans l'application d'initialisation
             log.info(f"Chargement des paramètres du fichier default.settings.\n")
             default_settings = sd.SettingsDictionary()
-            default_settings.open(f"{PROJECT_DIR}settings\\general_settings\\default.settings")
+            default_settings.open(self.default_settings_file_path)
             self.set_values(default_settings)
 
             # De plus si les paramètres pour la taille et la position de la fenêtre existent, essaye de les récupérer
@@ -192,14 +200,13 @@ class InitialisationWindow:
             log.warning(f"Impossible de localiser la fenêtre d'initialisation.\n")
 
         # Vérifie si au moins une page est chargé graphiquement. (sinon tente de charger les paramètres défaut.settings)
-        if not any(self.is_fully_loaded) and os.path.isfile(f"{PROJECT_DIR}settings\\general_settings\\default.settings"):
+        if not any(self.is_fully_loaded) and os.path.isfile(self.default_settings_file_path):
             # Si aucune page n'est chargée correctement et que le fichier default.settings existe
-            parameters.open(f"{PROJECT_DIR}settings\\general_settings\\default.settings")
+            parameters.open(self.default_settings_file_path)
         elif any(self.is_fully_loaded):
             # Récupère ma traduction anglaise car les paramètres textuels sont stockés en anglais
             translation_data = td.TranslationDictionary()
-            translation_data.create_translation(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang",
-                                                self.language, "English")
+            translation_data.create_translation(self.translation_file_path, self.language, "English")
 
             # Pour chaque page ayant une partie logique fonctionnelle et une fonction get_values:
             for page in (p for p in self.visible_pages if "get_values" in dir(p)):
@@ -242,8 +249,7 @@ class InitialisationWindow:
 
         # Récupère la traduction par rapport à l'anglais car les paramètres textuels sont stockés en anglais
         translation_data = td.TranslationDictionary()
-        translation_data.create_translation(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang",
-                                            "English", self.language)
+        translation_data.create_translation(self.translation_file_path, "English", self.language)
 
         # Pour chaque page ayant une partie logique fonctionnelle et une fonction set_values:
         for page in (p for p in self.visible_pages if "set_values" in dir(p)):
