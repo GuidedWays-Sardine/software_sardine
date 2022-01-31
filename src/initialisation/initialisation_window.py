@@ -34,6 +34,9 @@ class InitialisationWindow:
     pages_list = [None] * 8     # Stocke les pages que l'utilisateur peut afficher
     screens_dimensions = []        # Données sur les écrans connectés : format : [[x, y], [w, h], ...]
 
+    # Variable stockant l'index de la fenêtre de paramètres actuellement chargée
+    active_page_index = None       # Stocke l'index de la page de paramètres active de 1 à 8
+
     # Variable stockant la langue actuelle de l'application d'initialisation
     language = "Français"
 
@@ -42,9 +45,6 @@ class InitialisationWindow:
     general_settings_folder_path = f"{PROJECT_DIR}settings\\general_settings\\"
     default_settings_file_path = f"{general_settings_folder_path}default.settings"
     initialisation_window_file_path = f"{PROJECT_DIR}src\\initialisation\\initialisation_window.qml"
-
-    # Variable stockant l'index de la fenêtre de paramètres actuellement chargée
-    active_page_index = None       # Stocke l'index de la page de paramètres active de 1 à 8
 
     # Variable stockant si le simulateur va être lancé
     launch_simulator = False
@@ -235,7 +235,7 @@ class InitialisationWindow:
         """
         # Si la combobox pour choisir la langue existe (page_rb1 chargée), alors change la langue dans cette combobox
         # La langue de l'application d'initialisation sera changée automatiquement
-        if self.pages_list[0] is not None and not isinstance(self.pages_list[0], type(self.engine)):
+        if self.pages_list[0] is not None and not isinstance(self.pages_list[0], QQmlApplicationEngine):
             language_combo = self.pages_list[0].page.findChild(QObject, "language_combo")
             try:
                 # Si la langue est différente essaye de changer la langue du simulateur
