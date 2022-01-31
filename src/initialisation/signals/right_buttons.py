@@ -14,6 +14,8 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
 import src.misc.decorators.decorators as decorators
+import src.misc.translation_dictionary.translation as td
+import src.initialisation.initialisation_window as ini
 
 
 class RightButtons:
@@ -23,15 +25,18 @@ class RightButtons:
     right_buttons = None
     pages_stackview = None
 
-    def __init__(self, application):
+    def __init__(self, application, translation_data):
         """
         Permet d'initialiser les 8 boutons permanents (rb1 -> rb8) situés à droite de la fenêtre.
         Connecte chaque bouton à sa page de paramètres associés
 
         Parameters
         ----------
-        application: `InitialisationWindow`
+        application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+        translation_data: `td.TranslationDictionary`
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive
+            Utile pour traduire les noms de dossiers et de fenêtres sauvegardés en anglais
         """
         # Récupère les boutons de droite à partir de la fenêtre
         self.right_buttons = application.win.findChild(QObject, "right_buttons")
@@ -58,7 +63,7 @@ class RightButtons:
 
             # Essaye d'initialiser la page et si elle est correctement initialisé, tente de charger les signals
             if self.initialise_page(application, engine, index, page_path, current_button):
-                if self.initialise_signals(application, engine, index, page_path, current_button):
+                if self.initialise_signals(application, engine, index, page_path, current_button, translation_data):
                     log.info(f"Chargement complet (graphique et fonctionelle) de la  page_rb{index} en " +
                              f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\n")
                 else:
@@ -78,7 +83,7 @@ class RightButtons:
 
         Parameters
         ----------
-        application: `InitialisationWindow`
+        application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         engine: `QQmlApplicationEngine`
             La QQmlApplicationEngine sur laquelle on a tenté de charger la page
@@ -122,13 +127,13 @@ class RightButtons:
             log.warning(f"Le fichier graphique {page_path} contient des erreurs.\n\n")
             return False
 
-    def initialise_signals(self, application, engine, index, page_path, current_button):
+    def initialise_signals(self, application, engine, index, page_path, current_button, translation_data):
         """Permet lorsqu'une page de paramètres de l'application a été chargée, de charger les signals ainsi
         que des fonctions de bases (get_values() et set_values()) si celle-ci existe
 
         Parameters
         ----------
-        application: `InitialisationWindow`
+        application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         engine: `QQmlApplicationEngine`
             La QQmlApplicationEngine sur laquelle on a tenté de charger la page
@@ -138,6 +143,9 @@ class RightButtons:
             Chemin vers la page de widgets (.qml) à charger (par rapport au main.py)
         current_button: `QObject`
             Le bouton auquel sera relié la page (généralement d'id : page_rb + index)
+        translation_data: `td.TranslationDictionary`
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive
+            Utile pour traduire les noms de dossiers et de fenêtres sauvegardés en anglais
 
         Returns
         -------
@@ -151,7 +159,7 @@ class RightButtons:
                 # Import localement le fichier de la page
                 # Appelle le constructeur de la page pour affilier tous les signals aux widgets
                 exec(f"from src.initialisation.signals.page_rb import page_rb{index} as rb{index}\n" +
-                     f"application.visible_pages[index - 1] = rb{index}.PageRB{index}(application, engine, index, current_button)")
+                     f"application.visible_pages[index - 1] = rb{index}.PageRB{index}(application, engine, index, current_button, translation_data)")
             except Exception as error:
                 # Permet de rattraper une erreur si le code est incorrect où qu'il ne suit pas la documentation
                 log.warning(f"Erreur lors du chargement des signaux de la page : {page_path}",
@@ -201,7 +209,7 @@ class RightButtons:
 
         Parameters
         ----------
-        application: `InitialisationWindow`
+        application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         engine: `QQmlApplicationEngine`
             La QQmlApplicationEngine sur laquelle on a tenté de charger la page
