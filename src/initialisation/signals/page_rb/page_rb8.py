@@ -130,8 +130,13 @@ class PageRB8:
             raise NameError("Aucun écran à paramétrer. Le dictionnaire \"screen_default\" est vide.")
 
         # connecte les différents boutons des autres pages à la paramétrabilité de certaines fenêtres
-        # FEATURE : Ajouter les conditions dans des fonctions annexes comme ci-dessous pour les autres pages
-        self.connect_page_rb1(application)
+        try:
+            # FEATURE : Ajouter les conditions dans des fonctions annexes comme ci-dessous pour les autres pages
+            self.connect_page_rb1(application)
+            # Aucune fonction pour la page_rb2
+
+        except Exception as error:
+            log.error("Erreur lors de la connexion des composants au paramétrage de leur écran.\n", exception=error)
 
     def connect_page_rb1(self, application):
         """Fonction permettant de connecter les différents composants de la page de paramètres page_rb1 à leurs fenêtres
@@ -326,6 +331,7 @@ class PageRB8:
         # Si aucune des pages n'a pas encore été complétée, retourne que la page est complète
         return True
 
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_page_opened(self, application):
         """Fonction appelée lorsque la page de paramètres 8 est chargée.
         Permet d'afficher les fenêtre d'index et actualise les paramètres des écrans visibles
@@ -342,6 +348,7 @@ class PageRB8:
         # Remets à jour la page actuelle
         self.change_visible_screen_list()
 
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_page_closed(self, application):
         """Fonction appelée quand la page de paramètres 8 est fermée.
         Permet de cacher les différentes fenêtres d'index

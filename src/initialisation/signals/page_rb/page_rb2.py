@@ -321,6 +321,7 @@ class PageRB2:
             pass
             # FEATURE : faire la fonction de changement de langue de la fenêtre de paramétrage du freinage
 
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_page_opened(self, application):
         """Fonction appelée lorsque la page de paramètres 8 est chargée.
         Permet d'afficher les fenêtre d'index et actualise les paramètres des écrans visibles
@@ -335,6 +336,7 @@ class PageRB2:
                 and self.page.findChild(QObject, "mode_switchbutton").property("selection_index") == 1:
             self.complex_popup.win.show()
 
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_page_closed(self, application):
         """Fonction appelée quand la page de paramètres 8 est fermée.
         Permet de cacher les différentes fenêtres d'index
