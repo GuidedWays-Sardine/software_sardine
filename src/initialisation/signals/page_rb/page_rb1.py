@@ -131,7 +131,7 @@ class PageRB1:
         page_parameters["dmi"] = translation_data[dmi_selection].replace(" ", "_")
 
         # Paramètre niveau de logging
-        log_text = self.page.findChild(QObject, "log_switchbutton").property("text")
+        log_text = self.page.findChild(QObject, "log_switchbutton").property("selection_text")
         page_parameters["log_level"] = self.log_converter[log_text]
 
         # Paramètre langue
