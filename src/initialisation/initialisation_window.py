@@ -69,6 +69,15 @@ class InitialisationWindow:
         log.change_log_prefix("Initialisation")
         log.info(f"Début du chargement de l'application d'intialisation.\n\n")
 
+        # Charge tous les écrans connectés à l'ordinateur (utile pour la positionnement de certaines popup)
+        for screen_index in range(0, QDesktopWidget().screenCount()):
+            # Charge les informations de l'écran (au format [x_min, y_min, x_max, y_max]
+            sg = QDesktopWidget().screenGeometry(screen_index).getCoords()
+
+            # Les stockes au bon format [[x, y], [w, h]]
+            self.screens_dimensions.append([[sg[0], sg[1]], [sg[2] - sg[0] + 1, sg[3] - sg[1] + 1]])
+        log.info(f"Détection de {len(self.screens_dimensions)} écrans connectés à l'ordinateur.\n\n")
+
         # Lance l'application et cherche pour le fichier QML avec tous les éléments de la fenêtre d'initialisation
         self.app = app
         self.engine = QQmlApplicationEngine()
@@ -81,15 +90,6 @@ class InitialisationWindow:
         elif not self.engine.rootObjects() and os.path.isfile(self.initialisation_window_file_path):
             raise SyntaxError(f"Le fichier .qml pour la fenêtre d\'initialisation contient des erreurs.\n\t\t" +
                               self.initialisation_window_file_path)
-
-        # Charge tous les écrans connectés à l'ordinateur (utile pour la positionnement de certaines popup)
-        for screen_index in range(0, QDesktopWidget().screenCount()):
-            # Charge les informations de l'écran (au format [x_min, y_min, x_max, y_max]
-            sg = QDesktopWidget().screenGeometry(screen_index).getCoords()
-
-            # Les stockes au bon format [[x, y], [w, h]]
-            self.screens_dimensions.append([[sg[0], sg[1]], [sg[2] - sg[0] + 1, sg[3] - sg[1] + 1]])
-        log.info(f"Détection de {len(self.screens_dimensions)} écrans connectés à l'ordinateur.\n\n")
 
         # Si le fichier qml a été compris, récupère la fenêtre et initialise les différents boutons et pages
         self.win = self.engine.rootObjects()[0]
