@@ -198,16 +198,17 @@ class PageRB2:
             Un dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
         """
         # Récupère le nom du fichier train (et regard si le paramètre existe)
-        train_name = data.get_value("train_name")
-        if train_name is not None:
+        file_name = data.get_value("train_name")
+        if file_name is not None:
             # Vérifie que le fichier de paramètres existe
-            if os.path.exists(f"{self.train_settings_folder_path}{train_name}.train"):
+            file_name += ".train" if file_name and not file_name.lower().endswith(".train") else ""
+            if os.path.exists(f"{self.train_settings_folder_path}{file_name}"):
                 # Si c'est le cas, l'ouvre et change les différentes valeurs du paramétrage train sur la page
-                self.open_train_data_file(f"{self.train_settings_folder_path}{train_name}.train")
+                self.open_train_data_file(f"{self.train_settings_folder_path}{file_name}")
             else:
                 # Sinon laisse un message d'erreur
-                log.warning(f"le fichier de paramètres : {train_name}.train , n'existe plus.\n" +
-                            f"\t\t{self.train_settings_folder_path}{train_name}.train",
+                log.warning(f"le fichier de paramètres : {file_name} , n'existe plus.\n" +
+                            f"\t\t{self.train_settings_folder_path}{file_name}",
                             prefix="Ouverture des données train")
 
     def open_train_data_file(self, file_path):
