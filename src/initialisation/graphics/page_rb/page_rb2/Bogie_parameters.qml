@@ -161,7 +161,7 @@ Item {
         default_y: plus_minus_button.default_y
         box_length: plus_minus_button.default_height
 
-        text: root.articulated_text
+        title: root.articulated_text
         font_size: 8
 
         is_checked: false
