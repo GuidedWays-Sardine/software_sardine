@@ -68,40 +68,31 @@ class BottomButtons:
         application: `InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets
         """
-        try:
-            # Vérifie si toutes les pages sont complètes et stocke les pages qui ne sont pas complétées
-            non_completed_pages = list(i for i in range(0, 8)
-                                       if application.is_completed_by_default[i] != application.is_fully_loaded[i]
-                                       and not application.visible_pages[i].is_page_valid())
-        except Exception as error:
-            # Si une erreur a été détectée dans une des fonction de validation, l'indique et ne complète pas l'initialisation
-            log.warning(f"Erreur lors de la validation d'une des pages de paramètres.\n",
-                        exception=error)
+        # Récupère la liste des pages complétées ou non. Une page est compléte si :
+        # - la page n'a pas de partie logique (elle sera donc de type QObject ou None)
+        # - la page a une partie logique mais pas de fonctions "is_page_valid"
+        # - la page a une partie logique et la fonbction is_page_valid retourne true
+        page_complete = [(page is None or isinstance(page, QObject)) or
+                         ("is_page_valid" not in dir(page)) or
+                         (page.is_page_valid())
+                         for page in application.visible_pages]
+
+        # Vérifie que toutes les pages sont complétées
+        if all(page_complete):
+            # Si c'est le cas, ferme correctement la page actuelle, récupère les paramètres et lance la simulation
+            if "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
+                application.visible_pages[application.active_settings_page - 1].on_page_closed()
+
+            log.change_log_prefix("Récupération des données")
+            application.launch_simulator = True
+            application.app.quit()
         else:
-            # Dans le cas où toutes les pages ont été vérifiées avec succès
-            if not non_completed_pages:
-                # Dans le cas où aucune page est incomplète (et donc que toutes les pages sont complètes)
-                if "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
-                    try:
-                        # Appelle la fonction de fermeture de page (si celle-ci existe)
-                        application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
-                    except Exception as error:
-                        # Si la fonction de fermeture de page contient une erreur, l'indique
-                        log.error(f"La fonction on_page_closed de la page_rb{application.active_settings_page} contient une erreur.\n",
-                                  exception=error)
-
-                # Indique que le simulateur va être lancée et ferme l'application (les données seront alors récupérées
-                log.change_log_prefix("Récupération des données")
-                application.launch_simulator = True
-                application.app.quit()
-            else:
-                # Si toutes les pages ne sont pas complétées, indique en niveau debug les pages qui ne le sont pas
-                log.debug(f"Pages de paramètres : {' ; '.join([str(n + 1) for n in non_completed_pages])} non complétés.\n")
-
-                # Et change la page de paramètres active sur la première page non complète
-                application.right_buttons.on_new_page_selected(application,
-                                                               application.visible_pages[non_completed_pages[0]].engine,
-                                                               non_completed_pages[0] + 1)
+            # Sinon récupère les pages non complètes, laisse un message de registre et se met sur la page non complétée
+            non_completed_pages = [index for index, completed in enumerate(page_complete) if not completed]
+            log.debug(f"Pages de paramètres : {' ; '.join([str(n + 1) for n in non_completed_pages])} non complétés.\n")
+            application.right_buttons.on_new_page_selected(application,
+                                                           application.visible_pages[non_completed_pages[0]].engine,
+                                                           non_completed_pages[0] + 1)
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_open_clicked(self, application):
