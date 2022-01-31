@@ -783,22 +783,6 @@ Item {
         is_positive: false
     }
 
-    //Combobox permettant de choisir le type de missions réalisés par le matériel roulant
-    INI_combobox{
-        id: mission_type_combo
-        objectName: "mission_type_combo"
-
-        default_x: mode_switchbutton.default_x
-        default_y: 65
-        default_width: mode_switchbutton.default_width
-        default_height: 50
-
-        elements: ["Voyageurs", "Fret"]
-
-        is_positive: true
-        is_activable: !page_rb2.generated
-    }
-
     //Bouton ouvrir
     INI_button{
         id: open_button
@@ -845,5 +829,21 @@ Item {
 
         is_activable: false     //Activé après l'initialisation de la popup de paramétrage freinage
         is_positive: false
+    }
+
+    //Combobox permettant de choisir le type de missions réalisés par le matériel roulant
+    INI_combobox{
+        id: mission_type_combo
+        objectName: "mission_type_combo"
+
+        default_x: mode_switchbutton.default_x
+        default_y: 65
+        default_width: mode_switchbutton.default_width
+        default_height: 50
+
+        elements: ["Voyageurs", "Fret"]
+
+        is_positive: true
+        is_activable: !page_rb2.generated
     }
 }
