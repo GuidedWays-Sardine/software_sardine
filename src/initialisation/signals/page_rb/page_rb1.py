@@ -138,7 +138,7 @@ class PageRB1:
         page_parameters["Langue"] = self.page.findChild(QObject, "language_combo").property("selection_text")
 
         # Paramètre si PCC connecté
-        page_parameters["ccs"] = self.page.findChild(QObject, "pcc_check").property("is_checked")
+        page_parameters["ccs"] = self.page.findChild(QObject, "ccs_check").property("is_checked")
 
         # Paramètres si affichage des données en direct (vitesse, ...)
         page_parameters["live_data"] = self.page.findChild(QObject, "data_check").property("is_checked")
@@ -183,7 +183,7 @@ class PageRB1:
                 log.debug(f"Le niveau de registre du fichier de paramètre \"{data['log_level']}\" n'existe pas.\n")
 
         # Paramètre pour le PCC (savoir s'il sera activé)
-        data.update_parameter(self.page, "pcc_check", "is_checked", "ccs")
+        data.update_parameter(self.page, "ccs_check", "is_checked", "ccs")
 
         # Paramètres pour l'affichage des données en direct (genre vitesse, ...)
         data.update_parameter(self.page, "data_check", "is_checked", "live_data")
@@ -202,7 +202,7 @@ class PageRB1:
         self.current_button.setProperty("text", translation_data[self.current_button.property("text")])
 
         # Traduit le titre de tous les widgets qui en ont un
-        for widget_id in ["data_check", "dashboard_check", "data_save_check", "pcc_check", "log_switchbutton",
+        for widget_id in ["data_check", "dashboard_check", "data_save_check", "ccs_check", "log_switchbutton",
                           "language_combo", "dmi_combo", "renard_check", "camera_check", "command_board_combo"]:
             widget = self.page.findChild(QObject, widget_id)
             widget.setProperty("title", translation_data[widget.property("title")])

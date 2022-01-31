@@ -67,8 +67,8 @@ Item {
 
     //Checkbutton pour savoir si le pupitre léger est connecté à UE (ou à Renard)
     INI_checkbutton {
-        id: pcc_check
-        objectName: "pcc_check"
+        id: ccs_check
+        objectName: "ccs_check"
 
         default_x: 55
         default_y: 329
