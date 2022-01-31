@@ -32,10 +32,8 @@ class PageRB2:
     engine = None
     page = None
     current_button = None
-    data_components = {}     # Dictionaire avec tous les composants contenant des valeurs sur le train
-
-    # Chemin vers les fichiers de paramètres train
-    train_settings_folder_path = f"{PROJECT_DIR}settings\\train_settings\\"
+    data_widgets = {}      # Dictionaire avec tous les composants contenant des valeurs sur le train
+    train_name_widget = None  # "train_name_stringinput". Permet une optimisation
 
     # Variables nécessaires à l'indication du mode de paramétrage actuel
     class Mode(Enum):
@@ -49,6 +47,9 @@ class PageRB2:
     # Page de paramètres de freinage (situé dans pagerb2/braking_popup.py)
     brake_popup = None
     # FEATURE : ajouter la classe les import et les fichiers graphiques et logiques nécessaires
+    
+    # Chemin vers les fichiers de paramètres train
+    train_settings_folder_path = f"{PROJECT_DIR}settings\\train_settings\\"
 
     def __init__(self, application, engine, index, current_button, translation_data):
         """Fonction d'initialisation de la page de paramtètres 2 (page paramètres train)
@@ -81,16 +82,18 @@ class PageRB2:
                           "a_floatinput", "b_floatinput", "c_floatinput", "pantograph_check", "thermic_check",
                           "pad_brake_integerinput", "magnetic_brake_integerinput", "regenerative_check",
                           "disk_brake_integerinput", "foucault_brake_integerinput", "dynamic_check"]:
-            self.data_components[widget_id] = self.page.findChild(QObject, widget_id)
+            self.data_widgets[widget_id] = self.page.findChild(QObject, widget_id)
+        self.train_name_widget = self.page.findChild(QObject, "train_name_stringinput")
 
         # Initialise la combobox avec les types de trains
-        self.page.findChild(QObject, "mission_type_combo").setProperty("elements", [key.value for key in cd.MissionType])
+        self.page.findChild(QObject, "mission_type_combo").setProperty("elements", [translation_data[key.value] for key in cd.MissionType])
 
         # Tente d'initialiser la fenêtre de paramétrage complexe
         try:
             self.complex_popup = cp.ComplexPopup(self)
         except Exception as error:
-            log.error("Erreur lors du chargement de la popup complexe (page_rb2).", exception=error)
+            log.error("Erreur lors du chargement de la popup complexe (page_rb2).",
+                      exception=error, prefix="Initialisation popup paramétrage train")
         finally:
             # Vérifie que celle-ci a été chargée et si oui, active le changement de mode et le connecte à son signal
             if self.complex_popup is not None and self.complex_popup.loaded:
@@ -104,7 +107,8 @@ class PageRB2:
             raise NotImplementedError("La fenêtre de paramétrage freinage n'a pas été implémentée")
             # FEATURE : Créer la page de paramètrages des systèmes de freinages
         except Exception as error:
-            log.error("Erreur lors du chargement de la popup freinage (page_rb2).", exception=error)
+            log.error("Erreur lors du chargement de la popup freinage (page_rb2).",
+                      exception=error, prefix="Initialisation popup paramétrage freinage")
         finally:
             # Vérifie que celle-ci a été chargée et si oui, active le paramétrage des systèmes de freinages
             if self.brake_popup is not None and self.brake_popup.loaded:
@@ -133,14 +137,14 @@ class PageRB2:
         page_parameters = sd.SettingsDictionary()
 
         # Vérifie si le fichier a eu un nom donné
-        file_name = self.page.findChild(QObject, "train_name_stringinput").property("text")
+        file_name = self.train_name_widget.property("text")
         if file_name:
             # Rajoute l'extension si nécessaire et appelle la fonction de sauvegarde (definit plus bas)
             file_name += ".train" if file_name and not file_name.lower().endswith(".train") else ""
             self.save_train_data_file(f"{self.train_settings_folder_path}{file_name}")
 
             # Ajoute le nom du fichier dans le dictionnaire de paramètres
-            page_parameters["train_name"] = self.page.findChild(QObject, 'train_name_stringinput').property('text')
+            page_parameters["train_name"] = self.train_name_widget.property('text')
         else:
             log.warning("Impossible de sauvegarder le fichier de paramètres train, aucun nom de fichier entré.\n",
                         prefix="Sauvegarde des données train")
@@ -160,7 +164,7 @@ class PageRB2:
                  prefix="Sauvegarde des données train")
 
         train_data = sd.SettingsDictionary()
-        train_data["train_name"] = self.page.findChild(QObject, 'train_name_stringinput').property('text')
+        train_data["train_name"] = self.train_name_widget.property('text')
 
         # Commence par ajouter le mode de paramétrage
         train_data["mode"] = str(self.current_mode)
@@ -251,7 +255,7 @@ class PageRB2:
         else:
             # Change le nom du fichier train dans le train_name_stringinput et indique le temps de chargement
             file_name = file_path.replace("\\", "/").rsplit("/", maxsplit=1)[1][:-6]
-            self.page.findChild(QObject, "train_name_stringinput").change_value(file_name)
+            self.train_name_widget.change_value(file_name)
 
         # S'occupe pour finir du changement des paramètres de freinage
         try:
@@ -278,16 +282,17 @@ class PageRB2:
         self.current_button.setProperty("text", translation_data[self.current_button.property("text")])
 
         # Traduit le placeholder texte ainsi que le titre pour le stringinput du nom du train
-        train_name_input = self.page.findChild(QObject, "train_name_stringinput")
-        train_name_input.setProperty("placeholder_text", translation_data[train_name_input.property("placeholder_text")])
-        train_name_input.setProperty("title", translation_data[train_name_input.property("title")])
+        self.train_name_widget.setProperty("placeholder_text",
+                                           translation_data[self.train_name_widget.property("placeholder_text")])
+        self.train_name_widget.setProperty("title",
+                                           translation_data[self.train_name_widget.property("title")])
 
         # Traduit le nom de chacune des catégories de paramètres
         for category in ["general_data_text", "dynamic_data_text", "alimentation_data_text", "brake_data_text"]:
             self.page.setProperty(category, translation_data[self.page.property(category)])
 
         # Essaye de traduire chaque textes au dessus des widgets et check_button
-        for widget_id, widget in self.data_components.items():
+        for widget_id, widget in self.data_widgets.items():
             widget.setProperty("title", translation_data[widget.property("title")])
 
         # Traduit toutes les clés pour le switchbutton du mode ainsi que pour le combobox
@@ -354,9 +359,8 @@ class PageRB2:
             Est ce que la page de paramètre est complétée ?
         """
         # Retourne vrai si le nom du fichier a été complété (autre variables complétés par défaut)
-        train_name_widget = self.page.findChild(QObject, "train_name_stringinput")
-        if not train_name_widget.property("text"):
-            train_name_widget.blink(None, None, None)
+        if not self.train_name_widget.property("text"):
+            self.train_name_widget.blink(None, None, None)
             return False
 
         return True
@@ -375,7 +379,7 @@ class PageRB2:
         train_data["mission"] = cd.mission_getter[self.page.findChild(QObject, "mission_type_combo").property("selection_index")]
 
         # Change les données de la fenêtre principale du paramétrage train
-        for widget_id, widget in self.data_components.items():
+        for widget_id, widget in self.data_widgets.items():
             # Cas des valueinput (floatinput, integerinput), change la propriétée "value"
             if "_integerinput" in widget_id or "_floatinput" in widget_id:
                 train_data[widget_id.rsplit("_", maxsplit=1)[0]] = widget.property("value")
@@ -398,7 +402,7 @@ class PageRB2:
         self.page.findChild(QObject, "mission_type_combo").change_selection(mission_index)
 
         # Change les données de la fenêtre principale du paramétrage train
-        for widget_id, widget in self.data_components.items():
+        for widget_id, widget in self.data_widgets.items():
             # Cas des valueinput (floatinput, integerinput), change la propriétée "value"
             if "_integerinput" in widget_id or "_floatinput" in widget_id:
                 widget.change_value(train_data.get_value(widget_id.rsplit("_", maxsplit=1)[0], widget.property("value")))
@@ -412,8 +416,7 @@ class PageRB2:
         Demande à l'utilisateur de confirmer le nom du fichier, puis le sauvegarde
         """
         # Commence par créer le chemin vers le fichier
-        train_name_widget = self.page.findChild(QObject, "train_name_stringinput")
-        file_name = train_name_widget.property("text")
+        file_name = self.train_name_widget.property("text")
         file_name += ".train" if file_name and not file_name.lower().endswith(".train") else ""
 
         # Ouvre la boite de dialoque pour confirmer l'enregistrement du fichier
@@ -423,7 +426,7 @@ class PageRB2:
         if file_path[0] != "":
             # Dans le cas où le nom du fichier a été changé à la sauvegarder, récupère le nouveau nom de fichier
             file_name = file_path[0].rsplit("/", maxsplit=1)[1][:-6]
-            train_name_widget.change_value(file_name)
+            self.train_name_widget.change_value(file_name)
 
             # Sauvegarde le fichier de paramètres train
             self.save_train_data_file(file_path[0])
@@ -440,7 +443,7 @@ class PageRB2:
         if file_path[0] != "":
             # Dans le cas où le nom du fichier a été changé à la sauvegarder, récupère le nouveau nom de fichier
             file_name = file_path[0].rsplit("/", maxsplit=1)[1][:-6]
-            self.page.findChild(QObject, "train_name_stringinput").change_value(file_name)
+            self.train_name_widget.change_value(file_name)
 
             # Sauvegarde le fichier de paramètres train
             self.open_train_data_file(file_path[0])
