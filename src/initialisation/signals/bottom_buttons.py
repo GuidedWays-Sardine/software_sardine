@@ -15,6 +15,7 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.settings_dictionary.settings as sd
 import src.misc.log.log as log
 import src.misc.decorators.decorators as decorators
+import src.initialisation.initialisation_window as ini
 
 
 class BottomButtons:
@@ -26,7 +27,7 @@ class BottomButtons:
 
         Parameters
         ----------
-        application: `InitialisationWindow`
+        application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
         initial_time = time.perf_counter()
@@ -56,7 +57,7 @@ class BottomButtons:
 
         Parameters
         ----------
-        application: `InitialisationWindow`
+        application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets
         """
         # Laisse un message de registre, puis ferme la page, puis l'application
@@ -72,7 +73,7 @@ class BottomButtons:
 
         Parameters
         ----------
-        application: `InitialisationWindow`
+        application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets
         """
         # Récupère la liste des pages complétées ou non. Une page est compléte si :
@@ -108,7 +109,7 @@ class BottomButtons:
 
         Parameters
         ----------
-        application: `InitialisationWindow`
+        application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets
         """
         # Ouvre la fenêtre d'ouverture de fichier pour sélectionner le fichier à ouvrir
@@ -136,7 +137,7 @@ class BottomButtons:
 
         Parameters
         ----------
-        application: `InitialisationWindow`
+        application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets
         """
         # Ouvre la fenêtre de sauvegarde et enregegistre le fichier si un nom a été donné
