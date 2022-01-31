@@ -56,7 +56,11 @@ class BottomButtons:
         application: `InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets
         """
+        # Laisse un message de registre, puis ferme la page, puis l'application
         log.info(f"Fermeture de la page de paramètres page_rb{application.active_settings_page}.\n\n")
+
+        if "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
+            application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
         application.app.quit()
 
     @decorators.QtSignal(log_level=log.Level.CRITICAL, end_process=True)
