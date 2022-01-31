@@ -208,14 +208,10 @@ class RightButtons:
         """
         # Vérifie que la page que l'on veut charger n'est pas celle qui est déjà chargée
         if new_index != application.active_page_index:
-            # Vérifie si la page que l'on va décharger a un protocole de déchargement spécifique
+            # Si la page actuelle a une fonction de fermeture, l'appelle
             if "on_page_closed" in dir(application.pages_list[application.active_page_index - 1]):
                 # Si c'est le cas, appelle la fonction de fermeture de la page
-                try:
-                    application.pages_list[application.active_page_index - 1].on_page_closed(application)
-                except Exception as error:
-                    log.error(f"La fonction on_page_closed de la page_rb{application.active_page_index} contient une erreur",
-                              exception=error)
+                application.pages_list[application.active_page_index - 1].on_page_closed(application)
 
             # Indique que l'on sort de l'ancienne page, change le préfixe et indique que l'on rentre dans la nouvelle page
             log.info(f"Fermeture de la page de paramètres page_rb{application.active_page_index}.\n\n")
@@ -226,11 +222,7 @@ class RightButtons:
             self.pages_stackview.set_active_page(engine.rootObjects()[0])
             application.active_page_index = new_index
 
-            # Vérifie si la page que l'on charge  a un protocole de chargement particulier
+            # Si la nouvelle page a une fonction d'ouverture l'appelle
             if "on_page_opened" in dir(application.pages_list[application.active_page_index - 1]):
                 # Si c'est le cas, appelle la fonction d'ouverture de la page
-                try:
-                    application.pages_list[application.active_page_index - 1].on_page_opened(application)
-                except Exception as error:
-                    log.error(f"La fonction on_page_opened de la page_rb{application.active_page_index} contient une erreur.\n",
-                              exception=error)
+                application.pages_list[application.active_page_index - 1].on_page_opened(application)
