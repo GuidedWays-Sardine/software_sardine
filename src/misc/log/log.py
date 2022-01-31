@@ -4,6 +4,7 @@ import logging
 import traceback
 from enum import Enum
 from datetime import datetime
+import re
 
 
 VERSION = "1.1.0"
@@ -137,10 +138,13 @@ def log(log_level, message, exception=None, prefix=None):
 
     # Si une erreur est ajoutée, l'ajoute au message.
     if isinstance(exception, Exception):
-        message += (f"\t\tErreur de type ;{type(exception)}\n" +
-                    f"\t\tAvec comme message d'erreur : {exception.args}\n\n\t\t" +
-                    "".join(traceback.format_tb(exception.__traceback__)).replace("\n", "\n\t\t") + "\n")
+        message += (("\n" if not message.endswith("\n") else "") + f"\tErreur de type ;{type(exception)}\n" +
+                    f"\tAvec comme message d'erreur : {exception.args}\n\t" + "Traceback : \n\t" +
+                    "".join(traceback.format_tb(exception.__traceback__)).replace("\n", "\n\t") + "\n")
 
+    # Remplace les "\n\t..." par autant d'espaces que nécessaire pour bien aligner le texte avec le message
+    prefix_length = len(logging.getLogger().handlers[0].formatter._fmt) - 3 - 19 + len(str(log_level)) - 11
+    message = re.sub("\\n[\\t]*", "\n" + " " * prefix_length, message)
 
     # Laisse le message dans le fichier de registre de niveau debug
     logging.log(log_level.value, message)
