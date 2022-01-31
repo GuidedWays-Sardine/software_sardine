@@ -119,9 +119,13 @@ def log(log_level, message, exception=None, prefix=None):
     exception: Exception
         Exception à afficher si nécessaire (pour donner plus d'indications sur la raison et l'endroit d'une erreur)
     """
-    # Vérifie qu'un fichier registre existe bien sinon jette l'erreur FileNotFoundError
+    # Vérifie qu'un fichier registre existe bien sinon en crée un (console)
     if not logging.getLogger().hasHandlers():
-        raise FileNotFoundError("Aucun fichier de registre existant pour cette simulation")
+        # Sinon crée une configuration de registre par défaut pour pouvoir afficher le message
+        logging.basicConfig(level=Level.DEBUG.value,
+                            datefmt="%H:%M:%S",
+                            format="%(asctime)s - %(levelname)s - %(message)s")
+        logging.warning("fonction de registre appelée sans configuration de registre initialisé (log.initialise().\n")
 
     # Vérifie si un préfix temporaire a été envoyé et si oui change le préfix utilisé
     previous_format = logging.getLogger().handlers[0].formatter._fmt
