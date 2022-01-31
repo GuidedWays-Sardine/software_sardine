@@ -98,12 +98,12 @@ class RightButtons:
             current_button.setProperty("is_activable", True)
 
             # Si c'est la première page existante, la charge
-            if application.visible_pages == [None] * 8:
+            if application.pages_list == [None] * 8:
                 self.pages_stackview.set_active_page(engine.rootObjects()[0])
                 application.active_settings_page = index
 
             # store l'engine comme étant la page chargée
-            application.visible_pages[index - 1] = engine
+            application.pages_list[index - 1] = engine
 
             # Connect le bouton de droite à une fonction permettant de charger la page et d'appeler d'autres fonctions :
             # Une pour décharger la page active, et l'autre pour charger la nouvelle page
@@ -152,7 +152,7 @@ class RightButtons:
                 # Import localement le fichier de la page
                 # Appelle le constructeur de la page pour affilier tous les signals aux widgets
                 exec(f"from src.initialisation.signals.page_rb import page_rb{index} as rb{index}\n" +
-                     f"application.visible_pages[index - 1] = rb{index}.PageRB{index}(application, engine, index, current_button, translation_data)")
+                     f"application.pages_list[index - 1] = rb{index}.PageRB{index}(application, engine, index, current_button, translation_data)")
             except Exception as error:
                 # Permet de rattraper une erreur si le code est incorrect où qu'il ne suit pas la documentation
                 log.warning(f"Erreur lors du chargement des signaux de la page : {page_path}",
@@ -161,7 +161,7 @@ class RightButtons:
                 return False
             else:
                 # Vérifie (ou l'indique) si des fonctions manquent et rend le bouton relié à la page positif
-                self.are_page_functions_there(application.visible_pages[index - 1])
+                self.are_page_functions_there(application.pages_list[index - 1])
                 current_button.setProperty("is_positive", True)
                 return True
         else:
@@ -209,10 +209,10 @@ class RightButtons:
         # Vérifie que la page que l'on veut charger n'est pas celle qui est déjà chargée
         if new_index != application.active_settings_page:
             # Vérifie si la page que l'on va décharger a un protocole de déchargement spécifique
-            if "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
+            if "on_page_closed" in dir(application.pages_list[application.active_settings_page - 1]):
                 # Si c'est le cas, appelle la fonction de fermeture de la page
                 try:
-                    application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
+                    application.pages_list[application.active_settings_page - 1].on_page_closed(application)
                 except Exception as error:
                     log.error(f"La fonction on_page_closed de la page_rb{application.active_settings_page} contient une erreur",
                               exception=error)
@@ -227,10 +227,10 @@ class RightButtons:
             application.active_settings_page = new_index
 
             # Vérifie si la page que l'on charge  a un protocole de chargement particulier
-            if "on_page_opened" in dir(application.visible_pages[application.active_settings_page - 1]):
+            if "on_page_opened" in dir(application.pages_list[application.active_settings_page - 1]):
                 # Si c'est le cas, appelle la fonction d'ouverture de la page
                 try:
-                    application.visible_pages[application.active_settings_page - 1].on_page_opened(application)
+                    application.pages_list[application.active_settings_page - 1].on_page_opened(application)
                 except Exception as error:
                     log.error(f"La fonction on_page_opened de la page_rb{application.active_settings_page} contient une erreur.\n",
                               exception=error)

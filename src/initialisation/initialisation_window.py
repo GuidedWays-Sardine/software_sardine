@@ -31,7 +31,7 @@ class InitialisationWindow:
     right_buttons = None
 
     # Stocke si la page est chargée et si elle est complète (pour lancer le simulateur
-    visible_pages = [None] * 8     # Stocke les pages que l'utilisateur peut afficher
+    pages_list = [None] * 8     # Stocke les pages que l'utilisateur peut afficher
     screens_dimensions = []        # Données sur les écrans connectés : format : [[x, y], [w, h], ...]
 
     # Variable stockant la langue actuelle de l'application d'initialisation
@@ -154,10 +154,10 @@ class InitialisationWindow:
             log.info(f"Ouverture de la page de paramètres page_rb{self.active_settings_page}.\n")
 
             # Appelle la fonction d'ouverture logique de la page si celle-ci existe
-            if self.visible_pages[self.active_settings_page - 1] is not None and \
-                    "on_page_opened" in dir(self.visible_pages[self.active_settings_page - 1]):
+            if self.pages_list[self.active_settings_page - 1] is not None and \
+                    "on_page_opened" in dir(self.pages_list[self.active_settings_page - 1]):
                 try:
-                    self.visible_pages[self.active_settings_page - 1].on_page_opened(self)
+                    self.pages_list[self.active_settings_page - 1].on_page_opened(self)
                 except Exception as error:
                     log.error(f"La fonction on_page_opened de la page_rb{self.active_settings_page} contient une erreur.\n",
                               exception=error)
@@ -201,7 +201,7 @@ class InitialisationWindow:
             log.warning(f"Impossible de localiser la fenêtre d'initialisation.\n")
 
         # Vérifie si au moins une page est chargé graphiquement. (sinon tente de charger les paramètres défaut.settings)
-        any_loaded = any([page is not None and not isinstance(page, QObject) for page in self.visible_pages])
+        any_loaded = any([page is not None and not isinstance(page, QObject) for page in self.pages_list])
         if not any_loaded and os.path.isfile(self.default_settings_file_path):
             # Si aucune page n'est chargée correctement et que le fichier default.settings existe
             parameters.open(self.default_settings_file_path)
@@ -211,7 +211,7 @@ class InitialisationWindow:
             translation_data.create_translation(self.translation_file_path, self.language, "English")
 
             # Pour chaque page ayant une partie logique fonctionnelle et une fonction get_values:
-            for page in (p for p in self.visible_pages if "get_values" in dir(p)):
+            for page in (p for p in self.pages_list if "get_values" in dir(p)):
                 try:
                     # Appelle la fonction get_values de la page et si celle-ci fonctionne, récupère ses paramètres
                     parameters.update(page.get_values(translation_data))
@@ -235,8 +235,8 @@ class InitialisationWindow:
         """
         # Si la combobox pour choisir la langue existe (page_rb1 chargée), alors change la langue dans cette combobox
         # La langue de l'application d'initialisation sera changée automatiquement
-        if self.visible_pages[0] is not None and not isinstance(self.visible_pages[0], type(self.engine)):
-            language_combo = self.visible_pages[0].page.findChild(QObject, "language_combo")
+        if self.pages_list[0] is not None and not isinstance(self.pages_list[0], type(self.engine)):
+            language_combo = self.pages_list[0].page.findChild(QObject, "language_combo")
             try:
                 # Si la langue est différente essaye de changer la langue du simulateur
                 if language_combo.property("text") != data["Langue"]:
@@ -254,7 +254,7 @@ class InitialisationWindow:
         translation_data.create_translation(self.translation_file_path, "English", self.language)
 
         # Pour chaque page ayant une partie logique fonctionnelle et une fonction set_values:
-        for page in (p for p in self.visible_pages if "set_values" in dir(p)):
+        for page in (p for p in self.pages_list if "set_values" in dir(p)):
             try:
                 # Appelle la fonction get_values de la page et récupère une potentielle erreur sur la fonction
                 page.set_values(data, translation_data)
@@ -287,7 +287,7 @@ class InitialisationWindow:
         self.bottom_buttons.change_language(self, translation_data)
 
         # Essaye de changer la langue pour chaque page ayant une partie fonctionnelle
-        for page in (p for p in self.visible_pages if "change_language" in dir(p)):
+        for page in (p for p in self.pages_list if "change_language" in dir(p)):
             try:
                 # Appelle la fonction get_values de la page et récupère une potentielle erreur sur la fonction
                 page.change_language(translation_data)

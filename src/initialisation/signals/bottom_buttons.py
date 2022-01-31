@@ -38,7 +38,7 @@ class BottomButtons:
         application.win.findChild(QObject, "launch_button").clicked.connect(lambda: self.on_launch_clicked(application))
 
         # Boutons sauvegarder/ouvrir (présent uniquement si au moins une page est chargée correctement)
-        if any([page is not None and not isinstance(page, QObject) for page in application.visible_pages]):
+        if any([page is not None and not isinstance(page, QObject) for page in application.pages_list]):
             application.win.findChild(QObject, "open_button").clicked.connect(lambda: self.on_open_clicked(application))
             application.win.findChild(QObject, "save_button").clicked.connect(lambda: self.on_save_clicked(application))
             log.info("Boutons ouvrir et fermer visibles car au moins une page de paramètres chargée entièrement.\n")
@@ -63,8 +63,8 @@ class BottomButtons:
         # Laisse un message de registre, puis ferme la page, puis l'application
         log.info(f"Fermeture de la page de paramètres page_rb{application.active_settings_page}.\n\n")
 
-        if "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
-            application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
+        if "on_page_closed" in dir(application.pages_list[application.active_settings_page - 1]):
+            application.pages_list[application.active_settings_page - 1].on_page_closed(application)
         application.app.quit()
 
     @decorators.QtSignal(log_level=log.Level.CRITICAL, end_process=True)
@@ -83,13 +83,13 @@ class BottomButtons:
         page_complete = [(page is None or isinstance(page, QObject)) or
                          ("is_page_valid" not in dir(page)) or
                          (page.is_page_valid())
-                         for page in application.visible_pages]
+                         for page in application.pages_list]
 
         # Vérifie que toutes les pages sont complétées
         if all(page_complete):
             # Si c'est le cas, ferme correctement la page actuelle, récupère les paramètres et lance la simulation
-            if "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
-                application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
+            if "on_page_closed" in dir(application.pages_list[application.active_settings_page - 1]):
+                application.pages_list[application.active_settings_page - 1].on_page_closed(application)
 
             log.change_log_prefix("Récupération des données")
             application.launch_simulator = True
@@ -99,7 +99,7 @@ class BottomButtons:
             non_completed_pages = [index for index, completed in enumerate(page_complete) if not completed]
             log.debug(f"Pages de paramètres : {' ; '.join([str(n + 1) for n in non_completed_pages])} non complétés.\n")
             application.right_buttons.on_new_page_selected(application,
-                                                           application.visible_pages[non_completed_pages[0]].engine,
+                                                           application.pages_list[non_completed_pages[0]].engine,
                                                            non_completed_pages[0] + 1)
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)

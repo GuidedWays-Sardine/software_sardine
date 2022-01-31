@@ -141,21 +141,21 @@ class PageRB8:
         application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
-        if application.visible_pages[0] is not None and not isinstance(application.visible_pages[0], type(self.engine)):
+        if application.pages_list[0] is not None and not isinstance(application.pages_list[0], type(self.engine)):
             # camera_check pour ligne virtuelle ou train caméra
-            application.visible_pages[0].page.findChild(QObject, "camera_check").value_changed.connect(
+            application.pages_list[0].page.findChild(QObject, "camera_check").value_changed.connect(
                 lambda: self.on_camera_train_checked(application))
             self.on_camera_train_checked(application)
 
             # pcc_check pour TCO et toute autre fenêtre nécessaire au fonctionnement du PCC
-            application.visible_pages[0].page.findChild(QObject, "pcc_check").value_changed.connect(
+            application.pages_list[0].page.findChild(QObject, "pcc_check").value_changed.connect(
                 lambda: self.on_pcc_checked(application))
             self.on_pcc_checked(application)
 
             # data_check pour l'affichage des données en direct
-            application.visible_pages[0].page.findChild(QObject, "data_check").value_changed.connect(
+            application.pages_list[0].page.findChild(QObject, "data_check").value_changed.connect(
                 lambda: self.on_data_checked(application))
-            application.visible_pages[0].page.findChild(QObject, "dashboard_check").value_changed.connect(
+            application.pages_list[0].page.findChild(QObject, "dashboard_check").value_changed.connect(
                 lambda: self.on_data_checked(application))
             self.on_data_checked(application)
         else:
@@ -512,7 +512,7 @@ class PageRB8:
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
         # Récupère si le checkbutton est activé, le nom de la catégorie et des écrans à modifier
-        is_checked = application.visible_pages[0].page.findChild(QObject, "camera_check").property("is_checked")
+        is_checked = application.pages_list[0].page.findChild(QObject, "camera_check").property("is_checked")
         category = list(self.screen_default)[0]
         screen_virtual_line = list(self.screen_default[category])[2]
         screen_camera_train = list(self.screen_default[category])[3]
@@ -538,7 +538,7 @@ class PageRB8:
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
         # Récupère si le checkbutton est activé, le nom de la catégorie et des écrans à modifier
-        is_checked = application.visible_pages[0].page.findChild(QObject, "pcc_check").property("is_checked")
+        is_checked = application.pages_list[0].page.findChild(QObject, "pcc_check").property("is_checked")
         category = list(self.screen_default)[1]
         screen_tco = list(self.screen_default[category])[0]
 
@@ -560,8 +560,8 @@ class PageRB8:
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
         # Récupère si les données sont activées et si elles sont activées en mode dashboard
-        is_data_checked = application.visible_pages[0].page.findChild(QObject, "data_check").property("is_checked")
-        dashboard = application.visible_pages[0].page.findChild(QObject, "dashboard_check")
+        is_data_checked = application.pages_list[0].page.findChild(QObject, "data_check").property("is_checked")
+        dashboard = application.pages_list[0].page.findChild(QObject, "dashboard_check")
         dashboard.setProperty("is_activable", is_data_checked)
         category = list(self.screen_default)[2]
         screen_graphs = list(self.screen_default[category])
