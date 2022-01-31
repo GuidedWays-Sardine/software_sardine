@@ -141,16 +141,17 @@ class PageRB8:
         application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
-        if application.pages_list[0] is not None and not isinstance(application.pages_list[0], type(self.engine)):
+        # Dans le cas où la première page de paramètre a été chargée entièrement correctement
+        if application.pages_list[0] is not None and not isinstance(application.pages_list[0], QQmlApplicationEngine):
             # camera_check pour ligne virtuelle ou train caméra
             application.pages_list[0].page.findChild(QObject, "camera_check").value_changed.connect(
                 lambda: self.on_camera_train_checked(application))
             self.on_camera_train_checked(application)
 
-            # pcc_check pour TCO et toute autre fenêtre nécessaire au fonctionnement du PCC
-            application.pages_list[0].page.findChild(QObject, "pcc_check").value_changed.connect(
-                lambda: self.on_pcc_checked(application))
-            self.on_pcc_checked(application)
+            # ccs_check pour TCO et toute autre fenêtre nécessaire au fonctionnement du ccs
+            application.pages_list[0].page.findChild(QObject, "ccs_check").value_changed.connect(
+                lambda: self.on_ccs_checked(application))
+            self.on_ccs_checked(application)
 
             # data_check pour l'affichage des données en direct
             application.pages_list[0].page.findChild(QObject, "data_check").value_changed.connect(
@@ -167,14 +168,10 @@ class PageRB8:
             screen_camera_train = list(self.screen_default[category])[3]
             self.screen_default[category][screen_camera_train][0] = False
 
-            # Désactive les graphs en mode fenêtré
+            # Désactive les graphes
             category = list(self.screen_default)[2]
-            screen_dashboard = list(self.screen_default[category])[0]
             for screen_graph in self.screen_default[category]:
-                if screen_graph == screen_dashboard:
-                    self.screen_default[category][screen_graph][0] = True
-                else:
-                    self.screen_default[category][screen_graph][0] = False
+                self.screen_default[category][screen_graph][0] = False
 
     def get_values(self, translation_data):
         """Récupère les paramètres de la page de paramètres page_rb8
@@ -449,7 +446,6 @@ class PageRB8:
         self.screen_list_active += 1
         self.change_visible_screen_list()
 
-    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def change_visible_screen_list(self):
         """Met à jour la liste de paramétrages éccrans visible par l"utilisateur.
         A appeler dans le cas où la catégorie ou la série d'écran a été changé ou que les paramètres défauts de l'écrans ont été changés.
@@ -528,7 +524,7 @@ class PageRB8:
             self.screen_settings[category][screen_camera_train] = [0, False, [0, 0], [0, 0]]
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
-    def on_pcc_checked(self, application):
+    def on_ccs_checked(self, application):
         """Signal appelé lorsque le checkbutton camera_check est coché ou décoché.
         Permet de mettre à jour la paramétrabilité des fenêtres TCO du PCC
 
@@ -538,7 +534,7 @@ class PageRB8:
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
         # Récupère si le checkbutton est activé, le nom de la catégorie et des écrans à modifier
-        is_checked = application.pages_list[0].page.findChild(QObject, "pcc_check").property("is_checked")
+        is_checked = application.pages_list[0].page.findChild(QObject, "ccs_check").property("is_checked")
         category = list(self.screen_default)[1]
         screen_tco = list(self.screen_default[category])[0]
 
@@ -561,16 +557,16 @@ class PageRB8:
         """
         # Récupère si les données sont activées et si elles sont activées en mode dashboard
         is_data_checked = application.pages_list[0].page.findChild(QObject, "data_check").property("is_checked")
-        dashboard = application.pages_list[0].page.findChild(QObject, "dashboard_check")
-        dashboard.setProperty("is_activable", is_data_checked)
+        is_dashboard_checked = application.pages_list[0].page.findChild(QObject, "dashboard_check").property("is_clicked")
         category = list(self.screen_default)[2]
         screen_graphs = list(self.screen_default[category])
         screen_dashboard = screen_graphs[0]
 
-        # Mets à jour la paramétrabilité des écrans
-        for screen_graph in screen_graphs:
-            if is_data_checked and (dashboard.property("is_checked") == (screen_graph == screen_dashboard)):
-                self.screen_default[category][screen_graph][0] = True
+        # Met à jour les propriétés du dashboard
+        for screen in screen_graphs:
+            if is_data_checked and ((is_dashboard_checked and screen == screen_dashboard) or
+                                    (not is_dashboard_checked and screen != screen_dashboard)):
+                self.screen_default[category][screen][0] = True
             else:
-                self.screen_default[category][screen_graph][0] = False
-                self.screen_settings[category][screen_graph] = [0, False, [0, 0], [0, 0]]
+                self.screen_default[category][screen][0] = False
+                self.screen_settings[category][screen] = [0, False, [0, 0], [0, 0]]
