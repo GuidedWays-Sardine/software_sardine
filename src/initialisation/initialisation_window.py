@@ -32,7 +32,6 @@ class InitialisationWindow:
 
     # Stocke si la page est chargée et si elle est complète (pour lancer le simulateur
     visible_pages = [None] * 8     # Stocke les pages que l'utilisateur peut afficher
-    is_fully_loaded = [False] * 8  # Stocke directement l'instance de la classe
     screens_dimensions = []        # Données sur les écrans connectés : format : [[x, y], [w, h], ...]
 
     # Variable stockant la langue actuelle de l'application d'initialisation
@@ -155,7 +154,7 @@ class InitialisationWindow:
             log.info(f"Ouverture de la page de paramètres page_rb{self.active_settings_page}.\n")
 
             # Appelle la fonction d'ouverture logique de la page si celle-ci existe
-            if self.is_fully_loaded[self.active_settings_page - 1] and \
+            if self.visible_pages[self.active_settings_page - 1] is not None and \
                     "on_page_opened" in dir(self.visible_pages[self.active_settings_page - 1]):
                 try:
                     self.visible_pages[self.active_settings_page - 1].on_page_opened(self)
@@ -202,10 +201,11 @@ class InitialisationWindow:
             log.warning(f"Impossible de localiser la fenêtre d'initialisation.\n")
 
         # Vérifie si au moins une page est chargé graphiquement. (sinon tente de charger les paramètres défaut.settings)
-        if not any(self.is_fully_loaded) and os.path.isfile(self.default_settings_file_path):
+        any_loaded = any([page is not None and not isinstance(page, QObject) for page in self.visible_pages])
+        if not any_loaded and os.path.isfile(self.default_settings_file_path):
             # Si aucune page n'est chargée correctement et que le fichier default.settings existe
             parameters.open(self.default_settings_file_path)
-        elif any(self.is_fully_loaded):
+        elif any_loaded:
             # Récupère ma traduction anglaise car les paramètres textuels sont stockés en anglais
             translation_data = td.TranslationDictionary()
             translation_data.create_translation(self.translation_file_path, self.language, "English")

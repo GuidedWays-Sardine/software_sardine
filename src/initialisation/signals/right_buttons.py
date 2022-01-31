@@ -70,13 +70,6 @@ class RightButtons:
                     log.info(f"Chargement partiel (graphique uniquement) de la page_rb{index} en " +
                              f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\n")
 
-        # Vérifie si au moins une page est chargée, sinon l'indique et cache les boutons ouvrir et sauvegarder
-        if not any(application.is_fully_loaded):
-            log.error(f"""Aucune des pages n'a été correctement chargée. Les valeurs par défaut seront utilisés.
-                      \t\tSeuls les boutons quitter et lancer sont fonctionnels.\n""")
-            application.win.findChild(QObject, "save_button").setProperty("is_visible", False)
-            application.win.findChild(QObject, "open_button").setProperty("is_visible", False)
-
     def initialise_page(self, application, engine, index, page_path, current_button):
         """Fonction permettant d'initialiser une des pages de l'application d'initialisation lié à un bouton de droite.
         Celle-ci sera initialiser si elle existe et qu'elle a un format valide
@@ -167,11 +160,8 @@ class RightButtons:
                 current_button.setProperty("is_positive", False)
                 return False
             else:
-                # Vérifie (ou l'indique) si des fonctions manquent
+                # Vérifie (ou l'indique) si des fonctions manquent et rend le bouton relié à la page positif
                 self.are_page_functions_there(application.visible_pages[index - 1])
-
-                # Indique que la page a entièrement été chargée (partie visuelle et signals)
-                application.is_fully_loaded[index - 1] = True
                 current_button.setProperty("is_positive", True)
                 return True
         else:
