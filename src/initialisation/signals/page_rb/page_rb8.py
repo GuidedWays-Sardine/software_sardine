@@ -15,6 +15,7 @@ import src.initialisation.initialisation_window as ini
 import src.misc.settings_dictionary.settings as sd
 import src.misc.translation_dictionary.translation as td
 import src.misc.log.log as log
+import src.misc.decorators.decorators as decorators
 
 
 class PageRB8:
@@ -367,6 +368,7 @@ class PageRB8:
         for index in range(0, len(screens_values)):
             self.screen_settings[self.category_active][screens_values[index][0]] = screens_values[index][1]
 
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_left_category_button_clicked(self):
         """Signal appelé quand le bouton pour passer à la catégorie de paramétraghes d'écran de gauche est cliqué.
         Attention ce signal doit être appelé uniquement si la page de gauche existe, sous risque de crash.
@@ -395,6 +397,7 @@ class PageRB8:
         if new_index == 0:
             left_category_button.setProperty("is_activable", False)
 
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_right_category_button_clicked(self):
         """Signal appelé quand le bouton pour passer à la catégorie de paramétraghes d'écran de droite est cliqué.
         Attention ce signal doit être appelé uniquement si la page de droite existe, sous risque de crash.
@@ -423,6 +426,7 @@ class PageRB8:
         if new_index == len(self.screen_default) - 1:
             right_category_button.setProperty("is_activable", False)
 
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_left_window_button_pressed(self):
         """Signal appelé quand le bouton pour passer à la série de paramétraghes d'écran de gauche d'une catégorie est cliqué.
         Attention ce signal doit être appelé uniquement si la série d'écrans de gauche existe, sous risque de crash.
@@ -436,6 +440,7 @@ class PageRB8:
         self.screen_list_active -= 1
         self.change_visible_screen_list()
 
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_right_window_button_pressed(self):
         """Signal appelé quand le bouton pour passer à la série de paramétraghes d'écran de droite d'une catégorie est cliqué.
         Attention ce signal doit être appelé uniquement si la série d'écrans de droite existe, sous risque de crash.
@@ -449,6 +454,7 @@ class PageRB8:
         self.screen_list_active += 1
         self.change_visible_screen_list()
 
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def change_visible_screen_list(self):
         """Met à jour la liste de paramétrages éccrans visible par l"utilisateur.
         A appeler dans le cas où la catégorie ou la série d'écran a été changé ou que les paramètres défauts de l'écrans ont été changés.
@@ -500,6 +506,7 @@ class PageRB8:
             self.page.findChild(QObject, "left_window_button").setProperty("is_visible", False)
             self.page.findChild(QObject, "right_window_button").setProperty("is_visible", False)
 
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_camera_train_checked(self, application):
         """Signal appelé lorsque le checkbutton camera_check est coché ou décoché.
         Permet de mettre à jour la paramétrabilité des fenêtres Train caméra et ligne virtuelle
@@ -525,6 +532,7 @@ class PageRB8:
         else:
             self.screen_settings[category][screen_camera_train] = [0, False, [0, 0], [0, 0]]
 
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_pcc_checked(self, application):
         """Signal appelé lorsque le checkbutton camera_check est coché ou décoché.
         Permet de mettre à jour la paramétrabilité des fenêtres TCO du PCC
@@ -546,6 +554,7 @@ class PageRB8:
         if not self.screen_default[category][screen_tco][0]:
             self.screen_settings[category][screen_tco] = [0, False, [0, 0], [0, 0]]
 
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_data_checked(self, application):
         """Signal appelé lorsque le checkbutton camera_check est coché ou décoché.
         Permet de mettre à jour la paramétrabilité des fenêtres des courbes de paramètres en direct

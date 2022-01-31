@@ -13,6 +13,7 @@ from PyQt5.QtCore import QObject
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
+import src.misc.decorators.decorators as decorators
 
 
 class RightButtons:
@@ -193,6 +194,7 @@ class RightButtons:
         if "on_page_closed" not in dir(page):
             log.debug(f"Aucune fonction \"on_page_closed\", pour la PageRB{page.index}.\n")
 
+    @decorators.QtSignal(log_level=log.Level.CRITICAL, end_process=True)
     def on_new_page_selected(self, application, engine, new_index):
         """Fonction permettant le changement de la page de paramètres active lorsqu'un bouton rb est cliqué
         Appelle aussi deux fonctions permettant le déchargement de la page actuelle et le chargement de la nouvelle page

@@ -14,6 +14,7 @@ import src.initialisation.initialisation_window as ini
 import src.misc.settings_dictionary.settings as sd
 import src.misc.translation_dictionary.translation as td
 import src.misc.log.log as log
+import src.misc.decorators.decorators as decorators
 
 
 class PageRB1:
@@ -73,7 +74,7 @@ class PageRB1:
             # Met la liste des langues dans la combo et connecte une fonction pour changer la langue
             language_combo = self.page.findChild(QObject, "language_combo")
             language_combo.setProperty("elements", language_list)
-            language_combo.selection_changed.connect(lambda: application.change_language(language_combo.property("selection_text")))
+            language_combo.selection_changed.connect(lambda: self.on_language_changed(application))
 
             # Si le premier language n'est pas le Français, traduit l'application
             if language_combo.property("selection_text").lower() != application.language.lower():
@@ -221,3 +222,15 @@ class PageRB1:
             selection_index = widget.property("selection_index")
             widget.setProperty("elements", [translation_data[e] for e in widget.property("elements").toVariant()])
             widget.change_selection(selection_index)
+
+    @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
+    def on_language_changed(self, application):
+        """Fonction permettant de changer la langue de l'application d'initialisation.
+        Permet aussi de choisir la langue pour le DMI du pupitre
+        Parameters
+        ----------
+        application: `ini.InitialisationWindow`
+            L'instance source de l'application d'initialisation, pour les widgets
+        """
+        # Appelle la fonction de changement de langue de l'application avec la nouvelle langue sélectionnée
+        application.change_language(self.page.findChild(QObject, "language_combo").property("selection_text"))

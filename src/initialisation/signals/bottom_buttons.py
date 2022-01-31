@@ -14,6 +14,7 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.settings_dictionary.settings as sd
 import src.misc.log.log as log
+import src.misc.decorators.decorators as decorators
 
 
 class BottomButtons:
@@ -46,6 +47,7 @@ class BottomButtons:
         log.info(f"Boutons inférieurs chargés en " +
                  f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\n")
 
+    @decorators.QtSignal(log_level=log.Level.CRITICAL, end_process=True)
     def on_quit_clicked(self, application):
         """Ferme la fenêtre d'initialisation
 
@@ -57,6 +59,7 @@ class BottomButtons:
         log.info(f"Fermeture de la page de paramètres page_rb{application.active_settings_page}.\n\n")
         application.app.quit()
 
+    @decorators.QtSignal(log_level=log.Level.FATAL, end_process=True)
     def on_launch_clicked(self, application):
         """Ferme la fenêtre d'initialisation et indique au programme de récupérer les données entrées
 
@@ -100,6 +103,7 @@ class BottomButtons:
                                                                application.visible_pages[non_completed_pages[0]].engine,
                                                                non_completed_pages[0] + 1)
 
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_open_clicked(self, application):
         """Fonction appelée lorsque le bouton ouvrir est cliqué.
         Permet l'ouverture d'un fichier texte et la récupération de ses paramètres.
@@ -127,6 +131,7 @@ class BottomButtons:
             # Remet le préfixe de registre de la page active
             log.change_log_prefix(f"page_rb{application.active_settings_page}")
 
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_save_clicked(self, application):
         """Fonction appelée lorsque le bouton sauvegarder est cliqué.
         Permet la sauvegarde d'un fichier avec les settings.

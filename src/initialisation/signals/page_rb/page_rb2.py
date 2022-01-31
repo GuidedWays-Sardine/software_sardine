@@ -20,6 +20,7 @@ import src.initialisation.signals.page_rb.pagerb2.complex_data as cd
 import src.misc.settings_dictionary.settings as sd
 import src.misc.translation_dictionary.translation as td
 import src.misc.log.log as log
+import src.misc.decorators.decorators as decorators
 
 
 class PageRB2:
@@ -406,6 +407,7 @@ class PageRB2:
             elif "_check" in widget_id:
                 widget.setProperty("is_checked", train_data.get_value(widget_id.rsplit("_", maxsplit=1)[0], False))
 
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_save_button_clicked(self):
         """Signal activé lorsque le bouton sauvegardé (de la page de paramètres train) est activé.
         Demande à l'utilisateur de confirmer le nom du fichier, puis le sauvegarde
@@ -427,6 +429,7 @@ class PageRB2:
             # Sauvegarde le fichier de paramètres train
             self.save_train_data_file(file_path[0])
 
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_open_button_clicked(self):
         """Signal activé lorsque le bouton ouvrir (de la page de paramètres train) est activé.
         Demande à l'utilisateur de sélectionner un fichier de paramètres du train, puis l'ouvre et change les paramètres
@@ -443,6 +446,7 @@ class PageRB2:
             # Sauvegarde le fichier de paramètres train
             self.open_train_data_file(file_path[0])
 
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_mode_switchbutton_clicked(self):
         """signal appelé lorsque le bouton du choix du mode de paramétrage est cliqué.
         S'occupe ou non d'afficher et de cacher la fenêtre de popup"""
