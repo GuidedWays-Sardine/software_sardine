@@ -93,8 +93,8 @@ class InitialisationWindow:
 
         # Si le fichier qml a été compris, récupère la fenêtre et initialise les différents boutons et pages
         self.win = self.engine.rootObjects()[0]
-        self.bottom_buttons = bb.BottomButtons(self)
         self.right_buttons = rb.RightButtons(self)
+        self.bottom_buttons = bb.BottomButtons(self)
 
         # Vérifie si un fichier de paramètres par défaut existe
         if os.path.isfile(self.default_settings_file_path):
