@@ -61,10 +61,10 @@ class BottomButtons:
             L'instance source de l'application d'initialisation, pour les widgets
         """
         # Laisse un message de registre, puis ferme la page, puis l'application
-        log.info(f"Fermeture de la page de paramètres page_rb{application.active_settings_page}.\n\n")
+        log.info(f"Fermeture de la page de paramètres page_rb{application.active_page_index}.\n\n")
 
-        if "on_page_closed" in dir(application.pages_list[application.active_settings_page - 1]):
-            application.pages_list[application.active_settings_page - 1].on_page_closed(application)
+        if "on_page_closed" in dir(application.pages_list[application.active_page_index - 1]):
+            application.pages_list[application.active_page_index - 1].on_page_closed(application)
         application.app.quit()
 
     @decorators.QtSignal(log_level=log.Level.CRITICAL, end_process=True)
@@ -88,8 +88,8 @@ class BottomButtons:
         # Vérifie que toutes les pages sont complétées
         if all(page_complete):
             # Si c'est le cas, ferme correctement la page actuelle, récupère les paramètres et lance la simulation
-            if "on_page_closed" in dir(application.pages_list[application.active_settings_page - 1]):
-                application.pages_list[application.active_settings_page - 1].on_page_closed(application)
+            if "on_page_closed" in dir(application.pages_list[application.active_page_index - 1]):
+                application.pages_list[application.active_page_index - 1].on_page_closed(application)
 
             log.change_log_prefix("Récupération des données")
             application.launch_simulator = True
@@ -128,7 +128,7 @@ class BottomButtons:
             application.set_values(data)
 
             # Remet le préfixe de registre de la page active
-            log.change_log_prefix(f"page_rb{application.active_settings_page}")
+            log.change_log_prefix(f"page_rb{application.active_page_index}")
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_save_clicked(self, application):
@@ -156,7 +156,7 @@ class BottomButtons:
             data.save(file_path[0])
 
             # Remet le préfixe de registre de la page active
-            log.change_log_prefix(f"page_rb{application.active_settings_page}")
+            log.change_log_prefix(f"page_rb{application.active_page_index}")
 
     def change_language(self, application, translation_data):
         """Permet à partir d'un dictionnaire de traduction de traduire le textes des 4 boutons inférieurs.

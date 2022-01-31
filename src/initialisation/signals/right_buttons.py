@@ -100,7 +100,7 @@ class RightButtons:
             # Si c'est la première page existante, la charge
             if application.pages_list == [None] * 8:
                 self.pages_stackview.set_active_page(engine.rootObjects()[0])
-                application.active_settings_page = index
+                application.active_page_index = index
 
             # store l'engine comme étant la page chargée
             application.pages_list[index - 1] = engine
@@ -207,30 +207,30 @@ class RightButtons:
             index de la page de paramètre à charger (de 1 à 8)
         """
         # Vérifie que la page que l'on veut charger n'est pas celle qui est déjà chargée
-        if new_index != application.active_settings_page:
+        if new_index != application.active_page_index:
             # Vérifie si la page que l'on va décharger a un protocole de déchargement spécifique
-            if "on_page_closed" in dir(application.pages_list[application.active_settings_page - 1]):
+            if "on_page_closed" in dir(application.pages_list[application.active_page_index - 1]):
                 # Si c'est le cas, appelle la fonction de fermeture de la page
                 try:
-                    application.pages_list[application.active_settings_page - 1].on_page_closed(application)
+                    application.pages_list[application.active_page_index - 1].on_page_closed(application)
                 except Exception as error:
-                    log.error(f"La fonction on_page_closed de la page_rb{application.active_settings_page} contient une erreur",
+                    log.error(f"La fonction on_page_closed de la page_rb{application.active_page_index} contient une erreur",
                               exception=error)
 
             # Indique que l'on sort de l'ancienne page, change le préfixe et indique que l'on rentre dans la nouvelle page
-            log.info(f"Fermeture de la page de paramètres page_rb{application.active_settings_page}.\n\n")
+            log.info(f"Fermeture de la page de paramètres page_rb{application.active_page_index}.\n\n")
             log.change_log_prefix(f"page_rb{new_index}")
             log.info(f"Ouverture de la page de paramètres page_rb{new_index}.\n")
 
             # Charge le graphique de la nouvelle page et indique à l'application l'index de la nouvelle page chargée
             self.pages_stackview.set_active_page(engine.rootObjects()[0])
-            application.active_settings_page = new_index
+            application.active_page_index = new_index
 
             # Vérifie si la page que l'on charge  a un protocole de chargement particulier
-            if "on_page_opened" in dir(application.pages_list[application.active_settings_page - 1]):
+            if "on_page_opened" in dir(application.pages_list[application.active_page_index - 1]):
                 # Si c'est le cas, appelle la fonction d'ouverture de la page
                 try:
-                    application.pages_list[application.active_settings_page - 1].on_page_opened(application)
+                    application.pages_list[application.active_page_index - 1].on_page_opened(application)
                 except Exception as error:
-                    log.error(f"La fonction on_page_opened de la page_rb{application.active_settings_page} contient une erreur.\n",
+                    log.error(f"La fonction on_page_opened de la page_rb{application.active_page_index} contient une erreur.\n",
                               exception=error)

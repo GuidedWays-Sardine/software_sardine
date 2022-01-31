@@ -44,7 +44,7 @@ class InitialisationWindow:
     initialisation_window_file_path = f"{PROJECT_DIR}src\\initialisation\\initialisation_window.qml"
 
     # Variable stockant l'index de la fenêtre de paramètres actuellement chargée
-    active_settings_page = None       #Stocke la page de paramètres active de 1 à 8
+    active_page_index = None       # Stocke l'index de la page de paramètres active de 1 à 8
 
     # Variable stockant si le simulateur va être lancé
     launch_simulator = False
@@ -113,7 +113,7 @@ class InitialisationWindow:
                     screen_index = default_settings["initialisation.screen_index"] - 1
 
                     # Vérifie que l'index écran est bien un index valide, sinon laisse un warning
-                    if 0 <= screen_index < len(self.screens_dimensions) :
+                    if 0 <= screen_index < len(self.screens_dimensions):
                         # Commence par calculer la taille théorique maximale selon la position de la fenêtre et la taille écran
                         max_window_size = [self.screens_dimensions[screen_index][1][0] - default_settings["initialisation.x"],
                                            self.screens_dimensions[screen_index][1][1] - default_settings["initialisation.y"]]
@@ -148,18 +148,18 @@ class InitialisationWindow:
                  f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\n")
 
         # Charge la logique de la première page de paramètres
-        if self.active_settings_page is not None:
+        if self.active_page_index is not None:
             # Dans le cas ou au moins une page a été chargée entièrement, change le préfix et appelle son ouverture
-            log.change_log_prefix(f"page_rb{self.active_settings_page}")
-            log.info(f"Ouverture de la page de paramètres page_rb{self.active_settings_page}.\n")
+            log.change_log_prefix(f"page_rb{self.active_page_index}")
+            log.info(f"Ouverture de la page de paramètres page_rb{self.active_page_index}.\n")
 
             # Appelle la fonction d'ouverture logique de la page si celle-ci existe
-            if self.pages_list[self.active_settings_page - 1] is not None and \
-                    "on_page_opened" in dir(self.pages_list[self.active_settings_page - 1]):
+            if self.pages_list[self.active_page_index - 1] is not None and \
+                    "on_page_opened" in dir(self.pages_list[self.active_page_index - 1]):
                 try:
-                    self.pages_list[self.active_settings_page - 1].on_page_opened(self)
+                    self.pages_list[self.active_page_index - 1].on_page_opened(self)
                 except Exception as error:
-                    log.error(f"La fonction on_page_opened de la page_rb{self.active_settings_page} contient une erreur.\n",
+                    log.error(f"La fonction on_page_opened de la page_rb{self.active_page_index} contient une erreur.\n",
                               exception=error)
 
         # Montre la fenêtre principale, indique que l'application doit se quitter quand celle-ci est fermée et Lance l'application
