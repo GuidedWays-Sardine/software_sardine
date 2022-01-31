@@ -1,4 +1,4 @@
-"""Module dérivé du module logging permettant de créer des fichiers de registres adapté à la simulation de SARDINE"""
+# librairies par défaut
 import os
 import logging
 import traceback
@@ -22,7 +22,7 @@ class Level(Enum):
 
 
 def initialise(path=f"{PROJECT_DIR}log\\", version=VERSION, log_level=Level.DEBUG, save=True):
-    """ crée le fichier log
+    """ initialiser un registre (console ou enregistré)
 
     Parameters
     ----------
@@ -61,7 +61,7 @@ def initialise(path=f"{PROJECT_DIR}log\\", version=VERSION, log_level=Level.DEBU
                             datefmt="%H:%M:%S",
                             format="%(asctime)s - %(levelname)s - %(message)s")
     else:
-        # Sinon change juste le niveau de debug et le format
+        # Sinon crée juste une configuration sans fichier (le registre s'affichera dans la console directement)
         logging.basicConfig(level=log_level.value,
                             datefmt="%H:%M:%S",
                             format="%(asctime)s - %(levelname)s - %(message)s")
@@ -80,24 +80,23 @@ def change_log_level(log_level):
 
 def change_log_prefix(prefix=""):
     """Permet à l'utilisateur de changer le préfix devant chaque message de registre pour mieux indiquer leur provenance
+    Celui-ci s'affichera entre crochets entre l'heure et le niveau de registre
     
     Parameters
     ----------
     prefix: `string`
         Le nouveau préfix à mettre en plus de l'heure et du niveau du registre
     """
-    # Vérifie qu'un fichier registre existe bien sinon jette l'erreur FileNotFoundError
+    # Dans le cas où aucun registre n'a été initialisé
     if not logging.getLogger().hasHandlers():
-        # Sinon crée une configuration de registre par défaut pour pouvoir afficher le message
+        # initialise un simple registre console et affiche un message de warning pour avertir de l'oubli
         logging.basicConfig(level=Level.DEBUG.value,
                             datefmt="%H:%M:%S",
                             format="%(asctime)s - %(levelname)s - %(message)s")
-        logging.warning("préfix changé sans configuration de registre initialisé précédement (log.initialise().\n")
+        logging.warning("préfix changé sans registre initialisé (log.initialise). Configuration par défaut utilisée.")
 
-    # Récupère le handler (fichier registre) à modifier
+    # Si un préfix non vide a été envoyé, l'ajoute au format du registre, sinon remet celui par défaut
     handler = logging.getLogger().handlers[0]
-
-    # Si le préfixe est vide, l'ajoute, sinon remet le logging par défaut
     if prefix != "":
         handler.setFormatter(logging.Formatter(datefmt="%H:%M:%S",
                                                fmt=f"%(asctime)s - [{prefix}] - %(levelname)s - %(message)s"))
@@ -107,7 +106,7 @@ def change_log_prefix(prefix=""):
 
 
 def log(log_level, message, exception=None, prefix=None):
-    """Permet de laisser un message de niveau log_level dans le fichier registre
+    """Permet de laisser un message de registre de niveau log_level
 
     Parameters
     ----------
@@ -116,27 +115,24 @@ def log(log_level, message, exception=None, prefix=None):
     message: `string`
         Le message à afficher dans le registre
     prefix: `string`
-        Le préfix temporaire à afficher
-    exception: Exception
-        Exception à afficher si nécessaire (pour donner plus d'indications sur la raison et l'endroit d'une erreur)
+        Le préfix temporaire (uniquement pour ce message) à utiliser
+    exception: `Exception`
+        Potentielle exception à afficher (pour donner plus d'indications sur la raison et l'endroit d'une erreur)
     """
-    # Vérifie qu'un fichier registre existe bien sinon en crée un (console)
+    # Dans le cas où aucun registre n'a été initialisé
     if not logging.getLogger().hasHandlers():
-        # Sinon crée une configuration de registre par défaut pour pouvoir afficher le message
+        # initialise un simple registre console et affiche un message de warning pour avertir de l'oubli
         logging.basicConfig(level=Level.DEBUG.value,
                             datefmt="%H:%M:%S",
                             format="%(asctime)s - %(levelname)s - %(message)s")
-        logging.warning("fonction de registre appelée sans configuration de registre initialisé (log.initialise().\n")
+        logging.warning("message laissé sans registre initialisé (log.initialise). Configuration par défaut utilisée.")
 
-    # Vérifie si un préfix temporaire a été envoyé et si oui change le préfix utilisé
+    # Vérifie si un préfix temporaire a été envoyé, si oui, enregistre le format actuel et change le préfix
     previous_format = logging.getLogger().handlers[0].formatter._fmt
     if prefix is not None:
         change_log_prefix(prefix)
 
-    # Rajoute un charactère de fin de ligne pour espace les messages s'il a été oublié
-    message += "\n" if message[-1] != "\n" else ""
-
-    # Si une erreur est ajoutée, l'ajoute au message.
+    # Dans le cas où une exception a été envoyée, l'ajoute dans le message avec une belle présentation
     if isinstance(exception, Exception):
         message += (("\n" if not message.endswith("\n") else "") + f"\tErreur de type ;{type(exception)}\n" +
                     f"\tAvec comme message d'erreur : {exception.args}\n\t" + "Traceback : \n\t" +
@@ -146,10 +142,10 @@ def log(log_level, message, exception=None, prefix=None):
     prefix_length = len(logging.getLogger().handlers[0].formatter._fmt) - 3 - 19 + len(str(log_level)) - 11
     message = re.sub("\\n[\\t]*", "\n" + " " * prefix_length, message)
 
-    # Laisse le message dans le fichier de registre de niveau debug
+    # Laisse le message fraichement créé dans le registre avec le niveau de registre demandé
     logging.log(log_level.value, message)
 
-    # Si le préfix a été changé temporairement
+    # Si le préfix a été changé temporairement, remet celui d'origine
     if prefix is not None:
         logging.getLogger().handlers[0].setFormatter(logging.Formatter(datefmt="%H:%M:%S", fmt=previous_format))
 
@@ -162,9 +158,9 @@ def debug(message, exception=None, prefix=None):
     message: `string`
         Le message à afficher dans le registre
     prefix: `string`
-        Le préfix temporaire à afficher
-    exception: Exception
-        Exception à afficher si nécessaire (pour donner plus d'indications sur la raison et l'endroit d'une erreur)
+        Le préfix temporaire (uniquement pour ce message) à utiliser
+    exception: `Exception`
+        Potentielle exception à afficher (pour donner plus d'indications sur la raison et l'endroit d'une erreur)
     """
     log(Level.DEBUG, message, exception, prefix)
 
@@ -177,9 +173,9 @@ def info(message, exception=None, prefix=None):
     message: `string`
         Le message à afficher dans le registre
     prefix: `string`
-        Le préfix temporaire à afficher
-    exception: Exception
-        Exception à afficher si nécessaire (pour donner plus d'indications sur la raison et l'endroit d'une erreur)
+        Le préfix temporaire (uniquement pour ce message) à utiliser
+    exception: `Exception`
+        Potentielle exception à afficher (pour donner plus d'indications sur la raison et l'endroit d'une erreur)
     """
     log(Level.INFO, message, exception, prefix)
 
@@ -192,9 +188,9 @@ def warning(message, exception=None, prefix=None):
     message: `string`
         Le message à afficher dans le registre
     prefix: `string`
-        Le préfix temporaire à afficher
-    exception: Exception
-        Exception à afficher si nécessaire (pour donner plus d'indications sur la raison et l'endroit d'une erreur)
+        Le préfix temporaire (uniquement pour ce message) à utiliser
+    exception: `Exception`
+        Potentielle exception à afficher (pour donner plus d'indications sur la raison et l'endroit d'une erreur)
     """
     log(Level.WARNING, message, exception, prefix)
 
@@ -207,9 +203,9 @@ def error(message, exception=None, prefix=None):
     message: `string`
         Le message à afficher dans le registre
     prefix: `string`
-        Le préfix temporaire à afficher
-    exception: Exception
-        Exception à afficher si nécessaire (pour donner plus d'indications sur la raison et l'endroit d'une erreur)
+        Le préfix temporaire (uniquement pour ce message) à utiliser
+    exception: `Exception`
+        Potentielle exception à afficher (pour donner plus d'indications sur la raison et l'endroit d'une erreur)
     """
     log(Level.ERROR, message, exception, prefix)
 
@@ -222,37 +218,38 @@ def critical(message, exception=None, prefix=None):
     message: `string`
         Le message à afficher dans le registre
     prefix: `string`
-        Le préfix temporaire à afficher
-    exception: Exception
-        Exception à afficher si nécessaire (pour donner plus d'indications sur la raison et l'endroit d'une erreur)
+        Le préfix temporaire (uniquement pour ce message) à utiliser
+    exception: `Exception`
+        Potentielle exception à afficher (pour donner plus d'indications sur la raison et l'endroit d'une erreur)
     """
     log(Level.CRITICAL, message, exception, prefix)
 
+
 def add_empty_lines(lines_count=1, log_level=Level.INFO):
-    """Fonction permettant de laisser des lignes vides dans le fichier de registre
+    """Fonction permettant de rajouter des lignes vides dans le fichier de registre
 
     Parameters
     ----------
     lines_count: `int`
         Nombre de lignes vides à ajouter dans le fichier de registre (par défaut 1)
     log_level: `Level`
-
+        Le niveau de registre à partir duquel le message doit apparaitre
     """
-    # Vérifie qu'un fichier registre existe bien en crée un (console)
+    # Dans le cas où aucun registre n'a été initialisé
     if not logging.getLogger().hasHandlers():
-        # Sinon crée une configuration de registre par défaut pour pouvoir afficher le message
+        # initialise un simple registre console et affiche un message de warning pour avertir de l'oubli
         logging.basicConfig(level=Level.DEBUG.value,
                             datefmt="%H:%M:%S",
                             format="%(asctime)s - %(levelname)s - %(message)s")
-        logging.warning("fonction de registre appelée sans configuration de registre initialisé (log.initialise().\n")
+        logging.warning("lignes sautées sans registre initialisé (log.initialise). Configuration par défaut utilisée.")
 
-    # Récupère le handler (fichier registre) à modifier
+    # Récupère le format de registe actuel et le change pour un format vide (pour écrire des lignes vides)
     handler = logging.getLogger().handlers[0]
-
     current_format = handler.formatter._fmt
     handler.setFormatter(logging.Formatter(fmt=""))
 
-    # Ne marche
+    # Ajoute autant de lignes que demandés (si la valeur est négative, une seule ligne sera sautée)
     log(log_level, "\n" * (lines_count - 1))
 
+    # Remet de nouveau le format actuel
     handler.setFormatter(logging.Formatter(datefmt="%H:%M:%S", fmt=current_format))
