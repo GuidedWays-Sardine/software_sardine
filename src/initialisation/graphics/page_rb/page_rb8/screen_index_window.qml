@@ -33,8 +33,8 @@ Window {
 
         default_x: 0
         default_y: 0
-        default_width: screen_index_window.width < 640 ? screen_index_window.width : 640        //Prise en compte des écrans aux résolutions pétés (8K)
-        default_height: screen_index_window.height < 480 ? screen_index_window.height : 480
+        default_width: screen_index_window.width
+        default_height: screen_index_window.height
 
         text: index
         font_size: 128
