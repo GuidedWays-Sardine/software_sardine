@@ -223,3 +223,32 @@ def critical(message, exception=None, prefix=None):
         Exception à afficher si nécessaire (pour donner plus d'indications sur la raison et l'endroit d'une erreur)
     """
     log(Level.CRITICAL, message, exception, prefix)
+
+def add_empty_lines(lines_count=1, log_level=Level.INFO):
+    """Fonction permettant de laisser des lignes vides dans le fichier de registre
+
+    Parameters
+    ----------
+    lines_count: `int`
+        Nombre de lignes vides à ajouter dans le fichier de registre (par défaut 1)
+    log_level: `Level`
+
+    """
+    # Vérifie qu'un fichier registre existe bien en crée un (console)
+    if not logging.getLogger().hasHandlers():
+        # Sinon crée une configuration de registre par défaut pour pouvoir afficher le message
+        logging.basicConfig(level=Level.DEBUG.value,
+                            datefmt="%H:%M:%S",
+                            format="%(asctime)s - %(levelname)s - %(message)s")
+        logging.warning("fonction de registre appelée sans configuration de registre initialisé (log.initialise().\n")
+
+    # Récupère le handler (fichier registre) à modifier
+    handler = logging.getLogger().handlers[0]
+
+    current_format = handler.formatter._fmt
+    handler.setFormatter(logging.Formatter(fmt=""))
+
+    # Ne marche
+    log(log_level, "\n" * (lines_count - 1))
+
+    handler.setFormatter(logging.Formatter(datefmt="%H:%M:%S", fmt=current_format))
