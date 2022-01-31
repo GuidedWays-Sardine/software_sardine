@@ -135,9 +135,6 @@ class PageRB8:
         # FEATURE : Ajouter les conditions dans des fonctions annexes comme ci-dessous pour les autres pages
         self.connect_page_rb1(application)
 
-        # Définit la page comme validée (toutes les valeurs par défaut suffisent)
-        application.is_completed_by_default[self.index - 1] = "is_page_valid" not in dir(self)
-
     def connect_page_rb1(self, application):
         """Fonction permettant de connecter les différents composants de la page de paramètres page_rb1 à leurs fenêtres
 

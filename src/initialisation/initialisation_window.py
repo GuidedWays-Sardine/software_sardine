@@ -33,8 +33,7 @@ class InitialisationWindow:
     # Stocke si la page est chargée et si elle est complète (pour lancer le simulateur
     visible_pages = [None] * 8     # Stocke les pages que l'utilisateur peut afficher
     is_fully_loaded = [False] * 8  # Stocke directement l'instance de la classe
-    is_completed_by_default = [False] * 8     # Détecte si la page est complété (égale à self.visible_pages si tout est complété)
-    screens_dimensions = []                   # Données sur les écrans connectés : format : [[x, y], [w, h], ...]
+    screens_dimensions = []        # Données sur les écrans connectés : format : [[x, y], [w, h], ...]
 
     # Variable stockant la langue actuelle de l'application d'initialisation
     language = "Français"

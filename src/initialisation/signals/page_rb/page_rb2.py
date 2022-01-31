@@ -114,10 +114,6 @@ class PageRB2:
         self.page.findChild(QObject, "open_button").clicked.connect(self.on_open_button_clicked)
         self.page.findChild(QObject, "save_button").clicked.connect(self.on_save_button_clicked)
 
-        # Définit la page comme validée (toutes les valeurs par défaut suffisent)
-        application.is_completed_by_default[self.index - 1] = "is_page_valid" not in dir(self)
-        # TODO : changer ce fonctionnemet
-
     def get_values(self, translation_data):
         """Récupère les paramètres de la page de paramètres page_rb1
 

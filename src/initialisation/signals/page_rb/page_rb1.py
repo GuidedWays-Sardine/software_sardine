@@ -98,9 +98,6 @@ class PageRB1:
         # Initialise la liste des niveaux de registre et l'envoie au log_switchbutton
         self.page.findChild(QObject, "log_switchbutton").setProperty("elements", list(self.log_converter))
 
-        # Définit la page comme validée (toutes les valeurs par défaut suffisent)
-        application.is_completed_by_default[self.index - 1] = "is_page_valid" not in dir(self)
-
     def get_values(self, translation_data):
         """Récupère les paramètres de la page de paramètres page_rb1
 
