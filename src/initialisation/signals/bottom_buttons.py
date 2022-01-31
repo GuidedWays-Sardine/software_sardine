@@ -36,13 +36,16 @@ class BottomButtons:
         application.win.findChild(QObject, "quit_button").clicked.connect(lambda: self.on_quit_clicked(application))
         application.win.findChild(QObject, "launch_button").clicked.connect(lambda: self.on_launch_clicked(application))
 
-        # Boutons sauvegarder/ouvrir (non obligatoire pour le lancement de l'application)
-        try:
+        # Boutons sauvegarder/ouvrir (présent uniquement si au moins une page est chargée correctement)
+        if any([page is not None and not isinstance(page, QObject) for page in application.visible_pages]):
             application.win.findChild(QObject, "open_button").clicked.connect(lambda: self.on_open_clicked(application))
             application.win.findChild(QObject, "save_button").clicked.connect(lambda: self.on_save_clicked(application))
-        except Exception as error:
-            log.warning(f"Problème lors du chargement du signal du bouton sauvegarder ou ouvrir.\n",
-                        exception=error)
+            log.info("Boutons ouvrir et fermer visibles car au moins une page de paramètres chargée entièrement.\n")
+        else:
+            # Sinon, cache les boutons
+            application.win.findChild(QObject, "open_button").setProperty("visible", False)
+            application.win.findChild(QObject, "save_button").setProperty("visible", False)
+            log.info("Boutons ouvrir et fermer cachés car aucune page de paramètres n'a été chargée entièrement.\n")
 
         log.info(f"Boutons inférieurs chargés en " +
                  f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\n")
