@@ -59,7 +59,7 @@ class BottomButtons:
         log.info(f"Fermeture de la page de paramètres page_rb{application.active_settings_page}.\n\n")
         application.app.quit()
 
-    @decorators.QtSignal(log_level=log.Level.FATAL, end_process=True)
+    @decorators.QtSignal(log_level=log.Level.CRITICAL, end_process=True)
     def on_launch_clicked(self, application):
         """Ferme la fenêtre d'initialisation et indique au programme de récupérer les données entrées
 
@@ -81,7 +81,7 @@ class BottomButtons:
         if all(page_complete):
             # Si c'est le cas, ferme correctement la page actuelle, récupère les paramètres et lance la simulation
             if "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
-                application.visible_pages[application.active_settings_page - 1].on_page_closed()
+                application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
 
             log.change_log_prefix("Récupération des données")
             application.launch_simulator = True
