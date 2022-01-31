@@ -17,6 +17,15 @@ Window {
     //Propriétés à définir lors de l'initialisation
     property int index: -1
 
+
+    //Signal permettant de faire clignoter les bordures à chaque fois que les popup apparaissent
+    onVisibleChanged: {
+        if(screen_index_window.visible) {
+            screen_index.blink()
+        }
+    }
+
+
     //Boutton inactivable contenant le numéro de la fenètre
      INI_button{
         id: screen_index
