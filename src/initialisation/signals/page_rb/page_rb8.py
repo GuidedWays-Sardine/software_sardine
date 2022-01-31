@@ -93,12 +93,15 @@ class PageRB8:
             for line in (l for l in file.readlines() if l != "\n" and l[0] != "#"):
                 # Rajoute les paramètres par défaut et crée une ligne de paramètres (incomplet par défaut)
                 info = list(map(str.strip, line.rstrip("\n").split(";")))
-                screens_default[translation_data[info[0]]] = [True,
-                                                              int(info[1]) if len(info) >= 2 else 0,
-                                                              int(info[2]) if len(info) >= 3 else 0,
-                                                              True if len(info) >= 4 and info[3].lower() == "true" else False]
-
-                screens_settings[translation_data[info[0]]] = [0, False, [0, 0], [0, 0]]
+                if len(info) >= 4:
+                    try:
+                        screens_default[translation_data[info[0]]] = [True, int(info[1]), int(info[2]), info[3].lower() == "true"]
+                        screens_settings[translation_data[info[0]]] = [0, False, [0, 0], [0, 0]]
+                    except Exception as error:
+                        # Si jamais une des données n'est pas au bon format, laisse un message d'erreur
+                        log.warning(f"Paramètres écrans au mauvais format sur la ligne :\n\t\t{line}", exception=error)
+                else:
+                    log.warning(f"Nombe d'informations fenêtres insuffisantes sur la ligne :\n\t\t{line}")
 
             # Rajouter cette série d'écran à la catégorie
             self.screen_default[translation_data[file_path.replace("_", " ")[3:-8]]] = screens_default
@@ -106,9 +109,6 @@ class PageRB8:
 
         # Définit le fonctionnement de base des boutons supérieurs et inférieurs
         if self.screen_default:
-            # Rend le texte supérieur en gris claire
-            self.page.findChild(QObject, "category_title").setProperty("is_dark_grey", False)
-
             # Change le nom de la catégorie pour la première catégorie d'écrans (pour initialiser une page)
             self.category_active = list(self.screen_default)[0]
             self.page.findChild(QObject, "category_title").setProperty("text", self.category_active)
