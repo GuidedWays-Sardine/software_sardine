@@ -24,6 +24,9 @@ class RightButtons:
     # stocke les éléments de bases des boutons de droite
     right_buttons = None
     pages_stackview = None
+    
+    # Variables stockant les chemins d'accès vers le fichiers nécessaire au fonctionnement de la structure
+    settings_page_folder_path = f"{PROJECT_DIR}src\\initialisation\\graphics\\page_rb\\"
 
     def __init__(self, application, translation_data):
         """
@@ -42,23 +45,24 @@ class RightButtons:
         self.right_buttons = application.win.findChild(QObject, "right_buttons")
         self.pages_stackview = application.win.findChild(QObject, "settings_pages")
 
+        # Commence à indiquer toutes les fenêtres qui n'ont pas de fichiers graphiques associés
         not_exist = " ; ".join(sorted({"1", "2", "3", "4", "5", "6", "7", "8"}.difference(f[7:-4]
-                                        for f in os.listdir(f"{PROJECT_DIR}src\\initialisation\\graphics\\page_rb")
+                                        for f in os.listdir(self.settings_page_folder_path)
                                         if f.startswith("page_rb") and f.endswith(".qml"))))
-
         if not_exist != "":
             log.warning(f"Les pages de paramètres : {not_exist} N'ont aucun fichier graphique(.qml) associés.\n\n")
 
         # Pour toutes les pages de paramètres ayant un ficher graphique (.qml) existant
-        for index in (int(f[7:-4]) for f in os.listdir(f"{PROJECT_DIR}src\\initialisation\\graphics\\page_rb")
-                              if f.startswith("page_rb") and f.endswith(".qml") and int(f[7:-4]) >= 1 and int(f[7:-4]) <= 8):
+        for index in (int(f[7:-4]) for f in os.listdir(self.settings_page_folder_path)
+                              if f.startswith("page_rb") and f.endswith(".qml") and (1 <= int(f[7:-4]) <= 8)):
             # Vérifie si la partie graphique de la page existe et charge la page et le bouton associé
             engine = QQmlApplicationEngine()
-            page_path = f"{PROJECT_DIR}src\\initialisation\\graphics\\page_rb\\page_rb{index}.qml"
+            page_path = f"{self.settings_page_folder_path}page_rb{index}.qml"
             engine.load(page_path)
             current_button = self.right_buttons.findChild(QObject, f"rb{index}")
 
             initial_time = time.perf_counter()
+            log.change_log_prefix(f"Initialisation page_rb{index}")
             log.info(f"Tentative du chargement de la page_rb{index}.\n")
 
             # Essaye d'initialiser la page et si elle est correctement initialisé, tente de charger les signals
@@ -69,6 +73,8 @@ class RightButtons:
                 else:
                     log.info(f"Chargement partiel (graphique uniquement) de la page_rb{index} en " +
                              f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\n")
+
+        log.change_log_prefix("Initialisation")
 
     def initialise_page(self, application, engine, index, page_path, current_button):
         """Fonction permettant d'initialiser une des pages de l'application d'initialisation lié à un bouton de droite.
