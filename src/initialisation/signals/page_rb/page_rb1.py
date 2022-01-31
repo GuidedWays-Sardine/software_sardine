@@ -38,7 +38,7 @@ class PageRB1:
     command_board_folder_path = f"{PROJECT_DIR}src\\train\\command_board"
     dmi_folder_path = f"{PROJECT_DIR}src\\train\\DMI"
 
-    def __init__(self, application, engine, index, current_button):
+    def __init__(self, application, engine, index, current_button, translation_data):
         """Fonction d'initialisation de la page de paramtètres 1 (page paramètres général)
 
         Parameters
@@ -51,6 +51,9 @@ class PageRB1:
             index de la page (1 pour le bouton d'en haut -> 8 pour le bouton d'en bas
         current_button: `QObject`
             Le bouton auquel sera relié la page (généralement d'id : page_rb + index)
+        translation_data: `td.TranslationDictionary`
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive
+            Utile pour traduire les noms de dossiers et de fenêtres sauvegardés en anglais
         """
         # Stocke les informations nécessaires au fonctionnement de la page
         self.index = index
@@ -69,20 +72,20 @@ class PageRB1:
         # Sinon lit la première ligne pour récupérer la liste des langues
         else:
             # Récupère la liste des langues (ligne 1 du fichier initialisation.lang)
+            language_combo = self.page.findChild(QObject, "language_combo")
             language_list = file.readline().rstrip('\n').split(";")
 
-            # Met la liste des langues dans la combo et connecte une fonction pour changer la langue
-            language_combo = self.page.findChild(QObject, "language_combo")
-            language_combo.setProperty("elements", language_list)
-            language_combo.selection_changed.connect(lambda: self.on_language_changed(application))
-
-            # Si le premier language n'est pas le Français, traduit l'application
-            if language_combo.property("selection_text").lower() != application.language.lower():
-                application.change_language(language_combo.property("selection_text"))
-
-        # Récupère le dictionaire Anglais -> langue principale pour traduire les répertoires des pupitres de l'anglais
-        translation_data = td.TranslationDictionary()
-        translation_data.create_translation(application.translation_file_path, "English", application.language)
+            # S'assure que le français est bien dedans, sinon c'est qu'il y a un soucis
+            if application.language.lower() in [lang.lower() for lang in language_list]:
+                # Met la liste des langues dans la combo et connecte une fonction pour changer la langue
+                language_combo.setProperty("elements", language_list)
+                language_combo.change_selection(application.language)
+                language_combo.selection_changed.connect(lambda: self.on_language_changed(application))
+            else:
+                # Sinon désactive la combobox et laisse un message de warning
+                language_combo.setProperty("is_activable", False)
+                log.warning(f"La langue : {application.language} n'est' pas dans la liste de langue : {language_list}" +
+                            f"du fichier : {application.translation_file_path}")
 
         # Charge tous les dossiers dans src.train.command_board, les traduits et les indiques comme potentiels pupitres
         command_boards = [translation_data[f.replace("_", " ")] for f in os.listdir(self.command_board_folder_path)

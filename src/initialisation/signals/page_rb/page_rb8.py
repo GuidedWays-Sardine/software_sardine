@@ -42,7 +42,7 @@ class PageRB8:
     screen_index_file_path = f"{PROJECT_DIR}src\\initialisation\\graphics\\page_rb\\page_rb8\\screen_index_window.qml"
     screen_settings_folder_path = f"{PROJECT_DIR}settings\\screen_settings\\"
 
-    def __init__(self, application, engine, index, current_button):
+    def __init__(self, application, engine, index, current_button, translation_data):
         """Fonction d'initialisation de la page de paramtètres 1 (page paramètres général)
 
         Parameters
@@ -55,6 +55,9 @@ class PageRB8:
             index de la page (1 pour le bouton d'en haut -> 8 pour le bouton d'en bas
         current_button: `QObject`
             Le bouton auquel sera relié la page (généralement d'id : page_rb + index)
+        translation_data: `td.TranslationDictionary`
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive
+            Utile pour traduire les noms de dossiers et de fenêtres sauvegardés en anglais
         """
         # Stocke les informations nécessaires au fonctionnement de la page
         self.index = index
@@ -78,11 +81,6 @@ class PageRB8:
 
         # Envoie la dimension des fenêtre à la partie graphique de la page
         self.page.setProperty("screens_size", [sd[1] for sd in application.screens_dimensions])
-
-        # Charge la traduction pour le nom des fichiers et des catégories (Anglais -> langue actuelle)
-        translation_data = td.TranslationDictionary()
-        translation_data.create_translation(application.translation_file_path,
-                                            "English", application.language)
 
         # Pour chacun des fichiers dans le répertoire de paramètres d'écrans
         for file_path in (f for f in os.listdir(self.screen_settings_folder_path) if f.endswith(".screens")):

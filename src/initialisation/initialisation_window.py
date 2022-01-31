@@ -90,10 +90,13 @@ class InitialisationWindow:
         elif not self.engine.rootObjects() and os.path.isfile(self.initialisation_window_file_path):
             raise SyntaxError(f"Le fichier .qml pour la fenêtre d\'initialisation contient des erreurs.\n\t\t" +
                               self.initialisation_window_file_path)
+        else:
+            self.win = self.engine.rootObjects()[0]
 
-        # Si le fichier qml a été compris, récupère la fenêtre et initialise les différents boutons et pages
-        self.win = self.engine.rootObjects()[0]
-        self.right_buttons = rb.RightButtons(self)
+        # Charge la traduction Anglais -> langue actuel (Français) et charge les pages de paramètres et les boutons.
+        translation_data = td.TranslationDictionary()
+        translation_data.create_translation(self.translation_file_path, "English", self.language)
+        self.right_buttons = rb.RightButtons(self, translation_data)
         self.bottom_buttons = bb.BottomButtons(self)
 
         # Vérifie si un fichier de paramètres par défaut existe

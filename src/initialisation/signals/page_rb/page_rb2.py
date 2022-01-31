@@ -50,7 +50,7 @@ class PageRB2:
     brake_popup = None
     # FEATURE : ajouter la classe les import et les fichiers graphiques et logiques nécessaires
 
-    def __init__(self, application, engine, index, current_button):
+    def __init__(self, application, engine, index, current_button, translation_data):
         """Fonction d'initialisation de la page de paramtètres 2 (page paramètres train)
 
         Parameters
@@ -63,6 +63,9 @@ class PageRB2:
             index de la page (1 pour le bouton d'en haut -> 8 pour le bouton d'en bas
         current_button: `QObject`
             Le bouton auquel sera relié la page (généralement d'id : page_rb + index)
+        translation_data: `td.TranslationDictionary`
+            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive
+            Utile pour traduire les noms de dossiers et de fenêtres sauvegardés en anglais
         """
         # Stocke les informations nécessaires au fonctionnement de la page
         self.index = index
