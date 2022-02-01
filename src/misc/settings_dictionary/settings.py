@@ -30,7 +30,7 @@ class SettingsDictionary(dict):
         if isinstance(key, str):
             super(SettingsDictionary, self).__setitem__(key.lower().replace(";", " "), value)
         else:
-            log.debug(f"la clé : {key}, n'est pas de type string : {type(key)}.\n")
+            log.debug(f"la clé : {key}, n'est pas de type string : {type(key)}.")
 
     def __getitem__(self, key):
         """Opérateur value = self["key"] permettant de lire des valeurs du dictionnaire de paramètres
@@ -70,7 +70,7 @@ class SettingsDictionary(dict):
         try:
             return self[key]
         except KeyError:
-            log.debug(f"Aucun paramètre \"{key.lower()}\" dans le dictionnaire de paramètres ouvert.\n")
+            log.debug(f"Aucun paramètre \"{key.lower()}\" dans le dictionnaire de paramètres ouvert.")
             return default
 
     def update_parameter(self, page, widget_id, property, key):
@@ -91,58 +91,65 @@ class SettingsDictionary(dict):
             page.findChild(QObject, widget_id).setProperty(property, self[key])
         except KeyError:
             log.debug(f"Impossible de changer le paramètre : {property} du composant {widget_id}\n" +
-                      f"\t\tPas de valeurs pour le paramètre : {key} dans le fichier ouvert.\n")
+                      f"\t\tPas de valeurs pour le paramètre : \"{key}\" dans le fichier ouvert.")
 
-    def save(self, path):
+    def save(self, file_path, delimiter=";"):
         """Méthode permettant de sauvegarder les paramètres dans un fichier
 
         Parameters
         ----------
-        path: `string`
+        file_path: `string`
+            Chemin d'accès vers le fichier de paramètres (celui-ci sera écrasé)
+        delimiter: `str`
+            délimiteur séparant les différentes traductions ";" par défaut
         """
         try:
             # Essaye de créer (ou d'écraser) le fichier avec les paramètres actuels
-            with open(path, "w", encoding="utf-8-sig") as file:
+            with open(file_path, "w", encoding="utf-8-sig") as file:
                 # Ecrit chacune des clés à l'intérieur séparé par le délimiteur
                 for key in self.keys():
-                    file.write(f"{key};{self[key]}\n")
+                    file.write(f"{key}{delimiter}{self[key]}\n")
         except Exception as error:
             # Cas où le fichier ouvert n'est pas accessible
-            log.warning(f"Impossible d'enregistrer le fichier : {path}\n",
-                        exception=error, prefix="dictionaire de données")
+            log.warning(f"Impossible d'enregistrer le fichier : {file_path}",
+                        exception=error, prefix="Sauvegarde des données")
+        else:
+            log.info(f"Enregistrement de {len(self)} données dans : {file_path}")
 
-    def open(self, path):
+    def open(self, file_path, delimiter=";"):
         """Méthode permettant d'ouvrir un fichier de paramètres et de rajouter les paramètres au dictionnaire
 
         Parameters
         ----------
-        path: `string`
-            chemin d'accès vers le fichier de paramètres à ouvrir et lire
+        file_path: `string`
+            chemin d'accès vers le fichier de paramètres
+        delimiter: `str`
+            délimiteur séparant les différentes traductions ";" par défaut
         """
         # Récupère la longueur actuelle
         current_length = len(self)
 
         try:
             # Essaye d'ouvrir le fichier avec les paramètres
-            with open(path, "r", encoding="utf-8-sig") as file:
+            with open(file_path, "r", encoding="utf-8-sig") as file:
                 # Si le fichier est ouvert, récupère chaque lignes de celui-ci
                 for line in file:
                     # Si la ligne ne contient pas le délimiteur (ici ;) l'indique dans les logs et saute la ligne
-                    if ";" not in line:
-                        log.debug("Ligne sautée. Délimiteur \";\" manquant dans la ligne : {line} \n",
-                                  prefix="dictionaire de données")
-                    else:
+                    if delimiter in line:
                         # Récupère les deux éléments de la ligne et les ajoutent comme clé et valeur
-                        line = list(map(str.strip, line.rstrip('\n').split(";")))
+                        line = list(map(str.strip, line.rstrip('\n').split(delimiter, maxsplit=1)))
                         self[line[0]] = SettingsDictionary.convert_type(line[1])
+                    else:
+                        log.debug(f"Ligne sautée. Délimiteur \"{delimiter}\" manquant dans la ligne : {line}",
+                                  prefix="Lecture des données")
 
         except Exception as error:
             # Cas où le fichier ouvert n'existe pas ou qu'il n'est pas accessible
-            log.warning(f"Impossible d'ouvrir le fichier : {path}\n",
-                        exception=error, prefix="dictionaire de données")
+            log.warning(f"Impossible d'ouvrir le fichier : {file_path}",
+                        exception=error, prefix="Lecture des données")
         else:
             # Indique en debug le nombre d'éléments récupérés
-            log.debug(f"{len(self) - current_length} éléments récupérés dans : {path}\n",
+            log.debug(f"{len(self) - current_length} nouveaux éléments récupérés dans : {file_path}",
                       prefix="dictionaire de traduction")
 
     @staticmethod
