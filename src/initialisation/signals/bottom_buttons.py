@@ -1,7 +1,6 @@
 # Librairies par défaut
 import os
 import sys
-import traceback
 import time
 
 
@@ -11,10 +10,12 @@ from PyQt5.QtWidgets import QFileDialog
 
 
 # Librairies SARDINE
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src\\")[0]
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.settings_dictionary.settings as sd
 import src.misc.log.log as log
+import src.misc.decorators.decorators as decorators
+import src.initialisation.initialisation_window as ini
 
 
 class BottomButtons:
@@ -26,101 +27,95 @@ class BottomButtons:
 
         Parameters
         ----------
-        application: `InitialisationWindow`
+        application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
-        initial_time = time.time()
-        log.info("Tentative de chargement des boutons inférieurs.\n")
+        initial_time = time.perf_counter()
+        log.info("Chargement des boutons inférieurs.")
 
         # Boutons quitter/lancer (obligatoires pour le lancement de l'application)
-        application.win.findChild(QObject, "quit").clicked.connect(lambda: self.on_quit_clicked(application))
-        application.win.findChild(QObject, "launch").clicked.connect(lambda: self.on_launch_clicked(application))
+        application.win.findChild(QObject, "quit_button").clicked.connect(lambda: self.on_quit_clicked(application))
+        application.win.findChild(QObject, "launch_button").clicked.connect(lambda: self.on_launch_clicked(application))
 
-        # Boutons sauvegarder/ouvrir (non obligatoire pour le lancement de l'application)
-        try:
-            application.win.findChild(QObject, "open").clicked.connect(lambda: self.on_open_clicked(application))
-            application.win.findChild(QObject, "save").clicked.connect(lambda: self.on_save_clicked(application))
-        except Exception as error:
-            log.warning("Problème lors du chargement du signal du bouton sauvegarder ou ouvrir.\n\t" +
-                        "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                        "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
-                        "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+        # Boutons sauvegarder/ouvrir (présent uniquement si au moins une page est chargée correctement)
+        if any([page is not None and not isinstance(page, QObject) for page in application.pages_list]):
+            application.win.findChild(QObject, "open_button").clicked.connect(lambda: self.on_open_clicked(application))
+            application.win.findChild(QObject, "save_button").clicked.connect(lambda: self.on_save_clicked(application))
+            log.info("Boutons ouvrir et fermer visibles car au moins une page de paramètres chargée entièrement.")
+        else:
+            # Sinon, cache les boutons
+            application.win.findChild(QObject, "open_button").setProperty("visible", False)
+            application.win.findChild(QObject, "save_button").setProperty("visible", False)
+            log.info("Boutons ouvrir et fermer cachés car aucune page de paramètres n'a été chargée entièrement.")
 
-        log.info("Boutons inférieurs chargés en " +
-                 str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n\n")
+        log.info(f"Boutons inférieurs chargés en " +
+                 f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n")
 
+    @decorators.QtSignal(log_level=log.Level.CRITICAL, end_process=True)
     def on_quit_clicked(self, application):
         """Ferme la fenêtre d'initialisation
 
         Parameters
         ----------
-        application: `InitialisationWindow`
+        application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets
         """
-        log.info("Fermeture de la page de paramètres page_rb" + str(application.active_settings_page) + ".\n\n")
+        # ferme la page puis l'application
+        if "on_page_closed" in dir(application.pages_list[application.active_page_index - 1]):
+            application.pages_list[application.active_page_index - 1].on_page_closed(application)
+        log.info(f"Fermeture de la page de paramètres page_rb{application.active_page_index}.\n")
+        log.change_log_prefix("")
         application.app.quit()
 
+    @decorators.QtSignal(log_level=log.Level.CRITICAL, end_process=True)
     def on_launch_clicked(self, application):
         """Ferme la fenêtre d'initialisation et indique au programme de récupérer les données entrées
 
         Parameters
         ----------
-        application: `InitialisationWindow`
+        application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets
         """
-        try:
-            # Vérifie si toutes les pages sont complètes et stocke les pages qui ne sont pas complétées
-            non_completed_pages = list(i for i in range(0, 8)
-                                       if application.is_completed_by_default[i] != application.is_fully_loaded[i]
-                                       and not application.visible_pages[i].is_page_valid())
-        except Exception as error:
-            # Si une erreur a été détectée dans une des fonction de validation, l'indique et ne complète pas l'initialisation
-            log.warning("Erreur lors de la validation d'une des pages de paramètres : "
-                        "\n\t\tErreur de type : " + str(type(error)) + "\n\t\t" +
-                        "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
-                        "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+        # Récupère la liste des pages complétées ou non. Une page est compléte si :
+        # - la page n'a pas de partie logique (elle sera donc de type QObject ou None)
+        # - la page a une partie logique mais pas de fonctions "is_page_valid"
+        # - la page a une partie logique et la fonbction is_page_valid retourne true
+        page_complete = [(page is None or isinstance(page, QObject)) or
+                         ("is_page_valid" not in dir(page)) or
+                         (page.is_page_valid())
+                         for page in application.pages_list]
+
+        # Vérifie que toutes les pages sont complétées
+        if all(page_complete):
+            # Si c'est le cas, ferme correctement la page actuelle, récupère les paramètres et lance la simulation
+            if "on_page_closed" in dir(application.pages_list[application.active_page_index - 1]):
+                application.pages_list[application.active_page_index - 1].on_page_closed(application)
+            log.info(f"Fermeture de la page de paramètres page_rb{application.active_page_index}.\n")
+
+            log.change_log_prefix("Récupération des données")
+            application.launch_simulator = True
+            application.app.quit()
         else:
-            # Dans le cas où toutes les pages ont été vérifiées avec succès
-            if not non_completed_pages:
-                # Dans le cas où aucune page est incomplète (et donc que toutes les pages sont complètes)
-                if "on_page_closed" in dir(application.visible_pages[application.active_settings_page - 1]):
-                    try:
-                        # Appelle la fonction de fermeture de page (si celle-ci existe)
-                        application.visible_pages[application.active_settings_page - 1].on_page_closed(application)
-                    except Exception as error:
-                        # Si la fonction de fermeture de page contient une erreur, l'indique
-                        log.error("La fonction on_page_closed de la page " + str(application.active_settings_page) +
-                                  " contient une erreur\n\t\t" +
-                                  "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                                  "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
-                                  "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+            # Sinon récupère les pages non complètes, laisse un message de registre et se met sur la page non complétée
+            non_completed_pages = [index for index, completed in enumerate(page_complete) if not completed]
+            log.debug(f"Pages de paramètres : {' ; '.join([str(n + 1) for n in non_completed_pages])} non complétés.")
+            application.right_buttons.on_new_page_selected(application,
+                                                           application.pages_list[non_completed_pages[0]].engine,
+                                                           non_completed_pages[0] + 1)
 
-                # Indique que le simulateur va être lancée et ferme l'application (les données seront alors récupérées
-                log.change_log_prefix("Récupération des données")
-                application.launch_simulator = True
-                application.app.quit()
-            else:
-                # Si toutes les pages ne sont pas complétées, indique en niveau debug les pages qui ne le sont pas
-                for index in non_completed_pages:
-                    log.debug("Page de paramètres " + str(index + 1) + " n'est pas complète.\n")
-
-                # Et change la page de paramètres active sur la première page non complète
-                application.right_buttons.on_new_page_selected(application,
-                                                               application.visible_pages[non_completed_pages[0]].engine,
-                                                               non_completed_pages[0] + 1)
-
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_open_clicked(self, application):
         """Fonction appelée lorsque le bouton ouvrir est cliqué.
         Permet l'ouverture d'un fichier texte et la récupération de ses paramètres.
 
         Parameters
         ----------
-        application: `InitialisationWindow`
+        application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets
         """
         # Ouvre la fenêtre d'ouverture de fichier pour sélectionner le fichier à ouvrir
         file_path = QFileDialog.getOpenFileName(caption="Ouvrir un fichier de configuration",
-                                                directory=PROJECT_DIR + "settings\\general_settings",
+                                                directory=f"{PROJECT_DIR}settings\\general_settings",
                                                 filter="Fichiers de configuration Sardine (*.settings)")
 
         # Si un fichier a bien été sélectionné
@@ -129,25 +124,26 @@ class BottomButtons:
             log.change_log_prefix("Changement des données")
 
             #Récupère les données dans le fichier sélectionné et les envoies à set_values
-            data = sd.SettingsDictionnary()
+            data = sd.SettingsDictionary()
             data.open(file_path[0])
             application.set_values(data)
 
             # Remet le préfixe de registre de la page active
-            log.change_log_prefix("page_rb" + str(application.active_settings_page) + "")
+            log.change_log_prefix(f"page_rb{application.active_page_index}")
 
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_save_clicked(self, application):
         """Fonction appelée lorsque le bouton sauvegarder est cliqué.
         Permet la sauvegarde d'un fichier avec les settings.
 
         Parameters
         ----------
-        application: `InitialisationWindow`
+        application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets
         """
         # Ouvre la fenêtre de sauvegarde et enregegistre le fichier si un nom a été donné
         file_path = QFileDialog.getSaveFileName(caption="Sauvegarder un fichier de configuration",
-                                                directory=PROJECT_DIR + "settings\\general_settings",
+                                                directory=f"{PROJECT_DIR}settings\\general_settings",
                                                 filter="Fichiers de configuration Sardine (*.settings)")
 
         # Si un fichier a bien été sélectionné
@@ -156,12 +152,12 @@ class BottomButtons:
             log.change_log_prefix("Sauvegarde des données")
 
             # Récupère les paramètres de l'application d'initialisation, les stockes et les enregistres dans le fichier
-            data = sd.SettingsDictionnary()
+            data = sd.SettingsDictionary()
             data.update(application.get_values())
             data.save(file_path[0])
 
             # Remet le préfixe de registre de la page active
-            log.change_log_prefix("page_rb" + str(application.active_settings_page))
+            log.change_log_prefix(f"page_rb{application.active_page_index}")
 
     def change_language(self, application, translation_data):
         """Permet à partir d'un dictionnaire de traduction de traduire le textes des 4 boutons inférieurs.
@@ -174,7 +170,7 @@ class BottomButtons:
             dictionaire contenant les traductions
         """
         # Pour chaque boutons : récupère le texte, prend sa traduction dans translation_data et change son texte
-        for button_id in ["quit", "launch", "open", "save"]:
+        for button_id in ["quit_button", "launch_button", "open_button", "save_button"]:
             # Récupère le bouton associé à l'id et change son texte
             button = application.win.findChild(QObject, button_id)
             button.setProperty("text", translation_data[button.property("text")])

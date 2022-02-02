@@ -2,7 +2,6 @@
 import sys
 import os
 import threading
-import traceback
 import time
 
 
@@ -33,7 +32,7 @@ class Simulation:
 
     # Informations sur la mise à jour, utile surtout du point de vue pratique et debug
     update_count = 0
-    update_average_time = 0
+    update_average_time = 0     # s
 
     #Différentes bases de données utiles au fonctionnement du simulateur
     train_database = None
@@ -50,7 +49,7 @@ class Simulation:
         ----------
         app: `QApplication`
             L'application sur laquelle les modules graphiques de la simulation vont se lancer
-        data: `sd.SettingsDictionnary`
+        data: `sd.SettingsDictionary`
 
         Raises
         ------
@@ -60,7 +59,7 @@ class Simulation:
             Soulevée lorsqu'une des fonctions d'initialisation, de lancement ou de mise à jour contient une erreur
         """
         # Indique le début de l'initialisation de la simulation
-        initial_time = time.time()
+        initial_time = time.perf_counter()
         log.change_log_prefix("initialisation simulation")
         log.info("Début de l'initialisation de la simulation.\n\n")
 
@@ -74,9 +73,8 @@ class Simulation:
         self.initialise_off_screens()
 
         # A partir d'ici initialise tous les modules un par un (ils seront lancées dans la fonction run())
-        # FEATURE : appeler les différentes fonctions d'initialisation de modules ici
-        self.initialise_dmi()
-        self.initialise_command_board()
+        # FEATURE : appeler les différentes fonctions d'initialisation de modules
+        self.initialise_dmi()  # Initialisation du DMI
 
         # Si aucun module de simulation n'a été lancé
         if not self.components:
@@ -84,8 +82,8 @@ class Simulation:
 
         # Indique le temps de chargement de la simulation avant de lancer tous les modules
         log.change_log_prefix("initialisation simulation")
-        log.info("Simulation (" + str(len(self.components)) + " modules) initialisés en " +
-                 str("{:.2f}".format((time.time() - initial_time) * 1000)) + " millisecondes.\n\n")
+        log.info(f"Simulation ({len(self.components)} modules) initialisés en " +
+                 f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n\n")
 
     def run(self):
         """Lance tous les modules initialisés.
@@ -98,7 +96,7 @@ class Simulation:
             Soulevée dans le cas où la fonction run() d'un des modules contient une erreur
         """
         # Indique le début de l'initialisation de la simulation
-        initial_time = time.time()
+        initial_time = time.perf_counter()
         log.change_log_prefix("lancement simulation")
         log.info("Début du lancement de la simulation.\n\n")
 
@@ -106,12 +104,13 @@ class Simulation:
         self.run_off_screens()
 
         # Lance tous les modules en appelant la fonction run()
+        # Chaque module doit avoir une fonction run() sinon la simulation ne se lance pas
         for module in self.components:
             self.components[module].run()
 
         # Indique le temps de lancement de l'application (celui-ci doit être le plus court possible)
-        log.info("Lancements des modules de simulation en " +
-                 str("{:.2f}".format((time.time() - initial_time) * 1000)) + " millisecondes.\n\t\t")
+        log.info(f"Lancements des modules de simulation en " +
+                 f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n")
 
         # Lance le thread pour mettre à jour constament la simulation et lance la partié graphique
         update = threading.Thread(target=self.update)
@@ -128,7 +127,7 @@ class Simulation:
         try:
             while self.running:
                 # Récupère le temps du début de la mise à jour (à pure titre de debug)
-                update_initial_time = time.time()
+                update_initial_time = time.perf_counter()
 
                 # Mets à jour tous les modules dans un ordre logique
                 # FEATURE appeler toutes les fonctions update des modules dans un ordre logique
@@ -136,7 +135,7 @@ class Simulation:
                     self.components["dmi"].update()
 
                 # Récupère le temps nécessaire à la mise à jour
-                update_time = time.time() - update_initial_time
+                update_time = time.perf_counter() - update_initial_time
 
                 # Mets à jour le tempos moyen des mises à jours ainsi que le nombre de mises à jours réussies
                 self.update_average_time = (self.update_average_time * self.update_count + update_time) / (self.update_count + 1)
@@ -150,9 +149,9 @@ class Simulation:
                         time.sleep(self.DELAY - update_time)
                     else:
                         # Sinon laisse un message de debug pour inciter à l'optimisation du code ou au changement du délai
-                        log.debug("Attention mise à jour de l'application en " + "{:.2f}".format(update_time * 1000) +
-                                  "ms, au lieu des " + "{:.2f}".format(self.DELAY * 1000) + "ms demandés.\n\t\t" +
-                                  "Prévoir une optimisation du code ou un délai plus long si le soucis persiste.\n",
+                        log.debug(f"Attention mise à jour de l'application en {(update_time * 1000):.2f} millisecondes" +
+                                  f"ms, au lieu des {(self.DELAY * 1000):.2f} millisecondes demandées.\n" +
+                                  "\t\tPrévoir une optimisation du code ou un délai plus long si le soucis persiste.\n",
                                   prefix="simulation : update()")
 
         except Exception as error:
@@ -163,20 +162,19 @@ class Simulation:
     def stop(self):
         """Fonction de fermeture de la simulation, permet d'arrêter correctement la simulation"""
         # Indique le début de la fermeture de la simulation dans les logs
-        initial_time = time.time()
+        initial_time = time.perf_counter()
         log.change_log_prefix("fermeture simulation")
         log.info("Fermeture de l'initialisation de la simulation.\n\n")
 
         # Indique le nombre de mises à jours réussies et le temps moyen de mise à jour
-        log.info("Simulation mises à jour " + str(self.update_count) + " avec un temps moyen de " + str(self.update_average_time) + ".\n")
+        log.info(f"Simulation mises à jour {self.update_count} fois avec un temps moyen de {(self.update_average_time * 1000):.2f} millisecondes.\n")
 
         # Appelle les différentes fonctions de fermetures
         # FEATURE : ajouter les différents appels de fonctions de fermetures ici
-        if "command_board" in self.components:
-            self.components["command_board"].stop()
 
         # Indique le temps nécessaire à la fermeture
-        log.info("Simulation terminée en " + str("{:.2f}".format((time.time() - initial_time) * 1000)) + " millisecondes.\n\n")
+        log.info(f"Simulation fermée correctement en : " +
+                 f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n\n")
 
     def initialise_dmi(self):
         """Fonction permettant d'initialiser le DMI.
@@ -190,8 +188,8 @@ class Simulation:
         """
         try:
             # Importe le module du DMI, essaye de l'initialiser et l'ajouter aux "components" (modules) initialisés
-            exec("import src.train.DMI." + str(self.parameters["dmi"]) + ".dmi as DMI\n" +
-                 "self.components[\"dmi\"] = DMI.DriverMachineInterface(self)")
+            exec(f"import src.train.DMI.{self.parameters['dmi']}.dmi as DMI\n" +
+                 f"self.components[\"dmi\"] = DMI.DriverMachineInterface(self)")
         except KeyError:
             # Dans le cas où le DMI n'a pas été trouvé, crash si le dmi est obligatoire, laisse un message d'erreur sinon
             if self.parameters["sardine simulator.central dmi.mandatory"]:
@@ -203,22 +201,8 @@ class Simulation:
             if self.parameters["sardine simulator.central dmi.mandatory"]:
                 raise
             else:
-                log.error("Impossible de charger le DMI : " + self.parameters["dmi"] + ". Aucun DMI ne sera chargé.\n\t\t" +
-                          "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                          "Avec comme message d\'erreur : " + str(error.args) + "\n\n\t\t" +
-                          "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
-                          prefix="initialisation simulation")
-
-    def initialise_command_board(self):
-        """Permet d'initialiser le pupitre de commande"""
-        try:
-            # Importe le module du pupitre, essaye de l'initialiser et l'ajouter aux "components" (modules) initialisés
-            exec("import src.train.command_board." + str(self.parameters["command_board"]) + ".command_board as cb\n" +
-                 "self.components[\"command_board\"] = cb.CommandBoard(self.app)")
-        except KeyError:
-            # Dans le cas où le pupitre n'a pas été trouvé, crash en indiquant que le paramètre n'existe pas
-            raise ModuleNotFoundError("Le paramètre \"command_board\" n'existe pas alors qu'il est obligatoire.\n")
-        # Dans le cas où l'initialisation contient une erreur, rejette juste l'erreur
+                log.error(f"Impossible de charger le DMI : {self.parameters['dmi']}. Aucun DMI ne sera chargé.\n",
+                          exception=error, prefix="initialisation simulation")
 
     def initialise_off_screens(self):
         """Permet d'initialiser toutes les fenêtres d'immersions (fenêtres noires en plein écran).
@@ -231,10 +215,10 @@ class Simulation:
                 exception_list = []
 
                 # Vérifie pour chaque exception si elle existe et où elle se situe
-                # FEATURE : indiquer ici les potentielles exceptions sur les fenêtre nécessitant une autre application
+                # FEATURE : indiquer ici les potentielles exceptions sur les fenêtres nécessitant une autre application
                 try:
                     # Vérification pour la ligne virtuelle (sur UE5)
-                    if self.parameters["sardine simulator.virtual line (ue5).screen_index"] != 0:
+                    if self.parameters["sardine simulator.virtual line (ue5).screen_index"]:
                         exception_list.append(self.parameters["sardine simulator.virtual line (ue5).screen_index"] - 1)
                 except KeyError:
                     pass

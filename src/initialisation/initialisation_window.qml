@@ -9,7 +9,7 @@ Window {
     id: window
     minimumWidth: 640
     minimumHeight: 480
-    visible: true
+    visible: false
     color: "#031122"
     title: "Initialisation Sardine"
 
@@ -27,6 +27,11 @@ Window {
     INI_stackview{
         id: settings_pages
         objectName: "settings_pages"
+
+        default_x: 0
+        default_y: 15
+        default_width: 580
+        default_height: 400
     }
 
     //stoque tous les boutons à droite de la page et affichant les différentes pages de settings

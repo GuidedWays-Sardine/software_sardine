@@ -1,7 +1,7 @@
 # Librairies par défaut
 import sys
 import os
-import traceback
+from typing import Union
 
 
 # Librairies graphiques
@@ -14,17 +14,67 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
 
 
-class SettingsDictionnary(dict):
+class SettingsDictionary(dict):
     """Classe permettant de convertir un fichier de paramètres en un dictionnaire fonctionnel"""
 
     def __setitem__(self, key, value):
-        super(SettingsDictionnary, self).__setitem__(key.lower(), value)
+        """Opérateur self["key"] = value permettant de rajouter des valeurs dans le dictionnaire de paramètres
+
+        Parameters
+        ----------
+        key: `str`
+            Nom du paramètre (non sensible aux minuscules et aux majuscules)
+        value: `Any`
+            Sa valeur
+        """
+        if isinstance(key, str):
+            super(SettingsDictionary, self).__setitem__(key.lower().replace(";", " "), value)
+        else:
+            log.debug(f"la clé : {key}, n'est pas de type string : {type(key)}.")
 
     def __getitem__(self, key):
-        return super(SettingsDictionnary, self).__getitem__(key.lower())
+        """Opérateur value = self["key"] permettant de lire des valeurs du dictionnaire de paramètres
+
+        Parameters
+        ----------
+        key : `str`
+            Nom du paramètre (non sensible aux minuscules et aux majuscules)
+
+        Returns
+        -------
+        value: `Any`
+            Sa valeur associée (si elle existe)
+
+        Raises
+        ------
+        KeyError :
+            Jetté si la clé n'a pas de valeur associée
+        """
+        return super(SettingsDictionary, self).__getitem__(key.lower())
+
+    def get_value(self, key, default=None):
+        """Méthode pour récupérer une valeur à partir de sa clé, et de mettre un message dans le registre s'il n'existe pas
+
+        Parameters
+        ----------
+        key: `string`
+            La clé à vérifier (la valeur associée à la clé sera retournée si elle existe
+        default: `Any`
+            La valeur à retourner si la clé n'a pas de valeurs associés (pour une facilité de lecture du code).
+
+        Returns
+        -------
+        value: `Any`
+            La valeur associée à la clé (si elle existe dans le dictionnaire) sinon la valeur par défaut
+        """
+        try:
+            return self[key]
+        except KeyError:
+            log.debug(f"Aucun paramètre \"{key.lower()}\" dans le dictionnaire de paramètres ouvert.")
+            return default
 
     def update_parameter(self, page, widget_id, property, key):
-        """Structure pour mettre à jour une propriété.
+        """Méthode pour mettre à jour une propriété d'un composant qml à partir de son ID et de la propriété.
 
         Parameters
         ----------
@@ -40,89 +90,98 @@ class SettingsDictionnary(dict):
         try:
             page.findChild(QObject, widget_id).setProperty(property, self[key])
         except KeyError:
-            log.debug("Impossible de changer le paramètre : " + property + " du composant" + widget_id + ".\n\t\t" +
-                      "Pas de valeurs pour le paramètre : " + key + " dans le fichier ouvert.\n")
+            log.debug(f"Impossible de changer le paramètre : {property} du composant {widget_id}\n" +
+                      f"\t\tPas de valeurs pour le paramètre : \"{key}\" dans le fichier ouvert.")
 
-    def save(self, file_path):
+    def save(self, file_path, delimiter=";"):
         """Méthode permettant de sauvegarder les paramètres dans un fichier
 
         Parameters
         ----------
         file_path: `string`
+            Chemin d'accès vers le fichier de paramètres (celui-ci sera écrasé)
+        delimiter: `str`
+            délimiteur séparant les différentes paramètres ";" par défaut
         """
         try:
             # Essaye de créer (ou d'écraser) le fichier avec les paramètres actuels
-            file = open(file_path, "w", encoding="utf-8-sig")
+            with open(file_path, "w", encoding="utf-8-sig") as file:
+                # Ecrit chacune des clés à l'intérieur séparé par le délimiteur
+                for key in self.keys():
+                    file.write(f"{key}{delimiter}{self[key]}\n")
         except Exception as error:
             # Cas où le fichier ouvert n'est pas accessible
-            log.warning("Impossible d'enregistrer le fichier :\n\t\t" + str(file_path + "\n") +
-                        "\n\t\tErreur de type : " + str(type(error)) +
-                        "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
-                        "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
-                        prefix="dictionaire de données")
+            log.warning(f"Impossible d'enregistrer le fichier : {file_path}",
+                        exception=error, prefix="Sauvegarde des données")
         else:
-            for key in self.keys():
-                file.write(str(key) + ";" + str(self[key]) + "\n")
+            log.info(f"Enregistrement de {len(self)} données dans : {file_path}")
 
-            # Ferme le fichier
-            file.close()
-
-    def open(self, file_path):
+    def open(self, file_path, delimiter=";"):
         """Méthode permettant d'ouvrir un fichier de paramètres et de rajouter les paramètres au dictionnaire
 
         Parameters
         ----------
         file_path: `string`
-            chemin d'accès vers le fichier de paramètres à ouvrir et lire
+            chemin d'accès vers le fichier de paramètres
+        delimiter: `str`
+            délimiteur séparant les différentes paramètres ";" par défaut
         """
-        try:
-            # Essaye d'ouvrir le fichier avec les paramètres
-            file = open(file_path, "r", encoding="utf-8-sig")
-        except Exception as error:
-            # Cas où le fichier ouvert n'existe pas ou qu'il n'est pas accessible
-            log.warning("Impossible d'ouvrir le fichier :\n\t\t" + str(file_path) + "\n" +
-                        "\n\t\tErreur de type : " + str(type(error)) +
-                        "\n\t\tAvec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
-                        "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
-                        prefix="dictionaire de données")
-            return
-
         # Récupère la longueur actuelle
         current_length = len(self)
 
-        # Si le fichier est ouvert, récupère chaque lignes de celui-ci
-        for line in file:
-            # Si la ligne ne contient pas le délimiteur (ici ;) l'indique dans les logs et saute la ligne
-            if ";" not in line:
-                log.debug("Ligne sautée. Délimiteur \";\" manquant dans la ligne :\n\t\t" + line + '\n',
-                          prefix="dictionaire de données")
-            else:
-                # Récupère les deux éléments de la ligne
-                line = list(map(str.strip, line.rstrip('\n').split(";")))
-
-                # Regarde s'il peut être convertir en bool?
-                if line[1] == "True" or line[1] == "False":
-                    self[line[0]] = True if line[1] == "True" else False
-                    continue
-
-                # Regarde s'il peut être convertit en int ou en float
-                try:
-                    line[1] = float(line[1])
-                except ValueError:
-                    pass
-                else:
-                    if line[1].is_integer():
-                        self[line[0]] = int(line[1])
+        try:
+            # Essaye d'ouvrir le fichier avec les paramètres
+            with open(file_path, "r", encoding="utf-8-sig") as file:
+                # Si le fichier est ouvert, récupère chaque lignes de celui-ci
+                for line in file:
+                    # Si la ligne ne contient pas le délimiteur (ici ;) l'indique dans les logs et saute la ligne
+                    if delimiter in line:
+                        # Récupère les deux éléments de la ligne et les ajoutent comme clé et valeur
+                        line = list(map(str.strip, line.rstrip('\n').split(delimiter, maxsplit=1)))
+                        self[line[0]] = SettingsDictionary.convert_type(line[1])
                     else:
-                        self[line[0]] = int(line[1])
-                    continue
+                        log.debug(f"Ligne sautée. Délimiteur \"{delimiter}\" manquant dans la ligne : {line}",
+                                  prefix="Lecture des données")
 
-                # Dans le cas où aucun type autre que string a été détecté
-                if isinstance(line[1], type(" ")):
-                    self[line[0]] = line[1]
+        except Exception as error:
+            # Cas où le fichier ouvert n'existe pas ou qu'il n'est pas accessible
+            log.warning(f"Impossible d'ouvrir le fichier : {file_path}",
+                        exception=error, prefix="Lecture des données")
+        else:
+            # Indique en debug le nombre d'éléments récupérés
+            log.debug(f"{len(self) - current_length} nouveaux paramètres récupérés dans le fichier :\n\t{file_path}",
+                      prefix="dictionaire de paramètres")
 
-        file.close()
+    @staticmethod
+    def convert_type(data):
+        """Fonction permettant de convertir un string de la data en son type correct.
+        Fonctionne pour tous les types immutables par défaut
 
-        # Indique en debug le nombre d'éléments récupérés
-        log.debug(str(len(self) - current_length) + " éléments récupérés dans :\n\t\t" + str(file_path) + "\n",
-                  prefix="dictionaire de traduction")
+        Parameters
+        ----------
+        data: `string`
+            donnée à convertir
+
+        Returns
+        -------
+        converted_data : `Union[bool, int, float, None, str]`
+            donnée convertie (string si aucun moyen de le convertir)
+        """
+        # Regarde s'il peut être convertir en bool?
+        if data.lower() == "true" or data.lower() == "false":
+            return data.lower() == "true"
+
+        # Regarde s'il peut être convertit en int
+        if data.isnumeric():
+            return int(data)
+
+        # Regarde s'il peut être convertit en float
+        if data.replace(".", "", 1).isnumeric():
+            return float(data)
+
+        # Regarde s'il peut être convertit en NoneType
+        if data.lower == "none":
+            return None
+
+        # Dans tous les cas (si aucun des autres cas n'a été intercepté) retourne le string
+        return data

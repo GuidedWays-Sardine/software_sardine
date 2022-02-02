@@ -13,8 +13,8 @@ Item {
 
     //Bouton quitter
     INI_button{
-        id: quit
-        objectName: "quit"
+        id: quit_button
+        objectName: "quit_button"
 
         default_x: 0
         default_y: 415
@@ -31,8 +31,8 @@ Item {
 
     //Bouton ouvrir
     INI_button{
-        id: open
-        objectName: "open"
+        id: open_button
+        objectName: "open_button"
 
         default_x: 280
         default_y: 415
@@ -48,8 +48,8 @@ Item {
 
     //Bouton sauvegarder
     INI_button{
-        id: save
-        objectName: "save"
+        id: save_button
+        objectName: "save_button"
 
         default_x: 400
         default_y: 415
@@ -65,8 +65,8 @@ Item {
 
     //Bouton lancer
     INI_button{
-        id: launch
-        objectName: "launch"
+        id: launch_button
+        objectName: "launch_button"
 
         default_x: 520
         default_y: 415

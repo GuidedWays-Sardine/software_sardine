@@ -1,7 +1,14 @@
-"""Module dérivé du module logging permettant de créer des fichiers de registres adapté à la simulation de SARDINE"""
+# librairies par défaut
+import os
 import logging
+import traceback
 from enum import Enum
 from datetime import datetime
+import re
+
+
+VERSION = "1.1.0"
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 
 
 class Level(Enum):
@@ -14,17 +21,23 @@ class Level(Enum):
     CRITICAL = logging.CRITICAL
 
 
-def initialise(path, version, log_level):
-    """ crée le fichier log
+def initialise(path=f"{PROJECT_DIR}log\\", version=VERSION, log_level=Level.DEBUG, save=True):
+    """ initialiser un registre (console ou enregistré)
 
     Parameters
     ----------
     path : `string`
         Le chemin vers le fichier log par rapport au fichier source
+        Par défaut chemin d'accès vers le dossier log du project
     version : `string`
         La version du programme
+        Par défaut la version sauvegardée dans le module log (pour éviter les incohérences)
     log_level : `Level`
         Le niveau de logging (Level.WARNING, Level.INFO, Level.DEBUG, Level.NOTSET)
+        Par défaut mis pour avoir tous les messages (Level.DEBUG)
+    save : `bool`
+        Indique si les messages doivent être sauvegardés dans un fichier (sinon elles apparaitront dans le terminal
+        Par défault les informations s'enregistrent dans un fichier
     """
     # Vérifie si un fichier log a déjà été créé, si oui, change le niveau de logging sinon le crée
     if logging.getLogger().hasHandlers():
@@ -32,25 +45,26 @@ def initialise(path, version, log_level):
         logging.warning("Fichier de registre pour cette simulation déjà existant. Aucun besoin d'en créer un nouveau.\n")
         return
 
-    # Si aucun log n'est demandé, définit le niveau de log comme "aucun" et retourne
-    if log_level is Level.NOTSET:
-        logging.basicConfig(level=logging.NOTSET)
-        return
+    # Dans le cas où les logs doivent être enregistrées et que le niveau n'est pas mis à log.NOTSET
+    if save and log_level is not Level.NOTSET:
+        # Rajoute un / à la fin du chemin s'il a été oublié
+        path += "\\" if path[-1] != "/" or "\\" else ""
+        path.replace("/", "\\")
 
-    # Rajoute un / à la fin du chemin s'il a été oublié
-    if path[len(path) - 1] != "/" or "\\":
-        path += "\\"
-    path.replace("/", "\\")
+        # Prend la date et crée le nom du fichier log
+        now = str(datetime.now()).split(".", 1)[0]
+        file_name = path + f"sardine {version} {now}.log".replace(':', ';')
 
-    # Prend la date et crée le nom du fichier log
-    now = str(datetime.now()).split(".", 1)[0]
-    file_name = path + ("sardine " + version + " " + now + ".log").replace(':', ';')
-
-    # Crée le fichier log avec les informations envoyées
-    logging.basicConfig(level=log_level.value,
-                        filename=file_name,
-                        datefmt="%H:%M:%S",
-                        format="%(asctime)s - %(levelname)s - %(message)s")
+        # Crée le fichier log avec les informations envoyées
+        logging.basicConfig(level=log_level.value,
+                            filename=file_name,
+                            datefmt="%H:%M:%S",
+                            format="%(asctime)s - %(levelname)s - %(message)s")
+    else:
+        # Sinon crée juste une configuration sans fichier (le registre s'affichera dans la console directement)
+        logging.basicConfig(level=log_level.value,
+                            datefmt="%H:%M:%S",
+                            format="%(asctime)s - %(levelname)s - %(message)s")
 
 
 def change_log_level(log_level):
@@ -66,35 +80,33 @@ def change_log_level(log_level):
 
 def change_log_prefix(prefix=""):
     """Permet à l'utilisateur de changer le préfix devant chaque message de registre pour mieux indiquer leur provenance
+    Celui-ci s'affichera entre crochets entre l'heure et le niveau de registre
     
     Parameters
     ----------
     prefix: `string`
         Le nouveau préfix à mettre en plus de l'heure et du niveau du registre
-
-    Raises
-    ------
-    FileNotFoundError
-        Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
     """
-    # Vérifie qu'un fichier registre existe bien sinon jette l'erreur FileNotFoundError
+    # Dans le cas où aucun registre n'a été initialisé
     if not logging.getLogger().hasHandlers():
-        raise FileNotFoundError("Aucun fichier de registre existant pour cette simulation")
+        # initialise un simple registre console et affiche un message de warning pour avertir de l'oubli
+        logging.basicConfig(level=Level.DEBUG.value,
+                            datefmt="%H:%M:%S",
+                            format="%(asctime)s - %(levelname)s - %(message)s")
+        logging.warning("préfix changé sans registre initialisé (log.initialise). Configuration par défaut utilisée.")
 
-    # Récupère le handler (fichier registre) à modifier
+    # Si un préfix non vide a été envoyé, l'ajoute au format du registre, sinon remet celui par défaut
     handler = logging.getLogger().handlers[0]
-
-    # Si le préfixe est vide, l'ajoute, sinon remet le logging par défaut
     if prefix != "":
         handler.setFormatter(logging.Formatter(datefmt="%H:%M:%S",
-                                               fmt="%(asctime)s - [" + str(prefix) + "] - %(levelname)s - %(message)s"))
+                                               fmt=f"%(asctime)s - [{prefix}] - %(levelname)s - %(message)s"))
     else:
         handler.setFormatter(logging.Formatter(datefmt="%H:%M:%S",
                                                fmt="%(asctime)s - %(levelname)s - %(message)s"))
 
 
-def log(log_level, message, prefix=None):
-    """Permet de laisser un message de niveau log_level dans le fichier registre
+def log(log_level, message, exception=None, prefix=None):
+    """Permet de laisser un message de registre de niveau log_level
 
     Parameters
     ----------
@@ -103,31 +115,42 @@ def log(log_level, message, prefix=None):
     message: `string`
         Le message à afficher dans le registre
     prefix: `string`
-        Le préfix temporaire à afficher
-
-    Raises
-    ------
-    FileNotFoundError
-        Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
+        Le préfix temporaire (uniquement pour ce message) à utiliser
+    exception: `Exception`
+        Potentielle exception à afficher (pour donner plus d'indications sur la raison et l'endroit d'une erreur)
     """
-    # Vérifie qu'un fichier registre existe bien sinon jette l'erreur FileNotFoundError
+    # Dans le cas où aucun registre n'a été initialisé
     if not logging.getLogger().hasHandlers():
-        raise FileNotFoundError("Aucun fichier de registre existant pour cette simulation")
+        # initialise un simple registre console et affiche un message de warning pour avertir de l'oubli
+        logging.basicConfig(level=Level.DEBUG.value,
+                            datefmt="%H:%M:%S",
+                            format="%(asctime)s - %(levelname)s - %(message)s")
+        logging.warning("message laissé sans registre initialisé (log.initialise). Configuration par défaut utilisée.")
 
-    # Vérifie si un préfix temporaire a été envoyé et si oui change le préfix utilisé
-    format = logging.getLogger().handlers[0].formatter._fmt
+    # Vérifie si un préfix temporaire a été envoyé, si oui, enregistre le format actuel et change le préfix
+    previous_format = logging.getLogger().handlers[0].formatter._fmt
     if prefix is not None:
         change_log_prefix(prefix)
 
-    # Laisse le message dans le fichier de registre de niveau debug
+    # Dans le cas où une exception a été envoyée, l'ajoute dans le message avec une belle présentation
+    if isinstance(exception, Exception):
+        message += (("\n" if not message.endswith("\n") else "") + f"\tErreur de type ;{type(exception)}\n" +
+                    f"\tAvec comme message d'erreur : {exception.args}\n\t" + "Traceback : \n\t" +
+                    "".join(traceback.format_tb(exception.__traceback__)).replace("\n", "\n\t") + "\n")
+
+    # Remplace les "\n\t..." par autant d'espaces que nécessaire pour bien aligner le texte avec le message
+    prefix_length = len(logging.getLogger().handlers[0].formatter._fmt) - 3 - 19 + len(str(log_level)) - 11
+    message = re.sub("\\n[\\t]*", "\n" + " " * prefix_length, message)
+
+    # Laisse le message fraichement créé dans le registre avec le niveau de registre demandé
     logging.log(log_level.value, message)
 
-    # Si le préfix a été changé temporairement
+    # Si le préfix a été changé temporairement, remet celui d'origine
     if prefix is not None:
-        logging.getLogger().handlers[0].setFormatter(logging.Formatter(datefmt="%H:%M:%S", fmt=format))
+        logging.getLogger().handlers[0].setFormatter(logging.Formatter(datefmt="%H:%M:%S", fmt=previous_format))
 
 
-def debug(message, prefix=None):
+def debug(message, exception=None, prefix=None):
     """Permet de laisser un message de niveau DEBUG dans le fichier registre
 
     Parameters
@@ -135,17 +158,14 @@ def debug(message, prefix=None):
     message: `string`
         Le message à afficher dans le registre
     prefix: `string`
-        Le préfix temporaire à afficher
-
-    Raises
-    ------
-    FileNotFoundError
-        Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
+        Le préfix temporaire (uniquement pour ce message) à utiliser
+    exception: `Exception`
+        Potentielle exception à afficher (pour donner plus d'indications sur la raison et l'endroit d'une erreur)
     """
-    log(Level.DEBUG, message, prefix)
+    log(Level.DEBUG, message, exception, prefix)
 
 
-def info(message, prefix=None):
+def info(message, exception=None, prefix=None):
     """Permet de laisser un message de niveau INFO dans le fichier registre
 
     Parameters
@@ -153,17 +173,14 @@ def info(message, prefix=None):
     message: `string`
         Le message à afficher dans le registre
     prefix: `string`
-        Le préfix temporaire à afficher
-
-    Raises
-    ------
-    FileNotFoundError
-        Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
+        Le préfix temporaire (uniquement pour ce message) à utiliser
+    exception: `Exception`
+        Potentielle exception à afficher (pour donner plus d'indications sur la raison et l'endroit d'une erreur)
     """
-    log(Level.INFO, message, prefix)
+    log(Level.INFO, message, exception, prefix)
 
 
-def warning(message, prefix=None):
+def warning(message, exception=None, prefix=None):
     """Permet de laisser un message de niveau WARNING dans le fichier registre
 
     Parameters
@@ -171,17 +188,14 @@ def warning(message, prefix=None):
     message: `string`
         Le message à afficher dans le registre
     prefix: `string`
-        Le préfix temporaire à afficher
-
-    Raises
-    ------
-    FileNotFoundError
-        Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
+        Le préfix temporaire (uniquement pour ce message) à utiliser
+    exception: `Exception`
+        Potentielle exception à afficher (pour donner plus d'indications sur la raison et l'endroit d'une erreur)
     """
-    log(Level.WARNING, message, prefix)
+    log(Level.WARNING, message, exception, prefix)
 
 
-def error(message, prefix=None):
+def error(message, exception=None, prefix=None):
     """Permet de laisser un message de niveau ERROR dans le fichier registre
 
     Parameters
@@ -189,17 +203,14 @@ def error(message, prefix=None):
     message: `string`
         Le message à afficher dans le registre
     prefix: `string`
-        Le préfix temporaire à afficher
-
-    Raises
-    ------
-    FileNotFoundError
-        Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
+        Le préfix temporaire (uniquement pour ce message) à utiliser
+    exception: `Exception`
+        Potentielle exception à afficher (pour donner plus d'indications sur la raison et l'endroit d'une erreur)
     """
-    log(Level.ERROR, message, prefix)
+    log(Level.ERROR, message, exception, prefix)
 
 
-def critical(message, prefix=None):
+def critical(message, exception=None, prefix=None):
     """Permet de laisser un message de niveau CRITICAL dans le fichier registre
 
     Parameters
@@ -207,11 +218,38 @@ def critical(message, prefix=None):
     message: `string`
         Le message à afficher dans le registre
     prefix: `string`
-        Le préfix temporaire à afficher
-
-    Raises
-    ------
-    FileNotFoundError
-        Erreur soulevée lorsque le fichier log n'a pas encore été créé ou qu'il n'existe pas
+        Le préfix temporaire (uniquement pour ce message) à utiliser
+    exception: `Exception`
+        Potentielle exception à afficher (pour donner plus d'indications sur la raison et l'endroit d'une erreur)
     """
-    log(Level.CRITICAL, message, prefix)
+    log(Level.CRITICAL, message, exception, prefix)
+
+
+def add_empty_lines(lines_count=1, log_level=Level.INFO):
+    """Fonction permettant de rajouter des lignes vides dans le fichier de registre
+
+    Parameters
+    ----------
+    lines_count: `int`
+        Nombre de lignes vides à ajouter dans le fichier de registre (par défaut 1)
+    log_level: `Level`
+        Le niveau de registre à partir duquel le message doit apparaitre
+    """
+    # Dans le cas où aucun registre n'a été initialisé
+    if not logging.getLogger().hasHandlers():
+        # initialise un simple registre console et affiche un message de warning pour avertir de l'oubli
+        logging.basicConfig(level=Level.DEBUG.value,
+                            datefmt="%H:%M:%S",
+                            format="%(asctime)s - %(levelname)s - %(message)s")
+        logging.warning("lignes sautées sans registre initialisé (log.initialise). Configuration par défaut utilisée.")
+
+    # Récupère le format de registe actuel et le change pour un format vide (pour écrire des lignes vides)
+    handler = logging.getLogger().handlers[0]
+    current_format = handler.formatter._fmt
+    handler.setFormatter(logging.Formatter(fmt=""))
+
+    # Ajoute autant de lignes que demandés (si la valeur est négative, une seule ligne sera sautée)
+    log(log_level, "\n" * (lines_count - 1))
+
+    # Remet de nouveau le format actuel
+    handler.setFormatter(logging.Formatter(datefmt="%H:%M:%S", fmt=current_format))
