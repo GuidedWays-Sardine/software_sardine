@@ -33,6 +33,7 @@ Item {
 
     //Propriété sur la liste des voitures
     property var type_list: []      // Liste contenant le type de chacune des voitures (fret, passager, ...)
+    readonly property var prime_list: [2, 3, 5, 7, 11, 13, 17]      //permettant de varier les icones visibles en bas
     property var position_list: []  // Liste contenant la position de chacune des voitures (avant, arrière, milieu)
 
     //propriétés relié à la visibilité et la présentation de la barre
@@ -189,7 +190,8 @@ Item {
             default_width: (root.default_width - 2 * root.default_height) / (root.visible_count + 2)
             default_height: root.default_height * 0.5
 
-            image: is_activable ? ("Train_icons/" + (is_dark_grey ? "dark_" : "") + "grey_" + root.type_list[button_index] + "_" + root.position_list[button_index] + ".png") : ""
+            image_activable: "Train_icons/" + root.type_list[button_index] + (root.prime_list.includes(button_index % (root.visible_count + 3)) ? "/empty/" : "/full/") + (is_dark_grey ? "dark_" : "") + "grey_" + root.position_list[button_index] + ".png"
+            image_not_activable: ""
             text: is_activable ? (button_index + 1).toString() : ""
             font_size: 8
 
