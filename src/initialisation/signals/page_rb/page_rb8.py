@@ -104,6 +104,8 @@ class PageRB8:
                     log.warning(f"Nombe d'informations fenêtres insuffisantes sur la ligne :\n\t\t{line}")
 
             # Rajouter cette série d'écran à la catégorie
+            log.info(f"{len(screens_default)} fenêtres trouvées ({screens_default.keys()}) dans la catégorie" +
+                     f"{translation_data[file_path.replace('_', ' ')[3:-8]]}. Dans le fichier\n\t{file_path}")
             self.screen_default[translation_data[file_path.replace("_", " ")[3:-8]]] = screens_default
             self.screen_settings[translation_data[file_path.replace("_", " ")[3:-8]]] = screens_settings
 
@@ -233,7 +235,7 @@ class PageRB8:
 
         # Inverse les données de traduction pour avoir un dictionnaire langue actuelle -> Français
         invert_translation = td.TranslationDictionary()
-        invert_translation.create_translation(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang",     # FIXME : voir pour envoyer la traduction inverse directement dans le get et set_values
+        invert_translation.create_translation(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang",
                                               translation_data["English"], "English")
 
         # Pour chaque catégorie d'écrans
@@ -253,7 +255,7 @@ class PageRB8:
                         self.screen_settings[category_key][screen_key][3][0] = data[screen_settings_key + "w"]
                         self.screen_settings[category_key][screen_key][3][1] = data[screen_settings_key + "h"]
                 except KeyError:
-                    log.debug(f"L'écran : {screen_settings_key} n'a pas de paramètres sauvegardés.\n")
+                    log.debug(f"L'écran : {screen_settings_key} n'a pas de paramètres sauvegardés.")
 
         # Met à jour la page visible de settings
         self.change_visible_screen_list()
@@ -319,9 +321,9 @@ class PageRB8:
             self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
 
         # Pour toutes les catégories de paramètrages d'écrans
-        for category_key in self.screen_default:
+        for category_index, category_key in enumerate(self.screen_default):
             # Pour tous les écrans de cette catégorie
-            for screen_key in self.screen_default[category_key]:
+            for screen_index, screen_key in enumerate(self.screen_default[category_key]):
                 # Vérifier pour chaque page si la page doit et peut être complétée mais ne l'est pas
                 if self.screen_default[category_key][screen_key][0] and \
                         self.screen_default[category_key][screen_key][3] \
@@ -483,7 +485,7 @@ class PageRB8:
         self.change_visible_screen_list()
 
     def change_visible_screen_list(self):
-        """Met à jour la liste de paramétrages éccrans visible par l"utilisateur.
+        """Met à jour la liste de paramétrages écrans visible par l"utilisateur.
         A appeler dans le cas où la catégorie ou la série d'écran a été changé ou que les paramètres défauts de l'écrans ont été changés.
         """
         # Essaye de récupérer le dictionnaire des écrans de la catégorie sélectionnée et récupère leurs clés
