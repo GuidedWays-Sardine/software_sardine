@@ -326,6 +326,35 @@ class PageRB8:
                 if self.screen_default[category_key][screen_key][0] and \
                         self.screen_default[category_key][screen_key][3] \
                         and self.screen_settings[category_key][screen_key][0] == 0:
+                    # Sauvegarde les paramètres actuellement visibles sur la page
+                    old_screens_values = self.page.get_values().toVariant()
+                    for index in range(0, len(old_screens_values)):
+                        self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
+
+                    # Désactive/active les boutons de la catégorie si la nouvelle est en première ou dernière
+                    self.page.findChild(QObject, "left_category_button").setProperty("is_activable", category_index != 0)
+                    self.page.findChild(QObject, "right_category_button").setProperty("is_activable", category_index != (len(self.screen_default) - 1))
+
+                    # Change la catégorie au sein de la classe mais aussi sur le composant graphique "category_title"
+                    self.category_active = category_key
+                    self.page.findChild(QObject, "category_title").setProperty("text", self.category_active)
+
+                    # Change l'index de la série d'écrans visible
+                    self.screen_list_active = int(screen_index / 4)
+
+                    # Cache/Montre/Désactive/active les boutons de changement de série d'écran
+                    left_button = self.page.findChild(QObject, "left_window_button")
+                    right_button = self.page.findChild(QObject, "right_window_button")
+                    left_button.setProperty("is_visible", len(self.screen_settings[category_key]) > 4)
+                    right_button.setProperty("is_visible", len(self.screen_settings[category_key]) > 4)
+                    left_button.setProperty("is_activable", int(screen_index / 4) > 0)
+                    right_button.setProperty("is_actibable", int(screen_index / 4) < int((len(self.screen_settings[category_key]) - 1) / 4))
+
+                    # Mets à jour les données actuellement visibles
+                    self.change_visible_screen_list()
+
+                    # fait clignoter les bordures de l'écran incomplet et retourne false (car page non complète)
+                    self.page.blink(screen_index % 4)
                     return False
 
         # Si aucune des pages n'a pas encore été complétée, retourne que la page est complète
