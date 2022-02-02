@@ -150,13 +150,8 @@ class InitialisationWindow:
             log.info(f"Ouverture de la page de paramètres page_rb{self.active_page_index}.\n")
 
             # Appelle la fonction d'ouverture logique de la page si celle-ci existe
-            if self.pages_list[self.active_page_index - 1] is not None and \
-                    "on_page_opened" in dir(self.pages_list[self.active_page_index - 1]):
-                try:
-                    self.pages_list[self.active_page_index - 1].on_page_opened(self)
-                except Exception as error:
-                    log.error(f"La fonction on_page_opened de la page_rb{self.active_page_index} contient une erreur.\n",
-                              exception=error)
+            if "on_page_opened" in dir(self.pages_list[self.active_page_index - 1]):
+                self.pages_list[self.active_page_index - 1].on_page_opened(self)
 
         # Montre la fenêtre principale, indique que l'application doit se quitter quand celle-ci est fermée et Lance l'application
         self.win.show()
