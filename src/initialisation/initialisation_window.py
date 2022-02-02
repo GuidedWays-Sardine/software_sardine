@@ -65,8 +65,8 @@ class InitialisationWindow:
             Soulevé quand le fichier .qml de la fenêtre d'initialisation a une erreur de syntaxe et n'est pas lisible
         """
         initial_time = time.perf_counter()
-        log.change_log_prefix("Initialisation")
-        log.info(f"Début du chargement de l'application d'intialisation.\n\n")
+        log.change_log_prefix("Initialisation application d'initialisation")
+        log.info(f"Début du chargement de l'application d'intialisation.")
 
         # Charge tous les écrans connectés à l'ordinateur (utile pour la positionnement de certaines popup)
         for screen_index in range(0, QDesktopWidget().screenCount()):
@@ -75,7 +75,7 @@ class InitialisationWindow:
 
             # Les stockes au bon format [[x, y], [w, h]]
             self.screens_dimensions.append([[sg[0], sg[1]], [sg[2] - sg[0] + 1, sg[3] - sg[1] + 1]])
-        log.info(f"Détection de {len(self.screens_dimensions)} écrans connectés à l'ordinateur.\n\n")
+        log.info(f"Détection de {len(self.screens_dimensions)} écrans connectés à l'ordinateur.")
 
         # Lance l'application et cherche pour le fichier QML avec tous les éléments de la fenêtre d'initialisation
         self.app = app
@@ -84,10 +84,10 @@ class InitialisationWindow:
 
         # Vérifie si le fichier qml de la fenêtre a bien été ouvert et compris, sinon jête une erreur
         if not self.engine.rootObjects() and not os.path.isfile(self.initialisation_window_file_path):
-            raise FileNotFoundError(f"Le fichier .qml de la fenêtre d\'initialisation n\'a pas été trouvé.\n\t\t" +
+            raise FileNotFoundError(f"Le fichier .qml de la fenêtre d\'initialisation n\'a pas été trouvé.\n\t" +
                                     self.initialisation_window_file_path)
         elif not self.engine.rootObjects() and os.path.isfile(self.initialisation_window_file_path):
-            raise SyntaxError(f"Le fichier .qml pour la fenêtre d\'initialisation contient des erreurs.\n\t\t" +
+            raise SyntaxError(f"Le fichier .qml pour la fenêtre d\'initialisation contient des erreurs.\n\t" +
                               self.initialisation_window_file_path)
         else:
             self.win = self.engine.rootObjects()[0]
@@ -101,7 +101,8 @@ class InitialisationWindow:
         # Vérifie si un fichier de paramètres par défaut existe
         if os.path.isfile(self.default_settings_file_path):
             # S'il existe, l'ouvre, récupère ses données et les changent dans l'application d'initialisation
-            log.info(f"Chargement des paramètres du fichier default.settings.\n")
+            log.change_log_prefix("Ouverture fichier default.settings")
+            log.info(f"Chargement des paramètres par défauts du fichier default.settings")
             default_settings = sd.SettingsDictionary()
             default_settings.open(self.default_settings_file_path)
             self.set_values(default_settings)
@@ -137,23 +138,23 @@ class InitialisationWindow:
                                 exception=error)
             # Sinon laisse un message de debug indiquant que certaines données sont manquantes
             else:
-                log.debug(f"Aucune information stocké sur la taille par défaut de la fenêtre d'initialisation.\n")
+                log.debug(f"Aucune information stocké sur la taille par défaut de la fenêtre d'initialisation.")
 
         # Indique le temps de chargement de l'application
         log.info(f"Application d'initialisation chargée en " +
-                 f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\n")
+                 f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n")
 
         # Charge la logique de la première page de paramètres
         if self.active_page_index is not None:
             # Dans le cas ou au moins une page a été chargée entièrement, change le préfix et appelle son ouverture
             log.change_log_prefix(f"page_rb{self.active_page_index}")
-            log.info(f"Ouverture de la page de paramètres page_rb{self.active_page_index}.\n")
+            log.info(f"Ouverture de la page de paramètres page_rb{self.active_page_index}.")
 
             # Appelle la fonction d'ouverture logique de la page si celle-ci existe
             if "on_page_opened" in dir(self.pages_list[self.active_page_index - 1]):
                 self.pages_list[self.active_page_index - 1].on_page_opened(self)
 
-        # Montre la fenêtre principale, indique que l'application doit se quitter quand celle-ci est fermée et Lance l'application
+        # Montre la fenêtre principale,  et Lance l'application
         self.win.show()
         self.win.closed.connect(lambda: self.app.quit())
         self.app.exec()
@@ -169,8 +170,8 @@ class InitialisationWindow:
         parameters : `sd.SettingsDictionary`
             un dictionaire de paramètres avec tous les paramètres du simulateur
         """
+        log.add_empty_lines()
         initial_time = time.perf_counter()
-        log.info(f"Récupération des paramètres de l'application.\n")
         parameters = sd.SettingsDictionary()
 
         # Dans le cas où des fonctions get_values sont détectés, récupère les paramètres de l'application
@@ -233,6 +234,8 @@ class InitialisationWindow:
         data: `sd.SettingsDictionary`
             Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
         """
+        log.info(f"Changement de paramètres sur l'application d'initialisation.")
+
         # Si la combobox pour choisir la langue existe (page_rb1 chargée), alors change la langue dans cette combobox
         # La langue de l'application d'initialisation sera changée automatiquement
         if self.pages_list[0] is not None and not isinstance(self.pages_list[0], QQmlApplicationEngine):
@@ -241,7 +244,6 @@ class InitialisationWindow:
             language_combo.change_selection(data.get_value("language", language_combo.property("text")))
 
         initial_time = time.perf_counter()
-        log.info(f"Tentative de changement des paramètres.\n")
         count = 0
 
         # Récupère la traduction par rapport à l'anglais car les paramètres textuels sont stockés en anglais
@@ -256,12 +258,12 @@ class InitialisationWindow:
                 count += 1
             except Exception as error:
                 # Permet de rattraper une potentielle erreur dans la fonction get_values()
-                log.warning(f"Erreur lors du changement des paramètres pour la page_rb{page.index}.\n",
+                log.warning(f"Erreur lors du changement des paramètres pour la page_rb{page.index}.",
                             exception=error)
 
-            # Indique le nombre de pages dont les paramètres on été changés
+        # Indique le nombre de pages dont les paramètres on été changés
         log.info(f"Paramètres correctement changés sur {count} pages en " +
-                 f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\n")
+                 f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n")
 
     def change_language(self, new_language):
         """Permet à partir d'un dictionaire de traduction, de traduire les textes de l'application d'initialisation
@@ -272,7 +274,7 @@ class InitialisationWindow:
             la nouvelle langue de l'application
         """
         initial_time = time.perf_counter()
-        log.info(f"Changement du choix de langue, mise à jour de l'application d'initialisation.\n")
+        log.info(f"Changement de la langue, mise à jour de la langue de l'application d'initialisation.")
 
         translation_data = td.TranslationDictionary()
         translation_data.create_translation(self.translation_file_path, self.language, new_language)
@@ -294,14 +296,15 @@ class InitialisationWindow:
             # change la langue actuelle pour la nouvelle langue envoyée
             self.language = new_language
 
-        log.info(f"La langue de l'application d'initialisation a été changée en " +
-                 f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n\n")
-
+            log.info(f"La langue de l'application d'initialisation a été changée en " +
+                     f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n")
+        else:
+            log.warning("Traduction impossible, aucune traduction trouvées.\n")
 
 def main():
     log.initialise(log_level=log.Level.DEBUG, save=True)
 
-    #Lance l'application d'initialisation
+    # Lance l'application d'initialisation
     app = QApplication(sys.argv)
     application = InitialisationWindow(app)
 
