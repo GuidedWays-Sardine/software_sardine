@@ -236,14 +236,9 @@ class InitialisationWindow:
         # Si la combobox pour choisir la langue existe (page_rb1 chargée), alors change la langue dans cette combobox
         # La langue de l'application d'initialisation sera changée automatiquement
         if self.pages_list[0] is not None and not isinstance(self.pages_list[0], QQmlApplicationEngine):
+            # Si la langue est différente essaye de changer la langue du simulateur
             language_combo = self.pages_list[0].page.findChild(QObject, "language_combo")
-            try:
-                # Si la langue est différente essaye de changer la langue du simulateur
-                if language_combo.property("text") != data["Langue"]:
-                    language_combo.change_selection(data["Langue"])
-            except KeyError:
-                # Si le paramètre "Langue" n'apparait pas, laisse juste un message de debug
-                log.debug(f"Impossible de changer la langue du simulateur car : \"Langue\" est manquant.\n")
+            language_combo.change_selection(data.get_value("language", language_combo.property("text")))
 
         initial_time = time.perf_counter()
         log.info(f"Tentative de changement des paramètres.\n")
