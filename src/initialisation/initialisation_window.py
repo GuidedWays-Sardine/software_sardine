@@ -280,24 +280,24 @@ class InitialisationWindow:
         log.info(f"Changement du choix de langue, mise à jour de l'application d'initialisation.\n")
 
         translation_data = td.TranslationDictionary()
-        translation_data.create_translation(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang",
-                                            self.language, new_language)
+        translation_data.create_translation(self.translation_file_path, self.language, new_language)
 
-        # Appel de la fonction set_languages pour les boutons du bas
-        self.bottom_buttons.change_language(self, translation_data)
+        if translation_data:
+            # Appel de la fonction set_languages pour les boutons du bas
+            self.bottom_buttons.change_language(self, translation_data)
 
-        # Essaye de changer la langue pour chaque page ayant une partie fonctionnelle
-        for page in (p for p in self.pages_list if "change_language" in dir(p)):
-            try:
-                # Appelle la fonction get_values de la page et récupère une potentielle erreur sur la fonction
-                page.change_language(translation_data)
-            except Exception as error:
-                # Permet de rattraper une potentielle erreur dans la fonction get_values()
-                log.warning(f"Erreur lors du changement de langue pour la page_rb{page.index}.\n",
-                            exception=error)
+            # Essaye de changer la langue pour chaque page ayant une partie fonctionnelle
+            for page in (p for p in self.pages_list if "change_language" in dir(p)):
+                try:
+                    # Appelle la fonction get_values de la page et récupère une potentielle erreur sur la fonction
+                    page.change_language(translation_data)
+                except Exception as error:
+                    # Permet de rattraper une potentielle erreur dans la fonction get_values()
+                    log.warning(f"Erreur lors du changement de langue pour la page_rb{page.index}.",
+                                exception=error)
 
-        # Si la traduction a été réalisée correctement (traduction trouvée) alors change la langue actuelle
-        self.language = new_language if translation_data else self.language
+            # change la langue actuelle pour la nouvelle langue envoyée
+            self.language = new_language
 
         log.info(f"La langue de l'application d'initialisation a été changée en " +
                  f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n\n")
