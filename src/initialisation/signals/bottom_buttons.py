@@ -31,7 +31,7 @@ class BottomButtons:
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
         initial_time = time.perf_counter()
-        log.info("Tentative de chargement des boutons inférieurs.\n")
+        log.info("Chargement des boutons inférieurs.")
 
         # Boutons quitter/lancer (obligatoires pour le lancement de l'application)
         application.win.findChild(QObject, "quit_button").clicked.connect(lambda: self.on_quit_clicked(application))
@@ -41,15 +41,15 @@ class BottomButtons:
         if any([page is not None and not isinstance(page, QObject) for page in application.pages_list]):
             application.win.findChild(QObject, "open_button").clicked.connect(lambda: self.on_open_clicked(application))
             application.win.findChild(QObject, "save_button").clicked.connect(lambda: self.on_save_clicked(application))
-            log.info("Boutons ouvrir et fermer visibles car au moins une page de paramètres chargée entièrement.\n")
+            log.info("Boutons ouvrir et fermer visibles car au moins une page de paramètres chargée entièrement.")
         else:
             # Sinon, cache les boutons
             application.win.findChild(QObject, "open_button").setProperty("visible", False)
             application.win.findChild(QObject, "save_button").setProperty("visible", False)
-            log.info("Boutons ouvrir et fermer cachés car aucune page de paramètres n'a été chargée entièrement.\n")
+            log.info("Boutons ouvrir et fermer cachés car aucune page de paramètres n'a été chargée entièrement.")
 
         log.info(f"Boutons inférieurs chargés en " +
-                 f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\n")
+                 f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n")
 
     @decorators.QtSignal(log_level=log.Level.CRITICAL, end_process=True)
     def on_quit_clicked(self, application):
@@ -60,11 +60,11 @@ class BottomButtons:
         application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets
         """
-        # Laisse un message de registre, puis ferme la page, puis l'application
-        log.info(f"Fermeture de la page de paramètres page_rb{application.active_page_index}.\n\n")
-
+        # ferme la page puis l'application
         if "on_page_closed" in dir(application.pages_list[application.active_page_index - 1]):
             application.pages_list[application.active_page_index - 1].on_page_closed(application)
+        log.info(f"Fermeture de la page de paramètres page_rb{application.active_page_index}.\n")
+        log.change_log_prefix("")
         application.app.quit()
 
     @decorators.QtSignal(log_level=log.Level.CRITICAL, end_process=True)
@@ -90,6 +90,7 @@ class BottomButtons:
             # Si c'est le cas, ferme correctement la page actuelle, récupère les paramètres et lance la simulation
             if "on_page_closed" in dir(application.pages_list[application.active_page_index - 1]):
                 application.pages_list[application.active_page_index - 1].on_page_closed(application)
+            log.info(f"Fermeture de la page de paramètres page_rb{application.active_page_index}.\n")
 
             log.change_log_prefix("Récupération des données")
             application.launch_simulator = True
@@ -97,7 +98,7 @@ class BottomButtons:
         else:
             # Sinon récupère les pages non complètes, laisse un message de registre et se met sur la page non complétée
             non_completed_pages = [index for index, completed in enumerate(page_complete) if not completed]
-            log.debug(f"Pages de paramètres : {' ; '.join([str(n + 1) for n in non_completed_pages])} non complétés.\n")
+            log.debug(f"Pages de paramètres : {' ; '.join([str(n + 1) for n in non_completed_pages])} non complétés.")
             application.right_buttons.on_new_page_selected(application,
                                                            application.pages_list[non_completed_pages[0]].engine,
                                                            non_completed_pages[0] + 1)
