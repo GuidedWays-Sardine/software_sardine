@@ -45,6 +45,14 @@ Item {
         return values
     }
 
+    //Fonction permettant de faire clignoter l'écran à l'index envoyé
+    function blink(index) {
+        if(index < page_rb8.windows_name.length) {
+            windows.itemAt(page_rb8.windows_name.length - index - 1).blink()
+        }
+    }
+
+
     //Flèche de droite pour naviguer à gauche sur les catégories d'écrans
     INI_button {
         id: left_category_button
@@ -102,6 +110,8 @@ Item {
         model : page_rb8.windows_name.length
         
         Window_parameters {
+            //id: window
+
             //Propriété permetant d'inverser l'index pour charger les zones de paramètres dans le désordre
             //(pour ne pas cacher les bordures du combobox par le composant du dessous) mais pour charger les données dans le bon ordre
             property int real_index: page_rb8.windows_name.length - index - 1
