@@ -26,7 +26,8 @@ class RightButtons:
     pages_stackview = None
     
     # Variables stockant les chemins d'accès vers le fichiers nécessaire au fonctionnement de la structure
-    settings_page_folder_path = f"{PROJECT_DIR}src\\initialisation\\graphics\\page_rb\\"
+    graphic_page_folder_path = f"{PROJECT_DIR}src\\initialisation\\graphics\\page_rb\\"
+    logic_page_folder_path = f"{PROJECT_DIR}src\\initialisation\\signals\\page_rb\\"
 
     def __init__(self, application, translation_data):
         """
@@ -44,37 +45,38 @@ class RightButtons:
         # Récupère les boutons de droite à partir de la fenêtre
         self.right_buttons = application.win.findChild(QObject, "right_buttons")
         self.pages_stackview = application.win.findChild(QObject, "settings_pages")
+        log.add_empty_lines()
 
         # Commence à indiquer toutes les fenêtres qui n'ont pas de fichiers graphiques associés
-        not_exist = " ; ".join(sorted({"1", "2", "3", "4", "5", "6", "7", "8"}.difference(f[7:-4]
-                                        for f in os.listdir(self.settings_page_folder_path)
-                                        if f.startswith("page_rb") and f.endswith(".qml"))))
-        if not_exist != "":
-            log.warning(f"Les pages de paramètres : {not_exist} N'ont aucun fichier graphique(.qml) associés.\n\n")
+        not_exist = sorted({str(i + 1) for i in range(8)}.difference(f[7:-4]
+                                                                     for f in os.listdir(self.graphic_page_folder_path)
+                                                                     if f.startswith("page_rb") and f.endswith(".qml")))
+        if not_exist:
+            log.warning(f"Les pages de paramètres : {not_exist} N'ont aucun fichier graphique(.qml) associés.\n")
 
         # Pour toutes les pages de paramètres ayant un ficher graphique (.qml) existant
-        for index in (int(f[7:-4]) for f in os.listdir(self.settings_page_folder_path)
-                              if f.startswith("page_rb") and f.endswith(".qml") and (1 <= int(f[7:-4]) <= 8)):
+        for index in (int(f[7:-4]) for f in os.listdir(self.graphic_page_folder_path)
+                      if f.startswith("page_rb") and f.endswith(".qml") and (1 <= int(f[7:-4]) <= 8)):
             # Vérifie si la partie graphique de la page existe et charge la page et le bouton associé
             engine = QQmlApplicationEngine()
-            page_path = f"{self.settings_page_folder_path}page_rb{index}.qml"
+            page_path = f"{self.graphic_page_folder_path}page_rb{index}.qml"
             engine.load(page_path)
             current_button = self.right_buttons.findChild(QObject, f"rb{index}")
 
             initial_time = time.perf_counter()
             log.change_log_prefix(f"Initialisation page_rb{index}")
-            log.info(f"Tentative du chargement de la page_rb{index}.\n")
+            log.info(f"Tentative du chargement de la page_rb{index}.")
 
             # Essaye d'initialiser la page et si elle est correctement initialisé, tente de charger les signals
             if self.initialise_page(application, engine, index, page_path, current_button):
                 if self.initialise_signals(application, engine, index, page_path, current_button, translation_data):
                     log.info(f"Chargement complet (graphique et fonctionelle) de la  page_rb{index} en " +
-                             f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\n")
+                             f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n")
                 else:
                     log.info(f"Chargement partiel (graphique uniquement) de la page_rb{index} en " +
-                             f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\n")
+                             f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n")
 
-        log.change_log_prefix("Initialisation")
+        log.change_log_prefix("Initialisation application d'initialisation")
 
     def initialise_page(self, application, engine, index, page_path, current_button):
         """Fonction permettant d'initialiser une des pages de l'application d'initialisation lié à un bouton de droite.
@@ -123,7 +125,7 @@ class RightButtons:
             current_button.setProperty("text", "")
 
             # Si le fichier n'a été chargé correctement
-            log.warning(f"Le fichier graphique {page_path} contient des erreurs.\n\n")
+            log.warning(f"Le fichier graphique contient des erreurs : {page_path}")
             return False
 
     def initialise_signals(self, application, engine, index, page_path, current_button, translation_data):
@@ -152,18 +154,18 @@ class RightButtons:
             La partie fonctionnelle de la page a-t-elle été chargé correctement ?
         """
         # Vérifie si la page a des signals handlers associés (en recherchant un ficher .py associé)
-        if os.path.isfile(f"{PROJECT_DIR}src/initialisation/signals/page_rb/page_rb{index}.py"):
+        if os.path.isfile(f"{self.logic_page_folder_path}page_rb{index}.py"):
             # Si c'est le cas, initialise les signals handlers et le stock
             try:
                 # Import localement le fichier de la page
                 # Appelle le constructeur de la page pour affilier tous les signals aux widgets
                 exec(f"from src.initialisation.signals.page_rb import page_rb{index} as rb{index}\n" +
-                     f"application.pages_list[index - 1] = rb{index}.PageRB{index}(application, engine, index, current_button, translation_data)")
+                     f"application.pages_list[index - 1] = " +
+                     f"rb{index}.PageRB{index}(application, engine, index, current_button, translation_data)")
             except Exception as error:
                 # Permet de rattraper une erreur si le code est incorrect où qu'il ne suit pas la documentation
                 log.warning(f"Erreur lors du chargement des signaux de la page : {page_path}",
                             exception=error)
-                current_button.setProperty("is_positive", False)
                 return False
             else:
                 # Vérifie (ou l'indique) si des fonctions manquent et rend le bouton relié à la page positif
@@ -172,9 +174,7 @@ class RightButtons:
                 return True
         else:
             # Sinon pas de signals handlers associé, le précise dans les logs
-            log.warning(f"""La page_rb{index} n'a aucun fichier signals associé.
-                        \t\tLa page sera visible mais ne sera pas fonctionnelle.\n""")
-            current_button.setProperty("is_positive", False)
+            log.warning(f"La page_rb{index} n'a pas de fichier signals. la page sera visible mais non fonctionnelle.")
             return False
 
     def are_page_functions_there(self, page):
@@ -213,9 +213,9 @@ class RightButtons:
                 application.pages_list[application.active_page_index - 1].on_page_closed(application)
 
             # Indique que l'on sort de l'ancienne page, change le préfixe et indique que l'on rentre dans la nouvelle page
-            log.info(f"Fermeture de la page de paramètres page_rb{application.active_page_index}.\n\n")
+            log.info(f"Fermeture de la page de paramètres page_rb{application.active_page_index}.\n")
             log.change_log_prefix(f"page_rb{new_index}")
-            log.info(f"Ouverture de la page de paramètres page_rb{new_index}.\n")
+            log.info(f"Ouverture de la page de paramètres page_rb{new_index}.")
 
             # Charge le graphique de la nouvelle page et indique à l'application l'index de la nouvelle page chargée
             self.pages_stackview.set_active_page(engine.rootObjects()[0])
