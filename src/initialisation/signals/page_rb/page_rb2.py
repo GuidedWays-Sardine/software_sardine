@@ -32,7 +32,7 @@ class PageRB2:
     engine = None
     page = None
     current_button = None
-    data_widgets = {}      # Dictionaire avec tous les composants contenant des valeurs sur le train
+    data_widgets = {}         # Dictionaire avec tous les composants contenant des valeurs sur le train
     train_name_widget = None  # "train_name_stringinput". Permet une optimisation
 
     # Variables nécessaires à l'indication du mode de paramétrage actuel
@@ -146,7 +146,7 @@ class PageRB2:
             # Ajoute le nom du fichier dans le dictionnaire de paramètres
             page_parameters["train_name"] = self.train_name_widget.property('text')
         else:
-            log.warning("Impossible de sauvegarder le fichier de paramètres train, aucun nom de fichier entré.\n",
+            log.warning("Impossible de sauvegarder le fichier de paramètres train, aucun nom de fichier entré.",
                         prefix="Sauvegarde des données train")
 
         return page_parameters
@@ -160,7 +160,7 @@ class PageRB2:
             chemin d'accès vers le fichier de sauvegarde
         """
         initial_time = time.perf_counter()
-        log.info(f"Tentative de sauvegarde des paramètres trains dans : {file_path}\n",
+        log.info(f"Tentative de sauvegarde des paramètres trains dans : {file_path}",
                  prefix="Sauvegarde des données train")
 
         train_data = sd.SettingsDictionary()
@@ -178,8 +178,9 @@ class PageRB2:
             #FEATURE : Ajouter la récupération des valeurs de freinage ici
         except Exception as error:
             # Dans le cas où une erreur se produit, laisse un message d'erreur (et sauvegarde le fichier tout de même
-            log.warning("Erreur lors de la sauvegarde des données train. Le fichier de paramètres sera incomplet.\n",
+            log.warning("Erreur lors de la sauvegarde des données train. Le fichier de paramètres sera incomplet.",
                         exception=error, prefix="Sauvegarde des données train")
+            log.add_empty_lines()
         finally:
             # Sauvegarde le fichier et indique le temps nécessaire pour la récupération et la sauvegarde des données
             train_data.save(file_path)
@@ -207,8 +208,7 @@ class PageRB2:
                 self.open_train_data_file(f"{self.train_settings_folder_path}{file_name}")
             else:
                 # Sinon laisse un message d'erreur
-                log.warning(f"le fichier de paramètres : {file_name} , n'existe plus.\n" +
-                            f"\t\t{self.train_settings_folder_path}{file_name}",
+                log.warning(f"le fichier de paramètres n'existe plus.\n\t{self.train_settings_folder_path}{file_name}.",
                             prefix="Ouverture des données train")
 
     def open_train_data_file(self, file_path):
@@ -264,11 +264,11 @@ class PageRB2:
             # FEATURE : changer les valeurs de la fenêtre de paramétrage
         except Exception as error:
             # Si le changement des paramètre a eu un soucis, laisse un message d'erreur
-            log.warning("Erreur survenu lors du changement des paramètres de freinage.\n",
+            log.warning("Erreur survenu lors du changement des paramètres de freinage.",
                         exception=error, prefix="Ouverture des données train")
 
         log.info(f"Lecture et changement {len(train_data)} paramètres en " +
-                 f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n",
+                 f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.",
                  prefix="Ouverture des données train")
 
     def change_language(self, translation_data):
