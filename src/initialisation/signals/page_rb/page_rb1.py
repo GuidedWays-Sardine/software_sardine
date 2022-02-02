@@ -68,7 +68,7 @@ class PageRB1:
         except (FileNotFoundError, OSError):
             # Ne change charge pas  la combo langues dans le cas ou le combo n'est pas chargé
             log.warning(f"Le fichier de traduction de langue de l'initialisation n'existe pas." +
-                        f"assurez vous qu'il existe :\n\t\t{application.translation_file_path}")
+                        f"assurez vous qu'il existe.\n\t{application.translation_file_path}")
         # Sinon lit la première ligne pour récupérer la liste des langues
         else:
             # Récupère la liste des langues (ligne 1 du fichier initialisation.lang)
@@ -87,7 +87,7 @@ class PageRB1:
                 # Sinon désactive la combobox et laisse un message de warning
                 language_combo.setProperty("is_activable", False)
                 log.warning(f"La langue : {application.language} n'est' pas dans la liste de langue : {language_list}" +
-                            f"du fichier : {application.translation_file_path}")
+                            f"du fichier :\n\t{application.translation_file_path}")
 
         # Charge tous les dossiers dans src.train.command_board, les traduits et les indiques comme potentiels pupitres
         command_boards = [translation_data[f.replace("_", " ")] for f in os.listdir(self.command_board_folder_path)
@@ -139,7 +139,7 @@ class PageRB1:
         page_parameters["log_level"] = self.log_converter[log_text]
 
         # Paramètre langue
-        page_parameters["Langue"] = self.page.findChild(QObject, "language_combo").property("selection_text")
+        page_parameters["language"] = self.page.findChild(QObject, "language_combo").property("selection_text")
 
         # Paramètre si PCC connecté
         page_parameters["ccs"] = self.page.findChild(QObject, "ccs_check").property("is_checked")
