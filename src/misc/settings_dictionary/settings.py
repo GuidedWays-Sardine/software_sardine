@@ -101,7 +101,7 @@ class SettingsDictionary(dict):
         file_path: `string`
             Chemin d'accès vers le fichier de paramètres (celui-ci sera écrasé)
         delimiter: `str`
-            délimiteur séparant les différentes traductions ";" par défaut
+            délimiteur séparant les différentes paramètres ";" par défaut
         """
         try:
             # Essaye de créer (ou d'écraser) le fichier avec les paramètres actuels
@@ -124,7 +124,7 @@ class SettingsDictionary(dict):
         file_path: `string`
             chemin d'accès vers le fichier de paramètres
         delimiter: `str`
-            délimiteur séparant les différentes traductions ";" par défaut
+            délimiteur séparant les différentes paramètres ";" par défaut
         """
         # Récupère la longueur actuelle
         current_length = len(self)
@@ -149,8 +149,8 @@ class SettingsDictionary(dict):
                         exception=error, prefix="Lecture des données")
         else:
             # Indique en debug le nombre d'éléments récupérés
-            log.debug(f"{len(self) - current_length} nouveaux éléments récupérés dans : {file_path}",
-                      prefix="dictionaire de traduction")
+            log.debug(f"{len(self) - current_length} nouveaux paramètres récupérés dans le fichier :\n\t{file_path}",
+                      prefix="dictionaire de paramètres")
 
     @staticmethod
     def convert_type(data):
