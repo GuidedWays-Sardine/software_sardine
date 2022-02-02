@@ -33,14 +33,14 @@ class PageRB8:
     screen_index_windows = []
 
     # Informations par défauts des écrans {"nom écran": [sera utilisé ?, longuer minimum, hauteur minimum]}
-    screen_default = {}
-    screen_settings = {}
+    windows_defaults = {}
+    windows_settings = {}
     category_active = ""
     screen_list_active = 0
 
     # Chemins d'accès vers les différents fichiers nécessaires au fonctionnement de la page
     screen_index_file_path = f"{PROJECT_DIR}src\\initialisation\\graphics\\page_rb\\page_rb8\\screen_index_window.qml"
-    screen_settings_folder_path = f"{PROJECT_DIR}settings\\screen_settings\\"
+    windows_settings_folder_path = f"{PROJECT_DIR}settings\\windows_settings\\"
 
     def __init__(self, application, engine, index, current_button, translation_data):
         """Fonction d'initialisation de la page de paramtètres 1 (page paramètres général)
@@ -83,11 +83,11 @@ class PageRB8:
         self.page.setProperty("screens_size", [sd[1] for sd in application.screens_dimensions])
 
         # Pour chacun des fichiers dans le répertoire de paramètres d'écrans
-        for file_path in (f for f in os.listdir(self.screen_settings_folder_path) if f.endswith(".screens")):
+        for file_path in (f for f in os.listdir(self.windows_settings_folder_path) if f.endswith(".screens")):
             # Ouvre le fichier, et crée un dictionaire vide pour les écrans dans le fichier
-            file = open(f"{self.screen_settings_folder_path}{file_path}", "r", encoding="utf-8-sig")
-            screens_default = {}
-            screens_settings = {}
+            file = open(f"{self.windows_settings_folder_path}{file_path}", "r", encoding="utf-8-sig")
+            windows_defaults = {}
+            windows_settings = {}
 
             # Pour chacune des lignes contenant des informations
             for line in (l for l in file.readlines() if l != "\n" and l[0] != "#"):
@@ -95,8 +95,8 @@ class PageRB8:
                 info = list(map(str.strip, line.rstrip("\n").split(";")))
                 if len(info) >= 4:
                     try:
-                        screens_default[translation_data[info[0]]] = [True, int(info[1]), int(info[2]), info[3].lower() == "true"]
-                        screens_settings[translation_data[info[0]]] = [0, False, [0, 0], [0, 0]]
+                        windows_defaults[translation_data[info[0]]] = [True, int(info[1]), int(info[2]), info[3].lower() == "true"]
+                        windows_settings[translation_data[info[0]]] = [0, False, [0, 0], [0, 0]]
                     except Exception as error:
                         # Si jamais une des données n'est pas au bon format, laisse un message d'erreur
                         log.warning(f"Paramètres écrans au mauvais format sur la ligne :\n\t\t{line}", exception=error)
@@ -104,15 +104,15 @@ class PageRB8:
                     log.warning(f"Nombe d'informations fenêtres insuffisantes sur la ligne :\n\t\t{line}")
 
             # Rajouter cette série d'écran à la catégorie
-            log.info(f"{len(screens_default)} fenêtres trouvées ({screens_default.keys()}) dans la catégorie" +
+            log.info(f"{len(windows_defaults)} fenêtres trouvées ({windows_defaults.keys()}) dans la catégorie" +
                      f"{translation_data[file_path.replace('_', ' ')[3:-8]]}. Dans le fichier\n\t{file_path}")
-            self.screen_default[translation_data[file_path.replace("_", " ")[3:-8]]] = screens_default
-            self.screen_settings[translation_data[file_path.replace("_", " ")[3:-8]]] = screens_settings
+            self.windows_defaults[translation_data[file_path.replace("_", " ")[3:-8]]] = windows_defaults
+            self.windows_settings[translation_data[file_path.replace("_", " ")[3:-8]]] = windows_settings
 
         # Définit le fonctionnement de base des boutons supérieurs et inférieurs
-        if self.screen_default:
+        if self.windows_defaults:
             # Change le nom de la catégorie pour la première catégorie d'écrans (pour initialiser une page)
-            self.category_active = list(self.screen_default)[0]
+            self.category_active = list(self.windows_defaults)[0]
             self.page.findChild(QObject, "category_title").setProperty("text", self.category_active)
 
             # Rend fonctionnel les boutons inférieurs (visibles et activable que quand nécessaire)
@@ -120,7 +120,7 @@ class PageRB8:
             self.page.findChild(QObject, "right_window_button").clicked.connect(self.on_right_window_button_pressed)
 
             # S'il y a plus d'une catégorie d'écrans, rend les boutons supérieurs de catégories fonctionnels
-            if len(self.screen_default) > 1:
+            if len(self.windows_defaults) > 1:
                 left_category_button = self.page.findChild(QObject, "left_category_button")
                 left_category_button.setProperty("is_activable", False)
                 left_category_button.clicked.connect(self.on_left_category_button_clicked)
@@ -129,7 +129,7 @@ class PageRB8:
                 right_category_button.clicked.connect(self.on_right_category_button_clicked)
         else:
             # Dans le cas où la liste des écrans à paramétrer est nulle
-            raise NameError("Aucun écran à paramétrer. Le dictionnaire \"screen_default\" est vide.")
+            raise NameError("Aucun écran à paramétrer. Le dictionnaire \"windows_defaults\" est vide.")
 
         # connecte les différents boutons des autres pages à la paramétrabilité de certaines fenêtres
         try:
@@ -171,14 +171,14 @@ class PageRB8:
                         \t\tCeux-ci ne peuvent pas se charger correctement.\n""")
 
             # Désactive l'écran train caméra
-            category = list(self.screen_default)[0]
-            screen_camera_train = list(self.screen_default[category])[3]
-            self.screen_default[category][screen_camera_train][0] = False
+            category = list(self.windows_defaults)[0]
+            screen_camera_train = list(self.windows_defaults[category])[3]
+            self.windows_defaults[category][screen_camera_train][0] = False
 
             # Désactive les graphes
-            category = list(self.screen_default)[2]
-            for screen_graph in self.screen_default[category]:
-                self.screen_default[category][screen_graph][0] = False
+            category = list(self.windows_defaults)[2]
+            for screen_graph in self.windows_defaults[category]:
+                self.windows_defaults[category][screen_graph][0] = False
 
     def get_values(self, translation_data):
         """Récupère les paramètres de la page de paramètres page_rb8
@@ -200,23 +200,23 @@ class PageRB8:
         # Récupère les valeurs actuellement sur l'écran
         old_screens_values = self.page.get_values().toVariant()
         for index in range(0, len(old_screens_values)):
-            self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
+            self.windows_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
 
         # Pour chaque catégorie d'écrans
-        for category_key in self.screen_settings:
+        for category_key in self.windows_settings:
             # Pour chaque écrans de cette catégorie
-            for screen_key in self.screen_settings[category_key]:
+            for screen_key in self.windows_settings[category_key]:
                 # Récupère les paramètres de l'écran et les sauvegardes (dépend de si l'écran est sélectionable ou non
-                screen_settings_key = f"{translation_data[category_key]}.{translation_data[screen_key]}."
-                is_activable = self.screen_default[category_key][screen_key][0]
-                screen_settings_values = self.screen_settings[category_key][screen_key]
-                page_parameters[screen_settings_key + "screen_index"] = screen_settings_values[0] if is_activable else 0
-                page_parameters[screen_settings_key + "full_screen"] = screen_settings_values[1] if is_activable else False
-                page_parameters[screen_settings_key + "x"] = screen_settings_values[2][0] if is_activable else 0
-                page_parameters[screen_settings_key + "y"] = screen_settings_values[2][1] if is_activable else 0
-                page_parameters[screen_settings_key + "w"] = screen_settings_values[3][0] if is_activable else 0
-                page_parameters[screen_settings_key + "h"] = screen_settings_values[3][1] if is_activable else 0
-                page_parameters[screen_settings_key + "mandatory"] = self.screen_default[category_key][screen_key][3]
+                windows_settings_key = f"{translation_data[category_key]}.{translation_data[screen_key]}."
+                is_activable = self.windows_defaults[category_key][screen_key][0]
+                windows_settings_values = self.windows_settings[category_key][screen_key]
+                page_parameters[windows_settings_key + "screen_index"] = windows_settings_values[0] if is_activable else 0
+                page_parameters[windows_settings_key + "full_screen"] = windows_settings_values[1] if is_activable else False
+                page_parameters[windows_settings_key + "x"] = windows_settings_values[2][0] if is_activable else 0
+                page_parameters[windows_settings_key + "y"] = windows_settings_values[2][1] if is_activable else 0
+                page_parameters[windows_settings_key + "w"] = windows_settings_values[3][0] if is_activable else 0
+                page_parameters[windows_settings_key + "h"] = windows_settings_values[3][1] if is_activable else 0
+                page_parameters[windows_settings_key + "mandatory"] = self.windows_defaults[category_key][screen_key][3]
 
         return page_parameters
 
@@ -239,23 +239,23 @@ class PageRB8:
                                               translation_data["English"], "English")
 
         # Pour chaque catégorie d'écrans
-        for category_key in self.screen_settings:
+        for category_key in self.windows_settings:
             # Pour chaque écrans de cette catégorie
-            for screen_key in self.screen_settings[category_key]:
+            for screen_key in self.windows_settings[category_key]:
                 # Crée pour chaque écran la clé avec laquelle l'information serait sauvegardée
-                screen_settings_key = f"{invert_translation[category_key]}.{invert_translation[screen_key]}."
+                windows_settings_key = f"{invert_translation[category_key]}.{invert_translation[screen_key]}."
 
                 # Essaye de récupérer les donnés reliées à l'écran
                 try:
-                    if int(data[screen_settings_key + "screen_index"]) <= len(self.screen_index_windows):
-                        self.screen_settings[category_key][screen_key][0] = data[screen_settings_key + "screen_index"]
-                        self.screen_settings[category_key][screen_key][1] = data[screen_settings_key + "full_screen"]
-                        self.screen_settings[category_key][screen_key][2][0] = data[screen_settings_key + "x"]
-                        self.screen_settings[category_key][screen_key][2][1] = data[screen_settings_key + "y"]
-                        self.screen_settings[category_key][screen_key][3][0] = data[screen_settings_key + "w"]
-                        self.screen_settings[category_key][screen_key][3][1] = data[screen_settings_key + "h"]
+                    if int(data[windows_settings_key + "screen_index"]) <= len(self.screen_index_windows):
+                        self.windows_settings[category_key][screen_key][0] = data[windows_settings_key + "screen_index"]
+                        self.windows_settings[category_key][screen_key][1] = data[windows_settings_key + "full_screen"]
+                        self.windows_settings[category_key][screen_key][2][0] = data[windows_settings_key + "x"]
+                        self.windows_settings[category_key][screen_key][2][1] = data[windows_settings_key + "y"]
+                        self.windows_settings[category_key][screen_key][3][0] = data[windows_settings_key + "w"]
+                        self.windows_settings[category_key][screen_key][3][1] = data[windows_settings_key + "h"]
                 except KeyError:
-                    log.debug(f"L'écran : {screen_settings_key} n'a pas de paramètres sauvegardés.")
+                    log.debug(f"L'écran : {windows_settings_key} n'a pas de paramètres sauvegardés.")
 
         # Met à jour la page visible de settings
         self.change_visible_screen_list()
@@ -278,26 +278,26 @@ class PageRB8:
         self.page.setProperty("immersion_text", translation_data[self.page.property("immersion_text")])
 
         # Pour chaque catégories
-        for category_key in list(self.screen_default):
+        for category_key in list(self.windows_defaults):
             # Pour chaque écrans de chaques catégories
-            for screen_key in list(self.screen_default[category_key]):
+            for screen_key in list(self.windows_defaults[category_key]):
                 # Traduit la clé d'écran pour le dictionaire de paramètres choisis et de paramètres par défaut
-                self.screen_default[category_key][translation_data[screen_key]] = self.screen_default[category_key][screen_key]
-                self.screen_settings[category_key][translation_data[screen_key]] = self.screen_settings[category_key][screen_key]
+                self.windows_defaults[category_key][translation_data[screen_key]] = self.windows_defaults[category_key][screen_key]
+                self.windows_settings[category_key][translation_data[screen_key]] = self.windows_settings[category_key][screen_key]
 
                 # Si la clé d'écran a été traduite avec succès, enlève la version non traduite
                 if screen_key != translation_data[screen_key]:
-                    self.screen_default[category_key].pop(screen_key)
-                    self.screen_settings[category_key].pop(screen_key)
+                    self.windows_defaults[category_key].pop(screen_key)
+                    self.windows_settings[category_key].pop(screen_key)
 
             # Traduit la clé de catégorie pour le dictionaire de paramètres choisis et de paramètres par défaut
-            self.screen_default[translation_data[category_key]] = self.screen_default[category_key]
-            self.screen_settings[translation_data[category_key]] = self.screen_settings[category_key]
+            self.windows_defaults[translation_data[category_key]] = self.windows_defaults[category_key]
+            self.windows_settings[translation_data[category_key]] = self.windows_settings[category_key]
 
             # Si la clé de la catégorie a été traduite avec succès, enlève la version non traduite
             if category_key != translation_data[category_key]:
-                self.screen_default.pop(category_key)
-                self.screen_settings.pop(category_key)
+                self.windows_defaults.pop(category_key)
+                self.windows_settings.pop(category_key)
 
             # Si la catégorie est la catégorie active, traduit la catégorie active
             if self.category_active == category_key:
@@ -318,24 +318,24 @@ class PageRB8:
         # Récupère les valeurs actuellement sur l'écran
         old_screens_values = self.page.get_values().toVariant()
         for index in range(0, len(old_screens_values)):
-            self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
+            self.windows_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
 
         # Pour toutes les catégories de paramètrages d'écrans
-        for category_index, category_key in enumerate(self.screen_default):
+        for category_index, category_key in enumerate(self.windows_defaults):
             # Pour tous les écrans de cette catégorie
-            for screen_index, screen_key in enumerate(self.screen_default[category_key]):
+            for screen_index, screen_key in enumerate(self.windows_defaults[category_key]):
                 # Vérifier pour chaque page si la page doit et peut être complétée mais ne l'est pas
-                if self.screen_default[category_key][screen_key][0] and \
-                        self.screen_default[category_key][screen_key][3] \
-                        and self.screen_settings[category_key][screen_key][0] == 0:
+                if self.windows_defaults[category_key][screen_key][0] and \
+                        self.windows_defaults[category_key][screen_key][3] \
+                        and self.windows_settings[category_key][screen_key][0] == 0:
                     # Sauvegarde les paramètres actuellement visibles sur la page
                     old_screens_values = self.page.get_values().toVariant()
                     for index in range(0, len(old_screens_values)):
-                        self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
+                        self.windows_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
 
                     # Désactive/active les boutons de la catégorie si la nouvelle est en première ou dernière
                     self.page.findChild(QObject, "left_category_button").setProperty("is_activable", category_index != 0)
-                    self.page.findChild(QObject, "right_category_button").setProperty("is_activable", category_index != (len(self.screen_default) - 1))
+                    self.page.findChild(QObject, "right_category_button").setProperty("is_activable", category_index != (len(self.windows_defaults) - 1))
 
                     # Change la catégorie au sein de la classe mais aussi sur le composant graphique "category_title"
                     self.category_active = category_key
@@ -347,10 +347,10 @@ class PageRB8:
                     # Cache/Montre/Désactive/active les boutons de changement de série d'écran
                     left_button = self.page.findChild(QObject, "left_window_button")
                     right_button = self.page.findChild(QObject, "right_window_button")
-                    left_button.setProperty("is_visible", len(self.screen_settings[category_key]) > 4)
-                    right_button.setProperty("is_visible", len(self.screen_settings[category_key]) > 4)
+                    left_button.setProperty("is_visible", len(self.windows_settings[category_key]) > 4)
+                    right_button.setProperty("is_visible", len(self.windows_settings[category_key]) > 4)
                     left_button.setProperty("is_activable", int(screen_index / 4) > 0)
-                    right_button.setProperty("is_actibable", int(screen_index / 4) < int((len(self.screen_settings[category_key]) - 1) / 4))
+                    right_button.setProperty("is_actibable", int(screen_index / 4) < int((len(self.windows_settings[category_key]) - 1) / 4))
 
                     # Mets à jour les données actuellement visibles
                     self.change_visible_screen_list()
@@ -396,7 +396,7 @@ class PageRB8:
         # récupère les valeurs des écrans actuels et les sauvegarde
         screens_values = self.page.get_values().toVariant()
         for index in range(0, len(screens_values)):
-            self.screen_settings[self.category_active][screens_values[index][0]] = screens_values[index][1]
+            self.windows_settings[self.category_active][screens_values[index][0]] = screens_values[index][1]
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_left_category_button_clicked(self):
@@ -406,14 +406,14 @@ class PageRB8:
         # Récupère les valeurs actuellement sur l'écran
         old_screens_values = self.page.get_values().toVariant()
         for index in range(0, len(old_screens_values)):
-            self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
+            self.windows_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
 
         left_category_button = self.page.findChild(QObject, "left_category_button")
         category_title = self.page.findChild(QObject, "category_title")
 
         # Récupère l'index et le nom du nouvel élément
-        new_index = list(self.screen_default).index(category_title.property("text")) - 1
-        self.category_active = list(self.screen_default)[new_index]
+        new_index = list(self.windows_defaults).index(category_title.property("text")) - 1
+        self.category_active = list(self.windows_defaults)[new_index]
 
         # Si nouvel élément trouvé, change le titre de la catégorie.
         category_title.setProperty("text", self.category_active)
@@ -435,14 +435,14 @@ class PageRB8:
         # Récupère les valeurs actuellement sur l'écran
         old_screens_values = self.page.get_values().toVariant()
         for index in range(0, len(old_screens_values)):
-            self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
+            self.windows_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
 
         right_category_button = self.page.findChild(QObject, "right_category_button")
         category_title = self.page.findChild(QObject, "category_title")
 
         # Récupère l'index et le nom du nouvel élément
-        new_index = list(self.screen_default).index(self.category_active) + 1
-        self.category_active = list(self.screen_default)[new_index]
+        new_index = list(self.windows_defaults).index(self.category_active) + 1
+        self.category_active = list(self.windows_defaults)[new_index]
 
         # Change le nom de la catégorie active
         category_title.setProperty("text", self.category_active)
@@ -453,7 +453,7 @@ class PageRB8:
 
         # Rend le bouton de gauche actif, et si dernière catégorie rend celui de droite inactif
         self.page.findChild(QObject, "left_category_button").setProperty("is_activable", True)
-        if new_index == len(self.screen_default) - 1:
+        if new_index == len(self.windows_defaults) - 1:
             right_category_button.setProperty("is_activable", False)
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
@@ -464,7 +464,7 @@ class PageRB8:
         # Récupère les valeurs actuellement sur l'écran
         old_screens_values = self.page.get_values().toVariant()
         for index in range(0, len(old_screens_values)):
-            self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
+            self.windows_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
 
         # Diminue l'index de la liste d'écrans et appelle la fonction pour changer les écrans à paramétrer
         self.screen_list_active -= 1
@@ -478,7 +478,7 @@ class PageRB8:
         # Récupère les valeurs actuellement sur l'écran
         old_screens_values = self.page.get_values().toVariant()
         for index in range(0, len(old_screens_values)):
-            self.screen_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
+            self.windows_settings[self.category_active][old_screens_values[index][0]] = old_screens_values[index][1]
 
         # Augmente l'index de la liste d'écrans et appelle la fonction pour changer les écrans à paramétrer
         self.screen_list_active += 1
@@ -489,22 +489,22 @@ class PageRB8:
         A appeler dans le cas où la catégorie ou la série d'écran a été changé ou que les paramètres défauts de l'écrans ont été changés.
         """
         # Essaye de récupérer le dictionnaire des écrans de la catégorie sélectionnée et récupère leurs clés
-        category_screen_dict = self.screen_default[self.category_active]
-        default_settings_dict = self.screen_settings[self.category_active]
+        category_screen_dict = self.windows_defaults[self.category_active]
+        default_settings_dict = self.windows_settings[self.category_active]
         category_screen_list = list(category_screen_dict)
 
         # Vide les liste qui seront envoyés à la partie graphique
         visible_screen_names = []
         visible_screen_activable = []
         visible_screen_minimum_wh = []
-        visible_screen_default_settings = []
+        visible_windows_defaults_settings = []
 
         # S'il y a plus de 4 écrans dans la catégorie, montre les 4 premiers sinon les montre tous
         for index in range(self.screen_list_active * 4,
                            len(category_screen_list) if len(category_screen_list) <= (self.screen_list_active + 1) * 4
                            else 4 * (self.screen_list_active + 1)):
             screen_data = category_screen_dict[category_screen_list[index]]
-            visible_screen_default_settings.append(default_settings_dict[category_screen_list[index]])
+            visible_windows_defaults_settings.append(default_settings_dict[category_screen_list[index]])
             visible_screen_names.append(category_screen_list[index])
             # Vérifie si l'écran a bien les 3 éléments nécessaires
             if (len(screen_data)) >= 3:
@@ -521,7 +521,7 @@ class PageRB8:
         self.page.setProperty("windows_name", visible_screen_names)
         self.page.setProperty("windows_activable", visible_screen_activable)
         self.page.setProperty("minimum_wh", visible_screen_minimum_wh)
-        self.page.setProperty("initial_settings", visible_screen_default_settings)
+        self.page.setProperty("initial_settings", visible_windows_defaults_settings)
 
         # Rend visible et fonctionnel les boutons du bas pour changer de page d'écrans dans le cas
         if len(category_screen_list) > 4:
@@ -547,19 +547,19 @@ class PageRB8:
         """
         # Récupère si le checkbutton est activé, le nom de la catégorie et des écrans à modifier
         is_checked = application.pages_list[0].page.findChild(QObject, "camera_check").property("is_checked")
-        category = list(self.screen_default)[0]
-        screen_virtual_line = list(self.screen_default[category])[2]
-        screen_camera_train = list(self.screen_default[category])[3]
+        category = list(self.windows_defaults)[0]
+        screen_virtual_line = list(self.windows_defaults[category])[2]
+        screen_camera_train = list(self.windows_defaults[category])[3]
 
         # Change la paramétrabilité des écrans souhaités
-        self.screen_default[category][screen_virtual_line][0] = not is_checked
-        self.screen_default[category][screen_camera_train][0] = is_checked
+        self.windows_defaults[category][screen_virtual_line][0] = not is_checked
+        self.windows_defaults[category][screen_camera_train][0] = is_checked
 
         # Réinitialise les paramètres de ces écrans s'ils ne sont plus paramétrables
-        if not self.screen_default[category][screen_virtual_line][0]:
-            self.screen_settings[category][screen_virtual_line] = [0, False, [0, 0], [0, 0]]
+        if not self.windows_defaults[category][screen_virtual_line][0]:
+            self.windows_settings[category][screen_virtual_line] = [0, False, [0, 0], [0, 0]]
         else:
-            self.screen_settings[category][screen_camera_train] = [0, False, [0, 0], [0, 0]]
+            self.windows_settings[category][screen_camera_train] = [0, False, [0, 0], [0, 0]]
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_ccs_checked(self, application):
@@ -573,15 +573,15 @@ class PageRB8:
         """
         # Récupère si le checkbutton est activé, le nom de la catégorie et des écrans à modifier
         is_checked = application.pages_list[0].page.findChild(QObject, "ccs_check").property("is_checked")
-        category = list(self.screen_default)[1]
-        screen_tco = list(self.screen_default[category])[0]
+        category = list(self.windows_defaults)[1]
+        screen_tco = list(self.windows_defaults[category])[0]
 
         # Change la paramétrabilité des écrans souhaités
-        self.screen_default[category][screen_tco][0] = is_checked
+        self.windows_defaults[category][screen_tco][0] = is_checked
 
         # Réinitialise les paramètres de ces écrans s'ils ne sont plus paramétrables
-        if not self.screen_default[category][screen_tco][0]:
-            self.screen_settings[category][screen_tco] = [0, False, [0, 0], [0, 0]]
+        if not self.windows_defaults[category][screen_tco][0]:
+            self.windows_settings[category][screen_tco] = [0, False, [0, 0], [0, 0]]
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_data_checked(self, application):
@@ -596,15 +596,15 @@ class PageRB8:
         # Récupère si les données sont activées et si elles sont activées en mode dashboard
         is_data_checked = application.pages_list[0].page.findChild(QObject, "data_check").property("is_checked")
         is_dashboard_checked = application.pages_list[0].page.findChild(QObject, "dashboard_check").property("is_clicked")
-        category = list(self.screen_default)[2]
-        screen_graphs = list(self.screen_default[category])
+        category = list(self.windows_defaults)[2]
+        screen_graphs = list(self.windows_defaults[category])
         screen_dashboard = screen_graphs[0]
 
         # Met à jour les propriétés du dashboard
         for screen in screen_graphs:
             if is_data_checked and ((is_dashboard_checked and screen == screen_dashboard) or
                                     (not is_dashboard_checked and screen != screen_dashboard)):
-                self.screen_default[category][screen][0] = True
+                self.windows_defaults[category][screen][0] = True
             else:
-                self.screen_default[category][screen][0] = False
-                self.screen_settings[category][screen] = [0, False, [0, 0], [0, 0]]
+                self.windows_defaults[category][screen][0] = False
+                self.windows_settings[category][screen] = [0, False, [0, 0], [0, 0]]
