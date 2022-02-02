@@ -187,16 +187,9 @@ class RightButtons:
             page à vérifier (celle-ci doit être de type PageRBX)
         """
         # Dans l'ordre : get_values, set_values, change_language, on_page_opened, on_page_closed
-        if "get_values" not in dir(page):
-            log.warning(f"Aucune fonction \"get_values\", pour la PageRB{page.index}.\n")
-        if "set_values" not in dir(page):
-            log.warning(f"Aucune fonction \"set_values\", pour la PageRB{page.index}.\n")
-        if "change_language" not in dir(page):
-            log.warning(f"Aucune fonction \"change_language\", pour la PageRB{page.index}.\n")
-        if "on_page_opened" not in dir(page):
-            log.debug(f"Aucune fonction \"on_page_opened\", pour la PageRB{page.index}.\n")
-        if "on_page_closed" not in dir(page):
-            log.debug(f"Aucune fonction \"on_page_closed\", pour la PageRB{page.index}.\n")
+        for function in ["get_values", "set_values", "change_language", "on_page_opened", "on_page_closed"]:
+            if function not in dir(page):
+                log.debug(f"Aucune fonction \"{function}\" dans la page_rb{page.index}.")
 
     @decorators.QtSignal(log_level=log.Level.CRITICAL, end_process=True)
     def on_new_page_selected(self, application, engine, new_index):
