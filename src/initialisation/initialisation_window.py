@@ -173,47 +173,56 @@ class InitialisationWindow:
         log.info(f"Récupération des paramètres de l'application.\n")
         parameters = sd.SettingsDictionary()
 
-        screens = QDesktopWidget()
-        screen_index = list(i for i in range(0, screens.screenCount())
+        # Dans le cas où des fonctions get_values sont détectés, récupère les paramètres de l'application
+        if any(["get_values" in dir(page) for page in self.pages_list]):
+            log.info(f"Récupération des paramètres de l'application.")
+
+            # Récupère l'écran sur lequel se situe la fenêtre d'initialisation.
+            screens = QDesktopWidget()
+            screen_index = [i for i in range(0, screens.screenCount())
                             if screens.screenGeometry(i).getCoords()[0] - 1 < self.win.x() <=
                             screens.screenGeometry(i).getCoords()[2]
                             and screens.screenGeometry(i).getCoords()[1] - 1 < self.win.y() <=
-                            screens.screenGeometry(i).getCoords()[3])
-        if screen_index:
-            sg = screens.screenGeometry(screen_index[0]).getCoords()
-            parameters["initialisation.screen_index"] = screen_index[0] + 1
-            parameters["initialisation.x"] = self.win.x() - sg[0]
-            parameters["initialisation.y"] = self.win.y() - sg[1]
-            parameters["initialisation.w"] = (self.win.width() if (self.win.x() + self.win.width() <= sg[2] + 1)
-                                                               else self.win.property("minimumWidth"))
-            parameters["initialisation.h"] = (self.win.height() if (self.win.y() + self.win.height() <= sg[3] + 1)
-                                                                else self.win.property("minimumHeight"))
-        else:
-            log.warning(f"Impossible de localiser la fenêtre d'initialisation.\n")
+                            screens.screenGeometry(i).getCoords()[3]]
 
-        # Vérifie si au moins une page est chargé graphiquement. (sinon tente de charger les paramètres défaut.settings)
-        any_loaded = any([page is not None and not isinstance(page, QObject) for page in self.pages_list])
-        if not any_loaded and os.path.isfile(self.default_settings_file_path):
-            # Si aucune page n'est chargée correctement et que le fichier default.settings existe
-            parameters.open(self.default_settings_file_path)
-        elif any_loaded:
-            # Récupère ma traduction anglaise car les paramètres textuels sont stockés en anglais
+            # Si la fenêtre d'initialisation a été détecté sur un écran, récupère et stocke ses coordonées
+            if screen_index:
+                sg = screens.screenGeometry(screen_index[0]).getCoords()
+                parameters["initialisation.screen_index"] = screen_index[0] + 1
+                parameters["initialisation.x"] = self.win.x() - sg[0]
+                parameters["initialisation.y"] = self.win.y() - sg[1]
+                parameters["initialisation.w"] = (self.win.width() if (self.win.x() + self.win.width() <= sg[2] + 1)
+                                                  else self.win.property("minimumWidth"))
+                parameters["initialisation.h"] = (self.win.height() if (self.win.y() + self.win.height() <= sg[3] + 1)
+                                                  else self.win.property("minimumHeight"))
+
+                log.info("emplacement de la fenêtre d'initialisation récupéré avec succès : " +
+                         str([parameters[f"initialisation.{p}"] for p in ["screen_index", "x", "y", "w", "h"]]))
+            else:
+                log.warning(f"Impossible de localiser la fenêtre d'initialisation.")
+
+            # Récupère la traduction anglaise car les paramètres textuels sont stockés en anglais
             translation_data = td.TranslationDictionary()
             translation_data.create_translation(self.translation_file_path, self.language, "English")
 
-            # Pour chaque page ayant une partie logique fonctionnelle et une fonction get_values:
-            for page in (p for p in self.pages_list if "get_values" in dir(p)):
+            # Récupère le reste des données du simulateur (en appelant la fonction get_values pour chaque page
+            for page_index, page in ((i, p) for (i, p) in enumerate(self.pages_list) if "get_values" in dir(p)):
                 try:
-                    # Appelle la fonction get_values de la page et si celle-ci fonctionne, récupère ses paramètres
                     parameters.update(page.get_values(translation_data))
                 except Exception as error:
-                    # Permet de rattraper une potentielle erreur dans la fonction get_values()
-                    log.warning(f"Erreur lors de la récupération des paramètres pour la page_rb{page.index}.\n",
+                    # Récupère une potentielle erreur dans la fonction d'écriture des valeurs
+                    log.warning(f"Erreur lors de la récupération des paramètres pour la page_rb{page_index}.",
                                 exception=error)
 
-        # Retourne le dictionnaire complété grâce aux différentes valeurs des get_values() de chaques pages
-        log.info(f"Récupération de {len(parameters)} paramètres sur l'application d'initialisation en " +
-                 f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\n")
+            log.info(f"Chargement de {len(parameters)} paramètres en" +
+                     f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n")
+        elif os.path.isfile(self.default_settings_file_path):
+            # Sinon récupère les paramètres du fichier par défaut s'il existe
+            parameters.open(self.default_settings_file_path)
+            log.add_empty_lines()
+        else:
+            log.warning("Aucune page de paramètres correctement chargé et pas de fichier default.settings.\n")
+
         return parameters
 
     def set_values(self, data):
