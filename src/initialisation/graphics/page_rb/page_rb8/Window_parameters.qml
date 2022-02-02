@@ -84,6 +84,13 @@ Item {
     onNone_textChanged: {screens_list[0] = root.none_text}
 
 
+    //Fonction permettant de faire clignoter l'encadré du paramétrage écran
+    function blink() {
+        body.blink()
+    }
+
+
+
     //Bouton permettant de créer l'encadré du combobox et contenant tous les éléments de paramétrage
     INI_button {
         id: body
