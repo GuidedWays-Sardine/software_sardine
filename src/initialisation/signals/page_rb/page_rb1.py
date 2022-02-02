@@ -78,6 +78,8 @@ class PageRB1:
             # S'assure que le français est bien dedans, sinon c'est qu'il y a un soucis
             if application.language.lower() in [lang.lower() for lang in language_list]:
                 # Met la liste des langues dans la combo et connecte une fonction pour changer la langue
+                log.info(f"{len(language_list)} langues trouvées ({language_list}) dans le fichier. \n\t" +
+                         application.translation_file_path)
                 language_combo.setProperty("elements", language_list)
                 language_combo.change_selection(application.language)
                 language_combo.selection_changed.connect(lambda: self.on_language_changed(application))
@@ -92,11 +94,13 @@ class PageRB1:
                           if os.path.isdir(os.path.join(self.command_board_folder_path, f))
                           and f != "__pycache__"]
         self.page.findChild(QObject, "command_board_combo").setProperty("elements", command_boards)
+        log.info(f"{len(command_boards)} pupitres trouvés ({command_boards}) dans :\n\t{self.command_board_folder_path}")
 
         # Charge tous les DMI présents dans src.train.DMI, les traduits et les indiques comme DMI sélectionables
         dmi_list = [translation_data[f.replace("_", " ")] for f in os.listdir(self.dmi_folder_path)
                     if os.path.isdir(os.path.join(self.dmi_folder_path, f))]
         self.page.findChild(QObject, "dmi_combo").setProperty("elements", dmi_list)
+        log.info(f"{len(dmi_list)} IHM trouvés ({dmi_list}) dans :\n\t{self.dmi_folder_path}")
 
         # Initialise la liste des niveaux de registre et l'envoie au log_switchbutton
         self.page.findChild(QObject, "log_switchbutton").setProperty("elements", list(self.log_converter))
