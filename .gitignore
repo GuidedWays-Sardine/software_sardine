@@ -3,3 +3,4 @@
 /log/*.log
 /results/*.xlsx
 /settings/general_settings/*.settings
+/settings/train_settings/*.train
