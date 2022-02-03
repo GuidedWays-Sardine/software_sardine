@@ -224,7 +224,48 @@ class Control:
         command_board_settings: `sd.SettingsDictionary`
             dictionnaire de paramètres pupitres. Permet de connecter tous les éléments à leurs fonctions
         """
-        pass
+        # Essaye
+        button_index = 1
+        # Essaye de charger des boutons jusqu'à ce que l'index soit trop grand et qu'il n'y en ait plus
+        while f"button{button_index}.type" in command_board_settings:
+            try:
+                # Commence par charger toutes les fonctions relié au bouton
+                function_index = 1
+                functions = {}      # Dictionnaire {[état pins] : fonction, ...}
+                while f"button{button_index}.function{function_index}.values" in command_board_settings\
+                        and f"button{button_index}.function{function_index}.function" in command_board_settings:
+                    try:
+                        functions[command_board_settings[f"button{button_index}.function{function_index}.values"]] = \
+                            Actions[command_board_settings[f"button{button_index}.function{function_index}.function"][8:]]
+                    except Exception as error:
+                        log.debug(f"Erreur lors du chargement d'une des fonctions pupitre",
+                                  exception=error, prefix=f"button{button_index}.function{function_index}")
+                    function_index += 1
+
+                type = command_board_settings.get_value(f"button{button_index}.type", "")
+                # S'occupe maintenant de charger les informations générales sur le bouton
+                if type == "PushButton":
+                    # Récupère les actions quand pressé et non pressé
+                    action_released = functions[False] if False in functions else None
+                    action_pressed = functions[True] if True in functions else None
+                    bd.PushButton(self.board, command_board_settings[f"button{button_index}.pins"][0], None,    # TODO : rajouter compatibilité avec LED
+                                  action_up=action_released, action_down=action_pressed)
+                elif type == "Potentiometer":
+                    pass # TODO : introduire la composante
+                elif type == "SwitchButton":
+                    # Pour les PushButton aucun traitement n'est nécessaire
+                    if command_board_settings.get_value(f"button{button_index}.read_mode", "").lower() == "update":
+                        self.update_buttons.append(bd.SwitchButton(self.board, command_board_settings[f"button{button_index}.pins"], functions))
+                    else:
+                        self.continuous_buttons.append(bd.SwitchButton(self.board, command_board_settings[f"button{button_index}.pins"], functions))
+            except Exception as error:
+                log.debug(f"Erreur lors du chargement d'un des boutons du pupitre",
+                          exception=error, prefix=f"button{button_index}")
+
+            button_index += 1
+
+        log.info(f"{len(self.continuous_buttons) + len(self.update_buttons)} connectés au pupitre")
+
 
     # Fonction (potentiellement à surcharger) permettant d'initialiser la fenêtre avec les boutons virtuels
     def initialise_virtual_buttons(self, app):
