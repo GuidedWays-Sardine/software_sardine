@@ -37,7 +37,7 @@ class Actions(Enum):
 class Control:
     """Classe contenant la logique générale du pupitre"""
     # Delai de lecture des valeurs des boutons (volontairement différent de simulation.DELAY pour une lecture plus précise)
-    DELAY = 0.02     # En secondes
+    DELAY = 0.015     # En secondes (Attention par palier de 0.015s)
 
     # Informations sur la mise à jour, utile surtout du point de vue pratique et debug
     update_count = 0
@@ -45,6 +45,11 @@ class Control:
 
     # Cadenas pour éviter les data races (Un thread qui lit sur le pupitre et ajoute les commandes et un autre)
     lock = threading.Lock()
+
+    # Liste des éléments nécessaires au fonctionnement du pupitre
+    board = None
+    continuous_buttons = []
+    update_buttons = []
 
     # Liste des actions à réaliser
     actions_list = []
