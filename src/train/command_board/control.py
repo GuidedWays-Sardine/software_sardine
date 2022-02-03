@@ -54,16 +54,30 @@ class Control:
     # Liste des actions à réaliser
     actions_list = []
 
-    def __init__(self, app):
+    def __init__(self, command_board_settings, app=None):
         """Initialisation  du pupitre du pupitre de commandes
 
         Parameters
         __________
+        command_board_settings: `sd.SettingsDictionary`
+            dictionnaire de paramètres pupitres. Permet de connecter tous les éléments à leurs fonctions
         app: `QApplication`
             L'application sur laquelle les modules graphiques de la simulation vont se lancer
+
+        Raises
+        ------
+        KeyError
+            Jeté si certains arguments vitaux (tel que le type de carte électronique) ne sont pas présents
+        PermissionError
+            Jeté s'il est impossible pour le pupitre de se connecter à la carte électronique de gestion de celle-ci
         """
-        # Commence par initialiser les boutons du pupitre
-        self.initialise_physical_buttons()
+        initial_time = time.perf_counter()
+
+        # Commence par initialiser l'arduino
+        self.initialise_board(command_board_settings)
+
+        # Continue en initialisant les différents boutons physiques connecté à l'arduino
+        self.initialise_physical_buttons(command_board_settings)
 
         # Puis initialise les boutons
         self.initialise_virtual_buttons(app)
@@ -143,9 +157,73 @@ class Control:
 
     # FEATURE : Liste de toutes les fonctions surchargeables
 
-    # Fonction (à surcharger) permettant d'initialiser la liste de tous les boutons réels sur le pupitre
-    def initialise_physical_buttons(self):
-        """Fonction permettant d'initialiser tous les boutons physiques du pupitre"""
+    # Fonction (surchargeable) permettant d'initialiser la carte électronique utilisée pour le pupitre
+    def initialise_board(self, command_board_settings):
+        """Fonction permettant d'initialiser la carte éléctronique utilisée pour le pupitre
+
+        Parameters
+        ----------
+        command_board_settings: `sd.SettingsDictionary`
+            dictionnaire de paramètres pupitres. Permet de connecter tous les éléments à leurs fonctions
+
+        Raises
+        ------
+        KeyError
+            Jeté si certains arguments vitaux (tel que le type de carte électronique) ne sont pas présents
+        PermissionError
+            Jeté s'il est impossible pour le pupitre de se connecter à la carte électronique de gestion de celle-ci
+        """
+        # Récupère tous les ports où l'Arduino peut être connecté
+        ports = serial.tools.list_ports.comports()
+        if command_board_settings["board.type"] in ["Arduino", "ArduinoDue", "ArduinoMega", "ArduinoNano"]:
+            # Dans le cas où c'est une carte par défaut, essaye d'initialiser jusqu'à ce qu'un des ports se connecte
+            for port in ports:
+                if self.board is None:
+                    try:
+                        # Essaye d'initialiser l'arduino
+                        exec(f"self.board = pyfirmata.{command_board_settings['board']}({port.device})")
+                        log.info(f"Connexion à la carte électronique : {port.name} sur le port : {port.device}.")
+                        # Cas où c'est une borne déjà présent par défaut:
+                    except Exception as error:
+                        # Si ça rate, passe au port suivant
+                        log.error("", exception=error)
+                        pass
+        else:
+            # Dans le cas où ce n'est pas une carte par défaut, initialise une carte grâce à l'initialisation Board
+            digital_pins = command_board_settings["board.digital_pins"]    # Considère digital et analog comme important
+            analog_pins = command_board_settings["board.analog_pins"]
+            pwm_pins = command_board_settings.get_value("board.pwm_pins", ())
+            disabled_pins = command_board_settings.get_value("board.disabled_pins", ())
+
+            # Essaye d'initialiser jusqu'à ce qu'un des ports se connecte
+            for port in ports:
+                if self.board is None:
+                    try:
+                        # Essaye d'initialiser la carte avec les arguments récupérés du fichier de paramètres
+                        self.board = pyfirmata.Board(port.device, {"digital": digital_pins,
+                                                                   "analog": analog_pins,
+                                                                   "pwm": pwm_pins,
+                                                                   "use_ports": True,
+                                                                   "disabled": disabled_pins})
+                        log.info(f"Connexion à la carte électronique : {port.name} sur le port : {port.device}.")
+                    except Exception as error:
+                        log.error("", exception=error)
+                        pass
+
+        # Si la carte électronique n'a toujours pas été chargée
+        if self.board is None:
+            raise PermissionError("Impossible de se connecter a une carte électronique. " +
+                                  "Assurez vous qu'elle est connectée et n'est pas utilisée par un autre logiciel.")
+
+    # Fonction (surchargeable) permettant d'initialiser la liste de tous les boutons réels sur le pupitre
+    def initialise_physical_buttons(self, command_board_settings):
+        """Fonction permettant d'initialiser la carte éléctronique utilisée pour le pupitre
+
+        Parameters
+        ----------
+        command_board_settings: `sd.SettingsDictionary`
+            dictionnaire de paramètres pupitres. Permet de connecter tous les éléments à leurs fonctions
+        """
         pass
 
     # Fonction (potentiellement à surcharger) permettant d'initialiser la fenêtre avec les boutons virtuels
