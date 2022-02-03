@@ -183,5 +183,13 @@ class SettingsDictionary(dict):
         if data.lower == "none":
             return None
 
+        # Regarde s'il peut contenir une liste d'éléments
+        if data.startswith("[") and data.endswith("]"):
+            return [SettingsDictionary.convert_type(v.strip()) for v in data[1:-1].split(",")]
+
+        # Regarde s'il peut contenir un tuple d'éléments
+        if data.startswith("(") and data.endswith(")"):
+            return tuple(SettingsDictionary.convert_type(v.strip()) for v in data[1:-1].split(","))
+
         # Dans tous les cas (si aucun des autres cas n'a été intercepté) retourne le string
         return data
