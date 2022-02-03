@@ -82,6 +82,12 @@ class Control:
         # Puis initialise les boutons
         self.initialise_virtual_buttons(app)
 
+        thread = util.Iterator(self.board)
+        thread.start()
+
+        log.info(f"Chargement du module pupitre ({command_board_settings.get_value('command_board', ' ')}) en " +
+                 f"{(time.perf_counter() - initial_time) * 1000:.2f} millisecondes.")
+
     def run(self):
         """Fonction permettant de lancer le pupitre ainsi que la boucle de lecture"""
         # Commence par lancer la partie physique et virtuelle du pupitre
@@ -138,7 +144,8 @@ class Control:
             # Pour chacune des actions dans la liste d'action à éxecuter, essaye de l'executer, sinon laise une erreur
             for action in self.actions_list:
                 try:
-                    exec(str(action[0]) + "(database," + str(*action[1::]) + ")")
+                    action[0](database, *action[1:])
+                    # exec(str(action[0]) + "(database," + str(*action[1::]) + ")")
                 except Exception as error:
                     log.error("Erreur fatale lors du fonctionnement du simulateur\n\t\t" +
                               "Erreur de type : " + str(type(error)) + "\n\t\t" +
