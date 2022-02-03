@@ -159,7 +159,8 @@ class SwitchButton:
                     actions_list.append([action, time.time()])
 
     def read_value(self):
-        self.pins_state = []
+        pins_state = []
         for pin in self.pins:
-            self.pins_state.append(pin.read())
+            pins_state.append(pin.read())
+        self.pins_state = tuple(pins_state)
 
