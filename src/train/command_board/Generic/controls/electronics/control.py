@@ -35,6 +35,7 @@ class Control:
 
     # Liste des éléments nécessaires au fonctionnement du pupitre
     board = None
+    reading_thread = None
     continuous_buttons = []
     update_buttons = []
 
@@ -68,9 +69,6 @@ class Control:
 
         # Puis initialise les boutons
         self.initialise_virtual_buttons(app)
-
-        thread = util.Iterator(self.board)
-        thread.start()
 
         log.info(f"Chargement du module pupitre ({command_board_settings.get_value('command_board', ' ')}) en " +
                  f"{(time.perf_counter() - initial_time) * 1000:.2f} millisecondes.")
@@ -208,6 +206,10 @@ class Control:
         if self.board is None:
             raise PermissionError("Impossible de se connecter a une carte électronique. " +
                                   "Assurez vous qu'elle est connectée et n'est pas utilisée par un autre logiciel.")
+
+        # Génère et démarre le thread qui lit les valeurs
+        self.reading_thread = util.Iterator(self.board)
+        self.reading_thread.start()
 
     # Fonction (surchargeable) permettant d'initialiser la liste de tous les boutons réels sur le pupitre
     def initialise_physical_buttons(self, command_board_settings):
