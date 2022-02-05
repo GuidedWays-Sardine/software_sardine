@@ -338,44 +338,121 @@ class Potentiometer:
 
 
 class SwitchButton:
-    pins = []
-    pins_state = []
-    functions = {}
+    """Classe permettant de controller un boutton multiposition"""
+    # Paramètres nécessaires au fonctionnement du bouton multiposition
+    __pins = ()
+    __actions = {}
 
-    def __init__(self, carte, pins, functions):
-        for pin in pins:
-            self.pins.append(carte.get_pin('d:' + str(pin) + ':i'))
-        self.functions = functions
-        for func in self.functions:
-            if len(self.pins) != len(func):
-                log.debug("Cle non valide pour appel de la fonction : " + str(self.functions[func]) + ".\n")
-                self.functions.pop(func)
+    # Paramètres sur l'état du bouton multiposition
+    __state = ()
+    __previous_states = []
+    __lookup = 0
+    __THRESHOLD = 1
+
+    def __init__(self, board, pins_index, actions, THRESHOLD=1):
+        """Fonction permettant d'initialiser une led sur le pupitre (seule ou sur un bouton)
+
+        Parameters
+        ----------
+        board: `pyfirmata.Board`
+            Carte Arduino/Electronique sur lequel le boutton est branchée
+        pins_index: `tuple`
+            Index des pins sur lesquel le bouton multiposition est connectée (forcément numérique)
+        actions: `dict`
+            Liste des actions à appeler selon les valeurs lus sur les pins. Clés = tuple des entrées -> valeurs : Action
+        THRESHOLD: `int`
+            Nombre de fois que la valeur minimales doit être lu pour être acceptée. Evite les faux-positifs lors des
+            lectures des valeurs du bouton mais rajoute un délai de Control.DELAY * THRESHOLD
+
+        Raises
+        ------
+        pyfirmata.InvalidPinDefError:
+            Jeté lorsque l'index du pin envoyé ne correspond à aucun pin sur la carte électronique
+        pyfirmata.PinAlreadyTakenError:
+            Jeté si le pin utilisé par le bouton est déjà utilisé par un autre composant
+        TypeError:
+            Jeté si l'action envoyée ne correspond à aucune action valide
+        """
+        # Récupère le pin sur la carte à partir de son index
+        self.__pins = tuple([board.get_pin(f"d:{pins_index[p_i]}:i") for p_i in pins_index])
+
+        # Enregistre chacune des actions valides dans le dictionnaire des actions
+        for key, action in actions.items():
+            # Vérifie que l'action est bien une action
+            if isinstance(action, control.Actions):
+                # Vérifie que les entrées sont bien au bon nombre
+                if len(key) == len(self.__pins):
+                    # Ajoute alors la fonction et ses clés au dictionnaire des actions
+                    self.__actions[key] = action
+                else:
+                    log.debug(f"pas suffisament de valeurs pour la clé : {key}: {action}. " +
+                              f"{len(key)} valeurs {key} au lieu des {len(self.__pins)} {pins_index} requis.")
+            else:
+                log.debug(f"L'action ({action}) du bouton multiposition relié aux positions {key}, " +
+                          f" connecté aux pins {pins_index} n'est pas valide. " +
+                          f" Elle est de type \"{type(action)}\" et non de type \"<class \'control.Actions\'>\"")
+
+        # Si aucune des actions n'a été chargée correctement, jette une erreur
+        if not self.__actions:
+            raise TypeError(f"Aucune action du bouton multiposition pins {pins_index} n'a été chargée correctement.")
+
+        # Stocke le seuil nécessaire pour accepter une valeur (la transforme en entier pour éviter tout problème d'index
+        if THRESHOLD >= 1:
+            self.__THRESHOLD = int(THRESHOLD)
+
+        # Modifie le tableau de valeurs précédemment lues pour qu'il soit de bonnes dimensions
+        self.__previous_states = [(False,) * len(self.__pins)] * self.__THRESHOLD
 
     def add_action(self, actions_list):
-        self.read_value()
+        """Fonction permettant de rajouter l'action à la liste d'actions selon la position du bouton multiposition.
+        Aucune action ne sera ajoutée si l'état actuel n'a pas d'action ajoutée, et le seuil ne sera pas considéré
+
+        Parameters
+        ----------
+        actions_list: `list`
+            Liste des actions sur laquelle l'action sera ajoutée
+        """
+        # Lit la valeur et la stocke dans la variable
+        state = self.read_value()
+
+        # Essaye de rajouter l'action correspondant à la valeur lu. Si une erreur est jetée, c'est qu'aucune n'est là
         try:
-            action = self.functions[self.pins_state]
-        except KeyError:
+            actions_list.append([self.__actions[state], time.time()])
+        except Exception:
             pass
-        else:
-            if action is not None:
-                actions_list.append([action, time.time()])
 
     def verify_value(self, actions_list):
-        old_value = self.pins_state
-        self.read_value()
-        if old_value != self.pins_state:
+        """Fonction permettant de lire la valeur et si elle est différentes pour plus de THRESHOLD fois,
+        ajouter l'action associée (si elle existe) à la liste d'actions.
+
+        Parameters
+        ----------
+        actions_list: `list`
+            Liste des actions sur laquelle l'action sera potentiellement ajoutée
+        """
+        # Lit la valeur et la stocke dans la case du tableau pointée, et passe à la case suivante
+        self.__previous_states[self.__lookup] = self.read_value()
+        self.__lookup = (self.__lookup + 1) % self.__THRESHOLD      # 0 -> 1 -> ... -> THRESHOLD - 1 -> 0 -> 1 -> ...
+
+        # Si toutes les valeurs sont identiques et ne valent pas None (erreur de lecture) ou la valeur précédente
+        if not any([p_s is None for p_s in self.__previous_states[0]]) and self.__previous_states[0] != self.__state and \
+                self.__previous_states.count(self.__previous_states[0]) == len(self.__previous_states):
+            # Change l'état du bouton
+            self.__state = self.__previous_states[0]
+
+            # Ajoute la fonction correspondante à la liste d'actions si elle existe
             try:
-                action = self.functions[self.pins_state]
-            except KeyError:
+                actions_list.append([self.__actions[self.__state], time.time()])
+            except Exception:
                 pass
-            else:
-                if action is not None:
-                    actions_list.append([action, time.time()])
 
     def read_value(self):
-        pins_state = []
-        for pin in self.pins:
-            pins_state.append(pin.read())
-        self.pins_state = tuple(pins_state)
+        """Fonction permettant de lire les valeur sur les pins du bouton multiposition
 
+        Returns
+        -------
+        value: `tuple`
+            Les valeurs lus sur les différents pins du bouton multiposition
+        """
+        # Récupère les valeurs pour chacun des pins, les convertits en tuples et les retournes
+        return tuple([pin.read() for pin in self.__pins])
