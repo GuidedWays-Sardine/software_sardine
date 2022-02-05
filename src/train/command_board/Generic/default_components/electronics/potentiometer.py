@@ -2,7 +2,6 @@
 import sys
 import os
 import time
-import threading
 
 
 # Librairies pour le controle de l'Arduino
@@ -13,7 +12,8 @@ import pyfirmata
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
-import src.train.command_board.Generic.control as control
+import src.train.command_board.Generic.actions.actions as actions
+import src.misc.decorators.decorators as decorators
 
 
 class Potentiometer:
@@ -28,6 +28,7 @@ class Potentiometer:
     __LIMITS = (-1, 1)
     __ERROR = 0.002
 
+    @decorators.CommandBoardComponent()
     def __init__(self, board, pin_index, action, PRECISION=0, LIMITS=(-1, 1), ERROR=0.002):
         """Fonction permettant d'initialiser une led sur le pupitre (seule ou sur un bouton)
 
@@ -37,7 +38,7 @@ class Potentiometer:
             Carte Arduino/Electronique sur lequel le potentiomètre est branchée
         pin_index: `int`
             Index du pin sur lequel le potentiomètre est connectée (forcément numérique)
-        action: `control.Actions`
+        action: `actions.Actions`
             Action à appeler. Cette fonction doit prendre la valeur du potentiomètre en quatirème argument
         PRECISION: `int`
             Nombre de valeurs maximales que le potentiomètre peut lire (généralement 1024)
@@ -60,11 +61,11 @@ class Potentiometer:
         self.__pin = board.get_pin(f"a:{int(pin_index)}:i")
 
         # Sauvegarde l'action permettant de mettre à jour l'état de la LED et jette une erreur si elle n'est pas bonne
-        if isinstance(action, control.Actions):
+        if isinstance(action, actions.Actions):
             self.__action = action
         else:
             raise TypeError(f"La fonction ({action}) du potentiomètre connecté au pin A{int(pin_index)} n'est pas valide. " +
-                            f"Elle est de type \"{type(action)}\" et non de type \"<class \'control.Actions\'>\"")
+                            f"Elle est de type \"{type(action)}\" et non de type \"<class \'actions.Actions\'>\"")
 
         # Stocke la précision (si fausse, les valeurs sortiront des limites) et l'erreur sans faire de vérifications
         self.__PRECISION = PRECISION

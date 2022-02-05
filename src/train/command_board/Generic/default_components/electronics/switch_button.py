@@ -2,7 +2,6 @@
 import sys
 import os
 import time
-import threading
 
 
 # Librairies pour le controle de l'Arduino
@@ -13,7 +12,8 @@ import pyfirmata
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
-import src.train.command_board.Generic.control as control
+import src.train.command_board.Generic.actions.actions as actions
+import src.misc.decorators.decorators as decorators
 
 
 class SwitchButton:
@@ -28,7 +28,8 @@ class SwitchButton:
     __lookup = 0
     __THRESHOLD = 1
 
-    def __init__(self, board, pins_index, actions, THRESHOLD=1):
+    @decorators.CommandBoardComponent()
+    def __init__(self, board, pins_index, actions_list, THRESHOLD=1):
         """Fonction permettant d'initialiser une led sur le pupitre (seule ou sur un bouton)
 
         Parameters
@@ -37,11 +38,11 @@ class SwitchButton:
             Carte Arduino/Electronique sur lequel le boutton est branchée
         pins_index: `tuple`
             Index des pins sur lesquel le bouton multiposition est connectée (forcément numérique)
-        actions: `dict`
+        actions_list: `dict`
             Liste des actions à appeler selon les valeurs lus sur les pins. Clés = tuple des entrées -> valeurs : Action
         THRESHOLD: `int`
             Nombre de fois que la valeur minimales doit être lu pour être acceptée. Evite les faux-positifs lors des
-            lectures des valeurs du bouton mais rajoute un délai de Control.DELAY * THRESHOLD
+            lectures des valeurs du bouton mais rajoute un délai de actions.DELAY * THRESHOLD
 
         Raises
         ------
@@ -56,9 +57,9 @@ class SwitchButton:
         self.__pins = tuple([board.get_pin(f"d:{pins_index[p_i]}:i") for p_i in pins_index])
 
         # Enregistre chacune des actions valides dans le dictionnaire des actions
-        for key, action in actions.items():
+        for key, action in actions_list.items():
             # Vérifie que l'action est bien une action
-            if isinstance(action, control.Actions):
+            if isinstance(action, actions.Actions):
                 # Vérifie que les entrées sont bien au bon nombre
                 if len(key) == len(self.__pins):
                     # Ajoute alors la fonction et ses clés au dictionnaire des actions
@@ -69,7 +70,7 @@ class SwitchButton:
             else:
                 log.debug(f"L'action ({action}) du bouton multiposition relié aux positions {key}, " +
                           f" connecté aux pins {pins_index} n'est pas valide. " +
-                          f" Elle est de type \"{type(action)}\" et non de type \"<class \'control.Actions\'>\"")
+                          f" Elle est de type \"{type(action)}\" et non de type \"<class \'actions.Actions\'>\"")
 
         # Si aucune des actions n'a été chargée correctement, jette une erreur
         if not self.__actions:

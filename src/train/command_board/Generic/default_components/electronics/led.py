@@ -12,8 +12,8 @@ import pyfirmata
 # Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
-import src.misc.log.log as log
-import src.train.command_board.Generic.control as control
+import src.train.command_board.Generic.actions.actions as actions
+import src.misc.decorators.decorators as decorators
 
 
 class LED:
@@ -29,6 +29,7 @@ class LED:
     __state = False
     __half_period = 0
 
+    @decorators.CommandBoardComponent()
     def __init__(self, board, pin_index, action):
         """Fonction permettant d'initialiser une led sur le pupitre (seule ou sur un bouton)
 
@@ -38,7 +39,7 @@ class LED:
             Carte Arduino/Electronique sur lequel la led est branchée
         pin_index: `int`
             Index sur lequel la led est connectée (forcément numérique)
-        action: `control.Actions`
+        action: `actions.Actions`
             Action permettant de controller la LED (appelée à chaque mise à jour logique)
 
         Raises
@@ -54,11 +55,11 @@ class LED:
         self.__pin = board.get_pin(f"d:{int(pin_index)}:o")
 
         # Sauvegarde l'action permettant de mettre à jour l'état de la LED et jette une erreur si elle n'est pas bonne
-        if isinstance(action, control.Actions):
+        if isinstance(action, actions.Actions):
             self.__action = action
         else:
             raise TypeError(f"L'action ({action}) de la LED connectée au pin {int(pin_index)} n'est pas valide. " +
-                            f"Elle est de type \"{type(action)}\" et non de type \"<class \'control.Actions\'>\"")
+                            f"Elle est de type \"{type(action)}\" et non de type \"<class \'actions.Actions\'>\"")
 
     def add_action(self, actions_list):
         """Fonction permettant d'ajouter l'appel d'une action dans la liste d'action
