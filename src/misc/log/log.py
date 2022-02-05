@@ -134,7 +134,7 @@ def log(log_level, message, exception=None, prefix=None):
 
     # Dans le cas où une exception a été envoyée, l'ajoute dans le message avec une belle présentation
     if isinstance(exception, Exception):
-        message += (("\n" if not message.endswith("\n") else "") + f"\tErreur de type ;{type(exception)}\n" +
+        message += (("\n" if not message.endswith("\n") else "") + f"\tErreur de type : {type(exception)}\n" +
                     f"\tAvec comme message d'erreur : {exception.args}\n\t" + "Traceback : \n\t" +
                     "".join(traceback.format_tb(exception.__traceback__)).replace("\n", "\n\t") + "\n")
 
