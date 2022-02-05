@@ -3,7 +3,6 @@ import sys
 import traceback
 import threading
 import time
-from enum import Enum, unique
 
 
 # Librairies pour la commande des pupitres
@@ -17,25 +16,13 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src\\")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
 import src.misc.settings_dictionary.settings as sd
-import src.train.command_board.functions as func
 import src.train.train_database.database as tdb
-import src.train.command_board.buttons_definitions as bd
-
-
-@unique
-class Actions(Enum):
-    """Enum contenant toutes les actions possibles par le pupitre"""
-    # FEATURE : ajouter les différentes actions en suivant la structure NOM_ACTION = (func.fonction,) relié à functions.py
-    LEVER_PANTHO = (func.lever_panto,)
-    MANIP_DE_TRACTION = (func.manip_de_traction,)
-
-    # Fonction permettant de facilement appeler la fonction associée à la valeur de l'Enum
-    def __call__(self, *args, **kwargs):
-        self.value[0](*args, **kwargs)
+import src.train.command_board.Generic.actions.actions as actions
+import src.train.command_board.Generic.default_components.components as components
 
 
 class Control:
-    """Classe contenant la logique générale du pupitre"""
+    """Classe contenant la logique générale des pupitres utilisant des cartes électroniques"""
     # Delai de lecture des valeurs des boutons (volontairement différent de simulation.DELAY pour une lecture plus précise)
     DELAY = 0.015     # En secondes (Attention par palier de 0.015s)
 
@@ -43,7 +30,7 @@ class Control:
     update_count = 0
     update_average_time = 0
 
-    # Cadenas pour éviter les data races (Un thread qui lit sur le pupitre et ajoute les commandes et un autre)
+    # Cadenas pour éviter les data races (Un thread qui ajoute les commandes et un autre qui les execute)
     lock = threading.Lock()
 
     # Liste des éléments nécessaires au fonctionnement du pupitre
