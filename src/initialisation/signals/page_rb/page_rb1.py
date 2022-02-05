@@ -92,7 +92,7 @@ class PageRB1:
         # Charge tous les dossiers dans src.train.command_board, les traduits et les indiques comme potentiels pupitres
         command_boards = [translation_data[f.replace("_", " ")] for f in os.listdir(self.command_board_folder_path)
                           if os.path.isdir(os.path.join(self.command_board_folder_path, f))
-                          and f != "__pycache__"]
+                          and f != "__pycache__" and f != "Generic"]
         self.page.findChild(QObject, "command_board_combo").setProperty("elements", command_boards)
         log.info(f"{len(command_boards)} pupitres trouvés ({command_boards}) dans :\n\t{self.command_board_folder_path}")
 
