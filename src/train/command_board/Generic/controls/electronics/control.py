@@ -11,6 +11,10 @@ import pyfirmata
 from pyfirmata import util
 
 
+# Librairies graphiques
+from PyQt5.QtWidgets import QApplication
+
+
 # Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src\\")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
@@ -30,11 +34,12 @@ class Control:
     update_count = 0
     update_average_time = 0
 
-    # Cadenas pour éviter les data races (Un thread qui ajoute les commandes et un autre qui les execute)
+    # Cadenas pour éviter les settings races (Un thread qui ajoute les commandes et un autre qui les execute)
     lock = threading.Lock()
 
-    # Liste des éléments nécessaires au fonctionnement du pupitre
+    # Liste des éléments nécessaires au fonctionnement du pupitre physique
     board = None
+    board_name = ""
     reading_thread = None
     continuous_components = []     # boutons ; lever panto ; BP Urge...
     update_components = []         # manipulateur de tracion
@@ -87,8 +92,9 @@ class Control:
     def run(self):
         """Fonction permettant de lancer le pupitre ainsi que la boucle de lecture"""
         # Commence par lancer la partie physique et virtuelle du pupitre
-        self.launch_physical_buttons()
-        self.launch_virtual_buttons()
+        with self.lock:
+            self.launch_physical_buttons()
+            self.launch_virtual_buttons()
 
         # Lance le thread avec la fonction permettant de lire les états des boutons en boucles
         reading_loop = threading.Thread(target=self.loop, daemon=True)
