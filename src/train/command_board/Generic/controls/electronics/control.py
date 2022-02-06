@@ -179,7 +179,6 @@ class Control:
                         # Cas où c'est une borne déjà présent par défaut:
                     except Exception as error:
                         # Si ça rate, passe au port suivant
-                        log.error("", exception=error)
                         pass
         else:
             # Dans le cas où ce n'est pas une carte par défaut, initialise une carte grâce à l'initialisation Board
@@ -200,7 +199,6 @@ class Control:
                                                                    "disabled": disabled_pins})
                         log.info(f"Connexion à la carte électronique : {port.name} sur le port : {port.device}.")
                     except Exception as error:
-                        log.error("", exception=error)
                         pass
 
         # Si la carte électronique n'a toujours pas été chargée
