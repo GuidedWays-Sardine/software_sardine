@@ -1,4 +1,4 @@
-command_board; Regio2N
+board.name; Regio2N
 board.type ; Other
 board.digital_pins ; (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
 board.analog_pins ; (1, 2, 3, 4, 5)
@@ -17,3 +17,6 @@ button1.function4.values; (False, False, False, True)
 button1.function4.function; Actions.PL1
 button1.function5.values; (False, False, False, False)
 button1.function5.function; Actions.PL2
+
+
+virtual.active; False
