@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import QApplication
 
 
 # Librairies SARDINE
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src\\")[0]
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
 import src.misc.settings_dictionary.settings as sd
@@ -76,6 +76,12 @@ class Control:
             Jeté s'il est impossible pour le pupitre de se connecter à la carte électronique de gestion de celle-ci
         """
         initial_time = time.perf_counter()
+        self.train_database = train_database
+        self.board_name = command_board_settings.get_value("board.name", "")
+        log.change_log_prefix(f"Initialisation pupitre {self.board_name}")
+        log.info("Chargement du pupitre")
+        # s'assure que le délai est non nul (pyfirmata lit des valeurs incohérente lorsqu'aucun délai est ajouté)
+        self.DELAY = self.DELAY if self.DELAY > 0 else 0.01
 
         # Commence par initialiser l'arduino
         self.initialise_board(command_board_settings)
@@ -87,7 +93,8 @@ class Control:
         self.initialise_virtual_buttons(app, settings, command_board_settings)
 
         log.info(f"Chargement du module pupitre ({command_board_settings.get_value('command_board', ' ')}) en " +
-                 f"{(time.perf_counter() - initial_time) * 1000:.2f} millisecondes.")
+                 f"{(time.perf_counter() - initial_time) * 1000:.2f} millisecondes.\n",
+                 prefix=f"Initialisation pupitre {self.board_name}")
 
     def run(self):
         """Fonction permettant de lancer le pupitre ainsi que la boucle de lecture"""
@@ -134,8 +141,8 @@ class Control:
                 try:
                     action[0](self.train_database, *action[1:])
                 except Exception as error:
-                    log.warning(f"Erreur lors de l'execution de la command pupitre {action[0]}",
-                                exception=error)
+                    log.warning(f"Erreur lors de l'execution de la command pupitre {action[0]} ({self.update_count})",
+                                exception=error, prefix=f"Mise à jour pupitre : {self.board_name}")
                 finally:
                     # Dans tous les cas supprime l'action
                     del self.actions_list[0]
@@ -163,6 +170,8 @@ class Control:
         PermissionError
             Jeté s'il est impossible pour le pupitre de se connecter à la carte électronique de gestion de celle-ci
         """
+        log.change_log_prefix(f"Initialisation pupitre {self.board_name} (carte électronique)")
+
         # Récupère tous les ports où l'Arduino peut être connecté
         ports = serial.tools.list_ports.comports()
         if command_board_settings["board.type"] in ["Arduino", "ArduinoDue", "ArduinoMega", "ArduinoNano"]:
@@ -207,6 +216,8 @@ class Control:
         self.reading_thread = util.Iterator(self.board)
         self.reading_thread.start()
 
+        log.change_log_prefix(f"Initialisation pupitre {self.board_name}")
+
     # Fonction (surchargeable) permettant d'initialiser la liste de tous les boutons réels sur le pupitre
     def initialise_physical_buttons(self, command_board_settings):
         """Fonction permettant d'initialiser la carte éléctronique utilisée pour le pupitre
@@ -216,6 +227,8 @@ class Control:
         command_board_settings: `sd.SettingsDictionary`
             dictionnaire de paramètres pupitres. Permet de connecter tous les éléments à leurs fonctions
         """
+        log.change_log_prefix(f"Initialisation pupitre {self.board_name} (boutons physiques)")
+
         button_index = 1
         # Essaye de charger des boutons jusqu'à ce que l'index soit trop grand et qu'il n'y en ait plus
         while f"button{button_index}.type" in command_board_settings:
@@ -290,6 +303,7 @@ class Control:
             self.output_components.remove(None)
 
         log.info(f"{len(self.continuous_components) + len(self.update_components)} connectés au pupitre")
+        log.change_log_prefix(f"Initialisation pupitre {self.board_name}")
 
     # Fonction (potentiellement à surcharger) permettant d'initialiser la fenêtre avec les boutons virtuels
     def initialise_virtual_buttons(self, app, settings, command_board_settings):
@@ -316,12 +330,15 @@ class Control:
                 settings.get_value("sardine simulator.virtual buttons.screen_index", 0) > 0:
             # Essaye de charger la fenêtre d'écran virtuel et récupère une potentielle erreur
             try:
-                pass # TODO : rempplacer par la création d'un pupitre virtuel (Generic.controls.virtual.controls.py)
+                log.add_empty_lines()
+                pass # TODO : remplacer par la création d'un pupitre virtuel (Generic.controls.virtual.controls.py)
             except Exception as error:
                 log.error("Erreur lors du chargement de la partie virtuel du pupitre physique.",
                           exception=error)
         else:
             log.info("fenêtre des boutons virtuels non activée")
+
+        log.change_log_prefix(f"Initialisation pupitre {self.board_name}")
 
     # Fonction (potentiellement à surcharger) permettant de lancer le pupitre
     def launch_physical_buttons(self):
