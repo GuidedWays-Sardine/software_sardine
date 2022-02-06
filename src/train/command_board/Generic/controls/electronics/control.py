@@ -36,18 +36,28 @@ class Control:
     # Liste des éléments nécessaires au fonctionnement du pupitre
     board = None
     reading_thread = None
-    continuous_buttons = []     # boutons ; lever panto ; BP Urge...
-    update_buttons = []         # manipulateur de tracion
-    output_components = []      # LEDs ; acquitement ; inverseur
+    continuous_components = []     # boutons ; lever panto ; BP Urge...
+    update_components = []         # manipulateur de tracion
+    output_components = []         # LEDs ; acquitement ; inverseur
+
+    # Stockage d'un lien vers la base de données train pour modifier les informations
+    train_database = None
+
+    # Elements nécessaires au fonctionnement de la partie virtuelle du pupitre
+    virtual_command_board = None
 
     # Liste des actions à réaliser
     actions_list = []
 
-    def __init__(self, command_board_settings, app=None):
+    def __init__(self, train_database, settings, command_board_settings, app=None):
         """Initialisation  du pupitre du pupitre de commandes
 
         Parameters
         __________
+        train_database : `tdb.TrainDatabase` TODO : trouver le vrai type de la base de données train
+            lien vers la base de données train dans laquelle toutes les données seront stockées
+        settings: `sd.SettingsDictionary`
+            dictionnaire de paramètres simulation. Utile nottament pour les boutons virtuels
         command_board_settings: `sd.SettingsDictionary`
             dictionnaire de paramètres pupitres. Permet de connecter tous les éléments à leurs fonctions
         app: `QApplication`
@@ -68,8 +78,8 @@ class Control:
         # Continue en initialisant les différents boutons physiques connecté à l'arduino
         self.initialise_physical_buttons(command_board_settings)
 
-        # Puis initialise les boutons
-        self.initialise_virtual_buttons(app)
+        # Puis initialise les boutons virtuels
+        self.initialise_virtual_buttons(app, settings, command_board_settings)
 
         log.info(f"Chargement du module pupitre ({command_board_settings.get_value('command_board', ' ')}) en " +
                  f"{(time.perf_counter() - initial_time) * 1000:.2f} millisecondes.")
@@ -149,7 +159,6 @@ class Control:
                  prefix="fermeture pupitre")
 
     # FEATURE : Liste de toutes les fonctions surchargeables
-
     # Fonction (surchargeable) permettant d'initialiser la carte électronique utilisée pour le pupitre
     def initialise_board(self, command_board_settings):
         """Fonction permettant d'initialiser la carte éléctronique utilisée pour le pupitre
@@ -248,10 +257,10 @@ class Control:
 
                 # Selon s'il est indiqué en mode update ou continuous, l'ajoute dans la liste correspondante
                 if button_read_mode == "update":
-                    self.update_buttons.append(components.Buttons.PUSH_BUTTON(self.board, button_pins[0],
+                    self.update_components.append(components.Buttons.PUSH_BUTTON(self.board, button_pins[0],
                                                                               action_released, action_pressed))
                 else:
-                    self.continuous_buttons.append(components.Buttons.PUSH_BUTTON(self.board, button_pins[0],
+                    self.continuous_components.append(components.Buttons.PUSH_BUTTON(self.board, button_pins[0],
                                                                                   action_released, action_pressed))
             # Dans le cas où le bouton est un Potentiometer
             elif str(button_type).lower() == str(components.Buttons.POTENTIOMETER).lower():
@@ -262,10 +271,10 @@ class Control:
                 error = command_board_settings.get_value(f"button{button_index}.error", 0.002)
 
                 if button_read_mode == "update":
-                    self.update_buttons.append(components.Buttons.POTENTIOMETER(self.board, button_pins[0], action,
+                    self.update_components.append(components.Buttons.POTENTIOMETER(self.board, button_pins[0], action,
                                                                                 precision, limits, error))
                 else:
-                    self.continuous_buttons.append(components.Buttons.POTENTIOMETER(self.board, button_pins[0], action,
+                    self.continuous_components.append(components.Buttons.POTENTIOMETER(self.board, button_pins[0], action,
                                                                                     precision, limits, error))
             # Dans le cas où le bouton est un SwitchButton
             elif str(button_type).lower() == str(components.Buttons.POTENTIOMETER).lower():
@@ -284,8 +293,7 @@ class Control:
 
             button_index += 1
 
-        log.info(f"{len(self.continuous_buttons) + len(self.update_buttons)} connectés au pupitre")
-
+        log.info(f"{len(self.continuous_components) + len(self.update_components)} connectés au pupitre")
 
     # Fonction (potentiellement à surcharger) permettant d'initialiser la fenêtre avec les boutons virtuels
     def initialise_virtual_buttons(self, app):
