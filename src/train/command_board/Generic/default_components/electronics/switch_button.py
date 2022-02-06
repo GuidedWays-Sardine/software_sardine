@@ -83,7 +83,7 @@ class SwitchButton:
         # Modifie le tableau de valeurs précédemment lues pour qu'il soit de bonnes dimensions
         self.__previous_states = [(False,) * len(self.__pins)] * self.__THRESHOLD
 
-    def add_action(self, actions_list):
+    def add_action(self, actions_list, prepend=False):
         """Fonction permettant de rajouter l'action à la liste d'actions selon la position du bouton multiposition.
         Aucune action ne sera ajoutée si l'état actuel n'a pas d'action ajoutée, et le seuil ne sera pas considéré
 
@@ -91,13 +91,16 @@ class SwitchButton:
         ----------
         actions_list: `list`
             Liste des actions sur laquelle l'action sera ajoutée
+        prepend: `bool`
+            Indique si l'action doit être traitée en premier ou en dernier
         """
         # Lit la valeur et la stocke dans la variable
         state = self.read_value()
 
         # Essaye de rajouter l'action correspondant à la valeur lu. Si une erreur est jetée, c'est qu'aucune n'est là
         try:
-            actions_list.append([self.__actions[state], time.time()])
+            # (inséré à l'index 0 si inséré sinon à l'index len(actions_list)
+            actions_list.insert(len(actions_list) * (not prepend), [self.__actions[state], time.time()])
         except Exception:
             pass
 

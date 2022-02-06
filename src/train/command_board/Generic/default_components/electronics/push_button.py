@@ -84,7 +84,7 @@ class PushButton:
         # Modifie le tableau de valeurs précédemment lues pour qu'il soit de bonnes dimensions
         self.__previous_states = [False] * self.__THRESHOLD
 
-    def add_action(self, actions_list):
+    def add_action(self, actions_list, prepend=False):
         """Fonction permettant de rajouter l'action à la liste d'actions selon l'état actuel du bouton.
         Aucune action ne sera ajoutée si l'état actuel n'a pas d'action ajoutée, et le seuil ne sera pas considéré
 
@@ -92,13 +92,17 @@ class PushButton:
         ----------
         actions_list: `list`
             Liste des actions sur laquelle l'action sera ajoutée
+        prepend: `bool`
+            Indique si l'action doit être traitée en premier ou en dernier
         """
         # Récupère l'état du bouton actuel et si l'action relié à l'état existe, ajoute cette action à la list d'actions
         state = self.read_value()
         if state and self.__action_down is not None:
-            actions_list.append([self.__action_down, time.time()])
+            # (inséré à l'index 0 si inséré sinon à l'index len(actions_list)
+            actions_list.insert(len(actions_list) * (not prepend), [self.__action_down, time.time()])
         elif not state and self.__action_up is not None:
-            actions_list.append([self.__action_up, time.time()])
+            # (inséré à l'index 0 si inséré sinon à l'index len(actions_list)
+            actions_list.insert(len(actions_list) * (not prepend), [self.__action_up, time.time()])
 
     def verify_value(self, actions_list):
         """Fonction permettant de lire la valeur et si elle est différentes pour plus de THRESHOLD fois,

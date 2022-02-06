@@ -80,15 +80,18 @@ class Potentiometer:
             log.debug(f"Limite par défaut gardé pour le potentiomètre connecté au pin {int(pin_index)}. " +
                       f"{LIMITS} ne contient pas les 2 bornes nécessaires")
 
-    def add_action(self, actions_list):
+    def add_action(self, actions_list, prepend=False):
         """Fonction permettant de rajouter l'action à la liste d'actions selon l'état actuel du potentiomètre.
 
         Parameters
         ----------
         actions_list: `list`
             Liste des actions sur laquelle l'action sera ajoutée
+        prepend: `bool`
+            Indique si l'action doit être traitée en premier ou en dernier
         """
-        actions_list.append([self.__action, time.time(), self.read_value()])
+        # Ajoute l'action avec la valeur lu (début sinon fin)
+        actions_list.insert(len(actions_list) * (not prepend), [self.__action, time.time(), self.read_value()])
 
     def verify_value(self, actions_list):
         """Fonction permettant de lire la valeur et si elle est différentes (au seuil de ERROR), ajoute l'action.
