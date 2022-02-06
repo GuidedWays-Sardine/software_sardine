@@ -4,8 +4,10 @@ import os
 
 
 # Librairies SARDINE
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src\\")[0]
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
+import src.misc.settings_dictionary.settings as sd
+
 
 class Dynamic:
     # Define attributes
@@ -24,7 +26,7 @@ class Dynamic:
     V = 0
     Pk = 0
 
-    def __init__(self):
+    def __init__(self, train_data):
         self.Along = 0
         self.Atrans = 0
         self.Avert = 0

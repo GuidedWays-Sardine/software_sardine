@@ -4,8 +4,10 @@ import os
 
 
 # Librairies SARDINE
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src\\")[0]
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
+import src.misc.settings_dictionary.settings as sd
+
 
 class Static:
 
@@ -17,7 +19,7 @@ class Static:
     type = 0
 
 
-    def __init__(self):
+    def __init__(self, train_data):
         self.A = 0
         self.B = 0
         self.C = 0
