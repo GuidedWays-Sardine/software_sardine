@@ -281,6 +281,14 @@ class Control:
 
             button_index += 1
 
+        # Enlève tous les composants non chargés (ayant retournées None au lieu de leur composants
+        while None in self.continuous_components:
+            self.continuous_components.remove(None)
+        while None in self.update_components:
+            self.update_components.remove(None)
+        while None in self.output_components:
+            self.output_components.remove(None)
+
         log.info(f"{len(self.continuous_components) + len(self.update_components)} connectés au pupitre")
 
     # Fonction (potentiellement à surcharger) permettant d'initialiser la fenêtre avec les boutons virtuels
