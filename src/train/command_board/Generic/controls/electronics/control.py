@@ -102,33 +102,24 @@ class Control:
 
     def loop(self):
         """Fonction appelé sur un thread permettant de lire les valeurs en boucle
-        (Cette fonction gère uniquement la logique. La fonction à surcharger est self.get_buttons_state)"""
+        (Cette fonction gère uniquement la logique. La fonction à surcharger est self.vérify_continuous)"""
         while True:
-           # Récupère le temps de début de la lecture des boutons
-            update_initial_time = time.time()
+            # Récupère le temps de début de la lecture des boutons
+            update_initial_time = time.perf_counter()
 
             # Lecture des états des boutons et ajouts des commandes si nécessaire
-            self.get_buttons_state()
+            with self.lock:
+                self.vérify_continuous()
 
             # Récupère le temps nécessaire à la lecture de toutes les états des boutons
-            update_time = time.time() - update_initial_time
+            update_time = time.perf_counter() - update_initial_time
 
             # Mets à jour le tempos moyen des mises à jours ainsi que le nombre de mises à jours réussies
             self.update_average_time = (self.update_average_time * self.update_count + update_time) / (self.update_count + 1)
             self.update_count += 1
 
-            # Dans le cas où un délai a été ajouté pour la lecture des valeurs du pupitre
-            if self.DELAY != 0:
-                # Vérifie si la mise à jour a pris moins de temps que le délai souhaité
-                if self.DELAY - update_time >= 0:
-                    # Si c'est le cas, attend le temps nécessaire
-                    time.sleep(self.DELAY - update_time)
-                else:
-                    # Sinon laisse un message de debug pour inciter à l'optimisation du code ou au changement du délai
-                    log.debug("Attention lecture des états des boutons du pupitre en " + "{:.2f}".format(update_time * 1000) +
-                              "ms, au lieu des " + "{:.2f}".format(self.DELAY * 1000) + "ms demandés.\n\t\t" +
-                              "Prévoir une optimisation du code ou un délai plus long si le soucis persiste.\n",
-                              prefix="pupitre : loop()")
+            # Dors le bon temps si nécessaire, sinon dort 1ms
+            time.sleep(self.DELAY - update_time if update_time < self.DELAY else 0.001)
 
     def update(self, database):
         """Fonction qui à partir de la liste des actions execute toutes les actions associées
