@@ -268,9 +268,9 @@ class Control:
             elif str(button_type).lower() == str(components.Buttons.POTENTIOMETER).lower():
                 # Pour les PushButton aucun traitement supplémentaire n'est nécessaire
                 if button_read_mode == "update":
-                    self.update_buttons.append(components.Buttons.SWITCH_BUTTON(self.board, button_pins, actions))
+                    self.update_components.append(components.Buttons.SWITCH_BUTTON(self.board, button_pins, actions))
                 else:
-                    self.continuous_buttons.append(components.Buttons.SWITCH_BUTTON(self.board, button_pins, actions))
+                    self.continuous_components.append(components.Buttons.SWITCH_BUTTON(self.board, button_pins, actions))
             # Dans le cas où le bouton est en fait... une LED
             elif str(button_type).lower() == str(components.Buttons.POTENTIOMETER).lower():
                 # Récupère l'action permettant de changer l'état de la LED
@@ -284,15 +284,36 @@ class Control:
         log.info(f"{len(self.continuous_components) + len(self.update_components)} connectés au pupitre")
 
     # Fonction (potentiellement à surcharger) permettant d'initialiser la fenêtre avec les boutons virtuels
-    def initialise_virtual_buttons(self, app):
+    def initialise_virtual_buttons(self, app, settings, command_board_settings):
         """Fonction permettant d'initialiser la fenêtre avec les boutons virtuels
 
         Parameters
         ----------
         app: `QApplication`
             L'application sur laquelle les modules graphiques de la simulation vont se lancer
+        settings: `sd.SettingsDictionary`
+            dictionnaire de paramètres simulation. Utile nottament pour les boutons virtuels
+        command_board_settings: `sd.SettingsDictionary`
+            dictionnaire de paramètres pupitres. Permet de connecter tous les éléments à leurs fonctions
+
+        Raises
+        ------
+        KeyError
+            Jeté si certains arguments vitaux (tel que le type de carte électronique) ne sont pas présents
+        PermissionError
+            Jeté s'il est impossible pour le pupitre de se connecter à la carte électronique de gestion de celle-ci
         """
-        pass
+        # Vérifie si les boutons virtuels sont activés et si l'écran pour les boutons virtuels a été paramétré
+        if command_board_settings.get_value("virtual.active", False) and \
+                settings.get_value("sardine simulator.virtual buttons.screen_index", 0) > 0:
+            # Essaye de charger la fenêtre d'écran virtuel et récupère une potentielle erreur
+            try:
+                pass # TODO : rempplacer par la création d'un pupitre virtuel (Generic.controls.virtual.controls.py)
+            except Exception as error:
+                log.error("Erreur lors du chargement de la partie virtuel du pupitre physique.",
+                          exception=error)
+        else:
+            log.info("fenêtre des boutons virtuels non activée")
 
     # Fonction (potentiellement à surcharger) permettant de lancer le pupitre (Dans le cas où des vérifications
     # supplémentaires sont nécessaires
