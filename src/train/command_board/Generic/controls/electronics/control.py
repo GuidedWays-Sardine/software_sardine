@@ -315,11 +315,26 @@ class Control:
         else:
             log.info("fenêtre des boutons virtuels non activée")
 
-    # Fonction (potentiellement à surcharger) permettant de lancer le pupitre (Dans le cas où des vérifications
-    # supplémentaires sont nécessaires
+    # Fonction (potentiellement à surcharger) permettant de lancer le pupitre
     def launch_physical_buttons(self):
-        """Fonction permettant de lancer le pupitre (Cette fonction ne s'occupe pas de la lecture des valeurs)"""
-        pass
+        """Fonction permettant de lancer le pupitre physique"""
+        # Allume toutes les LEDs
+        for o_c in self.output_components:
+            o_c.change_state(True)
+
+        # Vérifie les input de tous les composants une trentaine de fois pour récupérer la valeur initiale
+        for i in range(30):
+            for i_c in self.update_components + self.continuous_components:
+                i_c.verify_value([])
+
+        # Attend l'équivalent d'un délai pour s'assurer que les lampes restent allumées suffisament longtemps
+        time.sleep(self.DELAY)
+
+        # éteint toutes les lampes et appelle leur fonction respectives pour rallumer les bonnes
+        for o_c in self.output_components:
+            o_c.change_state(False)
+            o_c.add_action(self.actions_list)
+        self.update(self.train_database)
 
     # Fonction (potentiellement à surcharger) pour rendre visible la fenêtre avec tous les boutons virtuels
     def launch_virtual_buttons(self):
