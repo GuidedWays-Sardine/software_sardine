@@ -344,13 +344,17 @@ class Control:
             pass        # TODO : appeler la fonction de lancement des boutons virtuels
 
     # Fonction (à surcharger) permettant de lire les états des différents boutons en boucles
-    def get_buttons_state(self):
+    def vérify_continuous(self):
         """Fonction permettant de lire en boucle les états des différents éléments du pupitre"""
-        for button in self.continuous_buttons:
-            button.verify_value(self.actions_list)
+        for component in self.continuous_components:
+            component.verify_value(self.actions_list)
 
     # Fonction (à surchager) permettant de lire les valeurs analogiques (position manip de traction...)
-    def read_specific_values(self):
+    def prepend_update(self):
         """Fonction permettant de récupérer les valeurs ne nécessitant pas une lecture en continu"""
-        for button in self.update_buttons:
-            button.add_action(self.actions_list)
+        for component in self.update_components:
+            component.add_action(self.actions_list, prepend=True)
+
+    def append_outputs(self):
+        for component in self.output_components:
+            component.add_action(self.actions_list)
