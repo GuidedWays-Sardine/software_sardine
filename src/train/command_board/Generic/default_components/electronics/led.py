@@ -72,12 +72,12 @@ class LED:
         # Ajoute une action avec : l'action demandée, le pin (pour controller la LED) et le temps de demande du bouton
         actions_list.append([self.__action, self.__pin, time.time()])
 
-    def change_led_state(self, led_state=False, frequency=0):
+    def change_state(self, state=False, frequency=0):
         """Fonction permettant de changer l'état de la LED
 
         Parameters
         ----------
-        led_state: `bool`
+        state: `bool`
             Nouvel état de la LED (par défaut False pour l'éteindre)
         frequency: `float`
             fréquence de clignotement, pris en compte que si led_state à True (par défaut à 0 pour aucun clignotement)
@@ -85,7 +85,7 @@ class LED:
         # bloque le cadenas le temps du changement d'état de la LED pour éviter les data races
         with self.lock:
             # Cas d'un clignotement de la LED
-            if led_state and frequency > 0:
+            if state and frequency > 0:
                 # Calcule la half période
                 self.__half_period = 0.5 / frequency
 
@@ -95,8 +95,8 @@ class LED:
                 led_blink.start()
             else:
                 self.__half_period = 0
-                self.__pin.write(led_state)
-                self.__state = led_state
+                self.__pin.write(state)
+                self.__state = state
 
     def __blink(self):
         """Fonction (privée) permettant de faire clignoter la LED. Pour l'initier, appeler change_led_state"""
