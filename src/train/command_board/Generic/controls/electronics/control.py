@@ -36,8 +36,9 @@ class Control:
     # Liste des éléments nécessaires au fonctionnement du pupitre
     board = None
     reading_thread = None
-    continuous_buttons = []
-    update_buttons = []
+    continuous_buttons = []     # boutons ; lever panto ; BP Urge...
+    update_buttons = []         # manipulateur de tracion
+    output_components = []      # LEDs ; acquitement ; inverseur
 
     # Liste des actions à réaliser
     actions_list = []
