@@ -121,30 +121,21 @@ class Control:
             # Dors le bon temps si nécessaire, sinon dort 1ms
             time.sleep(self.DELAY - update_time if update_time < self.DELAY else 0.001)
 
-    def update(self, database):
-        """Fonction qui à partir de la liste des actions execute toutes les actions associées
-
-        Parameters
-        ----------
-        database:  `tdb.TrainDatabase`
-            Base de données train dont il faut modifier les informations
-        """
-        # Bloque le thread afin d'éviter les data races
+    def update(self):
+        """Fonction qui à partir de la liste des actions execute toutes les actions associées"""
+        # Bloque le thread afin d'éviter les settings races
         with self.lock:
-            # Commence par ajouter les valeurs nécessaires (position du manip de traction, ...) à la liste d'actions
-            self.read_specific_values()
+            # Commence par ajouter les valeurs nécessaires (pour les entrées variables et les sorties
+            self.prepend_update()
+            self.append_outputs()
 
             # Pour chacune des actions dans la liste d'action à éxecuter, essaye de l'executer, sinon laise une erreur
-            for action in self.actions_list:
+            for action in list(self.actions_list):  # list() VITAL POUR CREER UNE COPIE ET EVITER LES ERREURS ITERATION
                 try:
-                    action[0](database, *action[1:])
-                    # exec(str(action[0]) + "(database," + str(*action[1::]) + ")")
+                    action[0](self.train_database, *action[1:])
                 except Exception as error:
-                    log.error("Erreur fatale lors du fonctionnement du simulateur\n\t\t" +
-                              "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                              "Avec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
-                              "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
-                              prefix="pupitre: update()")
+                    log.warning(f"Erreur lors de l'execution de la command pupitre {action[0]}",
+                                exception=error)
                 finally:
                     # Dans tous les cas supprime l'action
                     del self.actions_list[0]
