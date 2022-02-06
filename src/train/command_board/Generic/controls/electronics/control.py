@@ -219,43 +219,68 @@ class Control:
         command_board_settings: `sd.SettingsDictionary`
             dictionnaire de paramètres pupitres. Permet de connecter tous les éléments à leurs fonctions
         """
-        # Essaye
         button_index = 1
         # Essaye de charger des boutons jusqu'à ce que l'index soit trop grand et qu'il n'y en ait plus
         while f"button{button_index}.type" in command_board_settings:
-            try:
-                # Commence par charger toutes les fonctions relié au bouton
-                function_index = 1
-                functions = {}      # Dictionnaire {[état pins] : fonction, ...}
-                while f"button{button_index}.function{function_index}.values" in command_board_settings\
-                        and f"button{button_index}.function{function_index}.function" in command_board_settings:
-                    try:
-                        functions[command_board_settings[f"button{button_index}.function{function_index}.values"]] = \
-                            Actions[command_board_settings[f"button{button_index}.function{function_index}.function"][8:]]
-                    except Exception as error:
-                        log.debug(f"Erreur lors du chargement d'une des fonctions pupitre",
-                                  exception=error, prefix=f"button{button_index}.function{function_index}")
-                    function_index += 1
+            # Commence par charger toutes les fonctions relié au bouton
+            function_index = 1
+            functions = {}      # Dictionnaire {[état pins] : fonction, ...}
+            while f"button{button_index}.function{function_index}.values" in command_board_settings\
+                    and f"button{button_index}.function{function_index}.function" in command_board_settings:
+                try:
+                    functions[command_board_settings[f"button{button_index}.function{function_index}.values"]] = \
+                        actions.Actions[command_board_settings[f"button{button_index}.function{function_index}.function"][8:]]
+                except Exception as error:
+                    log.debug(f"Erreur lors du chargement d'une des fonctions pupitre",
+                              exception=error, prefix=f"button{button_index}.function{function_index}")
+                function_index += 1
 
-                type = command_board_settings.get_value(f"button{button_index}.type", "")
-                # S'occupe maintenant de charger les informations générales sur le bouton
-                if type == "PushButton":
-                    # Récupère les actions quand pressé et non pressé
-                    action_released = functions[False] if False in functions else None
-                    action_pressed = functions[True] if True in functions else None
-                    bd.PushButton(self.board, command_board_settings[f"button{button_index}.pins"][0], None,    # TODO : rajouter compatibilité avec LED
-                                  action_up=action_released, action_down=action_pressed)
-                elif type == "Potentiometer":
-                    pass # TODO : introduire la composante
-                elif type == "SwitchButton":
-                    # Pour les PushButton aucun traitement n'est nécessaire
-                    if command_board_settings.get_value(f"button{button_index}.read_mode", "").lower() == "update":
-                        self.update_buttons.append(bd.SwitchButton(self.board, command_board_settings[f"button{button_index}.pins"], functions))
-                    else:
-                        self.continuous_buttons.append(bd.SwitchButton(self.board, command_board_settings[f"button{button_index}.pins"], functions))
-            except Exception as error:
-                log.debug(f"Erreur lors du chargement d'un des boutons du pupitre",
-                          exception=error, prefix=f"button{button_index}")
+            # Récupère le type et les pins du bouton et initialise le bon boutton selon le type enregistré
+            button_pins = command_board_settings.get_value(f"button{button_index}.pins", 0)
+            button_type = command_board_settings.get_value(f"button{button_index}.type", "")
+            button_read_mode = command_board_settings.get_value(f"button{button_index}.read_mode", "").lower()
+
+            # Dans le cas où le bouton est un PushButton
+            if str(button_type).lower() == str(components.Buttons.PUSH_BUTTON).lower():
+                # Récupère les actions quand pressé et non pressé
+                action_released = functions[False] if False in functions else None
+                action_pressed = functions[True] if True in functions else None
+
+                # Selon s'il est indiqué en mode update ou continuous, l'ajoute dans la liste correspondante
+                if button_read_mode == "update":
+                    self.update_buttons.append(components.Buttons.PUSH_BUTTON(self.board, button_pins[0],
+                                                                              action_released, action_pressed))
+                else:
+                    self.continuous_buttons.append(components.Buttons.PUSH_BUTTON(self.board, button_pins[0],
+                                                                                  action_released, action_pressed))
+            # Dans le cas où le bouton est un Potentiometer
+            elif str(button_type).lower() == str(components.Buttons.POTENTIOMETER).lower():
+                # Récupère l'action à appeler lorsque mis à jour ainsi que les différentes constantes
+                action = functions[None] if None in functions else None
+                precision = command_board_settings.get_value(f"button{button_index}.precision", 1024)
+                limits = command_board_settings.get_value(f"button{button_index}.limits", (-1, 1))
+                error = command_board_settings.get_value(f"button{button_index}.error", 0.002)
+
+                if button_read_mode == "update":
+                    self.update_buttons.append(components.Buttons.POTENTIOMETER(self.board, button_pins[0], action,
+                                                                                precision, limits, error))
+                else:
+                    self.continuous_buttons.append(components.Buttons.POTENTIOMETER(self.board, button_pins[0], action,
+                                                                                    precision, limits, error))
+            # Dans le cas où le bouton est un SwitchButton
+            elif str(button_type).lower() == str(components.Buttons.POTENTIOMETER).lower():
+                # Pour les PushButton aucun traitement supplémentaire n'est nécessaire
+                if button_read_mode == "update":
+                    self.update_buttons.append(components.Buttons.SWITCH_BUTTON(self.board, button_pins, actions))
+                else:
+                    self.continuous_buttons.append(components.Buttons.SWITCH_BUTTON(self.board, button_pins, actions))
+            # Dans le cas où le bouton est en fait... une LED
+            elif str(button_type).lower() == str(components.Buttons.POTENTIOMETER).lower():
+                # Récupère l'action permettant de changer l'état de la LED
+                action = functions[None] if None in functions else None
+
+                # Ajoute le composant dans la liste des sorties
+                self.output_components.append(components.Buttons.LED(self.board, button_pins[0], action))
 
             button_index += 1
 
