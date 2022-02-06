@@ -1,25 +1,41 @@
 # Librairies par défaut python
 import sys
 import os
-import threading
+from enum import Enum
 
 
 # Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
+import src.misc.settings_dictionary.settings as sd
+import src.train.train_database.Dynamic.dynamic as dynamic
+import src.train.train_database.Static.static as static
+import src.train.train_database.Systems.systems as systems
+
+
+class Position(Enum):
+    """Enum permettant de savoir si la voiture est une voiture avant ou arrière (utile pour savoir l'image à charger"""
+    FRONT = "front"
+    MIDDLE = "middle"
+    BACK = "back"
+
+
+class MissionType(Enum):
+    """Enum permettant de connaitre le type de mission (pour la génération"""
+    # Feature : ajouter les autres modes de transports ci-dessous. Ils seront automatiquement détectés par les modules
+    PASSENGER = "Passengers"
+    FREIGHT = "Freight"
 
 
 class TrainDatabase:
     # Données du train
-    lock = threading.Lock()
-    speed = 0
 
-
-    # TODO : travailler la structure et rajouter tous les
-
+    dynamic = None
+    static = None
+    systems = None
 
     def __init__(self, train_data):
-        #TODO : faire une fonction qui récupère les données du trains et qui complète la base de donnée
-        with self.lock:
-            log.info("Début de l'initialisation de la base de donnée train.", prefix="Train database")
+        self.dynamic = dynamic.Dynamic(train_data)
+        self.static = static.Static(train_data)
+        self.systems = systems.Systems(train_data)
