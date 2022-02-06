@@ -339,7 +339,9 @@ class Control:
     # Fonction (potentiellement à surcharger) pour rendre visible la fenêtre avec tous les boutons virtuels
     def launch_virtual_buttons(self):
         """Fonction permettant de rendre visible la fenêtre contenant tous les boutons virtuels si elle existe"""
-        pass
+        # Si la fenêtre virtuelle existe et a été chargée correctement, la lance
+        if self.virtual_command_board is not None:
+            pass        # TODO : appeler la fonction de lancement des boutons virtuels
 
     # Fonction (à surcharger) permettant de lire les états des différents boutons en boucles
     def get_buttons_state(self):
