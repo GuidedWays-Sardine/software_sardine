@@ -16,7 +16,7 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.initialisation.initialisation_window as ini
 import src.initialisation.signals.page_rb.pagerb2.complex_popup as cp
-import src.initialisation.signals.page_rb.pagerb2.complex_data as cd
+import src.train.train_database.database as tdb
 import src.misc.settings_dictionary.settings as sd
 import src.misc.translation_dictionary.translation as td
 import src.misc.log.log as log
@@ -86,7 +86,7 @@ class PageRB2:
         self.train_name_widget = self.page.findChild(QObject, "train_name_stringinput")
 
         # Initialise la combobox avec les types de trains
-        self.page.findChild(QObject, "mission_type_combo").setProperty("elements", [translation_data[key.value] for key in cd.MissionType])
+        self.page.findChild(QObject, "mission_type_combo").setProperty("elements", [translation_data[key.value] for key in tdb.MissionType])
 
         # Tente d'initialiser la fenêtre de paramétrage complexe
         try:
@@ -379,7 +379,7 @@ class PageRB2:
         train_data = sd.SettingsDictionary()
 
         # Rajoute le type de mission
-        train_data["mission"] = cd.mission_getter[self.page.findChild(QObject, "mission_type_combo").property("selection_index")]
+        train_data["mission"] = tdb.mission_getter[self.page.findChild(QObject, "mission_type_combo").property("selection_index")]
 
         # Change les données de la fenêtre principale du paramétrage train
         for widget_id, widget in self.data_widgets.items():
@@ -401,7 +401,7 @@ class PageRB2:
             Propriétés du train
         """
         # Change le type de mission (en récupérant l'index de l'élément sauvegardé et en le changeant sur le combobox
-        mission_index = cd.MissionType[train_data.get_value("mission", str(cd.MissionType.PASSENGER))[12:]].value
+        mission_index = tdb.MissionType[train_data.get_value("mission", str(tdb.MissionType.PASSENGER))[12:]].value
         self.page.findChild(QObject, "mission_type_combo").change_selection(mission_index)
 
         # Change les données de la fenêtre principale du paramétrage train
