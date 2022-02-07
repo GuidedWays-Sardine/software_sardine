@@ -28,6 +28,9 @@ class MissionType(Enum):
     FREIGHT = "Freight"
 
 
+mission_getter = {i: key for i, key in enumerate(MissionType)}  # Permet d'obtenir la mission avec l'index de celle-ci
+
+
 class TrainDatabase:
     # Données du train
 
