@@ -15,7 +15,7 @@ Window{
     title: "Outil de paramétrage complexe de train Sardine"
 
     // Différentes propriétés sur le train complet
-    property var type_list: []      // Liste contenant le type de chacune des voitures (fret, passager, ...)
+    property var mission_list: []      // Liste contenant le type de chacune des voitures (fret, passager, ...)
     property var position_list: []  // Liste contenant la position de chacune des voitures (avant, arrière, milieu)
 
     // Propriétés sur les bogies
@@ -286,7 +286,7 @@ Window{
         default_width: 640
         default_height: 32
 
-        type_list: complex_popup.type_list
+        mission_list: complex_popup.mission_list
         position_list: complex_popup.position_list
 
         is_visible: complex_popup.generated

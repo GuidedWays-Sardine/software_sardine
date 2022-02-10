@@ -32,7 +32,7 @@ Item {
     }
 
     //Propriété sur la liste des voitures
-    property var type_list: []      // Liste contenant le type de chacune des voitures (fret, passager, ...)
+    property var mission_list: []      // Liste contenant le type de chacune des voitures (fret, passager, ...)
     readonly property var prime_list: [2, 3, 5, 7, 11, 13, 17]      //permettant de varier les icones visibles en bas
     property var position_list: []  // Liste contenant la position de chacune des voitures (avant, arrière, milieu)
 
@@ -42,7 +42,7 @@ Item {
     property bool is_positive: false
 
     //Propriétés permettant de connaitre la taille du train (et donc l'index maximal) et le nombre de pages possibles
-    readonly property int train_length: type_list.length > position_list.length ? position_list.length : type_list.length     //La longueur du train se base toujours sur la liste la plus courte
+    readonly property int train_length: mission_list.length > position_list.length ? position_list.length : mission_list.length     //La longueur du train se base toujours sur la liste la plus courte
     readonly property int pages_count: (((root.train_length % root.visible_count) != 0) + (root.train_length - root.train_length % root.visible_count) / root.visible_count)
     onTrain_lengthChanged: {
         //S'assure que l'index montre bien une page contenant des voitures
@@ -190,7 +190,7 @@ Item {
             default_width: (root.default_width - 2 * root.default_height) / (root.visible_count + 2)
             default_height: root.default_height * 0.5
 
-            image_activable: "Train_icons/" + root.type_list[button_index] + (root.prime_list.includes(button_index % (root.visible_count + 3)) ? "/empty/" : "/full/") + (is_dark_grey ? "dark_" : "") + "grey_" + root.position_list[button_index] + ".png"
+            image_activable: "Train_icons/" + root.mission_list[button_index] + (root.prime_list.includes(button_index % (root.visible_count + 3)) ? "/empty/" : "/full/") + (is_dark_grey ? "dark_" : "") + "grey_" + root.position_list[button_index] + ".png"
             image_not_activable: ""
             text: is_activable ? (button_index + 1).toString() : ""
             font_size: 8
