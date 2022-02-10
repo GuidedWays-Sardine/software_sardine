@@ -259,3 +259,22 @@ class Systems:
         else:
             return []
 
+    def get_mission_list(self):
+        """Fonction retournant la liste des missions de chacunes des voitures
+        
+        Returns 
+        -------
+        mission_list: `list`
+            liste des missions de chacunes des voitures du train
+        """
+        return [rc.mission_type.value for rc in self.railcars]
+
+    def get_position_list(self):
+        """Fonction retournant la liste des tupes de positions (Front, Middle, Back) de chacunes des voitures
+
+        Returns
+        -------
+        mission_list: `list`
+            liste des types de positions de chacunes des voitures du train
+        """
+        return [rc.position_type.value for rc in self.railcars]
