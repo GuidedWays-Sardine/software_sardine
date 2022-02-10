@@ -379,8 +379,9 @@ class PageRB2:
         """
         train_data = sd.SettingsDictionary()
 
-        # Rajoute le type de mission
+        # Rajoute le type de mission du train ainsi que le mode de paramétrage
         train_data["mission"] = tdb.mission_getter[self.page.findChild(QObject, "mission_type_combo").property("selection_index")]
+        train_data["mode"] = str(self.current_mode)
 
         # Change les données de la fenêtre principale du paramétrage train
         for widget_id, widget in self.data_widgets.items():
