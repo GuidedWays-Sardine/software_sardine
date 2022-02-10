@@ -6,26 +6,36 @@ import os
 # Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src\\")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
+import src.train.train_database.database as tdb
 
 class coaches:
 
-    axle_number = 0
+class RailCar:
+    """classe cotenant toutes les informations sur la voiture"""
+    # Toutes les informations générale
+    mission_type = None
+    position_type = None
+    position_index = None   # Index de 0 à Ncoaches - 1
 
+    # Autres informations générales
     levels = 0
     doors = 0
+    doors_activable = [[], []]
+    doors_open = [[], []]
 
+    # Informations reliées à la masse et la longueur
     Mtare = 0
+    Mcurrent = 0
     Mfull = 0
     length = 0
 
-    mission_type = None
-    position_type = None
-    position_index = None
-
+    # Informations reliées aux facteurs A,B,C à vide
     Aempty = 0
     Bempty = 0
     Cempty = 0
+    multiply_mass_empty = False
 
+    # Informations reliées aux facteurs A, B, C chargé
     Afull = 0
     Bfull = 0
     Cfull = 0
