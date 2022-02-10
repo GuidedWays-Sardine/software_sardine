@@ -117,8 +117,8 @@ class Systems:
         # Passe par chacune des voitures du train
         for car_index in range(train_data["railcars"]):
             # Commence par déterminer si l'essieu précédent et l'essieu suivant sont articulés
-            previous_articulated = car_index > 0 and self.get_bogies(car_index - 1, tdb.Position.BACK)[0].is_jacob_bogie()
-            next_articulated = average_bogies_count < 2 and (front_bonus_bogies <= car_index < train_data["railcars"] - back_bonus_bogies - 1)
+            previous_articulated = car_index > 0 and any(self.get_bogies(car_index, tdb.Position.FRONT))
+            next_articulated = average_bogies_count < 2 and not (front_bonus_bogies <= car_index < train_data["railcars"] - back_bonus_bogies - 1)
 
             # Détermine le nombre d'essieux centraux à ajoutés (valable que si average_bogies_count > 2)
             central_bogies_count = (int(average_bogies_count - 2) + (front_bonus_bogies < car_index or car_index > train_data["railcars"] - back_bonus_bogies - 1)
@@ -196,7 +196,7 @@ class Systems:
             # Ajoute le bogie arrière
             self.traction.append(traction.Bogie(position_type=tdb.Position.BACK,
                                                 position_index=-1,
-                                                linked_railcars=car_index if next_articulated else [car_index, car_index + 1],
+                                                linked_railcars=[car_index, car_index + 1] if next_articulated else car_index,
                                                 axles_count=train_data["axles_per_bogie"],
                                                 motorized_axles=back_axles_motorized_count,
                                                 axles_power=train_data["axles_power"]))
@@ -246,15 +246,15 @@ class Systems:
             # - le bogie avant (ou non spécifié) est cherché et que le bogie arrière de la voiture précédent est articulée
             # - le bogie arrière (ou non spécifié) est cherche et que le bogie avant de la voiture suivant est articulée
             return [b for b in self.traction
-                    if ((position_index in b.linked_railcars and (position_type is None or b.position == position_type))
+                    if ((position_index[0] in b.linked_railcars and (position_type is None or b.position_type == position_type))
                         or (position_type != tdb.Position.MIDDLE and b.is_jacob_bogie()
-                            and ((position_type != tdb.Position.FRONT and b.position == tdb.Position.FRONT and position_index + 1 in b.linked_railcars)
-                                 or (position_type != tdb.Position.BACK and b.position == tdb.Position.BACK and position_index - 1 in b.linked_railcars))))]
+                            and ((position_type != tdb.Position.FRONT and b.position_type == tdb.Position.FRONT and position_index[0] + 1 in b.linked_railcars)
+                                 or (position_type != tdb.Position.BACK and b.position_type == tdb.Position.BACK and position_index[0] - 1 in b.linked_railcars))))]
         # Cas où le bogie recherché se trouve sur deux voiture (bogie jacobien, rame articulée)
         elif len(position_index) == 2:
             # Retourne le bogie qui appartient aux deux voitures s'il existe (sinon retourne liste vide)
             return [b for b in self.traction if all(p_i in b.linked_railcars for p_i in position_index)
-                    and (position_type is None or b.position == position_type)]
+                    and (position_type is None or b.position_type == position_type)]
         # Cas où trop d'index ou aucun index n'ont été donnés (retourne une liste vide)
         else:
             return []
