@@ -219,3 +219,43 @@ class Systems:
 
             # TODO : initialiser les systèmes de freinage
 
+    def get_bogies(self, position_index, position_type=None):
+        """Fonction permettant d'avoir un bogie avec les index indiqués
+
+        Parameters
+        ----------
+        position_index: `Union[int, list]`
+            Les voitures auxquelles le bogie est connecté (int ou liste de int) doit aller de 0 à Nvoitures - 1
+        position_type: `Position`
+            La position des bogies dans la voiture (Position.FRONT ; Position.MIDDLE ; Position.BACK) si cela est vital
+
+        Returns
+        -------
+        bogies_list: `list`
+            liste des bogies suivant les conditions envoyés
+        """
+        # Transforme l'index de la position du bogie en liste d'index si l'index envoyé est un entier
+        if isinstance(position_index, int):
+            position_index = [position_index]
+
+        # Cas où le/les bogies recherchés se trouvent sur une seule voiture
+        if len(position_index) == 1:
+            # Le bogie est sur la voiture dans le cas où :
+            # - l'index envoyé est dans la liste et qu'aucune position n'a été donnée
+            # - l'index envoyé est dans la liste et que le type de position correspond à celui du bogie
+            # - le bogie avant (ou non spécifié) est cherché et que le bogie arrière de la voiture précédent est articulée
+            # - le bogie arrière (ou non spécifié) est cherche et que le bogie avant de la voiture suivant est articulée
+            return [b for b in self.traction
+                    if ((position_index in b.linked_coaches and (position_type is None or b.position == position_type))
+                        or (position_type != tdb.Position.MIDDLE and b.is_jacob_bogie()
+                            and ((position_type != tdb.Position.FRONT and b.position == tdb.Position.FRONT and position_index + 1 in b.linked_coaches)
+                                 or (position_type != tdb.Position.BACK and b.position == tdb.Position.BACK and position_index - 1 in b.linked_coaches))))]
+        # Cas où le bogie recherché se trouve sur deux voiture (bogie jacobien, rame articulée)
+        elif len(position_index) == 2:
+            # Retourne le bogie qui appartient aux deux voitures s'il existe (sinon retourne liste vide)
+            return [b for b in self.traction if all(p_i in b.linked_coaches for p_i in position_index)
+                    and (position_type is None or b.position == position_type)]
+        # Cas où trop d'index ou aucun index n'ont été donnés (retourne une liste vide)
+        else:
+            return []
+
