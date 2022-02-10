@@ -78,21 +78,21 @@ class Systems:
         # average_bogies_count < 2  -> rame articulée      -> bogies jacobiens       -> aucun bogie central
         # average_bogies_count = 2  -> rame non articulée  -> aucun bogie jacobiens  -> aucun bogie central
         # average_bogies_count > 2  -> rame non articulée  -> aucun bogie jacobiens  -> bogies centraux
-        average_bogies_count = train_data["bogies_count"] / train_data["coaches"]
+        average_bogies_count = train_data["bogies_count"] / train_data["railcars"]
 
         # Récupère le nombre de bogies supplémentaires à rajouter à l'avant et à l'arrière (extérieurs priorisé)
         # Si impaire (rame assymétrique), le bogie supplémentaire sera mis à l'avant du train (d'où le +1)
         # average_bogies_count < 2   -> nombre de rames non articulés de chaque côté
         # average_bogies_count > 2   -> nombre de rames avec un bogie central supplémentaire
         if average_bogies_count <= 2:
-            front_bonus_bogies = int(((train_data["bogies_count"] - (train_data["coaches"] + 1)) + 1) / 2.0)
-            back_bonus_bogies = int((train_data["bogies_count"] - (train_data["coaches"] + 1)) / 2.0)
+            front_bonus_bogies = int(((train_data["bogies_count"] - (train_data["railcars"] + 1)) + 1) / 2.0)
+            back_bonus_bogies = int((train_data["bogies_count"] - (train_data["railcars"] + 1)) / 2.0)
         else:
-            front_bonus_bogies = int((train_data["bogies_count"] - int(average_bogies_count) * train_data["coaches"] + 1) / 2.0)
-            back_bonus_bogies = int((train_data["bogies_count"] - int(average_bogies_count) * train_data["coaches"]) / 2.0)
+            front_bonus_bogies = int((train_data["bogies_count"] - int(average_bogies_count) * train_data["railcars"] + 1) / 2.0)
+            back_bonus_bogies = int((train_data["bogies_count"] - int(average_bogies_count) * train_data["railcars"]) / 2.0)
 
         # Vérifie que le train n'a pas un taux de motorisation > à 100% (minimum entre essieux moteurs et essieux)
-        motorized_count = min(train_data["motorized_axles_count"], train_data["bogies_count"] * train_data["axles_per_bogies"])
+        motorized_count = min(train_data["motorized_axles_count"], train_data["bogies_count"] * train_data["axles_per_bogie"])
 
         # Récupère le nombre d'essieux moteurs à mettre de chaque à l'avant et à l'arrière (extérieurs priorisés)
         # Si impaire (rame assymétrique), l'essieu moteur supplémentaire sera mis à l'avant du trai (d'où le +1)
@@ -105,27 +105,27 @@ class Systems:
         # Si une voiture non articulé n'a pas tous ces essieux moteurs
         motorized_axle_weight = train_data["motorized_axle_weight"]
         carrying_axle_weight = (train_data["weight"] - motorized_axle_weight * train_data["motorized_axles_count"]) / \
-                               (train_data["bogies_count"] * train_data["axles_per_bogies"] - train_data["motorized_axles_count"])
+                               (train_data["bogies_count"] * train_data["axles_per_bogie"] - train_data["motorized_axles_count"])
 
         # Initialise les variables permettant de garder en mémoire le nombre d'essieux déjà initialisés
         previous_axles_count = 0
-        next_axles_count = train_data["bogies_count"] * train_data["axles_per_bogies"]
+        next_axles_count = train_data["bogies_count"] * train_data["axles_per_bogie"]
 
         # stocke dans une varible temporaire la mission générale du train (pour simplifier sa lecture
         general_mission = tdb.MissionType[str(train_data.get_value("mission", "MissionType.PASSENGER"))[12:]]
 
         # Passe par chacune des voitures du train
-        for car_index in range(train_data["coaches"]):
+        for car_index in range(train_data["railcars"]):
             # Commence par déterminer si l'essieu précédent et l'essieu suivant sont articulés
             previous_articulated = car_index > 0 and self.get_bogies(car_index - 1, tdb.Position.BACK)[0].is_jacob_bogie()
-            next_articulated = average_bogies_count < 2 and (front_bonus_bogies <= car_index < train_data["coaches"] - back_bonus_bogies - 1)
+            next_articulated = average_bogies_count < 2 and (front_bonus_bogies <= car_index < train_data["railcars"] - back_bonus_bogies - 1)
 
             # Détermine le nombre d'essieux centraux à ajoutés (valable que si average_bogies_count > 2)
-            central_bogies_count = (int(average_bogies_count - 2) + (front_bonus_bogies < car_index or car_index > train_data["coaches"] - back_bonus_bogies - 1)
+            central_bogies_count = (int(average_bogies_count - 2) + (front_bonus_bogies < car_index or car_index > train_data["railcars"] - back_bonus_bogies - 1)
                                     if average_bogies_count > 2 else 0)
 
             # Compte le nombre de bogies à rajouter (ne compte pas le bogie articulé précédent mais compte le suivant)
-            new_axles_count = ((not previous_articulated) + central_bogies_count + 1) * train_data["axles_per_bogies"]
+            new_axles_count = ((not previous_articulated) + central_bogies_count + 1) * train_data["axles_per_bogie"]
             next_axles_count -= new_axles_count
 
             # Récupère le nombre d'essieux motorisés qui seront rajoutés. Le nombre d'essieux moteurs dépendra de :
@@ -139,14 +139,14 @@ class Systems:
 
             # Récupère le nombre d'essieux à rajouter sur les diffrents bogies du train
             # 0 s'il est articulé (d'où le not previous articulated)
-            front_axles_motorized_count = min(new_motorized_count, train_data["axles_per_bogies"] * (not previous_articulated))
+            front_axles_motorized_count = min(new_motorized_count, train_data["axles_per_bogie"] * (not previous_articulated))
             # Motorisation prioritaire sur les essieux avant et arrière
-            back_axles_motorized_count = min(new_motorized_count - front_axles_motorized_count, train_data["axles_per_bogies"])
+            back_axles_motorized_count = min(new_motorized_count - front_axles_motorized_count, train_data["axles_per_bogie"])
             # Génère une liste avec les bogies centraux
             # min pour éviter d'avoir plus d'essieux moteurs que d'essieux(axles_per_bogie si trop d'essieu à motoriser)
             # max pour éviter d'aviur un nombre d'essieux moteurs négatifs(0 si min retourne une valeur négative)
             remain_motorized = new_motorized_count - front_axles_motorized_count - back_axles_motorized_count
-            central_axles_motorized_count = [max(min(remain_motorized - c_m_c * train_data["axles_per_bogies"], train_data["axles_per_bogies"]), 0)
+            central_axles_motorized_count = [max(min(remain_motorized - c_m_c * train_data["axles_per_bogie"], train_data["axles_per_bogie"]), 0)
                                              for c_m_c in range(central_bogies_count)]
 
             # Maintenant s'occupe de calculer la masse de la voiture (bogie avant -> bogies centraux -> bogie arrière)
@@ -159,16 +159,16 @@ class Systems:
             else:
                 # Sinon calcule simplement la masse du bogie (pas de division par 2 car bogie non articulé)
                 railcar_weight = (front_axles_motorized_count * motorized_axle_weight +
-                                  (train_data["axles_per_bogies"] - front_axles_motorized_count) * carrying_axle_weight)
+                                  (train_data["axles_per_bogie"] - front_axles_motorized_count) * carrying_axle_weight)
             # Continue par les bogies centraux
             for c_m_a_c in central_axles_motorized_count:
                 # Pour chacun des bogies, rajoute la masse sur chacuns des essieux
                 railcar_weight += (c_m_a_c * motorized_axle_weight +
-                                   (train_data["axles_per_bogies"] - c_m_a_c) * carrying_axle_weight)
+                                   (train_data["axles_per_bogie"] - c_m_a_c) * carrying_axle_weight)
             # Fini par l'essieu arrière
             # Divise par 2 si l'essieu est articulé (1 + (1 si bogie articulé))
             railcar_weight += ((back_axles_motorized_count * motorized_axle_weight +
-                                (train_data["axles_per_bogies"] - back_axles_motorized_count) * carrying_axle_weight) /
+                                (train_data["axles_per_bogie"] - back_axles_motorized_count) * carrying_axle_weight) /
                                (1 + next_articulated))
 
             # Incrémente le nombre d'essieux déjà paramétrés par les nouveaux essieux
@@ -179,39 +179,39 @@ class Systems:
             if not previous_articulated:
                 self.traction.append(traction.Bogie(position_type=tdb.Position.FRONT,
                                                     position_index=-1,
-                                                    linked_coaches=car_index,
-                                                    axles_count=train_data["axles_per_bogies"],
+                                                    linked_railcars=car_index,
+                                                    axles_count=train_data["axles_per_bogie"],
                                                     motorized_axles=front_axles_motorized_count,
-                                                    axles_power=train_data["axle_power"]))
+                                                    axles_power=train_data["axles_power"]))
 
             # Ajoute les bogies centraux
             for c_b in range(central_bogies_count):
                 self.traction.append(traction.Bogie(position_type=tdb.Position.MIDDLE,
                                                     position_index=c_b,
-                                                    linked_coaches=car_index,
-                                                    axles_count=train_data["axles_per_bogies"],
+                                                    linked_railcars=car_index,
+                                                    axles_count=train_data["axles_per_bogie"],
                                                     motorized_axles=central_axles_motorized_count[c_b],
-                                                    axles_power=train_data["axle_power"]))
+                                                    axles_power=train_data["axles_power"]))
 
             # Ajoute le bogie arrière
             self.traction.append(traction.Bogie(position_type=tdb.Position.BACK,
                                                 position_index=-1,
-                                                linked_coaches=car_index if next_articulated else [car_index, car_index + 1],
-                                                axles_count=train_data["axles_per_bogies"],
+                                                linked_railcars=car_index if next_articulated else [car_index, car_index + 1],
+                                                axles_count=train_data["axles_per_bogie"],
                                                 motorized_axles=back_axles_motorized_count,
-                                                axles_power=train_data["axle_power"]))
+                                                axles_power=train_data["axles_power"]))
 
             # Ajoute la voiture paramétré ainsi que tous ses paramètres
             self.railcars.append(railcar.RailCar(mission_type=general_mission,
                                                  position_type=(tdb.Position.FRONT if car_index == 0 else
-                                                                tdb.Position.BACK if car_index == (train_data["coaches"] - 1)
+                                                                tdb.Position.BACK if car_index == (train_data["railcars"] - 1)
                                                                 else tdb.Position.MIDDLE),
                                                  position_index=car_index,
                                                  levels=1 if general_mission != tdb.MissionType.FREIGHT else 0,
                                                  doors=2 if general_mission != tdb.MissionType.FREIGHT else 0,
                                                  Mtare=railcar_weight,
                                                  Mfull=railcar_weight,
-                                                 length=train_data["length"] / train_data["coaches"],
+                                                 length=train_data["length"] / train_data["railcars"],
                                                  ABCempty=[train_data["a"], train_data["b"], train_data["c"]],
                                                  multiply_mass_empty=False,
                                                  ABCfull=[train_data["a"], train_data["b"], train_data["c"]],
@@ -246,14 +246,14 @@ class Systems:
             # - le bogie avant (ou non spécifié) est cherché et que le bogie arrière de la voiture précédent est articulée
             # - le bogie arrière (ou non spécifié) est cherche et que le bogie avant de la voiture suivant est articulée
             return [b for b in self.traction
-                    if ((position_index in b.linked_coaches and (position_type is None or b.position == position_type))
+                    if ((position_index in b.linked_railcars and (position_type is None or b.position == position_type))
                         or (position_type != tdb.Position.MIDDLE and b.is_jacob_bogie()
-                            and ((position_type != tdb.Position.FRONT and b.position == tdb.Position.FRONT and position_index + 1 in b.linked_coaches)
-                                 or (position_type != tdb.Position.BACK and b.position == tdb.Position.BACK and position_index - 1 in b.linked_coaches))))]
+                            and ((position_type != tdb.Position.FRONT and b.position == tdb.Position.FRONT and position_index + 1 in b.linked_railcars)
+                                 or (position_type != tdb.Position.BACK and b.position == tdb.Position.BACK and position_index - 1 in b.linked_railcars))))]
         # Cas où le bogie recherché se trouve sur deux voiture (bogie jacobien, rame articulée)
         elif len(position_index) == 2:
             # Retourne le bogie qui appartient aux deux voitures s'il existe (sinon retourne liste vide)
-            return [b for b in self.traction if all(p_i in b.linked_coaches for p_i in position_index)
+            return [b for b in self.traction if all(p_i in b.linked_railcars for p_i in position_index)
                     and (position_type is None or b.position == position_type)]
         # Cas où trop d'index ou aucun index n'ont été donnés (retourne une liste vide)
         else:

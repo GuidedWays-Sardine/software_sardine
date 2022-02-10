@@ -17,14 +17,14 @@ class Bogie:
     position_type = None
     position_index = -1  # Uniquement pour les bogies centraux! Les bogies extérieurs n'ont pas d'index
     axles_count = 1
-    linked_coaches = []
+    linked_railcars = []
 
     # Informations sur la motorisation
     axles_power = []     # Puissance du moteur, sinon 0 si aucun moteur
     activated = []      # True si le moteur est allumé, False sinon
     activable = []      # True si le moteur est activable, False sinon (si panne)
 
-    def __init__(self, position_type, position_index, linked_coaches, axles_count, motorized_axles, axles_power):
+    def __init__(self, position_type, position_index, linked_railcars, axles_count, motorized_axles, axles_power):
         """Fonction permettant d'initialiser un bogie
 
         Parameters
@@ -33,7 +33,7 @@ class Bogie:
             La position du bogie sur la voiture (Position.FRONT ; Position.MIDDLE ; Position.BACK)
         position_index: `int`
             L'index de la position si le bogie est central (sinon -1)
-        linked_coaches: `Union[int, list]`
+        linked_railcars: `Union[int, list]`
             Liste des voitures auxquelles le bogie est connecté
         axles_count: `int`
             nombre d'essieux
@@ -45,9 +45,9 @@ class Bogie:
             list[float] -> liste de la puissance de chacun des moteurs
             float -> puissance des moteurs (tous les essieux motorisés auront cette puissance)
         """
-        self.set_general_values(position_type, position_index, linked_coaches, axles_count, motorized_axles, axles_power)
+        self.set_general_values(position_type, position_index, linked_railcars, axles_count, motorized_axles, axles_power)
 
-    def set_general_values(self, position_type, position_index, linked_coaches, axles_count, motorized_axles, axles_power):
+    def set_general_values(self, position_type, position_index, linked_railcars, axles_count, motorized_axles, axles_power):
         """Fonction permettant de changer les valeurs d'un bogie
 
         Parameters
@@ -56,7 +56,7 @@ class Bogie:
             La position du bogie sur la voiture (Position.FRONT ; Position.MIDDLE ; Position.BACK)
         position_index: `int`
             L'index de la position si le bogie est central (sinon -1)
-        linked_coaches: `Union[int, list]`
+        linked_railcars: `Union[int, list]`
             Liste des voitures auxquelles le bogie est connecté
         axles_count: `int`
             nombre d'essieux
@@ -71,10 +71,10 @@ class Bogie:
         # initialise les caractéristiques générales du bogie
         self.position_type = position_type
         self.position_index = position_index
-        if isinstance(linked_coaches, list):
-            self.linked_coaches = linked_coaches
-        elif isinstance(linked_coaches, int):
-            self.linked_coaches = [linked_coaches]
+        if isinstance(linked_railcars, list):
+            self.linked_railcars = linked_railcars
+        elif isinstance(linked_railcars, int):
+            self.linked_railcars = [linked_railcars]
         self.axles_count = axles_count if axles_count >= 1 else 1
 
         # Initialise la puissance des essieux moteurs
@@ -111,9 +111,9 @@ class Bogie:
         Returns
         -------
         qml_values: `list`
-            (position_type, position_index, [linked_coaches], axles_count, axles_power)
+            (position_type, position_index, [linked_railcars], axles_count, axles_power)
         """
-        return (self.position_type, self.position_index, self.linked_coaches, self.axles_count, self.axles_power)
+        return (self.position_type, self.position_index, self.linked_railcars, self.axles_count, self.axles_power)
 
     def get_motorized_axles_count(self):
         """Fonction retournant le nombre d'essieux moteurs
@@ -134,4 +134,4 @@ class Bogie:
         is_jacob_bogie: `True`
             retourne vrai si l'essieu est articulé, sinon faux
         """
-        return len(self.linked_coaches) == 2
+        return len(self.linked_railcars) == 2

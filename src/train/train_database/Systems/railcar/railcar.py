@@ -14,7 +14,7 @@ class RailCar:
     # Toutes les informations générale
     mission_type = None
     position_type = None
-    position_index = None   # Index de 0 à Ncoaches - 1
+    position_index = None   # Index de 0 à Nrailcars - 1
 
     # Autres informations générales
     levels = 0

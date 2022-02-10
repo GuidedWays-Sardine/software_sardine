@@ -21,14 +21,14 @@ Item {
                 bogies_count_integerinput.maximum_value = root.max_central_bogies
                 bogies_count_integerinput.minimum_value = 1
 
-                axle_power_floatinput.is_activable = root.motorized_axles[root.current_bogie_index][root.current_axle_index]
-                axle_power_floatinput.change_value(root.motorized_axles_powers[root.current_bogie_index][root.current_axle_index])
+                axles_power_floatinput.is_activable = root.motorized_axles[root.current_bogie_index][root.current_axle_index]
+                axles_power_floatinput.change_value(root.motorized_axles_powers[root.current_bogie_index][root.current_axle_index])
             }
             else {
                 bogies_count_integerinput.minimum_value = 0
                 bogies_count_integerinput.maximum_value = 0
 
-                axle_power_floatinput.change_value(0)
+                axles_power_floatinput.change_value(0)
             }
         }
     
@@ -47,7 +47,7 @@ Item {
 
     //Données par défaut pour les bogies
     property int default_axle_count: 2
-    property double default_axle_power: 750.0
+    property double default_axles_power: 750.0
     property int default_pad_brake_count: 0
     property int default_disk_brake_count: 0
     property int default_magnetic_brake_count: 0
@@ -55,8 +55,8 @@ Item {
 
     // Valeurs limites pour les bogies
     property int max_central_bogies: (root.position == "front" || root.position == "back") ? 1 : 10
-    property int max_axles_per_bogies: 10
-    property double max_axle_power: 1e4
+    property int max_axles_per_bogie: 10
+    property double max_axles_power: 1e4
     property int max_pad_per_axle: 2
     property int max_disk_per_axle: 4
     property int max_magnetic_between_axle: 2       //Identique pour le freinage de foucault
@@ -339,7 +339,7 @@ Item {
         default_height: plus_minus_button.default_height
 
         minimum_value: 1
-        maximum_value: root.max_axles_per_bogies
+        maximum_value: root.max_axles_per_bogie
         is_max_default: false
         font_size: 8
 
@@ -420,12 +420,12 @@ Item {
                  background_color = root.motorized_axles[root.current_bogie_index][index] ? dark_grey : ""
 
                  // Change la valeur de la puissance moteur à 0 si la motorisation est enlevée et à la valeur par défaut
-                 root.motorized_axles_powers[root.current_bogie_index][index] = root.motorized_axles[root.current_bogie_index][index] ? root.default_axle_power : 0
+                 root.motorized_axles_powers[root.current_bogie_index][index] = root.motorized_axles[root.current_bogie_index][index] ? root.default_axles_power : 0
 
                 // Active/désactive le valueinput de la puissance si l'index correspond
                 if(index === root.current_axle_index) {
-                    axle_power_floatinput.is_activable = root.motorized_axles_powers[root.current_bogie_index][index]
-                    axle_power_floatinput.change_value(root.motorized_axles_powers[root.current_bogie_index][root.current_axle_index])
+                    axles_power_floatinput.is_activable = root.motorized_axles_powers[root.current_bogie_index][index]
+                    axles_power_floatinput.change_value(root.motorized_axles_powers[root.current_bogie_index][root.current_axle_index])
                 }
             }
         }
@@ -476,8 +476,8 @@ Item {
         //Signal appelé lorsque le texte change (et donc que l'index d'essieu change
         onTextChanged: {
             //rend l'integerinput de la puissance moteur activable ou non selon si l'essieu est motorisé ou non et change sa valeur
-            axle_power_floatinput.is_activable = root.motorized_axles[root.current_bogie_index][root.current_axle_index]
-            axle_power_floatinput.change_value(root.motorized_axles_powers[root.current_bogie_index][root.current_axle_index])
+            axles_power_floatinput.is_activable = root.motorized_axles[root.current_bogie_index][root.current_axle_index]
+            axles_power_floatinput.change_value(root.motorized_axles_powers[root.current_bogie_index][root.current_axle_index])
         }
     }
 
@@ -506,8 +506,8 @@ Item {
 
     //floatinput permettant de rentrer la puissance moteur
     INI_floatinput {
-        id: axle_power_floatinput
-        objectName: "axle_power_floatinput"
+        id: axles_power_floatinput
+        objectName: "axles_power_floatinput"
 
         default_x: right_axle_arrow_button.default_x + right_axle_arrow_button.default_height
         default_y: right_axle_arrow_button.default_y
@@ -515,7 +515,7 @@ Item {
         default_height: right_axle_arrow_button.default_height
 
         minimum_value: is_activable ? 0.001 : 0
-        maximum_value: root.max_axle_power
+        maximum_value: root.max_axles_power
         is_max_default: false
         decimals: 3
         font_size: 8
@@ -529,8 +529,8 @@ Item {
         id: axles_power_text
         objectName: "axles_power_text"
 
-        default_x: axle_power_floatinput.default_x + axle_power_floatinput.default_width + font_size * 0.5
-        default_y: axle_power_floatinput.default_y + (axle_power_floatinput.default_height - font_size) * 0.5 - 1
+        default_x: axles_power_floatinput.default_x + axles_power_floatinput.default_width + font_size * 0.5
+        default_y: axles_power_floatinput.default_y + (axles_power_floatinput.default_height - font_size) * 0.5 - 1
 
         text: root.motor_text
         font_size: 8
@@ -540,14 +540,14 @@ Item {
     }
 
     INI_text {
-        id: axle_power_unit_text
-        objectName: "axle_power_unit_text"
+        id: axles_power_unit_text
+        objectName: "axles_power_unit_text"
 
         text: "kW"
         font_size: 4
 
-        default_x: axle_power_floatinput.default_x + axle_power_floatinput.default_width + 2
-        default_y: axle_power_floatinput.default_y + axle_power_floatinput.default_height - font_size
+        default_x: axles_power_floatinput.default_x + axles_power_floatinput.default_width + 2
+        default_y: axles_power_floatinput.default_y + axles_power_floatinput.default_height - font_size
 
         is_dark_grey: true
         is_visible: root.generated && root.any

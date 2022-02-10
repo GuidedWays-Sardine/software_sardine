@@ -15,10 +15,10 @@ Item {
     //Constantes permettant de controller les différentes valeurs maximales de chacun des trains
     readonly property double max_weight: 1e9            //t
     readonly property double max_length: 1e9            //m
-    readonly property int max_coaches: 1e3
-    readonly property int max_bogies_per_coaches: 1e1   //Utilisé uniquement dans la popup complex
-    readonly property int max_axles_per_bogies: 1e1
-    readonly property double max_axle_power: 1e6        //kW
+    readonly property int max_railcars: 1e3
+    readonly property int max_bogies_per_railcars: 1e1   //Utilisé uniquement dans la popup complex
+    readonly property int max_axles_per_bogie: 1e1
+    readonly property double max_axles_power: 1e6        //kW
     readonly property double a_max: 1e3                 //kN
     readonly property double b_max: 1e3                 //kN/(km/h)
     readonly property double c_max: 1e3                 //kM/(km/h)²
@@ -105,7 +105,7 @@ Item {
             default_height: page_rb2.input_height
 
             maximum_value: page_rb2.max_weight
-            minimum_value: 0.001 * bogies_count_integerinput.value * axles_per_bogies_integerinput.value
+            minimum_value: 0.001 * bogies_count_integerinput.value * axles_per_bogie_integerinput.value
             decimals: 3
 
             title: "Mconvoi"
@@ -128,7 +128,7 @@ Item {
             default_height: weight_floatinput.default_height
 
             maximum_value: page_rb2.max_length
-            minimum_value: 0.001 * coaches_integerinput.value
+            minimum_value: 0.001 * railcars_integerinput.value
             decimals: 3
 
             title: "Lconvoi"
@@ -142,15 +142,15 @@ Item {
 
         //integerinput du nombre de voitures
         INI_integerinput{
-            id: coaches_integerinput
-            objectName: "coaches_integerinput"
+            id: railcars_integerinput
+            objectName: "railcars_integerinput"
 
             default_x: length_floatinput.default_x +  page_rb2.x_offset
             default_y: length_floatinput.default_y
             default_width: length_floatinput.default_width
             default_height: length_floatinput.default_height
 
-            maximum_value: page_rb2.max_coaches
+            maximum_value: page_rb2.max_railcars
             minimum_value: 1
 
             title : "Nvoitures"
@@ -199,15 +199,15 @@ Item {
 
         //integerinput pour connaitre le nombre d'essieux par bogies
         INI_integerinput{
-            id: axles_per_bogies_integerinput
-            objectName: "axles_per_bogies_integerinput"
+            id: axles_per_bogie_integerinput
+            objectName: "axles_per_bogie_integerinput"
 
             default_x: length_floatinput.default_x
             default_y: bogies_count_integerinput.default_y
             default_width: length_floatinput.default_width
             default_height: bogies_count_integerinput.default_height
 
-            maximum_value: page_rb2.max_axles_per_bogies
+            maximum_value: page_rb2.max_axles_per_bogie
             minimum_value: 1
 
             title: "Nessieux/bogies"
@@ -224,12 +224,12 @@ Item {
             objectName: "motorized_axles_count_integerinput"
 
 
-            default_x: coaches_integerinput.default_x
-            default_y: axles_per_bogies_integerinput.default_y
-            default_width: coaches_integerinput.default_width
-            default_height: axles_per_bogies_integerinput.default_height
+            default_x: railcars_integerinput.default_x
+            default_y: axles_per_bogie_integerinput.default_y
+            default_width: railcars_integerinput.default_width
+            default_height: axles_per_bogie_integerinput.default_height
 
-            maximum_value: bogies_count_integerinput.value * axles_per_bogies_integerinput.value
+            maximum_value: bogies_count_integerinput.value * axles_per_bogie_integerinput.value
             minimum_value: 0
 
             title: "Nessieux moteurs"
@@ -242,7 +242,7 @@ Item {
             onValue_changed: {
                 //Commence par changer la valeur de la masse à l'essieu
                 if(motorized_axles_count_integerinput.value != 0){
-                    motorized_axle_weight_floatinput.change_value(weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogies_integerinput.value))
+                    motorized_axle_weight_floatinput.change_value(weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value))
                 }
                 else {
                     motorized_axle_weight_floatinput.clear()
@@ -250,20 +250,20 @@ Item {
 
                 // Si le dernier élément mis à jour est la puissance des moteurs, mets à jour la puissance du train
                 power_floatinput.is_modified = true
-                axle_power_floatinput.is_modified = true
-                if(axle_power_floatinput.last_changed && !power_floatinput.last_changed){
-                    power_floatinput.change_value(axle_power_floatinput.value * motorized_axles_count_integerinput.value)
+                axles_power_floatinput.is_modified = true
+                if(axles_power_floatinput.last_changed && !power_floatinput.last_changed){
+                    power_floatinput.change_value(axles_power_floatinput.value * motorized_axles_count_integerinput.value)
                 }
                 // Si le dernier élément mis à jour est la puissance du train, mets à jour la puissance des moteurs
                 else{
                     if(motorized_axles_count_integerinput.value != 0) {
-                        axle_power_floatinput.change_value(power_floatinput.value / motorized_axles_count_integerinput.value)
+                        axles_power_floatinput.change_value(power_floatinput.value / motorized_axles_count_integerinput.value)
                     }
                     else{
-                        axle_power_floatinput.change_value(0)
+                        axles_power_floatinput.change_value(0)
                     }
                 }
-                axle_power_floatinput.is_modified = false
+                axles_power_floatinput.is_modified = false
                 power_floatinput.is_modified = false
             }
         }
@@ -284,12 +284,12 @@ Item {
                            ? // Cas où le nombre d'essieux motorisés est différent de 0 (propose de telle sorte à ce que la masse totale sur les essieux moteur ne dépasse pas celle du train)
                              weight_floatinput.value / motorized_axles_count_integerinput.value
                            : // Sinon affiche la taille moyenne à l'essieu
-                           weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogies_integerinput.value)
+                           weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value)
             minimum_value: motorized_axles_count_integerinput.value != 0
                            ? // Cas où le nombre d'essieux motorisés est différent de 0 (propose à l'utilisateur de rentrer une valeur)
                              0.001
                            : // Sinon affiche la taille moyenne à l'essieu
-                           weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogies_integerinput.value)
+                           weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value)
             decimals: 3
 
             title: "masse/essieu moteur"
@@ -303,20 +303,20 @@ Item {
 
         //floatinput pour connaitre la puissance de chaque essieux moteurs (relié à la puissance générale
         INI_floatinput{
-            id: axle_power_floatinput
-            objectName: "axle_power_floatinput"
+            id: axles_power_floatinput
+            objectName: "axles_power_floatinput"
 
             //propriété permettant de se souvenir si la puissance du train ou la puissance moteur a été changée en dernier
             //Utile pour savoir quelle puissance mettre à jour lorsque le nombre d'essieux moteurs est changé
             property bool last_changed: false
             property bool is_modified: false
 
-            default_x: axles_per_bogies_integerinput.default_x
+            default_x: axles_per_bogie_integerinput.default_x
             default_y: motorized_axle_weight_floatinput.default_y
-            default_width: axles_per_bogies_integerinput.default_width
+            default_width: axles_per_bogie_integerinput.default_width
             default_height: motorized_axles_count_integerinput.default_height
 
-            maximum_value: motorized_axles_count_integerinput.value != 0 ? page_rb2.max_axle_power : 0     //Met la valeur ax à celle indiqué sauf si le train a aucun essieu motorisé (auquel cas à 0)
+            maximum_value: motorized_axles_count_integerinput.value != 0 ? page_rb2.max_axles_power : 0     //Met la valeur ax à celle indiqué sauf si le train a aucun essieu motorisé (auquel cas à 0)
             minimum_value: 0
             decimals: 3
 
@@ -332,11 +332,11 @@ Item {
                 //Met à jour la puissance générale du train
                 if(!power_floatinput.is_modified){
                     power_floatinput.is_modified = true
-                    power_floatinput.change_value(axle_power_floatinput.value * motorized_axles_count_integerinput.value)
+                    power_floatinput.change_value(axles_power_floatinput.value * motorized_axles_count_integerinput.value)
                     power_floatinput.is_modified = false
 
                     //Indique qu'il était le dernier à être modifié
-                    axle_power_floatinput.last_changed = true
+                    axles_power_floatinput.last_changed = true
                     power_floatinput.last_changed = false
                 }
             }
@@ -353,11 +353,11 @@ Item {
             property bool is_modified: false
 
             default_x: motorized_axles_count_integerinput.default_x
-            default_y: axle_power_floatinput.default_y
+            default_y: axles_power_floatinput.default_y
             default_width: motorized_axle_weight_floatinput.default_width
-            default_height: axle_power_floatinput.default_height
+            default_height: axles_power_floatinput.default_height
 
-            maximum_value: motorized_axles_count_integerinput.value != 0 ? max_axle_power * motorized_axles_count_integerinput.value : 0     //Met la valeur ax à celle indiqué sauf si le train a aucun essieu motorisé (auquel cas à 0)
+            maximum_value: motorized_axles_count_integerinput.value != 0 ? max_axles_power * motorized_axles_count_integerinput.value : 0     //Met la valeur ax à celle indiqué sauf si le train a aucun essieu motorisé (auquel cas à 0)
             minimum_value: 0
             decimals: 3
 
@@ -371,18 +371,18 @@ Item {
 
             onValue_changed: {
                 //Met à jour la puissance par essieux du train
-                if(!axle_power_floatinput.is_modified){
+                if(!axles_power_floatinput.is_modified){
                     power_floatinput.is_modified = true
                     if(motorized_axles_count_integerinput.value != 0) {
-                        axle_power_floatinput.change_value(power_floatinput.value / motorized_axles_count_integerinput.value)
+                        axles_power_floatinput.change_value(power_floatinput.value / motorized_axles_count_integerinput.value)
                     }
                     else{
-                        axle_power_floatinput.change_value(0)
+                        axles_power_floatinput.change_value(0)
                     }
                     power_floatinput.is_modified = false
 
                     //Indique qu'il était le dernier à être modifié
-                    axle_power_floatinput.last_changed = false
+                    axles_power_floatinput.last_changed = false
                     power_floatinput.last_changed = true
                 }
             }
@@ -642,7 +642,7 @@ Item {
             default_width: page_rb2.input_width
             default_height: page_rb2.input_height
 
-            maximum_value: page_rb2.max_pad_per_axle * bogies_count_integerinput.value * axles_per_bogies_integerinput.value
+            maximum_value: page_rb2.max_pad_per_axle * bogies_count_integerinput.value * axles_per_bogie_integerinput.value
             minimum_value: 0
 
             title: "Nplaquettes"
@@ -663,7 +663,7 @@ Item {
             default_width: pad_brake_integerinput.default_width
             default_height: pad_brake_integerinput.default_height
 
-            maximum_value: page_rb2.max_disk_per_axle * bogies_count_integerinput.value * axles_per_bogies_integerinput.value
+            maximum_value: page_rb2.max_disk_per_axle * bogies_count_integerinput.value * axles_per_bogie_integerinput.value
             minimum_value: 0
 
             title: "Ndisques"
@@ -707,14 +707,14 @@ Item {
             default_width: pad_brake_integerinput.default_width
             default_height: pad_brake_integerinput.default_height
 
-            maximum_value: -foucault_brake_integerinput.value + page_rb2.max_magnetic_between_axle * bogies_count_integerinput.value * (axles_per_bogies_integerinput.value - 1)
+            maximum_value: -foucault_brake_integerinput.value + page_rb2.max_magnetic_between_axle * bogies_count_integerinput.value * (axles_per_bogie_integerinput.value - 1)
             minimum_value: 0
 
             title: "Npatins magnétiques"
             font_size: 12
 
             is_max_default: false
-            is_activable: (axles_per_bogies_integerinput.value > 1) && !page_rb2.generated
+            is_activable: (axles_per_bogie_integerinput.value > 1) && !page_rb2.generated
             is_positive: pad_brake_integerinput.is_positive
         }
 
@@ -728,14 +728,14 @@ Item {
             default_width: magnetic_brake_integerinput.default_width
             default_height: magnetic_brake_integerinput.default_height
 
-            maximum_value: -magnetic_brake_integerinput.value + page_rb2.max_magnetic_between_axle * bogies_count_integerinput.value * (axles_per_bogies_integerinput.value - 1)
+            maximum_value: -magnetic_brake_integerinput.value + page_rb2.max_magnetic_between_axle * bogies_count_integerinput.value * (axles_per_bogie_integerinput.value - 1)
             minimum_value: 0
 
             title: "Nfoucault"
             font_size: 12
 
             is_max_default: false
-            is_activable: (axles_per_bogies_integerinput.value > 1) && !page_rb2.generated
+            is_activable: (axles_per_bogie_integerinput.value > 1) && !page_rb2.generated
             is_positive: disk_brake_integerinput.is_positive
         }
 
