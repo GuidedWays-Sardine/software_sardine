@@ -103,7 +103,7 @@ class Bogie:
 
         # Mets les essieux comme éteints et rends tous les essieux moteurs activables
         self.activated = [False] * self.axles_count
-        self.activable = [bool(axles_power[i]) for i in range(self.axles_count)] # bool retourne False que pour 0.0
+        self.activable = [bool(self.axles_power[i]) for i in range(self.axles_count)]  # bool() sort False que pour 0.0
 
     def get_general_values(self):
         """Fonction permettant de retourner toutes les valeurs de paramétrages bogie
