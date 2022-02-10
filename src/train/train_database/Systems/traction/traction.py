@@ -111,9 +111,9 @@ class Bogie:
         Returns
         -------
         qml_values: `list`
-            (position_type, position_index, [linked_coaches], axles_count, motorisation, axles_power)
+            (position_type, position_index, [linked_coaches], axles_count, axles_power)
         """
-        return (self.position_type, self.position_index, self.linked_coaches, self.axles_count, self.motorisation, self.axles_power)
+        return (self.position_type, self.position_index, self.linked_coaches, self.axles_count, self.axles_power)
 
 
 
