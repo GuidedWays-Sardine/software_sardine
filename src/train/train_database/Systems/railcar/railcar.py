@@ -136,6 +136,16 @@ class RailCar:
             self.Cfull = 0 if len(ABCfull) <= 2 else ABCfull[2]
         self.multiply_mass_full = multiply_mass_full
 
-        self.Afull = 0
-        self.Bfull = 0
-        self.Cfull = 0
+    def get_general_values(self):
+        """Fonction permettant de retourner toutes les valeurs de paramétrages voiture
+
+        Returns
+        -------
+        qml_values: `list`
+            (mission_type, position_type, position_index, levels, doors, Mtare, Mfull, length,
+            Aempty, Bempty, Cempty, multiply_mass_empty,
+            Afull, Bfull, Cfull, multiply_mass_full)
+        """
+        return (self.mission_type, self.position_type, self.position_index,  self.levels, self.doors, self.Mtare, self.Mfull, self.length,
+                self.Aempty, self.Bempty, self.Cempty, self.multiply_mass_empty,
+                self.Afull, self.Bfull, self.Cfull, self.multiply_mass_full)
