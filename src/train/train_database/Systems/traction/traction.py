@@ -115,5 +115,14 @@ class Bogie:
         """
         return (self.position_type, self.position_index, self.linked_coaches, self.axles_count, self.axles_power)
 
+    def get_motorized_axles_count(self):
+        """Fonction retournant le nombre d'essieux moteurs
 
+        Returns
+        -------
+        Motorized_axles_count: `int`
+            Nombre d'essieux motorisés du bogie
+        """
+        # nombre d'essieux totaux - nombre d'essieux porteurs
+        return self.axles_count - self.axles_power.count(0)
 
