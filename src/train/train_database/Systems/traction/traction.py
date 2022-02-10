@@ -126,3 +126,12 @@ class Bogie:
         # nombre d'essieux totaux - nombre d'essieux porteurs
         return self.axles_count - self.axles_power.count(0)
 
+    def is_jacob_bogie(self):
+        """Fonction retournant l'indication sur si l'essieu est moteur ou non
+
+        Returns
+        -------
+        is_jacob_bogie: `True`
+            retourne vrai si l'essieu est articulé, sinon faux
+        """
+        return len(self.linked_coaches) == 2
