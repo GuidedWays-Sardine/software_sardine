@@ -24,17 +24,28 @@ class Bogie:
     activated = []      # True si le moteur est allumé, False sinon
     activable = []      # True si le moteur est activable, False sinon (si panne)
 
-    def __init__(self):
-        self.axle_count = 0
-        self.axle_power = 0
-        self.motor_position = None
-        self.state = None
-        self.ignitable = None
-        self.linked_coaches = None
-        self.power = None
-        self.type = None
-        self.bogie_mass = 0
+    def __init__(self, position_type, position_index, linked_coaches, axles_count, motorized_axles, axles_power):
+        """Fonction permettant d'initialiser un bogie
 
+        Parameters
+        ----------
+        position_type: `tdb.Position`
+            La position du bogie sur la voiture (Position.FRONT ; Position.MIDDLE ; Position.BACK)
+        position_index: `int`
+            L'index de la position si le bogie est central (sinon -1)
+        linked_coaches: `Union[int, list]`
+            Liste des voitures auxquelles le bogie est connecté
+        axles_count: `int`
+            nombre d'essieux
+        motorized_axles: `Union[list, int, NoneType]`
+            list[bool] -> liste de la position des essieux moteurs (doit être de taille axles_count)
+            int -> nombre d'essieux moteurs (doit être inférieur à axles_count)
+            NoneType -> axles_power au format list[float] auquel cas cet argument n'est pas nécessaire
+        axles_power: `Union[list, float]`
+            list[float] -> liste de la puissance de chacun des moteurs
+            float -> puissance des moteurs (tous les essieux motorisés auront cette puissance)
+        """
+        self.set_general_values(position_type, position_index, linked_coaches, axles_count, motorized_axles, axles_power)
 
     def set_general_values(self, position_type, position_index, linked_coaches, axles_count, motorized_axles, axles_power):
         """Fonction permettant de changer les valeurs d'un bogie
