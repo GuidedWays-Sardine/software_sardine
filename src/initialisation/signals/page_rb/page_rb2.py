@@ -92,8 +92,9 @@ class PageRB2:
         try:
             self.complex_popup = cp.ComplexPopup(self)
         except Exception as error:
-            log.error("Erreur lors du chargement de la popup complexe (page_rb2).",
+            log.error(f"Erreur lors du chargement de la popup complexe (page_rb{self.index}).",
                       exception=error, prefix="Initialisation popup paramétrage train")
+            log.change_log_prefix("Initialisation")
         finally:
             # Vérifie que celle-ci a été chargée et si oui, active le changement de mode et le connecte à son signal
             if self.complex_popup is not None and self.complex_popup.loaded:
