@@ -29,8 +29,9 @@ class Bogie:
 
         Parameters
         ----------
-        position_type: `tdb.Position`
-            La position du bogie sur la voiture (Position.FRONT ; Position.MIDDLE ; Position.BACK)
+        position_type: `Union[tdb.Position, NoneType]`
+            La position du bogie sur la voiture (Position.FRONT ; Position.MIDDLE ; Position.BACK).
+            None si le bogie est articulé (la position sera déduit des index des voitures)
         position_index: `int`
             L'index de la position si le bogie est central (sinon -1)
         linked_railcars: `Union[int, list]`
@@ -52,8 +53,9 @@ class Bogie:
 
         Parameters
         ----------
-        position_type: `tdb.Position`
-            La position du bogie sur la voiture (Position.FRONT ; Position.MIDDLE ; Position.BACK)
+        position_type: `Union[tdb.Position, NoneType]`
+            La position du bogie sur la voiture (Position.FRONT ; Position.MIDDLE ; Position.BACK).
+            None si le bogie est articulé (la position sera déduit des index des voitures)
         position_index: `int`
             L'index de la position si le bogie est central (sinon -1)
         linked_railcars: `Union[int, list]`
@@ -69,12 +71,12 @@ class Bogie:
             float -> puissance des moteurs (tous les essieux motorisés auront cette puissance)
         """
         # initialise les caractéristiques générales du bogie
-        self.position_type = position_type
-        self.position_index = position_index
         if isinstance(linked_railcars, list):
             self.linked_railcars = linked_railcars
         elif isinstance(linked_railcars, int):
             self.linked_railcars = [linked_railcars]
+        self.position_index = position_index
+        self.position_type = position_type if len(self.linked_railcars) == 1 else None
         self.axles_count = axles_count if axles_count >= 1 else 1
 
         # Initialise la puissance des essieux moteurs
