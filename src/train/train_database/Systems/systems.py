@@ -125,7 +125,7 @@ class Systems:
         for car_index in range(train_data["railcars"]):
             # Commence par déterminer si l'essieu précédent et l'essieu suivant sont articulés
             previous_articulated = car_index > 0 and any(self.get_bogies(car_index, tdb.Position.FRONT))
-            next_articulated = average_bogies_count < 2 and not (front_bonus_bogies <= car_index < train_data["railcars"] - back_bonus_bogies - 1)
+            next_articulated = average_bogies_count < 2 and (front_bonus_bogies <= car_index < train_data["railcars"] - back_bonus_bogies - 1)
 
             # Détermine le nombre d'essieux centraux à ajoutés (valable que si average_bogies_count > 2)
             central_bogies_count = (int(average_bogies_count - 2) + (front_bonus_bogies < car_index or car_index > train_data["railcars"] - back_bonus_bogies - 1)
@@ -201,7 +201,7 @@ class Systems:
                                                     axles_power=train_data["axles_power"]))
 
             # Ajoute le bogie arrière
-            self.traction.append(traction.Bogie(position_type=tdb.Position.BACK,
+            self.traction.append(traction.Bogie(position_type=tdb.Position.BACK if not next_articulated else None,
                                                 position_index=-1,
                                                 linked_railcars=[car_index, car_index + 1] if next_articulated else car_index,
                                                 axles_count=train_data["axles_per_bogie"],
@@ -224,8 +224,11 @@ class Systems:
                                                  ABCfull=[train_data["a"], train_data["b"], train_data["c"]],
                                                  multiply_mass_full=False))
 
-        print("e")
-            # TODO : initialiser les systèmes de freinage
+        # Appelle la fonction pour initialiser les systèmes de freinage
+        self.braking.generate(train_data)
+
+        # Appelle la fonction d'initialisation des systèmes électriques
+        # TODO : initialiser le système électriques (pantographes etc...
 
     def get_bogies(self, position_index, position_type=None):
         """Fonction permettant d'avoir un bogie avec les index indiqués
