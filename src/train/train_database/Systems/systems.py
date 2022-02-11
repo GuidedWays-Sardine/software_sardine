@@ -11,17 +11,17 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.settings_dictionary.settings as sd
 import src.train.train_database.database as tdb
 import src.train.train_database.Systems.traction.traction as traction
-import src.train.train_database.Systems.braking.braking as freinage
+import src.train.train_database.Systems.braking.braking as braking
 import src.train.train_database.Systems.railcar.railcar as railcar
 import src.train.train_database.Systems.electric.electric as electric
 
 
 class Systems:
 
-    railcars = []
-    electric = []
-    traction = []
-    braking = []
+    railcars = None
+    electric = None
+    traction = None
+    braking = None
 
     def __init__(self, train_data):
         """Fonction permettant d'initialiser les systèmes du train, que ce soit en paramétrage simple ou complexe
@@ -31,6 +31,13 @@ class Systems:
         train_data: `sd.SettingsDictionary`
             Tous les paramètres du train
         """
+        # Commence par initialiser les différents systèmes en tant que liste
+        # Les liste étant mutable, il est nécessaire de les créer à l'initialisation au risque
+        self.railcars = []
+        self.electric = []
+        self.traction = []
+        self.braking = braking.Braking(train_data)
+
         # Si le train a été paramétré de façon complexe, récupère les données sinon génère un train complex
         if train_data.get_value("mode", "Mode.SIMPLE").lower() == 'mode.complex':
             self.read_train(train_data)
@@ -217,6 +224,7 @@ class Systems:
                                                  ABCfull=[train_data["a"], train_data["b"], train_data["c"]],
                                                  multiply_mass_full=False))
 
+        print("e")
             # TODO : initialiser les systèmes de freinage
 
     def get_bogies(self, position_index, position_type=None):
