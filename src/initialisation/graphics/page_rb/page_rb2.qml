@@ -16,14 +16,14 @@ Item {
     readonly property double max_weight: 1e9            //t
     readonly property double max_length: 1e9            //m
     readonly property int max_railcars: 1e3
-    readonly property int max_bogies_per_railcars: 1e1   //Utilisé uniquement dans la popup complex
+    readonly property int max_bogies_per_railcar: 1e1
     readonly property int max_axles_per_bogie: 1e1
     readonly property double max_axles_power: 1e6        //kW
     readonly property double a_max: 1e3                 //kN
     readonly property double b_max: 1e3                 //kN/(km/h)
     readonly property double c_max: 1e3                 //kM/(km/h)²
     readonly property int abc_decimals: 8
-    //Par défautl on considèrera : 2 roues (et donc plaquettes) par essieux ; 4 disques par essieux ; 2 patins magnétiques ou de foucault par bogies
+    //Par défaut on considèrera : 2 roues (et donc plaquettes) par essieux ; 4 disques par essieux ; 2 patins magnétiques ou de foucault par bogies
     //Pour changer ces valeurs merci de uniquement changer la valeur après le *
     property int max_pad_per_axle: 2 * 1
     property int max_disk_per_axle: 4 * 1
@@ -163,12 +163,12 @@ Item {
             //Signal appelé lorsque la valeur augmente. Permet de changer le nombre de bogie de façon sécurisée
             onValue_changed: {
                 //Dans le cas où la nouvelle valeur est supérieure
-                if(bogies_count_integerinput.maximum_value > 2 * value) {
+                if(bogies_count_integerinput.maximum_value > page_rb2.max_bogies_per_railcar * value) {
                     bogies_count_integerinput.minimum_value = value + 1
-                    bogies_count_integerinput.maximum_value = 2 * value
+                    bogies_count_integerinput.maximum_value = page_rb2.max_bogies_per_railcar * value
                 }
                 else {
-                    bogies_count_integerinput.maximum_value = 2 * value
+                    bogies_count_integerinput.maximum_value = page_rb2.max_bogies_per_railcar * value
                     bogies_count_integerinput.minimum_value = value + 1
                 }
             }

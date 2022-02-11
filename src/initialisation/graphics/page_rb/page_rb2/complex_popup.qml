@@ -15,7 +15,7 @@ Window{
     title: "Outil de paramétrage complexe de train Sardine"
 
     // Différentes propriétés sur le train complet
-    property var mission_list: []      // Liste contenant le type de chacune des voitures (fret, passager, ...)
+    property var mission_list: []   // Liste contenant le type de chacune des voitures (fret, passager, ...)
     property var position_list: []  // Liste contenant la position de chacune des voitures (avant, arrière, milieu)
 
     // Propriétés sur les bogies
@@ -56,8 +56,8 @@ Window{
     property int default_foucault_brake_count: 0
 
     //Propriétés sur les différentes limites de paramétrabilité
-    property int max_bogies_per_railcars: 1e1
-    onMax_bogies_per_railcarsChanged: {if(max_bogies_per_railcars) {max_bogies_per_railcars = 3;}} //Pour s'assure qu'il est au moins à 3
+    property int max_bogies_per_railcar: 1e1
+    onMax_bogies_per_railcarChanged: {if(max_bogies_per_railcar) {max_bogies_per_railcar = 3;}} //Pour s'assure qu'il est au moins à 3
     property int max_axles_per_bogie: 1e1
     property double max_axles_power: 1e4
     property int max_pad_per_axle: 2
@@ -214,7 +214,7 @@ Window{
         default_magnetic_brake_count: complex_popup.default_magnetic_brake_count
         default_foucault_brake_count: complex_popup.default_foucault_brake_count
 
-        max_central_bogies: complex_popup.max_bogies_per_railcars - 2
+        max_central_bogies: complex_popup.max_bogies_per_railcar - 2
         max_axles_per_bogie: complex_popup.max_axles_per_bogie
         max_axles_power: complex_popup.max_axles_power
         max_pad_per_axle: complex_popup.max_pad_per_axle
@@ -241,7 +241,7 @@ Window{
         default_magnetic_brake_count: complex_popup.default_magnetic_brake_count
         default_foucault_brake_count: complex_popup.default_foucault_brake_count
 
-        max_central_bogies: complex_popup.max_bogies_per_railcars - 2
+        max_central_bogies: complex_popup.max_bogies_per_railcar - 2
         max_axles_per_bogie: complex_popup.max_axles_per_bogie
         max_axles_power: complex_popup.max_axles_power
         max_pad_per_axle: complex_popup.max_pad_per_axle
@@ -267,7 +267,7 @@ Window{
         default_magnetic_brake_count: complex_popup.default_magnetic_brake_count
         default_foucault_brake_count: complex_popup.default_foucault_brake_count
 
-        max_central_bogies: complex_popup.max_bogies_per_railcars - 2
+        max_central_bogies: complex_popup.max_bogies_per_railcar - 2
         max_axles_per_bogie: complex_popup.max_axles_per_bogie
         max_axles_power: complex_popup.max_axles_power
         max_pad_per_axle: complex_popup.max_pad_per_axle
