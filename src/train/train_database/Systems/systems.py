@@ -251,13 +251,13 @@ class Systems:
             # Le bogie est sur la voiture dans le cas où :
             # - l'index envoyé est dans la liste et qu'aucune position n'a été donnée
             # - l'index envoyé est dans la liste et que le type de position correspond à celui du bogie
-            # - le bogie avant (ou non spécifié) est cherché et que le bogie arrière de la voiture précédent est articulée
+            # - le bogie avant est cherché et l'index de la voiture actuelle et précédente sont dans la liste
+            # - le bogie arrière est cherché et l'index de la voiture actuelle et suivant sont dans la liste
             # - le bogie arrière (ou non spécifié) est cherche et que le bogie avant de la voiture suivant est articulée
             return [b for b in self.traction
                     if ((position_index[0] in b.linked_railcars and (position_type is None or b.position_type == position_type))
-                        or (position_type != tdb.Position.MIDDLE and b.is_jacob_bogie()
-                            and ((position_type != tdb.Position.FRONT and b.position_type == tdb.Position.FRONT and position_index[0] + 1 in b.linked_railcars)
-                                 or (position_type != tdb.Position.BACK and b.position_type == tdb.Position.BACK and position_index[0] - 1 in b.linked_railcars))))]
+                        or (position_type == tdb.Position.FRONT and position_index[0] in b.linked_railcars and (position_index[0] - 1) in b.linked_railcars)
+                        or (position_type == tdb.Position.BACK and position_index[0] in b.linked_railcars and (position_index[0] + 1) in b.linked_railcars))]
         # Cas où le bogie recherché se trouve sur deux voiture (bogie jacobien, rame articulée)
         elif len(position_index) == 2:
             # Retourne le bogie qui appartient aux deux voitures s'il existe (sinon retourne liste vide)
