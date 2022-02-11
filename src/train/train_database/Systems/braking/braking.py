@@ -31,3 +31,9 @@ class Braking:
         self.disk_brakes = []
         self.magnetic_brakes = []
         self.foucault_brakes = []
+
+    def generate(self, train_data):
+        pass
+
+    def read_train(self, train_data):
+        pass
