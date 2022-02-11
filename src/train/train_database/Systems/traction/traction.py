@@ -17,7 +17,7 @@ class Bogie:
     position_type = None
     position_index = -1  # Uniquement pour les bogies centraux! Les bogies extérieurs n'ont pas d'index
     axles_count = 1
-    linked_railcars = []
+    linked_railcars = None   # [car_index] ou [car_index, car_index - 1] (les deux index doivent être concurents)
 
     # Informations sur la motorisation
     axles_power = None    # [Pmoteur1, ..., PmoteurN] -> Puissance du moteur, sinon 0 si aucun moteur
