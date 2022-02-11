@@ -20,9 +20,9 @@ class Bogie:
     linked_railcars = []
 
     # Informations sur la motorisation
-    axles_power = []     # Puissance du moteur, sinon 0 si aucun moteur
-    activated = []      # True si le moteur est allumé, False sinon
-    activable = []      # True si le moteur est activable, False sinon (si panne)
+    axles_power = None    # [Pmoteur1, ..., PmoteurN] -> Puissance du moteur, sinon 0 si aucun moteur
+    activated = None      # [bool, ...] -> True si le moteur est allumé, False sinon
+    activable = None      # [bool, ...] -> True si le moteur est activable, False sinon (si panne)
 
     def __init__(self, position_type, position_index, linked_railcars, axles_count, motorized_axles, axles_power):
         """Fonction permettant d'initialiser un bogie
