@@ -4,7 +4,7 @@ import os
 
 
 # Librairies SARDINE
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src\\")[0]
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.train.train_database.database as tdb
 
@@ -19,8 +19,8 @@ class RailCar:
     # Autres informations générales
     levels = 0
     doors = 0
-    doors_activable = [[], []]
-    doors_open = [[], []]
+    doors_activable = None      # format [[bool, ...], [bool, ...]] -> [[portes gauches], [portes droites]]
+    doors_open = None           # format [[bool, ...], [bool, ...]] -> [[portes gauches], [portes droites]]
 
     # Informations reliées à la masse et la longueur
     Mtare = 0
