@@ -89,22 +89,28 @@ class ComplexPopup:
 
         try:
             # Génère le train à partir des données simples
-            simple_parameters = parent.get_simple_mode_values()
-            self.train = cd.Train(simple_parameters)
+            simple_parameters = self.parent.get_simple_mode_values()
+            self.train_database = tdb.TrainDatabase(simple_parameters)
         except Exception as error:
-            # S'il y a une erreur, désactive le mode complex et laisse un message d'erreur et désactive le mode complexe
+            # S'il y a une erreur, laisse un message d'erreur et désactive le mode complexe
             log.error("Impossible de correctement générer le train, mode complexe désactivé.\n",
                       exception=error, prefix="Génération train complexe")
             self.win.hide()
-            mode_button = parent.page.findChild(QObject, "mode_button")
-            mode_button.setProperty("text", parent.mode_switch[mode_button.property("text")])
-            mode_button.setProperty("is_activable", False)
+            self.win.setProperty("generated", False)
+            self.parent.page.setProperty("generated", False)
+            mode_switchbutton = self.parent.page.findChild(QObject, "mode_switchbutton")
+            mode_switchbutton.change_selection(0)
+            mode_switchbutton.setProperty("is_activable", False)
             self.loaded = False
         else:
             # Sinon indique aux différentes pages que le mode complexe de paramétrage a été activé
-            parent.current_mode = parent.Mode.COMPLEX
+            self.parent.current_mode = self.parent.Mode.COMPLEX
             self.win.setProperty("generated", True)
-            parent.page.setProperty("generated", True)
+            self.parent.page.setProperty("generated", True)
+
+            # Récupère la liste de chacunes des positions des voitures
+            self.win.setProperty("mission_list", self.train_database.systems.get_mission_list())
+            self.win.setProperty("position_list", self.train_database.systems.get_position_list())
 
             # Récupère la liste des types et des positions de chacunes des voitures
             self.win.setProperty("type_list", [c.mission_type.value for c in self.train.railcars_list])
