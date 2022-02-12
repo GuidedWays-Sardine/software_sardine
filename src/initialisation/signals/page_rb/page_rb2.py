@@ -470,6 +470,7 @@ class PageRB2:
                 self.complex_popup.win.hide()
                 self.complex_popup.win.setProperty("generated", False)
                 self.page.setProperty("generated", False)
+                self.complex_popup.win.findChild(QObject, "train_preview").setProperty("current_index", 0)
                 self.complex_popup.reset()
 
         # FEATURE : faire la fonction connectée au bouton "Freinage" pour ouvrir la fenêtre de paramétrage freinage

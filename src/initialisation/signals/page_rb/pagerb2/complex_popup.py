@@ -70,7 +70,8 @@ class ComplexPopup:
             # Connecte tous les boutons nécessaires au fonctionnement de la popup de paramétrage complex
             self.parent = page_rb
             self.win.findChild(QObject, "generate_button").clicked.connect(self.on_complex_generate_clicked)
-            # TODO : connecter tous les autres boutons
+            self.win.railcar_changed.connect(self.on_railcar_changed)
+            self.win.update.connect(self.update_popup)
 
             # Indique que la fenêtre est complètement
             self.loaded = True
@@ -100,6 +101,7 @@ class ComplexPopup:
             mode_switchbutton = self.parent.page.findChild(QObject, "mode_switchbutton")
             mode_switchbutton.change_selection(0)
             mode_switchbutton.setProperty("is_activable", False)
+            mode_switchbutton.setProperty("is_positive", False)
             self.loaded = False
         else:
             # Sinon indique aux différentes pages que le mode complexe de paramétrage a été activé
@@ -114,8 +116,8 @@ class ComplexPopup:
             # Appelle la fonction permettant de mettre à jour les différentes constantes
             self.update_constants(simple_parameters)
 
-            # Appelle la fonction de mise à jour pour montrer la première voiture
-            # TODO : initialiser la première voiture
+            # Appelle la fonction de mise à jour pour montrer la voiture avec l'index actuel
+
 
     def update_constants(self, train_data):
         """Fonction permettant de mettre à jour les différentes constantes de la popup complexe
@@ -183,3 +185,38 @@ class ComplexPopup:
             for parameter in ["articulated_text", "axle_text", "motor_text",
                               "pad_text", "disk_text", "magnetic_text", "foucault_text"]:
                 widget.setProperty(parameter, translation_data[widget.property(parameter)])
+
+    @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
+    def on_railcar_changed(self):
+        """signal appelé lorsque la voiture paramétrée dans la popup complexe a changée"""
+        # Récupère d'abord les index de la voiture à décharger et de celle à charger
+        previous_railcar_index = self.win.property("previous_railcar_index")
+        current_railcar_index = self.win.property("current_railcar_index")
+
+        # Appelle d'abord la fonction pour mettre à jour la base de données avec les données visibles
+        self.update_database(previous_railcar_index)
+
+        # Appelle ensuite la fonction pour mettre à jour la popup avec les nouvelles données
+        self.update_popup(current_railcar_index)
+
+    def update_database(self, index):
+        """Fonction permettant de récupérer les valeurs de la popup et de les stoquer dans la base de données
+        Attention, l'appel de cette fonction écrase les données de la voiture paramétrée
+
+        Parameters
+        ----------
+        index: `int`
+            index de la voiture dont les données seront récupérés (0 à Nrailcar - 1)
+        """
+        pass
+
+    def update_popup(self, index):
+        """Fonction permettant de récupérer les valeurs de la base de données et de les mettre sur la popup
+        Attention, l'appel de cette fonction écrase les données visibles sur la popup de paramétrage complexe
+
+        Parameters
+        ----------
+        index: `int`
+            index de la voiture dont les données seront lus (0 à Nrailcar - 1)
+        """
+        pass

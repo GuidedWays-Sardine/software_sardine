@@ -47,6 +47,16 @@ Window{
         }
     }
 
+    //Propriétés sur l'index
+    property int previous_railcar_index: 0
+    property int current_railcar_index: train_preview.current_index
+    onCurrent_railcar_indexChanged() {
+        // lorsque l'index de la voiture paramétrée est changée, appelle la fonction update et change le précédent index
+        complex_popup.railcar_changed()
+        complex_popup.previous_railcar_index = complex_popup.current_railcar_index
+    }
+
+
     //Propriétés sur les différentes valeurs par défaut (définit lorsque la gfenêtre est générée
     property int default_axles_count: 2
     property double default_axles_power: 750.0
@@ -70,6 +80,9 @@ Window{
 
     //Signal utilisé pour détecter quand le fenêtre est fermée et quitter l'application
     signal closed()
+    signal railcar_changed()
+    signal update()
+
 
     onVisibilityChanged: {
         if(!complex_popup.visible) {
