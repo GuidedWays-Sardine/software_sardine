@@ -15,7 +15,9 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.train.train_database.database as tdb
 import src.misc.settings_dictionary.settings as sd
 import src.misc.translation_dictionary.translation as td
+import src.misc.decorators.decorators as decorators
 import src.misc.log.log as log
+import src.initialisation.signals.page_rb.page_rb2 as prb2
 
 
 class ComplexPopup:
@@ -30,6 +32,9 @@ class ComplexPopup:
     # Base de données train utile au paramétrage
     train_database = None
 
+    # Stocke la page parent
+    parent = None
+
     # Constantes sur les emplacements des différents fichiers et dossiers nécessaires au fonctionement de la popup
     graphic_file_path = f"{PROJECT_DIR}src\\initialisation\\graphics\\page_rb\\page_rb2\\complex_popup.qml"
 
@@ -38,7 +43,7 @@ class ComplexPopup:
 
         Parameters
         ----------
-        page_rb: `PageRB2`
+        page_rb: `prb2.PageRB2`
             La page de paramètres train (permettant d'accéder aux widgets du mode simple)
 
         Raises
@@ -63,7 +68,8 @@ class ComplexPopup:
             self.win.closed.connect(lambda: self.win.hide())
 
             # Connecte tous les boutons nécessaires au fonctionnement de la popup de paramétrage complex
-            self.win.findChild(QObject, "generate_button").clicked.connect(lambda p=page_rb: self.on_complex_generate_clicked(p))
+            self.parent = page_rb
+            self.win.findChild(QObject, "generate_button").clicked.connect(self.on_complex_generate_clicked)
             # TODO : connecter tous les autres boutons
 
             # Indique que la fenêtre est complètement
@@ -77,16 +83,9 @@ class ComplexPopup:
             else:  # Cas où le fichier n'existe pas
                 raise FileNotFoundError(f"Le fichier graphique de la popup complexe n'a pas été trouvé.\n\t{self.graphic_file_path}")
 
-    def on_complex_generate_clicked(self, page_rb):
-        """Fonction activée lorsque le bouton généré est cliqué
-
-        Parameters
-        ----------
-        page_rb: `PageRB2`
-            La page de paramètres train (permettant d'accéder aux widgets du mode simple
-        """
-
-
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
+    def on_complex_generate_clicked(self):
+        """Fonction activée lorsque le bouton généré est cliqué"""
         try:
             # Génère le train à partir des données simples
             simple_parameters = self.parent.get_simple_mode_values()
@@ -162,7 +161,7 @@ class ComplexPopup:
         return parameters
 
     def set_complex_mode_values(self, train_data):
-        pass
+        """"""
 
     def change_language(self, translation_data):
         """Fonction permettant de traduire la page de paramétrage train complet (appelé dans la page_rb2

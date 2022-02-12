@@ -46,10 +46,10 @@ Item {
     property int current_axle_index: 0
 
     //Données par défaut pour les bogies
-    property int default_axle_count: 2
+    property int default_axles_count: 2
     property double default_axles_power: 750.0
-    property int default_pad_brake_count: 0
-    property int default_disk_brake_count: 0
+    property int default_pad_brakes_count: 0
+    property int default_disk_brakes_count: 0
     property int default_magnetic_brake_count: 0
     property int default_foucault_brake_count: 0
 
@@ -57,9 +57,9 @@ Item {
     property int max_central_bogies: (root.position == "front" || root.position == "back") ? 1 : 10
     property int max_axles_per_bogie: 10
     property double max_axles_power: 1e4
-    property int max_pad_per_axle: 2
-    property int max_disk_per_axle: 4
-    property int max_magnetic_between_axle: 2       //Identique pour le freinage de foucault
+    property int max_pad_brakes_per_axle: 2
+    property int max_disk_brakes_per_axle: 4
+    property int max_magnetic_brakes_per_axle: 2       //Identique pour le freinage de foucault
 
     //Tous les textes nécessitant une traduction
     property string articulated_text: "Articulé ?"
@@ -228,13 +228,13 @@ Item {
                 root.current_axle_index = 0
 
                 //Change le nombre des différents systèmes de freinages
-                pad_brake_integerinput.change_value(root.brakes_counts[root.current_bogie_index][0])
-                disk_brake_integerinput.change_value(root.brakes_counts[root.current_bogie_index][1])
+                pad_brakes_count_integerinput.change_value(root.brakes_counts[root.current_bogie_index][0])
+                disk_brakes_count_integerinput.change_value(root.brakes_counts[root.current_bogie_index][1])
                 // Pour les freinages magnétiques, comme ceux-ci sont liés, les passes d'abord à 0 pour éviter des erreurs lors des changement de valeurs
-                magnetic_brake_integerinput.clear()
-                foucault_brake_integerinput.clear()
-                magnetic_brake_integerinput.change_value(root.brakes_counts[root.current_bogie_index][2])
-                foucault_brake_integerinput.change_value(root.brakes_counts[root.current_bogie_index][3])
+                magnetic_brakes_count_integerinput.clear()
+                foucault_brakes_count_integerinput.clear()
+                magnetic_brakes_count_integerinput.change_value(root.brakes_counts[root.current_bogie_index][2])
+                foucault_brakes_count_integerinput.change_value(root.brakes_counts[root.current_bogie_index][3])
             }
         }
     }
@@ -290,13 +290,13 @@ Item {
                 root.brakes_counts.pop()
             }
             while(root.axles_count.length < value){
-                root.axles_count.push(root.default_axle_count)
-                root.motorized_axles.push(Array(root.default_axle_count).fill(0))
-                root.motorized_axles_powers.push(Array(root.default_axle_count).fill(0.0))
-                root.brakes_counts.push([default_pad_brake_count <= pad_brake_integerinput.maximum_value ? default_pad_brake_count : pad_brake_integerinput.maximum_value,
-                                         default_disk_brake_count <= disk_brake_integerinput.maximum_value ? default_disk_brake_count : disk_brake_integerinput.maximum_value,
-                                         (default_magnetic_brake_count + default_foucault_brake_count) <= root.max_magnetic_between_axle * (root.default_axle_count - 1) ? default_magnetic_brake_count : (default_magnetic_brake_count >= default_foucault_brake_count ? root.max_magnetic_between_axle * (root.default_axle_count - 1) : 0),
-                                         (default_magnetic_brake_count + default_foucault_brake_count) <= root.max_magnetic_between_axle * (root.default_axle_count - 1) ? default_foucault_brake_count : (default_magnetic_brake_count >= default_foucault_brake_count ? 0 : root.max_magnetic_between_axle * (root.default_axle_count - 1))])
+                root.axles_count.push(root.default_axles_count)
+                root.motorized_axles.push(Array(root.default_axles_count).fill(0))
+                root.motorized_axles_powers.push(Array(root.default_axles_count).fill(0.0))
+                root.brakes_counts.push([default_pad_brakes_count <= pad_brakes_count_integerinput.maximum_value ? default_pad_brakes_count : pad_brakes_count_integerinput.maximum_value,
+                                         default_disk_brakes_count <= disk_brakes_count_integerinput.maximum_value ? default_disk_brakes_count : disk_brakes_count_integerinput.maximum_value,
+                                         (default_magnetic_brake_count + default_foucault_brake_count) <= root.max_magnetic_brakes_per_axle * (root.default_axles_count - 1) ? default_magnetic_brake_count : (default_magnetic_brake_count >= default_foucault_brake_count ? root.max_magnetic_brakes_per_axle * (root.default_axles_count - 1) : 0),
+                                         (default_magnetic_brake_count + default_foucault_brake_count) <= root.max_magnetic_brakes_per_axle * (root.default_axles_count - 1) ? default_foucault_brake_count : (default_magnetic_brake_count >= default_foucault_brake_count ? 0 : root.max_magnetic_brakes_per_axle * (root.default_axles_count - 1))])
             }
 
             // Change la valeur du nombre d'essieu à la valeur actuelle (utile dans le cas où root.any a changé)
@@ -555,15 +555,15 @@ Item {
 
     //intergerinput permettant de rentrer le nombre de roues équipées de plaquettes de freinages
     INI_integerinput {
-        id: pad_brake_integerinput
-        objectName: "pad_brake_integerinput"
+        id: pad_brakes_count_integerinput
+        objectName: "pad_brakes_count_integerinput"
 
         default_x: left_axle_arrow_button.default_x
         default_y: left_axle_arrow_button.default_y + left_axle_arrow_button.default_height
         default_width: 2 * plus_minus_button.default_width
         default_height: 12
 
-        maximum_value: root.max_pad_per_axle * axles_count_integerinput.value
+        maximum_value: root.max_pad_brakes_per_axle * axles_count_integerinput.value
         minimum_value: 0
         is_max_default: false
         font_size: 6
@@ -574,16 +574,16 @@ Item {
 
         //Signal permettant de mettre à jour la valeur stockée lorsque celle-ci est changée
         onValue_changed: {
-            root.brakes_counts[root.current_bogie_index][0] = pad_brake_integerinput.value
+            root.brakes_counts[root.current_bogie_index][0] = pad_brakes_count_integerinput.value
         }
     }
 
     INI_text {
-        id: pad_brake_text
-        objectName: "pad_brake_text"
+        id: pad_brakes_count_text
+        objectName: "pad_brakes_count_text"
 
-        default_x: pad_brake_integerinput.default_x + pad_brake_integerinput.default_width + font_size * 0.5
-        default_y: pad_brake_integerinput.default_y + (pad_brake_integerinput.default_height - font_size) * 0.5 - 1
+        default_x: pad_brakes_count_integerinput.default_x + pad_brakes_count_integerinput.default_width + font_size * 0.5
+        default_y: pad_brakes_count_integerinput.default_y + (pad_brakes_count_integerinput.default_height - font_size) * 0.5 - 1
 
         text: root.pad_text
         font_size: 8
@@ -594,16 +594,16 @@ Item {
 
     //integerinput pour indiquer le nombre de disques de freinages
     INI_integerinput {
-        id: disk_brake_integerinput
-        objectName: "disk_brake_integerinput"
+        id: disk_brakes_count_integerinput
+        objectName: "disk_brakes_count_integerinput"
 
-        default_x: pad_brake_integerinput.default_x
-        default_y: pad_brake_integerinput.default_y + pad_brake_integerinput.default_height
-        default_width: pad_brake_integerinput.default_width
-        default_height: pad_brake_integerinput.default_height
+        default_x: pad_brakes_count_integerinput.default_x
+        default_y: pad_brakes_count_integerinput.default_y + pad_brakes_count_integerinput.default_height
+        default_width: pad_brakes_count_integerinput.default_width
+        default_height: pad_brakes_count_integerinput.default_height
 
         minimum_value: 0
-        maximum_value: root.max_disk_per_axle * axles_count_integerinput.value
+        maximum_value: root.max_disk_brakes_per_axle * axles_count_integerinput.value
         is_max_default: false
         font_size: 6
 
@@ -613,16 +613,16 @@ Item {
 
         //Signal permettant de mettre à jour la valeur stockée lorsque celle-ci est changée
         onValue_changed: {
-            root.brakes_counts[root.current_bogie_index][1] = disk_brake_integerinput.value
+            root.brakes_counts[root.current_bogie_index][1] = disk_brakes_count_integerinput.value
         }
     }
 
     INI_text {
-        id: disk_brake_text
-        objectName: "disk_brake_text"
+        id: disk_brakes_count_text
+        objectName: "disk_brakes_count_text"
 
-        default_x: disk_brake_integerinput.default_x + disk_brake_integerinput.default_width + font_size * 0.5
-        default_y: disk_brake_integerinput.default_y + (disk_brake_integerinput.default_height - font_size) * 0.5 - 1
+        default_x: disk_brakes_count_integerinput.default_x + disk_brakes_count_integerinput.default_width + font_size * 0.5
+        default_y: disk_brakes_count_integerinput.default_y + (disk_brakes_count_integerinput.default_height - font_size) * 0.5 - 1
 
         text: root.disk_text
         font_size: 8
@@ -633,16 +633,16 @@ Item {
 
     //integerinput permettant
     INI_integerinput {
-        id: magnetic_brake_integerinput
-        objectName: "magnetic_brake_integerinput"
+        id: magnetic_brakes_count_integerinput
+        objectName: "magnetic_brakes_count_integerinput"
 
-        default_x: disk_brake_integerinput.default_x
-        default_y: disk_brake_integerinput.default_y + disk_brake_integerinput.default_height
-        default_width: disk_brake_integerinput.default_width
-        default_height: disk_brake_integerinput.default_height
+        default_x: disk_brakes_count_integerinput.default_x
+        default_y: disk_brakes_count_integerinput.default_y + disk_brakes_count_integerinput.default_height
+        default_width: disk_brakes_count_integerinput.default_width
+        default_height: disk_brakes_count_integerinput.default_height
 
         minimum_value: 0
-        maximum_value: -foucault_brake_integerinput.value + root.max_magnetic_between_axle * (axles_count_integerinput.value - 1)
+        maximum_value: -foucault_brakes_count_integerinput.value + root.max_magnetic_brakes_per_axle * (axles_count_integerinput.value - 1)
         is_max_default: false
         font_size: 6
 
@@ -652,7 +652,7 @@ Item {
 
         //Signal permettant de mettre à jour la valeur stockée lorsque celle-ci est changée
         onValue_changed: {
-            root.brakes_counts[root.current_bogie_index][2] = magnetic_brake_integerinput.value
+            root.brakes_counts[root.current_bogie_index][2] = magnetic_brakes_count_integerinput.value
         }
     }
 
@@ -660,28 +660,28 @@ Item {
         id: magnetic_brake_text
         objectName: "magnetic_brake_text"
 
-        default_x: magnetic_brake_integerinput.default_x + magnetic_brake_integerinput.default_width + font_size * 0.5
-        default_y: magnetic_brake_integerinput.default_y + (magnetic_brake_integerinput.default_height - font_size) * 0.5 - 1
+        default_x: magnetic_brakes_count_integerinput.default_x + magnetic_brakes_count_integerinput.default_width + font_size * 0.5
+        default_y: magnetic_brakes_count_integerinput.default_y + (magnetic_brakes_count_integerinput.default_height - font_size) * 0.5 - 1
 
         text: root.magnetic_text
         font_size: 8
 
-        is_dark_grey: magnetic_brake_integerinput.maximum_value == 0
+        is_dark_grey: magnetic_brakes_count_integerinput.maximum_value == 0
         is_visible: root.generated && root.any
     }
 
     //integerinput permettant de changer le nombre de freinages de foucault
     INI_integerinput {
-        id: foucault_brake_integerinput
-        objectName: "foucault_brake_integerinput"
+        id: foucault_brakes_count_integerinput
+        objectName: "foucault_brakes_count_integerinput"
 
-        default_x: magnetic_brake_integerinput.default_x
-        default_y: magnetic_brake_integerinput.default_y + magnetic_brake_integerinput.default_height
-        default_width: magnetic_brake_integerinput.default_width
-        default_height: magnetic_brake_integerinput.default_height
+        default_x: magnetic_brakes_count_integerinput.default_x
+        default_y: magnetic_brakes_count_integerinput.default_y + magnetic_brakes_count_integerinput.default_height
+        default_width: magnetic_brakes_count_integerinput.default_width
+        default_height: magnetic_brakes_count_integerinput.default_height
 
         minimum_value: 0
-        maximum_value: -magnetic_brake_integerinput.value + root.max_magnetic_between_axle * (axles_count_integerinput.value - 1)
+        maximum_value: -magnetic_brakes_count_integerinput.value + root.max_magnetic_brakes_per_axle * (axles_count_integerinput.value - 1)
         is_max_default: false
         font_size: 6
 
@@ -691,21 +691,21 @@ Item {
 
         //Signal permettant de mettre à jour la valeur stockée lorsque celle-ci est changée
         onValue_changed: {
-            root.brakes_counts[root.current_bogie_index][3] = foucault_brake_integerinput.value
+            root.brakes_counts[root.current_bogie_index][3] = foucault_brakes_count_integerinput.value
         }
     }
 
     INI_text {
-        id: foucault_brake_text
-        objectName: "foucault_brake_text"
+        id: foucault_brakes_count_text
+        objectName: "foucault_brakes_count_text"
 
-        default_x: foucault_brake_integerinput.default_x + foucault_brake_integerinput.default_width + font_size * 0.5
-        default_y: foucault_brake_integerinput.default_y + (foucault_brake_integerinput.default_height - font_size) * 0.5 - 1
+        default_x: foucault_brakes_count_integerinput.default_x + foucault_brakes_count_integerinput.default_width + font_size * 0.5
+        default_y: foucault_brakes_count_integerinput.default_y + (foucault_brakes_count_integerinput.default_height - font_size) * 0.5 - 1
 
         text: root.foucault_text
         font_size: 8
 
-        is_dark_grey: foucault_brake_integerinput.maximum_value == 0
+        is_dark_grey: foucault_brakes_count_integerinput.maximum_value == 0
         is_visible: root.generated && root.any
     }
 }

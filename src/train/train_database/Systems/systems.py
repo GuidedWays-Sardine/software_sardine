@@ -85,18 +85,18 @@ class Systems:
         # average_bogies_count < 2  -> rame articulée      -> bogies jacobiens       -> aucun bogie central
         # average_bogies_count = 2  -> rame non articulée  -> aucun bogie jacobiens  -> aucun bogie central
         # average_bogies_count > 2  -> rame non articulée  -> aucun bogie jacobiens  -> bogies centraux
-        average_bogies_count = train_data["bogies_count"] / train_data["railcars"]
+        average_bogies_count = train_data["bogies_count"] / train_data["railcars_count"]
 
         # Récupère le nombre de bogies supplémentaires à rajouter à l'avant et à l'arrière (extérieurs priorisé)
         # Si impaire (rame assymétrique), le bogie supplémentaire sera mis à l'avant du train (d'où le +1)
         # average_bogies_count < 2   -> nombre de rames non articulés de chaque côté
         # average_bogies_count > 2   -> nombre de rames avec un bogie central supplémentaire
         if average_bogies_count <= 2:
-            front_bonus_bogies = int(((train_data["bogies_count"] - (train_data["railcars"] + 1)) + 1) / 2.0)
-            back_bonus_bogies = int((train_data["bogies_count"] - (train_data["railcars"] + 1)) / 2.0)
+            front_bonus_bogies = int(((train_data["bogies_count"] - (train_data["railcars_count"] + 1)) + 1) / 2.0)
+            back_bonus_bogies = int((train_data["bogies_count"] - (train_data["railcars_count"] + 1)) / 2.0)
         else:
-            front_bonus_bogies = int((train_data["bogies_count"] - int(average_bogies_count) * train_data["railcars"] + 1) / 2.0)
-            back_bonus_bogies = int((train_data["bogies_count"] - int(average_bogies_count) * train_data["railcars"]) / 2.0)
+            front_bonus_bogies = int((train_data["bogies_count"] - int(average_bogies_count) * train_data["railcars_count"] + 1) / 2.0)
+            back_bonus_bogies = int((train_data["bogies_count"] - int(average_bogies_count) * train_data["railcars_count"]) / 2.0)
 
         # Vérifie que le train n'a pas un taux de motorisation > à 100% (minimum entre essieux moteurs et essieux)
         motorized_count = min(train_data["motorized_axles_count"], train_data["bogies_count"] * train_data["axles_per_bogie"])
@@ -122,13 +122,13 @@ class Systems:
         general_mission = tdb.MissionType[str(train_data.get_value("mission", "MissionType.PASSENGER"))[12:]]
 
         # Passe par chacune des voitures du train
-        for car_index in range(train_data["railcars"]):
+        for car_index in range(train_data["railcars_count"]):
             # Commence par déterminer si l'essieu précédent et l'essieu suivant sont articulés
             previous_articulated = car_index > 0 and any(self.get_bogies(car_index, tdb.Position.FRONT))
-            next_articulated = average_bogies_count < 2 and (front_bonus_bogies <= car_index < train_data["railcars"] - back_bonus_bogies - 1)
+            next_articulated = average_bogies_count < 2 and (front_bonus_bogies <= car_index < train_data["railcars_count"] - back_bonus_bogies - 1)
 
             # Détermine le nombre d'essieux centraux à ajoutés (valable que si average_bogies_count > 2)
-            central_bogies_count = (int(average_bogies_count - 2) + (front_bonus_bogies < car_index or car_index > train_data["railcars"] - back_bonus_bogies - 1)
+            central_bogies_count = (int(average_bogies_count - 2) + (front_bonus_bogies < car_index or car_index > train_data["railcars_count"] - back_bonus_bogies - 1)
                                     if average_bogies_count > 2 else 0)
 
             # Compte le nombre de bogies à rajouter (ne compte pas le bogie articulé précédent mais compte le suivant)
@@ -211,14 +211,14 @@ class Systems:
             # Ajoute la voiture paramétré ainsi que tous ses paramètres
             self.railcars.append(railcar.RailCar(mission_type=general_mission,
                                                  position_type=(tdb.Position.FRONT if car_index == 0 else
-                                                                tdb.Position.BACK if car_index == (train_data["railcars"] - 1)
+                                                                tdb.Position.BACK if car_index == (train_data["railcars_count"] - 1)
                                                                 else tdb.Position.MIDDLE),
                                                  position_index=car_index,
                                                  levels=1 if general_mission != tdb.MissionType.FREIGHT else 0,
                                                  doors=2 if general_mission != tdb.MissionType.FREIGHT else 0,
                                                  Mtare=railcar_weight,
                                                  Mfull=railcar_weight,
-                                                 length=train_data["length"] / train_data["railcars"],
+                                                 length=train_data["length"] / train_data["railcars_count"],
                                                  ABCempty=[train_data["a"], train_data["b"], train_data["c"]],
                                                  multiply_mass_empty=False,
                                                  ABCfull=[train_data["a"], train_data["b"], train_data["c"]],

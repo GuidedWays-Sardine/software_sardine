@@ -48,10 +48,10 @@ Window{
     }
 
     //Propriétés sur les différentes valeurs par défaut (définit lorsque la gfenêtre est générée
-    property int default_axle_count: 2
+    property int default_axles_count: 2
     property double default_axles_power: 750.0
-    property int default_pad_brake_count: 0
-    property int default_disk_brake_count: 0
+    property int default_pad_brakes_count: 0
+    property int default_disk_brakes_count: 0
     property int default_magnetic_brake_count: 0
     property int default_foucault_brake_count: 0
 
@@ -60,10 +60,9 @@ Window{
     onMax_bogies_per_railcarChanged: {if(max_bogies_per_railcar) {max_bogies_per_railcar = 3;}} //Pour s'assure qu'il est au moins à 3
     property int max_axles_per_bogie: 1e1
     property double max_axles_power: 1e4
-    property int max_pad_per_axle: 2
-    property int max_disk_per_axle: 4
-    property int max_magnetic_between_axle: 2       //Identique pour le freinage de foucault
-
+    property int max_pad_brakes_per_axle: 2
+    property int max_disk_brakes_per_axle: 4
+    property int max_magnetic_brakes_per_axle: 2       //Identique pour le freinage de foucault
 
 
     // Propriété permettant de savoir si la fenêtre a été générée
@@ -207,19 +206,19 @@ Window{
 
         position: "front"
 
-        default_axle_count: complex_popup.default_axle_count
+        default_axles_count: complex_popup.default_axles_count
         default_axles_power: complex_popup.default_axles_power
-        default_pad_brake_count: complex_popup.default_pad_brake_count
-        default_disk_brake_count: complex_popup.default_disk_brake_count
+        default_pad_brakes_count: complex_popup.default_pad_brakes_count
+        default_disk_brakes_count: complex_popup.default_disk_brakes_count
         default_magnetic_brake_count: complex_popup.default_magnetic_brake_count
         default_foucault_brake_count: complex_popup.default_foucault_brake_count
 
         max_central_bogies: complex_popup.max_bogies_per_railcar - 2
         max_axles_per_bogie: complex_popup.max_axles_per_bogie
         max_axles_power: complex_popup.max_axles_power
-        max_pad_per_axle: complex_popup.max_pad_per_axle
-        max_disk_per_axle: complex_popup.max_disk_per_axle
-        max_magnetic_between_axle: complex_popup.max_magnetic_between_axle
+        max_pad_brakes_per_axle: complex_popup.max_pad_brakes_per_axle
+        max_disk_brakes_per_axle: complex_popup.max_disk_brakes_per_axle
+        max_magnetic_brakes_per_axle: complex_popup.max_magnetic_brakes_per_axle
     }
 
 
@@ -234,19 +233,19 @@ Window{
 
         position: "middle"
 
-        default_axle_count: complex_popup.default_axle_count
+        default_axles_count: complex_popup.default_axles_count
         default_axles_power: complex_popup.default_axles_power
-        default_pad_brake_count: complex_popup.default_pad_brake_count
-        default_disk_brake_count: complex_popup.default_disk_brake_count
+        default_pad_brakes_count: complex_popup.default_pad_brakes_count
+        default_disk_brakes_count: complex_popup.default_disk_brakes_count
         default_magnetic_brake_count: complex_popup.default_magnetic_brake_count
         default_foucault_brake_count: complex_popup.default_foucault_brake_count
 
         max_central_bogies: complex_popup.max_bogies_per_railcar - 2
         max_axles_per_bogie: complex_popup.max_axles_per_bogie
         max_axles_power: complex_popup.max_axles_power
-        max_pad_per_axle: complex_popup.max_pad_per_axle
-        max_disk_per_axle: complex_popup.max_disk_per_axle
-        max_magnetic_between_axle: complex_popup.max_magnetic_between_axle
+        max_pad_brakes_per_axle: complex_popup.max_pad_brakes_per_axle
+        max_disk_brakes_per_axle: complex_popup.max_disk_brakes_per_axle
+        max_magnetic_brakes_per_axle: complex_popup.max_magnetic_brakes_per_axle
     }
 
     //Paramètres pour les différents bogies du train
@@ -260,19 +259,19 @@ Window{
 
         position: "front"
 
-        default_axle_count: complex_popup.default_axle_count
+        default_axles_count: complex_popup.default_axles_count
         default_axles_power: complex_popup.default_axles_power
-        default_pad_brake_count: complex_popup.default_pad_brake_count
-        default_disk_brake_count: complex_popup.default_disk_brake_count
+        default_pad_brakes_count: complex_popup.default_pad_brakes_count
+        default_disk_brakes_count: complex_popup.default_disk_brakes_count
         default_magnetic_brake_count: complex_popup.default_magnetic_brake_count
         default_foucault_brake_count: complex_popup.default_foucault_brake_count
 
         max_central_bogies: complex_popup.max_bogies_per_railcar - 2
         max_axles_per_bogie: complex_popup.max_axles_per_bogie
         max_axles_power: complex_popup.max_axles_power
-        max_pad_per_axle: complex_popup.max_pad_per_axle
-        max_disk_per_axle: complex_popup.max_disk_per_axle
-        max_magnetic_between_axle: complex_popup.max_magnetic_between_axle
+        max_pad_brakes_per_axle: complex_popup.max_pad_brakes_per_axle
+        max_disk_brakes_per_axle: complex_popup.max_disk_brakes_per_axle
+        max_magnetic_brakes_per_axle: complex_popup.max_magnetic_brakes_per_axle
     }
 
 

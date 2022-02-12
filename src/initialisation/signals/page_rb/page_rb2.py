@@ -76,12 +76,12 @@ class PageRB2:
         self.engine = engine
 
         # Commence par associer chaque widget à son widget_id (permettant une optimisation dû au surplus de composants)
-        for widget_id in ["weight_floatinput", "length_floatinput", "railcars_integerinput",
+        for widget_id in ["weight_floatinput", "length_floatinput", "railcars_count_integerinput",
                           "bogies_count_integerinput", "axles_per_bogie_integerinput", "motorized_axles_count_integerinput",
                           "motorized_axle_weight_floatinput", "axles_power_floatinput", "power_floatinput",
                           "a_floatinput", "b_floatinput", "c_floatinput", "pantograph_check", "thermic_check",
-                          "pad_brake_integerinput", "magnetic_brake_integerinput", "regenerative_check",
-                          "disk_brake_integerinput", "foucault_brake_integerinput", "dynamic_check"]:
+                          "pad_brakes_count_integerinput", "magnetic_brakes_count_integerinput", "regenerative_check",
+                          "disk_brakes_count_integerinput", "foucault_brakes_count_integerinput", "dynamic_check"]:
             self.data_widgets[widget_id] = self.page.findChild(QObject, widget_id)
         self.train_name_widget = self.page.findChild(QObject, "train_name_stringinput")
 

@@ -25,9 +25,9 @@ Item {
     readonly property int abc_decimals: 8
     //Par défaut on considèrera : 2 roues (et donc plaquettes) par essieux ; 4 disques par essieux ; 2 patins magnétiques ou de foucault par bogies
     //Pour changer ces valeurs merci de uniquement changer la valeur après le *
-    property int max_pad_per_axle: 2 * 1
-    property int max_disk_per_axle: 4 * 1
-    property int max_magnetic_between_axle: 2 * 1       //Identique pour le freinage de foucault
+    property int max_pad_brakes_per_axle: 2 * 1
+    property int max_disk_brakes_per_axle: 4 * 1
+    property int max_magnetic_brakes_per_axle: 2 * 1       //Identique pour le freinage de foucault
 
 
     //Titres des catégories (le texte des autres composants sera traduit
@@ -128,7 +128,7 @@ Item {
             default_height: weight_floatinput.default_height
 
             maximum_value: page_rb2.max_length
-            minimum_value: 0.001 * railcars_integerinput.value
+            minimum_value: 0.001 * railcars_count_integerinput.value
             decimals: 3
 
             title: "Lconvoi"
@@ -142,8 +142,8 @@ Item {
 
         //integerinput du nombre de voitures
         INI_integerinput{
-            id: railcars_integerinput
-            objectName: "railcars_integerinput"
+            id: railcars_count_integerinput
+            objectName: "railcars_count_integerinput"
 
             default_x: length_floatinput.default_x +  page_rb2.x_offset
             default_y: length_floatinput.default_y
@@ -224,9 +224,9 @@ Item {
             objectName: "motorized_axles_count_integerinput"
 
 
-            default_x: railcars_integerinput.default_x
+            default_x: railcars_count_integerinput.default_x
             default_y: axles_per_bogie_integerinput.default_y
-            default_width: railcars_integerinput.default_width
+            default_width: railcars_count_integerinput.default_width
             default_height: axles_per_bogie_integerinput.default_height
 
             maximum_value: bogies_count_integerinput.value * axles_per_bogie_integerinput.value
@@ -634,15 +634,15 @@ Item {
         //Tous les composants permettant de paramétrer les freinages
         //integerinput pour connaitre le nombre de roues utilisant des plaquettes de frein
         INI_integerinput{
-            id: pad_brake_integerinput
-            objectName: "pad_brake_integerinput"
+            id: pad_brakes_count_integerinput
+            objectName: "pad_brakes_count_integerinput"
 
             default_x: brake_data_box.default_x + 1 + (brake_data_box.is_positive)
             default_y: brake_data_box.default_y + 1 + (brake_data_box.is_positive) + 3 * brake_data_name.font_size - 2
             default_width: page_rb2.input_width
             default_height: page_rb2.input_height
 
-            maximum_value: page_rb2.max_pad_per_axle * bogies_count_integerinput.value * axles_per_bogie_integerinput.value
+            maximum_value: page_rb2.max_pad_brakes_per_axle * bogies_count_integerinput.value * axles_per_bogie_integerinput.value
             minimum_value: 0
 
             title: "Nplaquettes"
@@ -655,15 +655,15 @@ Item {
 
         //integerinput pour connaitre le nombre de disques
             INI_integerinput{
-            id: disk_brake_integerinput
-            objectName: "disk_brake_integerinput"
+            id: disk_brakes_count_integerinput
+            objectName: "disk_brakes_count_integerinput"
 
-            default_x: pad_brake_integerinput.default_x + page_rb2.x_offset
-            default_y: pad_brake_integerinput.default_y
-            default_width: pad_brake_integerinput.default_width
-            default_height: pad_brake_integerinput.default_height
+            default_x: pad_brakes_count_integerinput.default_x + page_rb2.x_offset
+            default_y: pad_brakes_count_integerinput.default_y
+            default_width: pad_brakes_count_integerinput.default_width
+            default_height: pad_brakes_count_integerinput.default_height
 
-            maximum_value: page_rb2.max_disk_per_axle * bogies_count_integerinput.value * axles_per_bogie_integerinput.value
+            maximum_value: page_rb2.max_disk_brakes_per_axle * bogies_count_integerinput.value * axles_per_bogie_integerinput.value
             minimum_value: 0
 
             title: "Ndisques"
@@ -671,7 +671,7 @@ Item {
 
             is_max_default: false
             is_activable: !page_rb2.generated
-            is_positive: pad_brake_integerinput.is_positive
+            is_positive: pad_brakes_count_integerinput.is_positive
         }
 
         //checkbutton pour savoir si le freinage par récupération est activé ?
@@ -679,8 +679,8 @@ Item {
             id: regenerative_check
             objectName: "regenerative_check"
 
-            default_x: disk_brake_integerinput.default_x + page_rb2.x_offset
-            default_y: disk_brake_integerinput.default_y + (page_rb2.input_height - page_rb2.checkbutton_box_length) * 0.5
+            default_x: disk_brakes_count_integerinput.default_x + page_rb2.x_offset
+            default_y: disk_brakes_count_integerinput.default_y + (page_rb2.input_height - page_rb2.checkbutton_box_length) * 0.5
             box_length: page_rb2.checkbutton_box_length
 
             title: "Récupération ?"
@@ -699,15 +699,15 @@ Item {
 
         //integerinput pour connaitre le nombre de Patins magnétiques
         INI_integerinput{
-            id: magnetic_brake_integerinput
-            objectName: "magnetic_brake_integerinput"
+            id: magnetic_brakes_count_integerinput
+            objectName: "magnetic_brakes_count_integerinput"
 
-            default_x: pad_brake_integerinput.default_x
-            default_y: pad_brake_integerinput.default_y + page_rb2.y_offset - 4
-            default_width: pad_brake_integerinput.default_width
-            default_height: pad_brake_integerinput.default_height
+            default_x: pad_brakes_count_integerinput.default_x
+            default_y: pad_brakes_count_integerinput.default_y + page_rb2.y_offset - 4
+            default_width: pad_brakes_count_integerinput.default_width
+            default_height: pad_brakes_count_integerinput.default_height
 
-            maximum_value: -foucault_brake_integerinput.value + page_rb2.max_magnetic_between_axle * bogies_count_integerinput.value * (axles_per_bogie_integerinput.value - 1)
+            maximum_value: -foucault_brakes_count_integerinput.value + page_rb2.max_magnetic_brakes_per_axle * bogies_count_integerinput.value * (axles_per_bogie_integerinput.value - 1)
             minimum_value: 0
 
             title: "Npatins magnétiques"
@@ -715,20 +715,20 @@ Item {
 
             is_max_default: false
             is_activable: (axles_per_bogie_integerinput.value > 1) && !page_rb2.generated
-            is_positive: pad_brake_integerinput.is_positive
+            is_positive: pad_brakes_count_integerinput.is_positive
         }
 
         //integerinput pour connaitre le nombre de systèmes de freinage de foucault
         INI_integerinput{
-            id: foucault_brake_integerinput
-            objectName: "foucault_brake_integerinput"
+            id: foucault_brakes_count_integerinput
+            objectName: "foucault_brakes_count_integerinput"
 
-            default_x: magnetic_brake_integerinput.default_x + page_rb2.x_offset
-            default_y: magnetic_brake_integerinput.default_y
-            default_width: magnetic_brake_integerinput.default_width
-            default_height: magnetic_brake_integerinput.default_height
+            default_x: magnetic_brakes_count_integerinput.default_x + page_rb2.x_offset
+            default_y: magnetic_brakes_count_integerinput.default_y
+            default_width: magnetic_brakes_count_integerinput.default_width
+            default_height: magnetic_brakes_count_integerinput.default_height
 
-            maximum_value: -magnetic_brake_integerinput.value + page_rb2.max_magnetic_between_axle * bogies_count_integerinput.value * (axles_per_bogie_integerinput.value - 1)
+            maximum_value: -magnetic_brakes_count_integerinput.value + page_rb2.max_magnetic_brakes_per_axle * bogies_count_integerinput.value * (axles_per_bogie_integerinput.value - 1)
             minimum_value: 0
 
             title: "Nfoucault"
@@ -736,7 +736,7 @@ Item {
 
             is_max_default: false
             is_activable: (axles_per_bogie_integerinput.value > 1) && !page_rb2.generated
-            is_positive: disk_brake_integerinput.is_positive
+            is_positive: disk_brakes_count_integerinput.is_positive
         }
 
         //checkbutton pour savoir si le freinage par récupération est activé ?
@@ -744,8 +744,8 @@ Item {
             id: dynamic_check
             objectName: "dynamic_check"
 
-            default_x: foucault_brake_integerinput.default_x + page_rb2.x_offset
-            default_y: foucault_brake_integerinput.default_y + (page_rb2.input_height - page_rb2.checkbutton_box_length) * 0.5
+            default_x: foucault_brakes_count_integerinput.default_x + page_rb2.x_offset
+            default_y: foucault_brakes_count_integerinput.default_y + (page_rb2.input_height - page_rb2.checkbutton_box_length) * 0.5
             box_length: regenerative_check.box_length
 
             title: "Rhéostatique ?"
