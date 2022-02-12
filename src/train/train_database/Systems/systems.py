@@ -128,7 +128,7 @@ class Systems:
             next_articulated = average_bogies_count < 2 and (front_bonus_bogies <= car_index < train_data["railcars_count"] - back_bonus_bogies - 1)
 
             # Détermine le nombre d'essieux centraux à ajoutés (valable que si average_bogies_count > 2)
-            central_bogies_count = (int(average_bogies_count - 2) + (front_bonus_bogies < car_index or car_index > train_data["railcars_count"] - back_bonus_bogies - 1)
+            central_bogies_count = (int(average_bogies_count - 2) + (front_bonus_bogies > car_index or car_index > (train_data["railcars_count"] - back_bonus_bogies - 1))
                                     if average_bogies_count > 2 else 0)
 
             # Compte le nombre de bogies à rajouter (ne compte pas le bogie articulé précédent mais compte le suivant)
