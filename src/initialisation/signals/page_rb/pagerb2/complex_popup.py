@@ -112,9 +112,35 @@ class ComplexPopup:
             self.win.setProperty("mission_list", self.train_database.systems.get_mission_list())
             self.win.setProperty("position_list", self.train_database.systems.get_position_list())
 
-            # Récupère la liste des types et des positions de chacunes des voitures
-            self.win.setProperty("type_list", [c.mission_type.value for c in self.train.railcars_list])
-            self.win.setProperty("position_list", [c.position_type.value for c in self.train.railcars_list])
+            # Appelle la fonction permettant de mettre à jour les différentes constantes
+            self.update_constants(simple_parameters)
+
+            # Appelle la fonction de mise à jour pour montrer la première voiture
+            # TODO : initialiser la première voiture
+
+    def update_constants(self, train_data):
+        """Fonction permettant de mettre à jour les différentes constantes de la popup complexe
+
+        Parameters
+        ----------
+        train_data: `sd.SettingsDictionary`
+            Les paramètres du train (certains paramètres doivent être convertis du train à la voiture/au bogie
+        """
+        # Commence par mettre à jour les valeurs par défaut selon la moyenne des paramètres entrés
+        self.win.setProperty("default_axles_count", train_data.get_value("axles_per_bogie", 2))
+        self.win.setProperty("default_axles_power", train_data.get_value("axles_power", 750.0))
+        self.win.setProperty("default_pad_brakes_count", round(train_data.get_value("pad_brakes_count", 0) / train_data.get_value("bogies_count", 1)))
+        self.win.setProperty("default_disk_brakes_count", round(train_data.get_value("disk_brakes_count", 0) / train_data.get_value("bogies_count", 1)))
+        self.win.setProperty("default_magnetic_brakes_count", round(train_data.get_value("magnetic_brakes_count", 0) / train_data.get_value("bogies_count", 1)))
+        self.win.setProperty("default_foucault_brakes_count", round(train_data.get_value("foucault_brakes_count", 0) / train_data.get_value("bogies_count", 1)))
+
+        # Puis met à jour les différentes limites
+        self.win.setProperty("max_bogies_per_railcar", max(self.parent.page.property("max_bogies_per_railcar"), 2))
+        self.win.setProperty("max_axles_per_bogies", self.parent.page.property("max_axles_per_bogie"))
+        self.win.setProperty("max_axles_power", self.parent.page.property("max_axles_power"))
+        self.win.setProperty("max_pad_brakes_per_axle", self.parent.page.property("max_pad_brakes_per_axle"))
+        self.win.setProperty("max_disk_brakes_per_axle", self.parent.page.property("max_disk_brakes_per_axle"))
+        self.win.setProperty("max_magnetic_brakes_per_axle", self.parent.page.property("max_magnetic_brakes_per_axle"))
 
     def reset(self):
         """Fonction permettant de réinitialiser le mode complexe (supression des données)"""
