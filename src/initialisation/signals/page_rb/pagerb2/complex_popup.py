@@ -200,7 +200,186 @@ class ComplexPopup:
         # Appelle ensuite la fonction pour mettre à jour la popup avec les nouvelles données
         self.update_popup(current_railcar_index)
 
+    def update_database(self, railcar_index):
+        """Fonction permettant de récupérer les valeurs de la popup et de les stoquer dans la base de données
+        Attention, l'appel de cette fonction écrase les données de la voiture paramétrée
 
+        Parameters
+        ----------
+        railcar_index: `int`
+            index de la voiture dont les données seront récupérés (0 à Nrailcar - 1)
+        """
+        # TODO : faire l'électrification
+        # TODO : faire les données générales
+
+        #S'occupe du bogie avant
+        # Récupère les données du bogie sur la popup complexe
+        front_bogie_data = self.win.findChild(QObject, "front_bogie").get_values().toVariant()
+        # Si les données sont vides ou que articulé est désactivé :
+        if not front_bogie_data or not front_bogie_data[4]:
+            # Essaye de diviser le bogie en deux bogies et récupère le bogie
+            self.split_bogies([railcar_index, railcar_index - 1])
+
+            # Si le bogie avant a été désactivé
+            if not front_bogie_data:
+                # Récupére le bogie avant et s'il existe le supprime
+                front_bogie = self.train_database.systems.get_bogies(railcar_index, tdb.Position.FRONT)
+                if front_bogie:
+                    self.train_database.systems.traction.remove(front_bogie[0])
+            # Sinon change ses paramètres pour ceux récupérés, où crée un nouveau bogie si la voiture était suspendue
+            else:
+                front_bogie = self.train_database.systems.get_bogies(railcar_index, tdb.Position.FRONT)
+                if front_bogie:
+                    front_bogie[0].set_general_values(tdb.Position.FRONT,
+                                                      -1,
+                                                      railcar_index,
+                                                      front_bogie_data[0][0],
+                                                      front_bogie_data[1][0],
+                                                      front_bogie_data[2][0])
+                    # TODO : changer les systèmes de freinages aussi
+                else:
+                    self.train_database.systems.traction.append(tdb.systems.traction.Bogie(tdb.Position.FRONT,
+                                                                                           -1,
+                                                                                           railcar_index,
+                                                                                           front_bogie_data[0][0],
+                                                                                           front_bogie_data[1][0],
+                                                                                           front_bogie_data[2][0]))
+        # Si les données sont les paramètres d'un bogie articulé
+        else:
+            # Crée un bogie articulé, le récupère et mets à jour ses données
+            self.merge_bogies([railcar_index - 1, railcar_index])
+            front_bogie = self.train_database.systems.get_bogies([railcar_index - 1, railcar_index])
+            front_bogie[0].set_general_values(None,
+                                              -1,
+                                              [railcar_index - 1, railcar_index],
+                                              front_bogie_data[0][0],
+                                              front_bogie_data[1][0],
+                                              front_bogie_data[2][0])
+
+        # S'occupe des bogies centraux
+        # Récupère d'abord les bogies centraux déjà existants pour la voiture
+        middle_bogies = self.train_database.systems.get_bogies(railcar_index, tdb.Position.MIDDLE)
+        middle_bogies_data = self.win.findChild(QObject, "middle_bogie").get_values().toVariant()
+
+        # Si des bogies centraux existent
+        # Pour chacun des bogies centraux, modifie les données si le bogie existe, sinon en rajoute un nouveau
+        if middle_bogies_data:
+            for r_i in range(len(middle_bogies_data[0])):
+                if r_i < len(middle_bogies):
+                    middle_bogies[r_i].set_general_values(tdb.Position.MIDDLE,
+                                                          r_i,
+                                                          railcar_index,
+                                                          middle_bogies_data[0][r_i],
+                                                          middle_bogies_data[1][r_i],
+                                                          middle_bogies_data[2][r_i])
+                else:
+                    self.train_database.systems.traction.append(tdb.systems.traction.Bogie(tdb.Position.MIDDLE,
+                                                                                           r_i,
+                                                                                           railcar_index,
+                                                                                           middle_bogies_data[0][r_i],
+                                                                                           middle_bogies_data[1][r_i],
+                                                                                           middle_bogies_data[2][r_i]))
+        # Si trop de bogies centraux existent, les suppriment
+        for r_i in range(0 if not middle_bogies_data else len(middle_bogies_data[0]), len(middle_bogies), 1):
+            self.train_database.systems.traction.remove(middle_bogies[r_i])
+
+        # S'occupe du bogie arrière (très similairement au bogie avant)
+        # Récupère les données du bogie sur la popup complexe
+        back_bogie_data = self.win.findChild(QObject, "back_bogie").get_values().toVariant()
+        # Si les données sont vides ou que articulé est désactivé :
+        if not back_bogie_data or not back_bogie_data[4]:
+            # Essaye de diviser le bogie en deux bogies et récupère le bogie
+            self.split_bogies([railcar_index, railcar_index + 1])
+
+            # Si le bogie avant a été désactivé
+            if not back_bogie_data:
+                # Récupére le bogie avant et s'il existe le supprime
+                back_bogie = self.train_database.systems.get_bogies(railcar_index, tdb.Position.BACK)
+                if back_bogie:
+                    self.train_database.systems.traction.remove(back_bogie[0])
+            # Sinon change ses paramètres pour ceux récupérés, où crée un nouveau bogie si la voiture était suspendue
+            else:
+                back_bogie = self.train_database.systems.get_bogies(railcar_index, tdb.Position.BACK)
+                if back_bogie:
+                    back_bogie[0].set_general_values(tdb.Position.BACK,
+                                                     -1,
+                                                     railcar_index,
+                                                     back_bogie_data[0][0],
+                                                     back_bogie_data[1][0],
+                                                     back_bogie_data[2][0])
+                    # TODO : changer les systèmes de freinages aussi
+                else:
+                    self.train_database.systems.traction.append(tdb.systems.traction.Bogie(tdb.Position.BACK,
+                                                                                           -1,
+                                                                                           railcar_index,
+                                                                                           back_bogie_data[0][0],
+                                                                                           back_bogie_data[1][0],
+                                                                                           back_bogie_data[2][0]))
+        # Si les données sont les paramètres d'un bogie articulé
+        else:
+            # Crée un bogie articulé, le récupère et mets à jour ses données
+            self.merge_bogies([railcar_index, railcar_index + 1])
+            back_bogie = self.train_database.systems.get_bogies([railcar_index, railcar_index + 1])
+            back_bogie[0].set_general_values(None,
+                                             -1,
+                                             [railcar_index, railcar_index + 1],
+                                             back_bogie_data[0][0],
+                                             back_bogie_data[1][0],
+                                             back_bogie_data[2][0])
+
+    def update_popup(self, index):
+        """Fonction permettant de récupérer les valeurs de la base de données et de les mettre sur la popup
+        Attention, l'appel de cette fonction écrase les données visibles sur la popup de paramétrage complexe
+
+        Parameters
+        ----------
+        index: `int`
+            index de la voiture dont les données seront lus (0 à Nrailcar - 1)
+        """
+        # TODO : faire l'électrification
+        # TODO : faire les données générales
+
+        # S'occupe maintenant du bogie avant.
+        front_bogie = self.train_database.systems.get_bogies(index, tdb.Position.FRONT)
+        if front_bogie:
+            # Récupère toutes les données du bogie avant et les envoient au bon format au bogie_parameters avant
+            front_bogie_data = front_bogie[0].get_general_values()
+            self.win.findChild(QObject, "front_bogie").change_values([front_bogie_data[3]],
+                                                                     [[bool(axles) for axles in front_bogie_data[4]]],
+                                                                     [front_bogie_data[4]],
+                                                                     [[0, 0, 0, 0]],   # TODO: mettre à jour (quantités systèmes de freinages)
+                                                                     front_bogie[0].is_jacob_bogie())
+        else:
+            # Réinitialise juste les données pour le bogie avant sinon
+            self.win.findChild(QObject, "front_bogie").clear()
+
+        # S'occupe maintenant des bogies centraux
+        middle_bogies = self.train_database.systems.get_bogies(index, tdb.Position.MIDDLE)
+        if middle_bogies:
+            # Récupère les données de tous les bogies centraux
+            middle_bogies_datas = [bogie.get_general_values() for bogie in middle_bogies]
+            self.win.findChild(QObject, "middle_bogie").change_values([bogie[3] for bogie in middle_bogies_datas],
+                                                                      [[bool(axles) for axles in bogie[4]] for bogie in middle_bogies_datas],
+                                                                      [bogie[4] for bogie in middle_bogies_datas],
+                                                                      [[0, 0, 0, 0] * len(middle_bogies)], # TODO : mettre à jour (quantités des systèmes de freinages)
+                                                                      False)
+        else:
+            # Réinitialise juste les donnés pour les bogies centraux sinon
+            self.win.findChild(QObject, "middle_bogie").clear()
+
+        # S'occupe maintenant du bogie arrière
+        back_bogie = self.train_database.systems.get_bogies(index, tdb.Position.BACK)
+        if back_bogie:
+            # Récupère toutes les données du bogie avant et les envoient au bon format au bogie_parameters avant
+            back_bogie_data = back_bogie[0].get_general_values()
+            self.win.findChild(QObject, "back_bogie").change_values([back_bogie_data[3]],
+                                                                    [[bool(axles) for axles in back_bogie_data[4]]],
+                                                                    [back_bogie_data[4]],
+                                                                    [[0, 0, 0, 0]],   # TODO: mettre à jour (quantités systèmes de freinages)
+                                                                    back_bogie[0].is_jacob_bogie())
+        else:
+            # Réinitialise juste les données pour le bogie avant sinon
+            self.win.findChild(QObject, "back_bogie").clear()
 
     def split_bogies(self, linked_coaches):
         """Fonction permettant de diviser un bogie jacobien en deux bogies.
@@ -238,7 +417,6 @@ class ComplexPopup:
             # TODO : dupliquer les systèmes de freinages
         else:
             log.debug(f"Impossible de séparer les deus bogies. Liste de voitures invalide ({linked_coaches}).")
-
 
     def merge_bogies(self, linked_coaches):
         """Fonction permettant de fusioner deux bogies pour en faire un bogie articulé.
