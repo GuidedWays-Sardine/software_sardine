@@ -132,11 +132,12 @@ Item {
     function get_values() {
         if(root.any) {
             // retourne un tableau avec toutes les informations sur le bogie
+            // Format : [[2, ...], [[True, ...], ...], [[750.0, ...], ...], [[pad, disk, magnetic, foucault], ...], true/false]
             return [root.axles_count, root.motorized_axles, root.motorized_axles_powers, root.brakes_counts, root.articulated]
         }
         else {
-            // Si aucune valeur n'est inscrite retourne faux
-            return false
+            // Si aucune valeur n'est inscrite retourne une liste de valeurs vide
+            return []
         }
     }
 
