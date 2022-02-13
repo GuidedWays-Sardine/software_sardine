@@ -79,20 +79,47 @@ Item {
 
 
     //Fonction permettant de changer les valeurs du module
+    // Format : [count, ...], [[True, ...], ...], [0.0, 150.0, ...], [pad, disk, magnetic, foucault], true/false
     function change_values(axles_count, motorized_axles, motorized_axles_powers, brakes_counts, articulated=false) {
         if(axles_count.length != 0) {
+            //Réinitialise les index
+            root.current_bogie_index = 0
+            root.any = true
+
             // Change le nombre de bogies selon la taille des tableaux
             bogies_count_integerinput.change_value(axles_count.length)
 
-            //Change la valeur pour chacun des tableaux
+            //Change la valeur pour les tableaux de motorisations et de puissances moteur
             root.axles_count = axles_count
             root.motorized_axles = motorized_axles
             root.motorized_axles_powers = motorized_axles_powers
-            root.brakes_counts = brakes_counts
-            articulated_check.is_checked = articulated
 
-            //Réinitialise les index
-            root.current_bogie_index = 0
+            //Mets à jours les boutons de motorisation
+            motorisation.model = root.axles_count[root.current_bogie_index]
+            for (let i = 0; i < root.motorized_axles[root.current_bogie_index].length; i++) {
+                motorisation.itemAt(i).background_color = root.motorized_axles[root.current_bogie_index][i] ? body.dark_grey : ""
+            }
+
+            //Mets à jour l'essieu paramétré au premier et mets à jour la valeur
+            root.current_axle_index = 0
+            //rend le floatinput de la puissance moteur activable ou non selon si l'essieu est motorisé ou non et change sa valeur
+            axles_power_floatinput.is_activable = root.motorized_axles[root.current_bogie_index][root.current_axle_index]
+            axles_power_floatinput.change_value(root.motorized_axles_powers[root.current_bogie_index][root.current_axle_index])
+            axles_power_floatinput.change_value(root.motorized_axles_powers[root.current_bogie_index][root.current_axle_index])
+
+            // Indique le nombre de systèmes de freinages
+            root.brakes_counts = brakes_counts
+            //Change le nombre des différents systèmes de freinages
+            pad_brakes_count_integerinput.change_value(root.brakes_counts[root.current_bogie_index][0])
+            disk_brakes_count_integerinput.change_value(root.brakes_counts[root.current_bogie_index][1])
+            // Pour les freinages magnétiques, comme ceux-ci sont liés, les passes d'abord à 0 pour éviter des erreurs lors des changement de valeurs
+            magnetic_brakes_count_integerinput.change_value(root.brakes_counts[root.current_bogie_index][2])
+            foucault_brakes_count_integerinput.change_value(root.brakes_counts[root.current_bogie_index][3])
+            magnetic_brakes_count_integerinput.change_value(root.brakes_counts[root.current_bogie_index][2])
+
+
+            // Fini en indiquant si l'essieu est articulé ou non
+            articulated_check.is_checked = articulated
         }
         else {
             // Si les tableaux de valeurs sont vides, réinitialise le module
