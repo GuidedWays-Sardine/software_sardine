@@ -204,20 +204,52 @@ class ComplexPopup:
         """Fonction permettant de récupérer les valeurs de la popup et de les stoquer dans la base de données
         Attention, l'appel de cette fonction écrase les données de la voiture paramétrée
 
-        Parameters
-        ----------
-        index: `int`
-            index de la voiture dont les données seront récupérés (0 à Nrailcar - 1)
-        """
-        pass
-
-    def update_popup(self, index):
-        """Fonction permettant de récupérer les valeurs de la base de données et de les mettre sur la popup
-        Attention, l'appel de cette fonction écrase les données visibles sur la popup de paramétrage complexe
+    def merge_bogies(self, linked_coaches):
+        """Fonction permettant de fusioner deux bogies pour en faire un bogie articulé.
+        Si aucun bogie existe sur les deus voitures, un bogie articulé sera créé
 
         Parameters
         ----------
-        index: `int`
-            index de la voiture dont les données seront lus (0 à Nrailcar - 1)
+        linked_coaches: `list`
+            Index des deux voitures dont les bogies doivent être fusionés.
+            elle doit contenir deux voitures consécutives. Si l'une des voitures sont suspendus, créera un nouveau bogie
         """
-        pass
+        # Vérifie que la liste d'index est bien composé de deux index consécutif
+        if isinstance(linked_coaches, list) and len(linked_coaches) == 2 and int(min(linked_coaches)) == int(max(linked_coaches) - 1):
+            # Vérifie qu'il n'y a pas déjà un bogie articulé entre ces deux voitures, sinon retourne
+            if self.train_database.systems.get_bogies([int(linked_coaches[0]), int(linked_coaches[1])]):
+                return
+
+            # Récupère les deux bogies à fusioner
+            back_bogie = self.train_database.systems.get_bogies(int(min(linked_coaches)), tdb.Position.BACK)
+            front_bogie = self.train_database.systems.get_bogies((int(max(linked_coaches))), tdb.Position.FRONT)
+
+            # Si au moins l'un des bogies non articulé existe
+            if front_bogie or back_bogie:
+                # Commence par supprimer le bogie arrière si les deux bogies non articulés existe (évite le duplicata)
+                if front_bogie and back_bogie:
+                    self.train_database.systems.traction.remove(back_bogie[0])
+
+                # Utilise ce bogie comme base pour créer le bogie articulé
+                bogie_data = front_bogie[0].get_general_values() if front_bogie else back_bogie[0].get_general_values()
+
+                # met à jour les données du bogie récupérer pour le mettre à l'arrière de la voiture avant
+                front_bogie[0].set_general_values(None,
+                                                  -1,
+                                                  [int(linked_coaches[0]), int(linked_coaches[1])],
+                                                  bogie_data[3],
+                                                  None,
+                                                  bogie_data[4])
+            # Si les deux bogies n'existent pas (les deux voitures suspendus)
+            else:
+                # Génère un essieu porteur
+                self.train_database.systems.traction.append(tdb.systems.traction.Bogie(None,
+                                                                                       -1,
+                                                                                       [int(linked_coaches[0], int(linked_coaches[1]))],
+                                                                                       self.win.property("default_axles_count"),
+                                                                                       0,
+                                                                                       0.0))
+
+        # TODO : dupliquer les systèmes de freinages
+        else:
+            log.debug(f"Impossible de fusionner deux voitures. Liste de voitures invalide ({linked_coaches}).")
