@@ -50,7 +50,7 @@ Window{
     //Propriétés sur l'index
     property int previous_railcar_index: 0
     property int current_railcar_index: train_preview.current_index
-    onCurrent_railcar_indexChanged() {
+    onCurrent_railcar_indexChanged: {
         // lorsque l'index de la voiture paramétrée est changée, appelle la fonction update et change le précédent index
         complex_popup.railcar_changed()
         complex_popup.previous_railcar_index = complex_popup.current_railcar_index
