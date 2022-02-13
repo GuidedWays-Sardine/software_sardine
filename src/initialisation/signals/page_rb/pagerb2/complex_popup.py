@@ -117,7 +117,8 @@ class ComplexPopup:
             self.update_constants(simple_parameters)
 
             # Appelle la fonction de mise à jour pour montrer la voiture avec l'index actuel
-
+            self.win.findChild(QObject, "train_preview").setProperty("current_index", 0)
+            self.update_popup(0)
 
     def update_constants(self, train_data):
         """Fonction permettant de mettre à jour les différentes constantes de la popup complexe
