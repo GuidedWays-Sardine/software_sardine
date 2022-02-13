@@ -259,10 +259,13 @@ Item {
                 pad_brakes_count_integerinput.change_value(root.brakes_counts[root.current_bogie_index][0])
                 disk_brakes_count_integerinput.change_value(root.brakes_counts[root.current_bogie_index][1])
                 // Pour les freinages magnétiques, comme ceux-ci sont liés, les passes d'abord à 0 pour éviter des erreurs lors des changement de valeurs
-                magnetic_brakes_count_integerinput.clear()
-                foucault_brakes_count_integerinput.clear()
                 magnetic_brakes_count_integerinput.change_value(root.brakes_counts[root.current_bogie_index][2])
                 foucault_brakes_count_integerinput.change_value(root.brakes_counts[root.current_bogie_index][3])
+                magnetic_brakes_count_integerinput.change_value(root.brakes_counts[root.current_bogie_index][2])
+
+                //rend le floatinput de la puissance moteur activable ou non selon si l'essieu est motorisé ou non et change sa valeur
+                axles_power_floatinput.is_activable = root.motorized_axles[root.current_bogie_index][root.current_axle_index]
+                axles_power_floatinput.change_value(root.motorized_axles_powers[root.current_bogie_index][root.current_axle_index])
             }
         }
     }
