@@ -1,6 +1,7 @@
 # Librairies par défaut python
 import sys
 import os
+import time
 from enum import Enum
 
 
@@ -32,13 +33,31 @@ mission_getter = {i: key for i, key in enumerate(MissionType)}  # Permet d'obten
 
 
 class TrainDatabase:
-    # Données du train
+    """base de données train"""
 
+    # Différents éléments nécessaires pour le train
     dynamic = None
     static = None
     systems = None
 
     def __init__(self, train_data):
+        """Fonction d'initialisation de la abse de données train
+
+        Parameters
+        ----------
+        train_data: `sd.SettingsDictionary`
+            Dictionaire de paramètres train
+        """
+        initial_time = time.perf_counter()
+        log.info("Initialisation Base de Données train", prefix="Initialisation BDD train")
+
+        # Initialise chacun des types de données (dynamiques, statiques, et systèmes)
         self.dynamic = dynamic.Dynamic(train_data)
         self.static = static.Static(train_data)
         self.systems = systems.Systems(train_data)
+
+        # Indique le temps de chargement de la BDD
+        log.info(f"Base de Données train initialisée en " +
+                 f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.",
+                 prefix="Initialisation BDD train")
+
