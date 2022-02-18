@@ -115,6 +115,22 @@ Item {
             is_max_default: false
             is_activable: !page_rb2.generated
             is_positive: false
+
+            onValueChanged: {
+                //Commence par mettre à jour les limites de masses à l'essieu moteur
+                if(motorized_axles_count_integerinput.value == 0 && motorized_axle_weight_floatinput.maximum_value > (weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value))){
+                    motorized_axle_weight_floatinput.minimum_value = weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value)
+                    motorized_axle_weight_floatinput.maximum_value = weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value)
+                }
+                else if(motorized_axles_count_integerinput.value == 0 && motorized_axle_weight_floatinput.maximum_value <= (weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value))){
+                    motorized_axle_weight_floatinput.maximum_value = weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value)
+                    motorized_axle_weight_floatinput.minimum_value = weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value)
+                }
+                else if(motorized_axles_count_integerinput.value != 0) {
+                    motorized_axle_weight_floatinput.minimum_value = 0.001
+                    motorized_axle_weight_floatinput.maximum_value = weight_floatinput.value / motorized_axles_count_integerinput.value
+                }
+            }
         }
 
         //floatinput de la longueur du train
@@ -195,6 +211,18 @@ Item {
             is_max_default: false
             is_activable: !page_rb2.generated
             is_positive: false
+
+            onValueChanged: {
+                //Commence par mettre à jour les limites de masses à l'essieu moteur
+                if(motorized_axles_count_integerinput.value == 0 && motorized_axle_weight_floatinput.maximum_value > (weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value))){
+                    motorized_axle_weight_floatinput.minimum_value = weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value)
+                    motorized_axle_weight_floatinput.maximum_value = weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value)
+                }
+                else if(motorized_axles_count_integerinput.value == 0 && motorized_axle_weight_floatinput.maximum_value <= (weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value))){
+                    motorized_axle_weight_floatinput.maximum_value = weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value)
+                    motorized_axle_weight_floatinput.minimum_value = weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value)
+                }
+            }
         }
 
         //integerinput pour connaitre le nombre d'essieux par bogies
@@ -216,6 +244,18 @@ Item {
             is_max_default: false
             is_activable: !page_rb2.generated
             is_positive: false
+
+            onValueChanged: {
+                //Commence par mettre à jour les limites de masses à l'essieu moteur
+                if(motorized_axles_count_integerinput.value == 0 && motorized_axle_weight_floatinput.maximum_value > (weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value))){
+                    motorized_axle_weight_floatinput.minimum_value = weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value)
+                    motorized_axle_weight_floatinput.maximum_value = weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value)
+                }
+                else if(motorized_axles_count_integerinput.value == 0 && motorized_axle_weight_floatinput.maximum_value <= (weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value))){
+                    motorized_axle_weight_floatinput.maximum_value = weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value)
+                    motorized_axle_weight_floatinput.minimum_value = weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value)
+                }
+            }
         }
 
         //integerinput pour connaitre le nombre d'essieux moteurs
@@ -240,10 +280,10 @@ Item {
             is_positive: false
 
             onValue_changed: {
-                //Commence par mettre à jour les limites de masses
+                //Commence par mettre à jour les limites de masses à l'essieu moteur
                 if(motorized_axles_count_integerinput.value == 0 && motorized_axle_weight_floatinput.maximum_value > (weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value))){
-                    motorized_axle_weight_floatinput.minimum_value = weight_floatinput.value / motorized_axles_count_integerinput.value
-                    motorized_axle_weight_floatinput.maximum_value = weight_floatinput.value / motorized_axles_count_integerinput.value
+                    motorized_axle_weight_floatinput.minimum_value = weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value)
+                    motorized_axle_weight_floatinput.maximum_value = weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value)
                 }
                 else if(motorized_axles_count_integerinput.value == 0 && motorized_axle_weight_floatinput.maximum_value <= (weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value))){
                     motorized_axle_weight_floatinput.maximum_value = weight_floatinput.value / (bogies_count_integerinput.value * axles_per_bogie_integerinput.value)
