@@ -9,7 +9,7 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.train.train_database.database as tdb
 
 
-class RailCar:
+class Railcar:
     """classe cotenant toutes les informations sur la voiture"""
     # Toutes les informations générale
     mission_type = None
