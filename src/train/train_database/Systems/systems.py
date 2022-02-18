@@ -1,24 +1,26 @@
 # Librairies par défaut python
 import sys
 import os
-from enum import Enum
-
 
 # Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 
+import src.misc.log.log as log
 import src.misc.settings_dictionary.settings as sd
 import src.train.train_database.database as tdb
+import src.train.train_database.Systems.frame.frame as frame
+import src.train.train_database.Systems.electric.electric as electric
 import src.train.train_database.Systems.traction.traction as traction
 import src.train.train_database.Systems.braking.braking as braking
-import src.train.train_database.Systems.railcar.railcar as railcar
-import src.train.train_database.Systems.electric.electric as electric
+
 
 
 class Systems:
-
-    railcars = None
+    """Classe permettant le fonctionnemetn des différents systèmes du train"""
+    # Liste de tous les systèmes nécessaires au fonctionnement du train
+    # Les systèmes sont initialisés plus bas pour éviter une copie (due à la mutabilité des classes et listes)
+    frame = None
     electric = None
     traction = None
     braking = None
@@ -33,9 +35,10 @@ class Systems:
         """
         # Commence par initialiser les différents systèmes en tant que liste
         # Les liste étant mutable, il est nécessaire de les créer à l'initialisation au risque
-        self.railcars = []
-        self.electric = []
-        self.traction = []
+        # Feature: ajouter l'initialisation des futurs systèmes ici
+        self.traction = traction.Traction()
+        self.frame = frame.Frame()
+        self.electric = electric.Electric()
         self.braking = braking.Braking(train_data)
 
         # Si le train a été paramétré de façon complexe, récupère les données sinon génère un train complex
@@ -124,7 +127,7 @@ class Systems:
         # Passe par chacune des voitures du train
         for car_index in range(train_data["railcars_count"]):
             # Commence par déterminer si l'essieu précédent et l'essieu suivant sont articulés
-            previous_articulated = car_index > 0 and any(self.get_bogies(car_index, tdb.Position.FRONT))
+            previous_articulated = car_index > 0 and any(self.traction.get_bogies(car_index, tdb.Position.FRONT))
             next_articulated = average_bogies_count < 2 and (front_bonus_bogies <= car_index < train_data["railcars_count"] - back_bonus_bogies - 1)
 
             # Détermine le nombre d'essieux centraux à ajoutés (valable que si average_bogies_count > 2)
@@ -160,7 +163,7 @@ class Systems:
             # Commence par le bogie avant et distingue deux cas s'il est articulé ou non
             if previous_articulated:
                 # Récupère le bogie précédent, récupère sa masse et le divise par 2 car bogie articulé
-                previous_bogie = self.get_bogies(car_index - 1, tdb.Position.BACK)[0]
+                previous_bogie = self.traction.get_bogies(car_index - 1, tdb.Position.BACK)[0]
                 railcar_weight = (previous_bogie.get_motorized_axles_count() * motorized_axle_weight +
                                   (train_data["axles_per_bogie"] - previous_bogie.get_motorized_axles_count()) * carrying_axle_weight) / 2
             else:
@@ -184,32 +187,32 @@ class Systems:
             # Ajoute les différents bogies maintenant que toutes les valeurs nécessaires ont été calculées
             # si le bogie avant n'est pas articulé (auquel cas il a été ajouté) le rajoute
             if not previous_articulated:
-                self.traction.append(traction.Bogie(position_type=tdb.Position.FRONT,
-                                                    position_index=-1,
-                                                    linked_railcars=car_index,
-                                                    axles_count=train_data["axles_per_bogie"],
-                                                    motorized_axles=front_axles_motorized_count,
-                                                    axles_power=train_data["axles_power"]))
+                self.traction.add_bogie(traction.Bogie(position_type=tdb.Position.FRONT,
+                                                       position_index=-1,
+                                                       linked_railcars=car_index,
+                                                       axles_count=train_data["axles_per_bogie"],
+                                                       motorized_axles=front_axles_motorized_count,
+                                                       axles_power=train_data["axles_power"]))
 
             # Ajoute les bogies centraux
             for c_b in range(central_bogies_count):
-                self.traction.append(traction.Bogie(position_type=tdb.Position.MIDDLE,
-                                                    position_index=c_b,
-                                                    linked_railcars=car_index,
-                                                    axles_count=train_data["axles_per_bogie"],
-                                                    motorized_axles=central_axles_motorized_count[c_b],
-                                                    axles_power=train_data["axles_power"]))
+                self.traction.add_bogie(traction.Bogie(position_type=tdb.Position.MIDDLE,
+                                                       position_index=c_b,
+                                                       linked_railcars=car_index,
+                                                       axles_count=train_data["axles_per_bogie"],
+                                                       motorized_axles=central_axles_motorized_count[c_b],
+                                                       axles_power=train_data["axles_power"]))
 
             # Ajoute le bogie arrière
-            self.traction.append(traction.Bogie(position_type=tdb.Position.BACK if not next_articulated else None,
-                                                position_index=-1,
-                                                linked_railcars=[car_index, car_index + 1] if next_articulated else car_index,
-                                                axles_count=train_data["axles_per_bogie"],
-                                                motorized_axles=back_axles_motorized_count,
-                                                axles_power=train_data["axles_power"]))
+            self.traction.add_bogie(traction.Bogie(position_type=tdb.Position.BACK if not next_articulated else None,
+                                                   position_index=-1,
+                                                   linked_railcars=[car_index, car_index + 1] if next_articulated else car_index,
+                                                   axles_count=train_data["axles_per_bogie"],
+                                                   motorized_axles=back_axles_motorized_count,
+                                                   axles_power=train_data["axles_power"]))
 
             # Ajoute la voiture paramétré ainsi que tous ses paramètres
-            self.railcars.append(railcar.RailCar(mission_type=general_mission,
+            self.frame.add_railcar(frame.Railcar(mission_type=general_mission,
                                                  position_type=(tdb.Position.FRONT if car_index == 0 else
                                                                 tdb.Position.BACK if car_index == (train_data["railcars_count"] - 1)
                                                                 else tdb.Position.MIDDLE),
@@ -224,8 +227,7 @@ class Systems:
                                                  ABCfull=[train_data["a"], train_data["b"], train_data["c"]],
                                                  multiply_mass_full=False))
 
-        # Appelle la fonction pour initialiser les systèmes de freinage
-        self.braking.generate(train_data)
+            # TODO : faire les calculs et initialiser les systèmes de freinage
 
         # Appelle la fonction d'initialisation des systèmes électriques
         # TODO : initialiser le système électriques (pantographes etc...
