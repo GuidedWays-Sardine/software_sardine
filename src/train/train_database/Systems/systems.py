@@ -230,62 +230,6 @@ class Systems:
         # Appelle la fonction d'initialisation des systèmes électriques
         # TODO : initialiser le système électriques (pantographes etc...
 
-    def get_bogies(self, position_index, position_type=None):
-        """Fonction permettant d'avoir un bogie avec les index indiqués
-
-        Parameters
-        ----------
-        position_index: `Union[int, list]`
-            Les voitures auxquelles le bogie est connecté (int ou liste de int) doit aller de 0 à Nvoitures - 1
-        position_type: `Position`
-            La position des bogies dans la voiture (Position.FRONT ; Position.MIDDLE ; Position.BACK) si cela est vital
-
-        Returns
-        -------
-        bogies_list: `list`
-            liste des bogies suivant les conditions envoyés
-        """
-        # Transforme l'index de la position du bogie en liste d'index si l'index envoyé est un entier
-        if isinstance(position_index, int):
-            position_index = [position_index]
-
-        # Cas où le/les bogies recherchés se trouvent sur une seule voiture
-        if len(position_index) == 1:
-            # Le bogie est sur la voiture dans le cas où :
-            # - l'index envoyé est dans la liste et qu'aucune position n'a été donnée
-            # - l'index envoyé est dans la liste et que le type de position correspond à celui du bogie
-            # - le bogie avant est cherché et l'index de la voiture actuelle et précédente sont dans la liste
-            # - le bogie arrière est cherché et l'index de la voiture actuelle et suivant sont dans la liste
-            # - le bogie arrière (ou non spécifié) est cherche et que le bogie avant de la voiture suivant est articulée
-            return [b for b in self.traction
-                    if ((position_index[0] in b.linked_railcars and (position_type is None or b.position_type == position_type))
-                        or (position_type == tdb.Position.FRONT and position_index[0] in b.linked_railcars and (position_index[0] - 1) in b.linked_railcars)
-                        or (position_type == tdb.Position.BACK and position_index[0] in b.linked_railcars and (position_index[0] + 1) in b.linked_railcars))]
-        # Cas où le bogie recherché se trouve sur deux voiture (bogie jacobien, rame articulée)
-        elif len(position_index) == 2:
-            # Retourne le bogie qui appartient aux deux voitures s'il existe (sinon retourne liste vide)
-            return [b for b in self.traction if all(p_i in b.linked_railcars for p_i in position_index)
-                    and (position_type is None or b.position_type == position_type)]
-        # Cas où trop d'index ou aucun index n'ont été donnés (retourne une liste vide)
-        else:
-            return []
-
-    def get_mission_list(self):
-        """Fonction retournant la liste des missions de chacunes des voitures
-        
-        Returns 
-        -------
-        mission_list: `list`
-            liste des missions de chacunes des voitures du train
-        """
-        return [rc.mission_type.value for rc in self.railcars]
-
-    def get_position_list(self):
-        """Fonction retournant la liste des tupes de positions (Front, Middle, Back) de chacunes des voitures
-
-        Returns
-        -------
-        mission_list: `list`
-            liste des types de positions de chacunes des voitures du train
-        """
-        return [rc.position_type.value for rc in self.railcars]
+        log.info("Initialisation des différents systèmes du train réussie. Train composé de :\n\t"
+                 f"{len(self.frame.railcars)} voitures ; {len(self.traction.bogies)} bogies ;")
+        # TODO : ajouter le logging pour les autres systèmes du train
