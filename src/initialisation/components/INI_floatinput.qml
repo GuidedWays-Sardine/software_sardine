@@ -61,12 +61,12 @@ Item{
     //Fonction pour remettre la valeur par défaut dans le valueinput (maximum_calue si is_max_default est vrai sinon minimum_value)
     function clear(){
         // Vérifie si la valeur actuellement visible est différente que la valeur quand vidé, change la valeur et appelle le signal value_changed si c'est le cas
-        var changed = root.is_max_default ? root.value !== root.maximum_value : root.value !== root.minimum_value
+        var changed = root.is_max_default ? root.value !== validator.bottom : root.value !== validator.top
         body.text = ""
 
         //Si la valeur a changée appelle le signal associé et change la valeur
         if(changed){
-            root.value = root.is_max_default ? root.maximum_value : root.minimum_value
+            root.value = root.is_max_default ? validator.top : validator.bottom
             value_changed()
         }
     }
@@ -74,12 +74,12 @@ Item{
     //Fonction permettant de changer la valeur du valueinput (de manière sécurisée)
     function change_value(new_value){
         //Si la valeur n'est pas valide (trop grand ou trop petite) la change
-        if(new_value < root.minimum_value || new_value > root.maximum_value) {
-            new_value = new_value < root.minimum_value ? root.minimum_value : root.maximum_value
+        if(new_value < validator.bottom || new_value > validator.top) {
+            new_value = new_value < validator.bottom ? validator.bottom : validator.top
         }
 
         // Si la valeur vaut la valeur min sans is_max_default ou max avec is_max_default, vide la zone de texte, sinon la met à la valeur approchée au bon nombre de décimales
-        body.text = ((new_value === root.minimum_value && !root.is_max_default) || (new_value === root.maximum_value && root.is_max_default)) ? "" : (Math.floor(new_value * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)).toString()
+        body.text = ((new_value === validator.bottom && !root.is_max_default) || (new_value === validator.top && root.is_max_default)) ? "" : new_value
 
         //Si la valeur a été changée, appelle le signal value_changed
         if(value !== new_value){
@@ -162,6 +162,9 @@ Item{
 
     //Signal détectant quand la valeur minimale est changée
     onMinimum_valueChanged: {
+        //Calcule la valeur arrondie minimale (pas encore mise à jour sur le validateur)
+        bottom = Math.floor(root.minimum_value * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
+
         //Cas où la valeur minimale est inférieure à 0
         if(root.minimum_value < 0){
             root.minimum_value = 0
@@ -174,13 +177,13 @@ Item{
 
         //cas où la valeur actuelle rentrée est inférieure à la nouvelle valeur minimale
         if(body.text != "" && parseFloat(body.text.replace(",", ".")) < root.minimum_value){
-            root.value = root.minimum_value
-            body.text = (root.is_max_default && root.maximum_value !== root.minimum_value) ? root.minimum_value.toString() : ""
+            root.value = bottom
+            body.text = (root.is_max_default && validator.top !== bottom) ? bottom : ""
             value_changed()
         }
         //cas où aucune valeur n'est entrée et que is_max_default faux
         else if(body.text === "" && !root.is_max_default){
-            root.value = root.minimum_value
+            root.value = bottom
             value_changed()
             body.text = ""
         }
@@ -188,20 +191,22 @@ Item{
 
     //Signal détectant quand la valeur maximale est changée
     onMaximum_valueChanged: {
+        //Calcule la valeur arrondie maximale (pas encore mise à jour dans le validateur)
+        top = Math.floor(root.maximum_value * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
+
         //cas où la valeur maximale est inférieure à la valeur minimale
         if(root.maximum_value < root.minimum_value){
             root.maximum_value = root.minimum_value
         }
-        
         //cas où la valeur actuelle rentrée est supériere à la nouvelle valeur maximale
-        if(body.text != "" && parseFloat(body.text.replace(",", ".")) > root.maximum_value){
-            root.value = root.maximum_value
-            body.text = (root.is_max_default || root.maximum_value === root.minimum_value) ? "" : root.maximum_value.toString()
+        if(root.value > top){
+            body.text = (root.is_max_default || top === validator.bottom) ? "" : top
+            root.value = top
             value_changed()
         }
         //cas où aucune valeur n'est entrée et que is_max_default vrai
         else if(body.text === "" && root.is_max_default) {
-            root.value = root.maximum_value
+            root.value = top
             body.text = ""
             value_changed()
         }
@@ -210,8 +215,8 @@ Item{
     //Signal détectact lorsque is_max_default est changé
     onIs_max_defaultChanged: {
         //Dans le cas où aucune valeur n'est entrée et que la valeur min et max diffèrent (la valeur va changer de borne)
-        if(body.text == "" && root.maximum_value > root.minimum_value) {
-            root.value = root.is_max_default ? root.maximum_value : root.minimum_value
+        if(body.text == "" && validator.top > validator.bottom) {
+            root.value = root.is_max_default ? validator.top : validator.bottom
             value_changed()
         }
     }
@@ -232,7 +237,7 @@ Item{
         readOnly: !root.is_activable
         echoMode: TextInput.Normal
 
-        placeholderText: root.is_max_default ? (Math.floor(root.maximum_value * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)).toString() : (Math.floor(root.minimum_value * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)).toString()
+        placeholderText: root.is_max_default ? validator.top : validator.bottom
         placeholderTextColor: root.is_dark_grey ? root.dark_grey : root.medium_grey
 
         //rectangle de fond
@@ -243,12 +248,13 @@ Item{
 
         //indique que seul des valeurs entières peuvent être entrées
         validator: DoubleValidator {
+            id: validator
 
             locale: "RejectGroupSeparator"
 
             decimals: root.decimals
-            bottom: root.minimum_value
-            top: root.maximum_value
+            bottom: Math.floor(root.minimum_value * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
+            top: Math.floor(root.maximum_value * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
         }
 
         //détecte quand le texte entrée est changé et vérifie si la valeur entrée est valide
@@ -259,21 +265,21 @@ Item{
                 var input_value = parseFloat(body.text.replace(",", "."))
                 
                 //Si la valeur est supérieur à la valeur maximale (s'occupe de remettre la valeur dans les limites
-                if(input_value > root.maximum_value) {
-                    input_value = root.maximum_value
-                    body.text = is_max_default ? "" : root.maximum_value.toString()
+                if(input_value > validator.top) {
+                    input_value = validator.top
+                    body.text = is_max_default ? "" : validator.top
                 }
                 // On vérifira que la valeur entrée est supérieur à la valeur minimale dans onCursorVisibleChanged
 
                 //vérifie si la nouvelle valeur est différente de l'ancienne, si oui appelle le signal value_changed et la change
-                if(root.value !== input_value && input_value >= root.minimum_value){
+                if(root.value !== input_value && input_value >= validator.bottom){
                     root.value = input_value
                     value_changed()
                 }
             }
             //Dans le cas où la case a été vidée
-            else if((root.is_max_default && root.value != root.maximum_value) || (!root.is_max_default && root.value != root.minimum_value)) {
-                root.value = root.is_max_default ? root.maximum_value : root.minimum_value
+            else if((root.is_max_default && root.value != validator.top) || (!root.is_max_default && root.value != validator.bottom)) {
+                root.value = root.is_max_default ? validator.top : validator.bottom
                 value_changed()
             }
         }
@@ -289,9 +295,9 @@ Item{
                 var input_value = parseFloat(body.text.replace(",", "."))
 
                 //S'assure que la valeur actuelle n'est pas trop faible
-                if(input_value < root.minimum_value) {
-                    input_value = root.minimum_value
-                    body.text = root.is_max_default ? root.minimum_value.toString() : ""
+                if(input_value < validator.bottom) {
+                    input_value = validator.bottom
+                    body.text = root.is_max_default ? validator.bottom : ""
                 }
 
                 //vérifie si la nouvelle valeur est différente de l'ancienne, si oui appelle le signal value_changed et la change
