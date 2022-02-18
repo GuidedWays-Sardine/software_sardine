@@ -163,7 +163,7 @@ Item{
     //Signal détectant quand la valeur minimale est changée
     onMinimum_valueChanged: {
         //Calcule la valeur arrondie minimale (pas encore mise à jour sur le validateur)
-        bottom = Math.floor(root.minimum_value * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
+        var bottom = Math.floor(root.minimum_value * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
 
         //Cas où la valeur minimale est inférieure à 0
         if(root.minimum_value < 0){
@@ -192,7 +192,7 @@ Item{
     //Signal détectant quand la valeur maximale est changée
     onMaximum_valueChanged: {
         //Calcule la valeur arrondie maximale (pas encore mise à jour dans le validateur)
-        top = Math.floor(root.maximum_value * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
+        var top = Math.floor(root.maximum_value * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
 
         //cas où la valeur maximale est inférieure à la valeur minimale
         if(root.maximum_value < root.minimum_value){
