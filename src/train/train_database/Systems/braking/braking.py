@@ -21,7 +21,13 @@ class Braking:
     foucault_brakes = None
 
     def __init__(self, train_data):
-        """Fonction permettant d'initialiser les systèmes de freinages"""
+        """Fonction permettant d'initialiser les systèmes de freinages
+
+        Parameters
+        ----------
+        train_data: `sd.SettingsDictionary`
+            Dictionaire de paramètres train
+        """
         # Récupère les valeurs pour le freinage rhéostatique et par régénération
         self.regenerative_activated = train_data.get_value("regenerative", False)
         self.dynamic_activated = train_data.get_value("dynamic", False)
