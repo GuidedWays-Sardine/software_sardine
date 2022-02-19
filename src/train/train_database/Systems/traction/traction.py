@@ -99,3 +99,76 @@ class Traction:
             log.debug(f"Impossible de supprimer le bogie {bogie}. Le train a seulement {len(self.bogies)} bogies.")
         else:
             log.debug(f"{type(bogie)} n'est pas un bogie valide. Il doit être de type Bogie ou int.")
+
+    def split_bogies(self, linked_coaches):
+        """Fonction permettant de diviser un bogie jacobien en deux bogies.
+
+        Parameters
+        ----------
+        linked_coaches: `list`
+            Index des deux voitures dont le bogie articulé doit être séparé.
+            elle doit contenir deux voitures consécutives. Si aucun bogie articulé n'est trouvé, rien ne se passera.
+        """
+        # Vérifie que la liste d'index est bien composé de deux index consécutif
+        if isinstance(linked_coaches, list) and len(linked_coaches) == 2 and int(min(linked_coaches)) == int(max(linked_coaches) - 1):
+            # Récupère le bogie articulé à diviser et le divise s'il existe (sinon fait rien)
+            jacob_bogie = self.get_bogies(linked_coaches)
+            if jacob_bogie:
+                # Récupère les données du bogie
+                bogie_data = jacob_bogie[0].get_general_values()
+
+                # met à jour les données du bogie récupérer pour le mettre à l'arrière de la voiture avant
+                jacob_bogie[0].set_general_values(tdb.Position.BACK,
+                                                  -1,
+                                                  int(min(linked_coaches)),
+                                                  bogie_data[3],
+                                                  None,
+                                                  bogie_data[4])
+
+                # Rajoute un nouveau bogie à l'avant de la voiture arrière avec les mêmes données
+                self.add_bogie(Bogie(tdb.Position.FRONT, -1, int(max(linked_coaches)), bogie_data[3], None, bogie_data[4]))
+        else:
+            log.debug(f"Impossible de séparer les deus bogies. Liste de voitures invalide ({linked_coaches}).")
+
+    def merge_bogies(self, linked_coaches):
+        """Fonction permettant de fusioner deux bogies pour en faire un bogie articulé.
+        Si aucun bogie existe sur les deus voitures, un bogie articulé sera créé
+
+        Parameters
+        ----------
+        linked_coaches: `list`
+            Index des deux voitures dont les bogies doivent être fusionés.
+            elle doit contenir deux voitures consécutives. Si l'une des voitures sont suspendus, créera un nouveau bogie
+        """
+        # S'assure que la liste des voitures représente deux entiers
+        if len(linked_coaches) == 2:
+            linked_coaches = [int(min(linked_coaches)), int(max(linked_coaches))]
+
+        # Vérifie que la liste d'index est bien composé de deux index consécutif
+        if isinstance(linked_coaches, list) and len(linked_coaches) == 2 and linked_coaches[0] == linked_coaches[1] - 1:
+            # Vérifie qu'il n'y a pas déjà un bogie articulé entre ces deux voitures, sinon retourne
+            if self.get_bogies(linked_coaches):
+                return
+
+            # Récupère les deux bogies à fusioner
+            back_bogie = self.get_bogies(linked_coaches[0], tdb.Position.BACK)
+            front_bogie = self.get_bogies(linked_coaches[1], tdb.Position.FRONT)
+
+            # Si au moins l'un des bogies non articulé existe
+            if front_bogie or back_bogie:
+                # Commence par supprimer le bogie arrière si les deux bogies non articulés existe (évite le duplicata)
+                if front_bogie and back_bogie:
+                    self.remove_bogie(back_bogie[0])
+
+                # Utilise ce bogie comme base pour créer le bogie articulé
+                bogie_data = front_bogie[0].get_general_values() if front_bogie else back_bogie[0].get_general_values()
+
+                # met à jour les données du bogie récupérer pour le mettre à l'arrière de la voiture avant
+                front_bogie[0].set_general_values(None, -1, linked_coaches, bogie_data[3], None, bogie_data[4])
+            # Si les deux bogies n'existent pas (les deux voitures suspendus)
+            else:
+                # Génère un essieu porteur
+                axles_count = self.bogies[0].axles_count if self.bogies else 2
+                self.add_bogie(Bogie(None, -1, linked_coaches, axles_count, 0, 0.0))
+        else:
+            log.debug(f"Impossible de fusionner deux voitures. Liste de voitures invalide ({linked_coaches}).")
