@@ -83,13 +83,13 @@ class Bogie:
             # S'assure juste qu'il y a autant d'éléments qu'il y a d'essieux sinon ralonge/raccourcis la liste
             self.axles_power = [axles_power[i] if i < len(axles_power) else 0.0 for i in range(self.axles_count)]
         # Cas 2 : la puissance des essieux moteurs est un float
-        elif isinstance(axles_power, float) or isinstance(axles_power, int):
+        elif isinstance(axles_power, (float, int)):
             # Cas 2.1 : les essieux moteurs est une liste
             if isinstance(motorized_axles, list):
                 # Met la puissance à axles_power pour chacun des essieux moteurs et ralong/raccourcis la liste au besoin
                 self.axles_power = [bool(motorized_axles[i]) * axles_power if i < len(motorized_axles) else 0.0 for i in range(self.axles_count)]
             # Cas 2.2 : les essieux moteurs est un int (nombre d'essieux moteurs
-            elif isinstance(motorized_axles, int) or isinstance(motorized_axles, float):
+            elif isinstance(motorized_axles, (int, float)):
                 # Met la puissance pour les motorized_axles premiers essieux, sinon la met à 0
                 self.axles_power = [axles_power * (i < motorized_axles) for i in range(self.axles_count)]
             # Cas 2.3 : les essieux moteurs ne sont ni une liste de bool, ni un int
