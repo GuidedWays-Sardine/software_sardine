@@ -66,14 +66,18 @@ class Traction:
 
         Parameters
         ----------
-        bogie: `Bogie`
-            bogie à rajouter dans la liste de bogies
+        bogie: `Bogie | tuple`
+            Bogie -> bogie à rajouter dans la liste de bogies
+            tuple -> Les données du bogie qui sera créé puis rajouter (se référer à traction.bogie.Bogie(...)
+            format : (position_type, position_index, linked_railcars, axles_count, motorized_axles, axles_power)
         """
         # Ajoute le bogie si c'est bien un bogie sinon laisse un message de debug
         if isinstance(bogie, Bogie):
             self.bogies.append(bogie)
+        elif isinstance(bogie, tuple) and len(bogie) == 6:
+            self.bogies.append(Bogie(bogie[0], bogie[1], bogie[2], bogie[3], bogie[4], bogie[5]))
         else:
-            log.debug(f"bogie envoyé de mauvais type ({type(bogie)} au lieu de Bogie).")
+            log.debug(f"bogie envoyé de mauvais type ({type(bogie)} au lieu de Bogie ou tuple de taille 6).")
 
     def remove_bogie(self, bogie):
         """fonction permettant d'enlever un bogie de la liste des bogies (par élément ou par bogie)
