@@ -88,10 +88,10 @@ Une fois le train généré, Certains paramètres seront inchangeables ou utilis
 Articulé ?;Jacob ?
 Nessieux;Naxles
 Pmoteur;Pmotor
-Nplaquettes;Npads
-Npatins magnétiques;Nmagnetic brakes
+Nplaquettes (paires);Npads (pairs)
 Ndisques;Ndisks
-Nfoucault;Nfoucault
+Nmagnétique (paires);Nmagnetics (pairs)
+Nfoucault (paires);Nfoucault (pairs)
 
 
 #page_rb8

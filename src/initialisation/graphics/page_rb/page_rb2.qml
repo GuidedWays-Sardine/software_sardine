@@ -25,9 +25,9 @@ Item {
     readonly property int abc_decimals: 8
     //Par défaut on considèrera : 2 roues (et donc plaquettes) par essieux ; 4 disques par essieux ; 2 patins magnétiques ou de foucault par bogies
     //Pour changer ces valeurs merci de uniquement changer la valeur après le *
-    property int max_pad_brakes_per_axle: 2 * 1
+    property int max_pad_brakes_per_axle: 1 * 1
     property int max_disk_brakes_per_axle: 4 * 1
-    property int max_magnetic_brakes_per_axle: 2 * 1       //Identique pour le freinage de foucault
+    property int max_magnetic_brakes_per_axle: 1 * 1       //Identique pour le freinage de foucault
 
 
     //Titres des catégories (le texte des autres composants sera traduit
@@ -41,7 +41,7 @@ Item {
     readonly property int input_width: 80
     readonly property int input_height: 24
     readonly property int checkbutton_box_length : 18
-    readonly property int x_offset: 140
+    readonly property int x_offset: 150
     readonly property int y_offset: 44
 
 
@@ -523,7 +523,7 @@ Item {
             default_x: (b_floatinput.default_x + b_floatinput.default_width + c_floatinput.default_x - default_text_width) * 0.5
             default_y: b_floatinput.default_y + (b_floatinput.default_height - font_size) * 0.5 - 4
 
-            text: "V  + "
+            text: "V     +     "
             font_size: v0.font_size
 
             is_dark_grey: v0.is_dark_grey
@@ -684,7 +684,7 @@ Item {
             maximum_value: page_rb2.max_pad_brakes_per_axle * bogies_count_integerinput.value * axles_per_bogie_integerinput.value
             minimum_value: 0
 
-            title: "Nplaquettes"
+            title: "Nplaquettes (paires)"
             font_size: 12
 
             is_max_default: false
@@ -749,7 +749,7 @@ Item {
             maximum_value: -foucault_brakes_count_integerinput.value + page_rb2.max_magnetic_brakes_per_axle * bogies_count_integerinput.value * (axles_per_bogie_integerinput.value - 1)
             minimum_value: 0
 
-            title: "Npatins magnétiques"
+            title: "Nmagnétique (paires)"
             font_size: 12
 
             is_max_default: false
@@ -770,7 +770,7 @@ Item {
             maximum_value: -magnetic_brakes_count_integerinput.value + page_rb2.max_magnetic_brakes_per_axle * bogies_count_integerinput.value * (axles_per_bogie_integerinput.value - 1)
             minimum_value: 0
 
-            title: "Nfoucault"
+            title: "Nfoucault (paires)"
             font_size: 12
 
             is_max_default: false
