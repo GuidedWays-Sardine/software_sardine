@@ -1,7 +1,6 @@
 # Librairies par défaut python
 import sys
 import os
-from typing import Union
 
 
 # Librairies SARDINE
@@ -28,20 +27,20 @@ class Bogie:
 
         Parameters
         ----------
-        position_type: `Union[tdb.Position, NoneType]`
+        position_type: `tdb.Position | None`
             La position du bogie sur la voiture (Position.FRONT ; Position.MIDDLE ; Position.BACK).
             None si le bogie est articulé (la position sera déduit des index des voitures)
         position_index: `int`
             L'index de la position si le bogie est central (sinon -1)
-        linked_railcars: `Union[int, list]`
+        linked_railcars: `int | list`
             Liste des voitures auxquelles le bogie est connecté
         axles_count: `int`
             nombre d'essieux
-        motorized_axles: `Union[list, int, NoneType]`
+        motorized_axles: `list | int | None`
             list[bool] -> liste de la position des essieux moteurs (doit être de taille axles_count)
             int -> nombre d'essieux moteurs (doit être inférieur à axles_count)
             NoneType -> axles_power au format list[float] auquel cas cet argument n'est pas nécessaire
-        axles_power: `Union[list, float]`
+        axles_power: `list | float`
             list[float] -> liste de la puissance de chacun des moteurs
             float -> puissance des moteurs (tous les essieux motorisés auront cette puissance)
         """
@@ -52,20 +51,20 @@ class Bogie:
 
         Parameters
         ----------
-        position_type: `Union[tdb.Position, NoneType]`
+        position_type: `tdb.Position | None`
             La position du bogie sur la voiture (Position.FRONT ; Position.MIDDLE ; Position.BACK).
             None si le bogie est articulé (la position sera déduit des index des voitures)
         position_index: `int`
             L'index de la position si le bogie est central (sinon -1)
-        linked_railcars: `Union[int, list]`
+        linked_railcars: `int | list`
             Liste des voitures auxquelles le bogie est connecté
         axles_count: `int`
             nombre d'essieux
-        motorized_axles: `Union[list, int, NoneType]`
+        motorized_axles: `list | int | None`
             list[bool] -> liste de la position des essieux moteurs (doit être de taille axles_count)
             int -> nombre d'essieux moteurs (doit être inférieur à axles_count)
             NoneType -> axles_power au format list[float] auquel cas cet argument n'est pas nécessaire
-        axles_power: `Union[list, float]`
+        axles_power: `list | float`
             list[float] -> liste de la puissance de chacun des moteurs
             float -> puissance des moteurs (tous les essieux motorisés auront cette puissance)
         """

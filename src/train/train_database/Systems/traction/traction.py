@@ -1,7 +1,6 @@
 # Librairies par défaut
 import sys
 import os
-from typing import Union
 
 
 # Librairies SARDINE
@@ -26,7 +25,7 @@ class Traction:
 
         Parameters
         ----------
-        position_index: `Union[int, list]`
+        position_index: `int | list`
             Les voitures auxquelles le bogie est connecté (int ou liste de int) doit aller de 0 à Nvoitures - 1
         position_type: `Position`
             La position des bogies dans la voiture (Position.FRONT ; Position.MIDDLE ; Position.BACK) si cela est vital
@@ -84,7 +83,7 @@ class Traction:
 
         Parameters
         ----------
-        bogie: `Union(Bogie, int)`
+        bogie: `Bogie | int`
             Bogie -> bogie à enlever (à récupérer avec la méthodes get_bogies()[...]
             int -> position dans la liste de bogies du bogie (Attention! Les bogies ne sont pas forcément dans l'ordre).
         """

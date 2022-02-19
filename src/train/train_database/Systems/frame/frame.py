@@ -1,7 +1,6 @@
 # Librairies par défaut
 import os
 import sys
-from typing import Union
 
 
 # Librairies SARDINE
@@ -30,7 +29,7 @@ class Frame:
 
         Returns
         -------
-        railcar: `Union[Railcar, NoneType]`
+        railcar: `Railcar | None`
             La voiture si elle existe, sinon None
         """
         if isinstance(index, int) and -len(self.railcars) <= index < len(self.railcars):

@@ -1,7 +1,6 @@
 # Librairies par défaut
 import sys
 import os
-from typing import Union
 
 
 # Librairies graphiques
@@ -164,7 +163,7 @@ class SettingsDictionary(dict):
 
         Returns
         -------
-        converted_data : `Union[bool, int, float, None, str]`
+        converted_data : `bool | int | float | str | None`
             donnée convertie (string si aucun moyen de le convertir)
         """
         # Regarde s'il peut être convertir en bool?
