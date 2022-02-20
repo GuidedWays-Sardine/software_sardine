@@ -226,17 +226,17 @@ class ComplexPopup:
             if not front_bogie_data:
                 self.train_database.systems.traction.remove_bogie(front_bogie[0])
             elif front_bogie_data and front_bogie:
-                front_bogie[0].set_general_values(tdb.Position.FRONT, -1, railcar_index,
+                front_bogie[0].set_general_values(tdb.Position.FRONT, railcar_index,
                                                   front_bogie_data[0][0], front_bogie_data[1][0], front_bogie_data[2][0])
             elif front_bogie_data and not front_bogie:
-                self.train_database.systems.traction.add_bogie((tdb.Position.FRONT, -1, railcar_index,
+                self.train_database.systems.traction.add_bogie((tdb.Position.FRONT, railcar_index,
                                                                 front_bogie_data[0][0], front_bogie_data[1][0], front_bogie_data[2][0]))
         # Si les données sont les paramètres d'un bogie articulé
         else:
             # Crée un bogie articulé, le récupère et mets à jour ses données
             self.train_database.systems.traction.merge_bogies([railcar_index - 1, railcar_index])
             front_bogie = self.train_database.systems.traction.get_bogies([railcar_index - 1, railcar_index])
-            front_bogie[0].set_general_values(None, -1, [railcar_index - 1, railcar_index],
+            front_bogie[0].set_general_values(None, [railcar_index - 1, railcar_index],
                                               front_bogie_data[0][0], front_bogie_data[1][0], front_bogie_data[2][0])
 
         # S'occupe des bogies centraux
@@ -248,12 +248,12 @@ class ComplexPopup:
         if middle_bogies_data:
             # Commence par modifier les données des bogies déjà existants
             for r_i in range(min(len(middle_bogies_data), len(middle_bogies))):
-                middle_bogies[r_i].set_general_values(tdb.Position.MIDDLE, r_i, railcar_index,
+                middle_bogies[r_i].set_general_values(tdb.Position.MIDDLE, railcar_index,
                                                       middle_bogies_data[0][r_i], middle_bogies_data[1][r_i], middle_bogies_data[2][r_i])
 
             # Puis rajoute les bogies nécessaires (boucle sauté si aucun bogie à rajouter)
             for r_i in range(len(middle_bogies), len(middle_bogies_data[0])):
-                self.train_database.systems.traction.add_bogie((tdb.Position.MIDDLE, r_i, railcar_index,
+                self.train_database.systems.traction.add_bogie((tdb.Position.MIDDLE, railcar_index,
                                                                 middle_bogies_data[0][r_i], middle_bogies_data[1][r_i], middle_bogies_data[2][r_i]))
 
         # Si trop de bogies centraux existent, les suppriment
@@ -273,17 +273,17 @@ class ComplexPopup:
             if not back_bogie_data:
                 self.train_database.systems.traction.remove_bogie(back_bogie[0])
             elif back_bogie_data and back_bogie:
-                back_bogie[0].set_general_values(tdb.Position.BACK, -1, railcar_index,
+                back_bogie[0].set_general_values(tdb.Position.BACK, railcar_index,
                                                  back_bogie_data[0][0], back_bogie_data[1][0], back_bogie_data[2][0])
             elif back_bogie_data and not back_bogie:
-                self.train_database.systems.traction.add_bogie((tdb.Position.BACK, -1, railcar_index,
+                self.train_database.systems.traction.add_bogie((tdb.Position.BACK, railcar_index,
                                                                 back_bogie_data[0][0], back_bogie_data[1][0], back_bogie_data[2][0]))
         # Si les données sont les paramètres d'un bogie articulé
         else:
             # Crée un bogie articulé, le récupère et mets à jour ses données
             self.train_database.systems.traction.merge_bogies([railcar_index, railcar_index + 1])
             back_bogie = self.train_database.systems.traction.get_bogies([railcar_index, railcar_index + 1])
-            back_bogie[0].set_general_values(None, -1, [railcar_index, railcar_index + 1],
+            back_bogie[0].set_general_values(None, [railcar_index, railcar_index + 1],
                                              back_bogie_data[0][0], back_bogie_data[1][0], back_bogie_data[2][0])
 
     def update_popup(self, index):
@@ -304,9 +304,9 @@ class ComplexPopup:
         if front_bogie:
             # Récupère toutes les données du bogie avant et les envoient au bon format au bogie_parameters avant
             front_bogie_data = front_bogie[0].get_general_values()
-            self.win.findChild(QObject, "front_bogie").change_values([front_bogie_data[3]],
-                                                                     [[bool(axles) for axles in front_bogie_data[4]]],
-                                                                     [front_bogie_data[4]],
+            self.win.findChild(QObject, "front_bogie").change_values([front_bogie_data[2]],
+                                                                     [[bool(axles) for axles in front_bogie_data[3]]],
+                                                                     [front_bogie_data[3]],
                                                                      [[0, 0, 0, 0]],   # TODO: mettre à jour (quantités systèmes de freinages)
                                                                      front_bogie[0].is_jacob_bogie())
         else:
@@ -318,9 +318,9 @@ class ComplexPopup:
         if middle_bogies:
             # Récupère les données de tous les bogies centraux
             middle_bogies_datas = [bogie.get_general_values() for bogie in middle_bogies]
-            self.win.findChild(QObject, "middle_bogie").change_values([bogie[3] for bogie in middle_bogies_datas],
-                                                                      [[bool(axles) for axles in bogie[4]] for bogie in middle_bogies_datas],
-                                                                      [bogie[4] for bogie in middle_bogies_datas],
+            self.win.findChild(QObject, "middle_bogie").change_values([bogie[2] for bogie in middle_bogies_datas],
+                                                                      [[bool(axles) for axles in bogie[3]] for bogie in middle_bogies_datas],
+                                                                      [bogie[3] for bogie in middle_bogies_datas],
                                                                       [[0, 0, 0, 0] * len(middle_bogies)], # TODO : mettre à jour (quantités des systèmes de freinages)
                                                                       False)
         else:
@@ -332,9 +332,9 @@ class ComplexPopup:
         if back_bogie:
             # Récupère toutes les données du bogie avant et les envoient au bon format au bogie_parameters avant
             back_bogie_data = back_bogie[0].get_general_values()
-            self.win.findChild(QObject, "back_bogie").change_values([back_bogie_data[3]],
-                                                                    [[bool(axles) for axles in back_bogie_data[4]]],
-                                                                    [back_bogie_data[4]],
+            self.win.findChild(QObject, "back_bogie").change_values([back_bogie_data[2]],
+                                                                    [[bool(axles) for axles in back_bogie_data[3]]],
+                                                                    [back_bogie_data[3]],
                                                                     [[0, 0, 0, 0]],   # TODO: mettre à jour (quantités systèmes de freinages)
                                                                     back_bogie[0].is_jacob_bogie())
         else:

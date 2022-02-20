@@ -188,7 +188,6 @@ class Systems:
             # si le bogie avant n'est pas articulé (auquel cas il a été ajouté) le rajoute
             if not previous_articulated:
                 self.traction.add_bogie(traction.Bogie(position_type=tdb.Position.FRONT,
-                                                       position_index=-1,
                                                        linked_railcars=car_index,
                                                        axles_count=train_data["axles_per_bogie"],
                                                        motorized_axles=front_axles_motorized_count,
@@ -197,7 +196,6 @@ class Systems:
             # Ajoute les bogies centraux
             for c_b in range(central_bogies_count):
                 self.traction.add_bogie(traction.Bogie(position_type=tdb.Position.MIDDLE,
-                                                       position_index=c_b,
                                                        linked_railcars=car_index,
                                                        axles_count=train_data["axles_per_bogie"],
                                                        motorized_axles=central_axles_motorized_count[c_b],
@@ -205,7 +203,6 @@ class Systems:
 
             # Ajoute le bogie arrière
             self.traction.add_bogie(traction.Bogie(position_type=tdb.Position.BACK if not next_articulated else None,
-                                                   position_index=-1,
                                                    linked_railcars=[car_index, car_index + 1] if next_articulated else car_index,
                                                    axles_count=train_data["axles_per_bogie"],
                                                    motorized_axles=back_axles_motorized_count,

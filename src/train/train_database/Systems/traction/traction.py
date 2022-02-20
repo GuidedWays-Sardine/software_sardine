@@ -68,13 +68,13 @@ class Traction:
         bogie: `Bogie | tuple`
             Bogie -> bogie à rajouter dans la liste de bogies
             tuple -> Les données du bogie qui sera créé puis rajouter (se référer à traction.bogie.Bogie(...)
-            format : (position_type, position_index, linked_railcars, axles_count, motorized_axles, axles_power)
+            format : (position_type, linked_railcars, axles_count, motorized_axles, axles_power)
         """
         # Ajoute le bogie si c'est bien un bogie sinon laisse un message de debug
         if isinstance(bogie, Bogie):
             self.bogies.append(bogie)
-        elif isinstance(bogie, tuple) and len(bogie) == 6:
-            self.bogies.append(Bogie(bogie[0], bogie[1], bogie[2], bogie[3], bogie[4], bogie[5]))
+        elif isinstance(bogie, tuple) and len(bogie) == 5:
+            self.bogies.append(Bogie(bogie[0], bogie[1], bogie[2], bogie[3], bogie[4]))
         else:
             log.debug(f"bogie envoyé de mauvais type ({type(bogie)} au lieu de Bogie ou tuple de taille 6).")
 
@@ -117,15 +117,10 @@ class Traction:
                 bogie_data = jacob_bogie[0].get_general_values()
 
                 # met à jour les données du bogie récupérer pour le mettre à l'arrière de la voiture avant
-                jacob_bogie[0].set_general_values(tdb.Position.BACK,
-                                                  -1,
-                                                  int(min(linked_coaches)),
-                                                  bogie_data[3],
-                                                  None,
-                                                  bogie_data[4])
+                jacob_bogie[0].set_general_values(tdb.Position.BACK, int(min(linked_coaches)), bogie_data[3], None, bogie_data[4])
 
                 # Rajoute un nouveau bogie à l'avant de la voiture arrière avec les mêmes données
-                self.add_bogie(Bogie(tdb.Position.FRONT, -1, int(max(linked_coaches)), bogie_data[3], None, bogie_data[4]))
+                self.add_bogie(Bogie(tdb.Position.FRONT, int(max(linked_coaches)), bogie_data[3], None, bogie_data[4]))
         else:
             log.debug(f"Impossible de séparer les deus bogies. Liste de voitures invalide ({linked_coaches}).")
 
@@ -163,11 +158,11 @@ class Traction:
                 bogie_data = front_bogie[0].get_general_values() if front_bogie else back_bogie[0].get_general_values()
 
                 # met à jour les données du bogie récupérer pour le mettre à l'arrière de la voiture avant
-                front_bogie[0].set_general_values(None, -1, linked_coaches, bogie_data[3], None, bogie_data[4])
+                front_bogie[0].set_general_values(None, linked_coaches, bogie_data[3], None, bogie_data[4])
             # Si les deux bogies n'existent pas (les deux voitures suspendus)
             else:
                 # Génère un essieu porteur
                 axles_count = self.bogies[0].axles_count if self.bogies else 2
-                self.add_bogie(Bogie(None, -1, linked_coaches, axles_count, 0, 0.0))
+                self.add_bogie(Bogie(None, linked_coaches, axles_count, 0, 0.0))
         else:
             log.debug(f"Impossible de fusionner deux voitures. Liste de voitures invalide ({linked_coaches}).")

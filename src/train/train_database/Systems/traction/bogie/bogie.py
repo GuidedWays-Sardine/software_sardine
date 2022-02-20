@@ -12,17 +12,16 @@ import src.train.train_database.database as tdb
 class Bogie:
     """classe contenant toutes les informations sur le bogie"""
     # Informations générales
-    position_type = None
-    position_index = -1     # Uniquement pour les bogies centraux! Les bogies extérieurs n'ont pas d'index
-    axles_count = 1
     linked_railcars = None  # [car_index] ou [car_index, car_index - 1] (les deux index doivent être concurents)
+    position_type = None
+    axles_count = 1
 
     # Informations sur la motorisation
     axles_power = None      # [Pmoteur1, ..., PmoteurN] -> Puissance du moteur, sinon 0 si aucun moteur
     activated = None        # [bool, ...] -> True si le moteur est allumé, False sinon
     activable = None        # [bool, ...] -> True si le moteur est activable, False sinon (si panne)
 
-    def __init__(self, position_type, position_index, linked_railcars, axles_count, motorized_axles, axles_power):
+    def __init__(self, position_type, linked_railcars, axles_count, motorized_axles, axles_power):
         """Fonction permettant d'initialiser un bogie
 
         Parameters
@@ -30,8 +29,6 @@ class Bogie:
         position_type: `tdb.Position | None`
             La position du bogie sur la voiture (Position.FRONT ; Position.MIDDLE ; Position.BACK).
             None si le bogie est articulé (la position sera déduit des index des voitures)
-        position_index: `int`
-            L'index de la position si le bogie est central (sinon -1)
         linked_railcars: `int | list`
             Liste des voitures auxquelles le bogie est connecté
         axles_count: `int`
@@ -44,9 +41,9 @@ class Bogie:
             list[float] -> liste de la puissance de chacun des moteurs
             float -> puissance des moteurs (tous les essieux motorisés auront cette puissance)
         """
-        self.set_general_values(position_type, position_index, linked_railcars, axles_count, motorized_axles, axles_power)
+        self.set_general_values(position_type, linked_railcars, axles_count, motorized_axles, axles_power)
 
-    def set_general_values(self, position_type, position_index, linked_railcars, axles_count, motorized_axles, axles_power):
+    def set_general_values(self, position_type, linked_railcars, axles_count, motorized_axles, axles_power):
         """Fonction permettant de changer les valeurs d'un bogie
 
         Parameters
@@ -54,8 +51,6 @@ class Bogie:
         position_type: `tdb.Position | None`
             La position du bogie sur la voiture (Position.FRONT ; Position.MIDDLE ; Position.BACK).
             None si le bogie est articulé (la position sera déduit des index des voitures)
-        position_index: `int`
-            L'index de la position si le bogie est central (sinon -1)
         linked_railcars: `int | list`
             Liste des voitures auxquelles le bogie est connecté
         axles_count: `int`
@@ -73,7 +68,6 @@ class Bogie:
             self.linked_railcars = linked_railcars
         elif isinstance(linked_railcars, int):
             self.linked_railcars = [linked_railcars]
-        self.position_index = position_index
         self.position_type = position_type if len(self.linked_railcars) == 1 else None
         self.axles_count = axles_count if axles_count >= 1 else 1
 
@@ -111,9 +105,9 @@ class Bogie:
         Returns
         -------
         qml_values: `list`
-            (position_type, position_index, [linked_railcars], axles_count, axles_power)
+            (position_type, [linked_railcars], axles_count, axles_power)
         """
-        return self.position_type, self.position_index, self.linked_railcars, self.axles_count, self.axles_power
+        return self.position_type, self.linked_railcars, self.axles_count, self.axles_power
 
     def get_motorized_axles_count(self):
         """Fonction retournant le nombre d'essieux moteurs
