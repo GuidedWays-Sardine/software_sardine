@@ -125,7 +125,7 @@ class Braking:
                 return [b_s for b_s in self.get_brake_list(brake_type) if b_s.bogie_linked is bogie]
             # Sinon rappelle la fonction récursivement avec chacun des types de freinage
             else:
-                return [self.get_bogie_brake_list(b_t) for b_t in [Pad, Disk, Magnetic, Foucault]]
+                return [self.get_bogie_brake_list(bogie, b_t) for b_t in [Pad, Disk, Magnetic, Foucault]]
         except TypeError as error:
             log.debug(f"Erreur dans le type de système de freinage demandé ({brake_type})", exception=error)
             return []
