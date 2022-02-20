@@ -43,11 +43,17 @@ class Frame:
 
         Parameters
         ----------
-        railcar: `Railcar`
-            voiture à rajouter dans la liste de bogies
+        railcar: `Railcar | list | tuple`
+            Railcar -> voiture à rajouter dans la liste de bogies
+            tuple/list -> Les données de la voiture qui sera créé puis rajouter (se référer à frame.railcar.Railcar(...)
+            format : (mission_type, position_type, position_index, levels, doors, Mtare, Mfull, length,
+                      ABCempty, multiply_mass_empty, ABCfull, multiply_mass_full)
         """
         if isinstance(railcar, Railcar):
             self.railcars.append(railcar)
+        if isinstance(railcar, (tuple, list)) and len(railcar) == 12:
+            self.railcars.append(Railcar(railcar[0], railcar[1], railcar[2], railcar[3], railcar[4], railcar[5],
+                                         railcar[6], railcar[7], railcar[8], railcar[9], railcar[10], railcar[11]))
         else:
             log.debug(f"voiture envoyée de mauvais type ({type(railcar)} au lieu de Railcar).")
 
