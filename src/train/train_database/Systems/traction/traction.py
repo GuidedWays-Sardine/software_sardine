@@ -79,25 +79,20 @@ class Traction:
             log.debug(f"bogie envoyé de mauvais type ({type(bogie)} au lieu de Bogie ou tuple de taille 6).")
 
     def remove_bogie(self, bogie):
-        """fonction permettant d'enlever un bogie de la liste des bogies (par élément ou par bogie)
+        """fonction permettant d'enlever un bogie de la liste des bogies (par bogie)
 
         Parameters
         ----------
-        bogie: `Bogie | int`
+        bogie: `Bogie`
             Bogie -> bogie à enlever (à récupérer avec la méthodes get_bogies()[...]
-            int -> position dans la liste de bogies du bogie (Attention! Les bogies ne sont pas forcément dans l'ordre).
         """
         # Enlève le bogie envoyé en s'assurant qu'il existe bien encore dans la liste
         if isinstance(bogie, Bogie) and bogie in self.bogies:
             self.bogies.remove(bogie)
-        elif isinstance(bogie, int) and -len(self.bogies) <= bogie < len(self.bogies):
-            self.bogies.pop(bogie)
         elif isinstance(bogie, Bogie) and bogie not in self.bogies:
             log.debug(f"Impossible de supprimer le bogie {bogie} qui n'est pas dans la liste.")
-        elif isinstance(bogie, int) and (bogie >= len(self.bogies) or bogie < -len(self.bogies)):
-            log.debug(f"Impossible de supprimer le bogie {bogie}. Le train a seulement {len(self.bogies)} bogies.")
         else:
-            log.debug(f"{type(bogie)} n'est pas un bogie valide. Il doit être de type Bogie ou int.")
+            log.debug(f"{type(bogie)} n'est pas un bogie valide. Il doit être de type Bogie.")
 
     def split_bogies(self, linked_coaches):
         """Fonction permettant de diviser un bogie jacobien en deux bogies.
