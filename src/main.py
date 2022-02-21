@@ -1,7 +1,6 @@
 # Librairies par défaut
 import sys
 import os
-import traceback
 
 
 # Librairies graphiques
@@ -16,20 +15,20 @@ import src.initialisation.initialisation_window as ini
 import src.simulation as sim
 
 
-VERSION = "1.1.0"
-INITIAL_LOGGING = log.Level.DEBUG
+INITIAL_LOG_LEVEL = log.Level.DEBUG
+SAVE = True
 
 
 def main():
+    # Lance le registre selon les constantes définit en amont
+    log.initialise(log_level=INITIAL_LOG_LEVEL, save=SAVE)
+    log.info(f"Lancement de l'application d'initialisation du simulateur.\n\n\n")
+    application = QApplication(sys.argv)        # Une seule QApplication peut être créée durant toute la simulation
 
-    # Lance le fichier de log en mode warning pour récupérer les warnings et erreurs critiques
-    log.initialise(PROJECT_DIR + "log\\", VERSION, INITIAL_LOGGING)
-    log.info("Lancement de l'application d'initialisation du simulateur\n\n\n")
-    application = QApplication(sys.argv)
-
-    parameters = None
+    # Application d'initialisation : Permet de rentrer tous les paramètres de simulation de façon simple
+    parameters = {}
     try:
-        # lance le programme d'initialisation et vérifie qu'il n'y a pas d'erreurs au lancement
+        # Initialise et lance l'application d'initialisation.
         initialisation = ini.InitialisationWindow(application)
 
         # Si le bouton lancer a été cliqué, récupère les informations, sinon sort
@@ -37,53 +36,48 @@ def main():
             parameters = initialisation.get_values()
             del initialisation
         else:
-            log.change_log_prefix()
-            log.info("l\'application d'initialisation a été fermée sans donner suite.\n")
+            log.add_empty_lines()
+            log.info(f"l'application d'initialisation a été fermée sans donner suite.",
+                     prefix="Application d'initialisation")
             exit(0)
     except Exception as error:
-        # Récupère une potentielle erreur fatale et la charge
-        log.critical("Erreur fatale lors du chargement de l'application d'initialisation simulateur\n\t\t" +
-                     "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                     "Avec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
-                     "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
-                     prefix="")
+        # Récupère une potentielle erreur ratée, la laisse dans le registre et arrête l'application
+        log.critical(f"Erreur fatale lors du chargement de l'application d'initialisation simulateur.",
+                     exception=error, prefix="Application d'initialisation")
         exit(-1)
 
     # Change le niveau de log à celui précisé par l'utilisateur et enlève tout préfixe
     log.change_log_prefix()
-    log.info("Lancement du simulateur\n\n\n")
-    try:
-        log.change_log_level(parameters["log_level"])
-    except KeyError:
-        log.warning("Aucun paramêtre \"log_level\" récupéré du programme d'initialisation" +
-                    "\n\t\tNiveau par défaut gardé à suffisant (log.WARNING)\n")
+    log.add_empty_lines()
+    log.info(f"Lancement du simulateur.\n\n\n")
+    log.change_log_level(parameters.get_value("log_level", INITIAL_LOG_LEVEL))
 
-    # Lance le simulateur et en ressort que si une erreur fatale est détecté ou que le simulateur est fermé
+    # Application de simulation : gère les différents modules de simulation
     try:
         # Initialise la simulation
         simulation = sim.Simulation(application, parameters)
     except Exception as error:
-        # Récupère une potentielle erreur lors de l'initialisation de la simulation
-        log.critical("Erreur fatale lors de l'initialisation du simulateur\n\t\t" +
-                     "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                     "Avec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
-                     "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
-                     prefix="")
+        # Récupère une potentielle erreur lors de l'initialisation, la laisse dans le registre et arrête l'application
+        log.critical(f"Erreur fatale lors de l'initialisation du simulateur.\n",
+                     exception=error, prefix="Initialisation Simulation")
         exit(-1)
-    else :
+    else:
         crash = False
         try:
-            # Lance la simulation
+            # Lance la simulation (reste dans la fonction jusqu'à un crash où l'arrêt demandé de la simulation)
             simulation.run()
         except Exception as error:
-            log.critical("Erreur fatale lors du fonctionnement du simulateur\n\t\t" +
-                         "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                         "Avec comme message d'erreur : " + str(error.args) + "\n\n\t\t" +
-                         "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n",
-                         prefix="")
+            log.critical(f"Erreur fatale lors du fonctionnement du simulateur.",
+                         exception=error, prefix="Simulation")
             crash = True
         finally:
-            simulation.stop()
+            try:
+                # Arrête la simulation de façon sécurisé
+                simulation.stop()
+            except Exception as error:
+                log.critical(f"Erreur fatale lors de la fermeture du simulateur.",
+                             exception=error, prefix="Fermeture simulation")
+                crash = True
             exit(0 if not crash else -1)
 
 

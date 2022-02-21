@@ -1,6 +1,7 @@
 # Librairies par défaut python
 import sys
 import os
+import time
 from enum import Enum
 
 
@@ -28,14 +29,46 @@ class MissionType(Enum):
     FREIGHT = "Freight"
 
 
-class TrainDatabase:
-    # Données du train
+mission_getter = {i: key for i, key in enumerate(MissionType)}  # Permet d'obtenir la mission avec l'index de celle-ci
 
+
+class TrainDatabase:
+    """base de données train"""
+
+    # Différents éléments nécessaires pour le train
     dynamic = None
     static = None
     systems = None
 
     def __init__(self, train_data):
+        """Fonction d'initialisation de la abse de données train
+
+        Parameters
+        ----------
+        train_data: `sd.SettingsDictionary`
+            Dictionaire de paramètres train
+        """
+        initial_time = time.perf_counter()
+        log.info("Initialisation Base de Données train", prefix="Initialisation BDD train")
+
+        # Initialise chacun des types de données (dynamiques, statiques, et systèmes)
         self.dynamic = dynamic.Dynamic(train_data)
         self.static = static.Static(train_data)
         self.systems = systems.Systems(train_data)
+
+        # Récupère la quantité de chacun des systèmes du train
+        railcar_count = len(self.systems.frame.railcars)
+        bogies_count = len(self.systems.traction.bogies)
+        pad_brakes_count = len(self.systems.braking.pad_brakes)
+        disk_brakes_count = len(self.systems.braking.disk_brakes)
+        magnetic_brakes_count = len(self.systems.braking.magnetic_brakes)
+        foucault_brakes_count = len(self.systems.braking.foucault_brakes)
+        brakes_count = pad_brakes_count + disk_brakes_count + magnetic_brakes_count + foucault_brakes_count
+
+        # Indique le temps de chargement de la BDD
+        log.info(f"Base de Données train initialisée en " +
+                 f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\t" +
+                 f"<{railcar_count} voitures ; {bogies_count} bogies ; " +
+                 f"{brakes_count} éléments de freinage ({pad_brakes_count} semelles, {disk_brakes_count} disques, {magnetic_brakes_count} magnétiques, {foucault_brakes_count} foucault) ; " +
+                 f">",
+                 prefix="Initialisation BDD train")

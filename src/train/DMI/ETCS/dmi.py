@@ -1,7 +1,6 @@
 # Librairies par défaut
 import os
 import sys
-import traceback
 import time
 
 
@@ -37,18 +36,18 @@ class DriverMachineInterface:
             Simulation contenant toutes les bases de données et modules de la simulation initialisée
         """
         # Indique le début du chargement de l'initialisation du dmi
-        initial_time = time.time()
+        initial_time = time.perf_counter()
         log.info("Début du chargement du Driver Machine Interface.\n\n",
                  prefix="Initialisation DMI ETCS")
 
         # crée un engine pour le chargement de la fenêtre du DMI et essaye de charger le DMI
         self.engine = QQmlApplicationEngine()
-        self.engine.load(PROJECT_DIR + "src\\train\\DMI\\ETCS\\dmi.qml")
+        self.engine.load(f"{PROJECT_DIR}src\\train\\DMI\\ETCS\\dmi.qml")
 
         # Vérifie si le fichier qml de la fenêtre a bien été ouvert et compris, sinon jête une erreur
-        if not self.engine.rootObjects() and not os.path.isfile(PROJECT_DIR + "src\\train\\DMI\\ETCS\\dmi.qml"):
+        if not self.engine.rootObjects() and not os.path.isfile(f"{PROJECT_DIR}src\\train\\DMI\\ETCS\\dmi.qml"):
             raise FileNotFoundError("Le fichier .qml pour la fenêtre du DMI ETCS n\'a pas été trouvé.")
-        elif not self.engine.rootObjects() and os.path.isfile(PROJECT_DIR + "src\\train\\DMI\\ETCS\\dmi.qml"):
+        elif not self.engine.rootObjects() and os.path.isfile(f"{PROJECT_DIR}src\\train\\DMI\\ETCS\\dmi.qml"):
             raise SyntaxError("Le fichier .qml pour la fenêtre du DMI ETCS contient des erreurs.")
 
         # Si le fichier qml a été compris, récupère la fenêtre et la cache le temps de charger le reste du module
@@ -57,8 +56,8 @@ class DriverMachineInterface:
         self.dmi_window.visibilityChanged.connect(lambda: simulation.app.quit())
 
         # Récupère la liste des dmis disponibles dans la norme ETCS (dossier ETCS + liste de ceux dans le dossier STM)
-        dmi_list = [(PROJECT_DIR + "src\\train\\DMI\\ETCS\\STM\\" + dmi) for dmi in os.listdir(PROJECT_DIR + "src\\train\\DMI\\ETCS\\STM")]
-        dmi_list.insert(0, PROJECT_DIR + "src\\train\\DMI\\ETCS\\ETCS")
+        dmi_list = [f"{PROJECT_DIR}src\\train\\DMI\\ETCS\\STM\\{dmi}" for dmi in os.listdir(f"{PROJECT_DIR}src\\train\\DMI\\ETCS\\STM")]
+        dmi_list.insert(0, f"{PROJECT_DIR}src\\train\\DMI\\ETCS\\ETCS")
         self.active_dmi = dmi_list[0].split("DMI\\ETCS\\")[1].replace("\\", ".")
 
         # Pour chacun des sous-dmi à charger
@@ -69,17 +68,17 @@ class DriverMachineInterface:
 
             # Dans le cas où il existe des sections sans dossiers graphiques, les indique toutes dans le registre
             if {"A", "B", "C", "D", "E", "F", "G"}.difference(os.listdir(dmi + "\\graphics")):
-                log.warning("Le DMI " + dmi_key + " n'a pas les sections : " +
+                log.warning(f"Le DMI {dmi_key} n'a pas les sections : " +
                             " ; ".join(sorted({"A", "B", "C", "D", "E", "F", "G"}.difference(os.listdir(dmi + "\\graphics")))) + ".\n")
 
             # Pour chaque sections graphiques du DMI ayant un dossier associé (normalement A à G)
             for folder in (f for f in ["A", "B", "C", "D", "E", "F", "G"] if f in os.listdir(dmi + "\\graphics")):
                 # Change le préfix des logs pour indiquer quelle section est en train d'être chargée
-                log.change_log_prefix("Initialisation DMI ETCS (" + dmi_key + ") ; section " + folder)
+                log.change_log_prefix(f"Initialisation DMI ETCS ({dmi_key}) ; section {folder}")
 
                 # Regarde pour chaque fichier graphique contenu dans le dossier de la section
-                for file in (f.replace(".qml", "") for f in os.listdir(PROJECT_DIR + "src\\train\\DMI\\ETCS\\ETCS\\graphics\\" + folder) if f.endswith(".qml")):
-                    page_initial_time = time.time()
+                for file in (f.replace(".qml", "") for f in os.listdir(f"{PROJECT_DIR}src\\train\\DMI\\ETCS\\ETCS\\graphics\\{folder}") if f.endswith(".qml")):
+                    page_initial_time = time.perf_counter()
 
                     # Essaye de charger la partie graphique de la page
                     if self.initialise_section(dmi_key, folder, file):
@@ -96,7 +95,7 @@ class DriverMachineInterface:
             # Tente de récuper l'index et si celui-ci n'a pas été trouvé, jette une erreur et crash le programme
             screen_index = simulation.parameters[dmi_screen_data + "screen_index"]
         except KeyError:
-            raise KeyError("Pas de valeurs : " + dmi_screen_data + "\n\t\tL'écran DMI central n'a pas pu être chargé.\n")
+            raise KeyError(f"Pas de valeurs : {dmi_screen_data}. L'écran DMI central n'a pas pu être chargé.\n")
         else:
             # Si l'index de l'écran n'est pas bon, jette une erreur, sinon récupère ses dimensions
             if screen_index == 0 or screen_index > QDesktopWidget().screenCount():
@@ -116,8 +115,8 @@ class DriverMachineInterface:
 
         # Indique le temps de chargement de l'application
         log.change_log_prefix("Initialisation DMI ETCS")
-        log.info("Application du DMI chargée en " +
-                 str("{:.2f}".format((time.time() - initial_time)*1000)) + " millisecondes.\n\n")
+        log.info(f"Application du DMI chargée en " +
+                 f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\n")
 
     def initialise_section(self, dmi, section, file):
         """Fonction permettant d'initialiser un fichier graphique en fonction du dmi auquel il appartient, de la section
@@ -138,9 +137,9 @@ class DriverMachineInterface:
             est-ce que la partie graphique de la page a été chargée ?
         """
         # Tente de charger le fichier graphique à partir du dmi, de la section et du fichier envoyé
-        log.info("tentative de chargement du fichier : " + file + ".qml.\n")
+        log.info(f"tentative de chargement du fichier : {file}.qml.\n")
         engine = QQmlApplicationEngine()
-        engine.load(PROJECT_DIR + "src\\train\\DMI\\ETCS\\" + dmi.replace(".", "\\") + "\\graphics\\" + section + "\\" + file + ".qml")
+        engine.load(f"{PROJECT_DIR}src\\train\\DMI\\ETCS\\" + dmi.replace('.', '\\') + f"\\graphics\\{section}\\{file}.qml")
 
         # Si la page a été correctement chargée
         if engine.rootObjects():
@@ -154,7 +153,7 @@ class DriverMachineInterface:
             return True
         else:
             # Dans le cas où la page n'est pas valide laisse un warning et retourne False
-            log.warning("Le fichier : " + file + ".qml contient des erreurs.\n\n")
+            log.warning(f"Le fichier : {file}.qml contient des erreurs.\n\n")
             return False
 
     def initialise_signals(self, dmi, section, file, page_initial_time):
@@ -179,31 +178,27 @@ class DriverMachineInterface:
         """
         # Vérifie si la page a des signals handlers associés (en recherchant un ficher .py associé)
         fully_loaded = False
-        if os.path.isfile(PROJECT_DIR + "src\\train\\DMI\\ETCS\\" + dmi.replace(".", "\\") + "\\signals\\" + section + "\\" + file + ".py"):
+        if os.path.isfile(f"{PROJECT_DIR}src\\train\\DMI\\ETCS\\" + dmi.replace(".", "\\") + f"\\signals\\{section}\\{file}.py"):
             # Si c'est le cas, initialise les signals handlers et le stock
             try:
                 # Import localement le fichier de la page et appelle le constructeur de la page pour initialiser les signaux
-                exec("import src.train.DMI.ETCS." + dmi + ".signals." + section + "." + file + " as " + file + "\n" +
-                     "self.pages[\"" + dmi + "\"][\"" + section + "\"][\"" + file + "\"] = " +
-                     file + "." + file + "(self.pages[\"" + dmi + "\"][\"" + section + "\"][\"" + file + "\"], section, file)")
+                exec(f"import src.train.DMI.ETCS.{dmi}.signals.{section}.{file} as {file}\n"
+                     f"self.pages[\"{dmi}\"][\"{section}\"][\"{file}\"] = {file}.{file}(self.pages[\"{dmi}\"][\"{section}\"][\"{file}\"], section, file)")
             except Exception as error:
                 # Permet de rattraper une erreur si le code est incorrect
-                log.warning("Erreur lors du chargement des signaux de la page : " + file + ".\n\t\t" +
-                            "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                            "Avec comme message d\'erreur : " + str(error.args) +
-                            "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
+                log.warning(f"Erreur lors du chargement des signaux de la page : {file}.\n",
+                            exception=error)
             else:
                 # Si la page a sa partie logique de chargée, l'indique et vérifie l'existence de toutes les fonctions nécessaires
                 fully_loaded = True
                 self.are_page_functions_there(self.pages[dmi][section][file])
         else:
             # Sinon pas de signals handlers associé, le précise dans les logs
-            log.warning("La page " + file + " n\'a aucun fichier signals associé." +
-                        "La page sera visible mais ne sera pas fonctionnelle.\n")
+            log.warning(f"La page {file} n'a aucun fichier signals associé. La page sera visible mais ne sera pas fonctionnelle.\n")
 
         # Indique le temps de chargement partiel (graphique uniquement) ou complet (graphique et logique) de la page
-        log.info("Page : " + file + " chargée partiellement (graphique " + ("et logique)" if fully_loaded else "uniquement)") +
-                 " en " + str("{:.2f}".format((time.time() - page_initial_time) * 1000)) + " millisecondes.\n\n")
+        log.info(f"Page : {file} chargée partiellement (graphique " + ("et logique)" if fully_loaded else "uniquement)") +
+                 f" en {((time.perf_counter() - page_initial_time) * 1000):.2f} millisecondes.\n\n")
         return fully_loaded
 
     def are_page_functions_there(self, page):
@@ -217,8 +212,8 @@ class DriverMachineInterface:
         """
         # Dans l'ordre : update (ici change_language n'est pas vérifié car très peu de texte sur le DMI)
         if "update" not in dir(page):
-            log.debug("Aucune fonction \"update\", pour la page " + page.section + "." + page.file + ".\n",
-                      prefix="Initialisation DMI ETCS ; section " + page.section)
+            log.debug(f"Aucune fonction \"update\", pour la page {page.section}.{page.file}.\n",
+                      prefix=f"Initialisation DMI ETCS ; section {page.section}")
 
     def run(self):
         """Fonction permettant de lancer le dmi, en montrant la fenêtre du dmi"""
@@ -230,22 +225,19 @@ class DriverMachineInterface:
 
         # Pour chacune des sections du dmi actif contenant des fichiers fichiers graphiques
         for folder in (f for f in ["A", "B", "C", "D", "E", "F", "G"] if self.pages[self.active_dmi][f]):
-            log.change_log_prefix("Update DMI " + self.active_dmi + " ; section " + folder)
+            log.change_log_prefix(f"Update DMI {self.active_dmi} ; section {folder}")
             # Pour chacunes des pages de chaque sections contenant une fonction update
             for file in (f for f in self.pages[self.active_dmi][folder] if "update" in dir(self.pages[self.active_dmi][folder][f])):
                 # Essaye d'appeler la fonction update (et attrape les erreurs s'il y a une erreur
                 try:
                     self.pages[self.active_dmi][folder][file].update()
                 except Exception as error:
-                    log.warning("Erreur lors de la mise à jour de la page" + folder + "." + file + " du DMI.\n\t\t" +
-                                "Erreur de type : " + str(type(error)) + "\n\t\t" +
-                                "Avec comme message d\'erreur : " + str(error.args) +
-                                "".join(traceback.format_tb(error.__traceback__)).replace("\n", "\n\t\t") + "\n")
-
+                    log.warning(f"Erreur lors de la mise à jour de la page {folder}.{file} du DMI.\n\t\t.\n",
+                                exception=error)
 
 def main():
     # Lance le fichier registre
-    log.initialise("../../../../log/", "1.1.0", log.Level.DEBUG)
+    log.initialise(log_level=log.Level.DEBUG, save=True)
 
     # Crée une micro simulation (avec juste le DMI, les bases de données et des paramètres)
     from PyQt5.QtWidgets import QApplication

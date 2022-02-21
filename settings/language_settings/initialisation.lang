@@ -39,9 +39,65 @@ Sauvegarder les données ?; Save data ?
 
 
 
+#page_rb2
+Train;Train
+
+Configuration du train;Train configuration
+Nom du train (utilisé pour le nom du fichier);Train name (used for the file name)
+
+Informations générales;General informations
+Mconvoi;Mconvoy
+Lconvoi;Lconvoy
+Nvoitures;Nrailcars
+Nbogies;Nbogies
+Nessieux/bogies;Naxles/bogies
+Nessieux moteurs;Nmotorized axles
+masse/essieu moteur;weight/axle
+Pmoteur;Pmotor
+Ptrain;Ptrain
+
+Dynamique du train (Rav);Train's dynamic(Rav)
+A :;A :
+B :;B :
+C :;C :
+
+Systèmes d'alimentation;Alimentation systems
+Pantographe ?;Pantograph ?
+Thermique ?;Thermic ?
+
+Systèmes de freinage;Braking systems
+Nplaquettes;Npads
+Npatins magnétiques;Nmagnetic brakes
+Récupération ?;Regenerative ?
+Ndisques;Ndisks
+Nfoucault;Nfoucault brakes
+Rhéostatique ?; Dynamic ?
+
+Paramétrage;Configuration
+Simple;Simple
+Complexe;Complex
+Voyageurs;Passengers
+Fret;Freight
+Sauvegarder;Save
+Freinage;Brakes
+
+# Popup de paramétrage complexe
+Générer;Generate
+Avant de générer le fichier il est important de compléter le paramétrage simple.;Before generating the file, it is important to complete the simple parametrization.
+Une fois le train généré, Certains paramètres seront inchangeables ou utilisés comme valeurs par défaut.;Once the train generated, Some parameters will be impossible to change or used for default values.
+Articulé ?;Jacob ?
+Nessieux;Naxles
+Pmoteur;Pmotor
+Nplaquettes (paires);Npads (pairs)
+Ndisques;Ndisks
+Nmagnétique (paires);Nmagnetics (pairs)
+Nfoucault (paires);Nfoucault (pairs)
+
+
 #page_rb8
 Écrans;Screens
 
+Index écran :;Screen index :
 Plein écran ?;Fullscreen ?
 Aucun;None
 Eteindre les écrans qui ne sont pas utilisés ?;Turn off the screens that aren't used ?
@@ -51,6 +107,7 @@ DMI central;Central DMI
 Boutons virtuels;Virtual buttons
 Ligne virtuelle (UE5);Virtual line (UE5)
 Train caméra (Renard);Camera train (Renard)
+Gestion des systèmes et pannes train;Train systems and breakdown control
 
 Poste de Commande Centralisé (PCC);Centralised Control Station (CCS)
 Tableau de Contrôle Optique (TCO);Optical Control Panel (OCP)
@@ -67,4 +124,3 @@ Insuffisance/Excès de dévers;Cant deficiency/excess
 Diagramme Effort-Vitesse;Effort-Speed Diagram
 Puissance (traction/freinage);Power (traction/braking)
 Courbes de freinage (EVC);Braking curves (EVC)
-
