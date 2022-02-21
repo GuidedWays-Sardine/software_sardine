@@ -307,7 +307,7 @@ class ComplexPopup:
             self.win.findChild(QObject, "front_bogie").change_values([front_bogie_data[2]],
                                                                      [[bool(axles) for axles in front_bogie_data[3]]],
                                                                      [front_bogie_data[3]],
-                                                                     [[0, 0, 0, 0]],   # TODO: mettre à jour (quantités systèmes de freinages)
+                                                                     [self.train_database.systems.braking.get_bogie_brakes_count(front_bogie[0])],
                                                                      front_bogie[0].is_jacob_bogie())
         else:
             # Réinitialise juste les données pour le bogie avant sinon
@@ -321,7 +321,7 @@ class ComplexPopup:
             self.win.findChild(QObject, "middle_bogie").change_values([bogie[2] for bogie in middle_bogies_datas],
                                                                       [[bool(axles) for axles in bogie[3]] for bogie in middle_bogies_datas],
                                                                       [bogie[3] for bogie in middle_bogies_datas],
-                                                                      [[0, 0, 0, 0] * len(middle_bogies)], # TODO : mettre à jour (quantités des systèmes de freinages)
+                                                                      [self.train_database.systems.braking.get_bogie_brakes_count(m_b) for m_b in middle_bogies],
                                                                       False)
         else:
             # Réinitialise juste les donnés pour les bogies centraux sinon
@@ -335,7 +335,7 @@ class ComplexPopup:
             self.win.findChild(QObject, "back_bogie").change_values([back_bogie_data[2]],
                                                                     [[bool(axles) for axles in back_bogie_data[3]]],
                                                                     [back_bogie_data[3]],
-                                                                    [[0, 0, 0, 0]],   # TODO: mettre à jour (quantités systèmes de freinages)
+                                                                    [self.train_database.systems.braking.get_bogie_brakes_count(back_bogie[0])],
                                                                     back_bogie[0].is_jacob_bogie())
         else:
             # Réinitialise juste les données pour le bogie avant sinon
