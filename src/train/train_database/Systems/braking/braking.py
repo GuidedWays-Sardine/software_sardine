@@ -146,3 +146,20 @@ class Braking:
             return [len(b_l) for b_l in bogie_brake_list]
         else:
             return [0, 0, 0, 0]
+
+    def add_braking_systems(self, bogie, brakes_list, brakes_parameters):
+        """fonction permettant à partir d'une liste de systèmes de freinage et de ses paramètres de les ajouter
+
+        Parameters
+        ----------
+        bogie: `Bogie`
+            bogie auquel les nouveaux systèmes de freinage sont connectés
+        brakes_list: `list | tuple`
+            Liste du nombre de systèmes de freinage à rajouter pour chaque types de freinage
+            format : [pad, disk, magnetic, foucault]
+        """
+        # Pour chacun des systèmes de freinage
+        for i, brake in enumerate([Pad, Disk, Magnetic, Foucault]):
+            # Ajoute autant du bon type de freinage
+            for _ in range(brakes_list[i]):
+                self.get_brake_list(brake).append(brake(bogie, brakes_parameters))
