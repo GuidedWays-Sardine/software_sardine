@@ -224,11 +224,5 @@ class Systems:
                                                  ABCfull=[train_data["a"], train_data["b"], train_data["c"]],
                                                  multiply_mass_full=False))
 
-            # TODO : faire les calculs et initialiser les systèmes de freinage
-
         # Appelle la fonction d'initialisation des systèmes électriques
-        # TODO : initialiser le système électriques (pantographes etc...
-
-        log.info("Initialisation des différents systèmes du train réussie. Train composé de :\n\t"
-                 f"{len(self.frame.railcars)} voitures ; {len(self.traction.bogies)} bogies ;")
-        # TODO : ajouter le logging pour les autres systèmes du train
+        # TODO : initialiser le système électriques (pantographes etc...) et le pupitre
