@@ -51,7 +51,7 @@ class Frame:
         """
         if isinstance(railcar, Railcar):
             self.railcars.append(railcar)
-        if isinstance(railcar, (tuple, list)) and len(railcar) == 12:
+        elif isinstance(railcar, (tuple, list)) and len(railcar) == 12:
             self.railcars.append(Railcar(railcar[0], railcar[1], railcar[2], railcar[3], railcar[4], railcar[5],
                                          railcar[6], railcar[7], railcar[8], railcar[9], railcar[10], railcar[11]))
         else:
