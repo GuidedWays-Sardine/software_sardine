@@ -8,6 +8,7 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
 import src.misc.settings_dictionary.settings as sd
+from src.train.train_database.Systems.traction.bogie.bogie import Bogie
 from src.train.train_database.Systems.braking.brakes.disk import Disk
 from src.train.train_database.Systems.braking.brakes.pad import Pad
 from src.train.train_database.Systems.braking.brakes.magnetic import Magnetic
@@ -79,8 +80,8 @@ class Braking:
 
         Parameters
         ----------
-        bogie: `Bogie`
-            bogie auquel appartient les systèmes de freinage recherché
+        bogie: `Bogie | None`
+            bogie auquel appartient les systèmes de freinage recherché (freinages de tous les bogies si à None)
         brake_type: `type | None`
             type de bogie recherché (laisser à None pour tous)
 
@@ -89,6 +90,10 @@ class Braking:
         brakes_list: `list`
             liste des systèmes de freinage [...] -> si freinage spécifique, [[...], [...], [...], [...]] si tous
         """
+        # Prend dans le cas où aucun bogie n'est spécifié (et que tous les systèmes de freinages doivent être retournés)
+        if bogie is None:
+            return [self.pad_brakes, self.disk_brakes, self.magnetic_brakes, self.foucault_brakes]
+
         # Se prépare a une potentielle erreur de type de système de freinage
         try:
             # Si un type spécifique de freinage a été demandé, retourne la liste de ce système spécifique
