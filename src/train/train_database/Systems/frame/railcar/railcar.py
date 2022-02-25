@@ -6,6 +6,7 @@ import os
 # Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
+import src.misc.settings_dictionary.settings as sd
 import src.train.train_database.database as tdb
 
 
@@ -149,3 +150,34 @@ class Railcar:
         return (self.mission_type, self.position_type, self.position_index,  self.levels, self.doors, self.Mtare, self.Mfull, self.length,
                 self.Aempty, self.Bempty, self.Cempty, self.multiply_mass_empty,
                 self.Afull, self.Bfull, self.Cfull, self.multiply_mass_full)
+
+    def get_values(self):
+        """Fonction permettant de récupérer toutes les valeurs de la voiture.
+
+        Returns
+        -------
+        settings_dictionary: `sd.SettingsDictionary`
+            dictionaire des paramètres avec tous les paramètres de la voiture
+        """
+        parameters = sd.SettingsDictionary()
+        prefix = f"railcar{self.position_index}"      # stocke dans une variable compacte l'index de la voiture
+
+        # Récupère chacun des paramètres dans l'ordre
+        parameters[f"{prefix}.mission_type"] = self.mission_type
+        parameters[f"{prefix}.position_type"] = self.position_type
+        parameters[f"{prefix}.position_index"] = self.position_index
+        parameters[f"{prefix}.levels"] = self.levels
+        parameters[f"{prefix}.doors"] = self.doors
+        parameters[f"{prefix}.Mtare"] = self.Mtare
+        parameters[f"{prefix}.Mfull"] = self.Mfull
+        parameters[f"{prefix}.length"] = self.length
+        parameters[f"{prefix}.Aempty"] = self.Aempty
+        parameters[f"{prefix}.Bempty"] = self.Bempty
+        parameters[f"{prefix}.Cempty"] = self.Cempty
+        parameters[f"{prefix}.multiply_mass_empty"] = self.multiply_mass_empty
+        parameters[f"{prefix}.Afull"] = self.Afull
+        parameters[f"{prefix}.Bfull"] = self.Bfull
+        parameters[f"{prefix}.Cfull"] = self.Cfull
+        parameters[f"{prefix}.multiply_mass_full"] = self.multiply_mass_full
+
+        return parameters
