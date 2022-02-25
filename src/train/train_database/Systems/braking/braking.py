@@ -158,3 +158,48 @@ class Braking:
                 self.add_brakes(bogie, b_type, b_count, b_parameters)
             elif b_count < 0:
                 self.remove_brakes(bogie, b_type, -b_count)
+
+    def add_brakes(self, bogie, brakes_type, brakes_count=1, brakes_parameters=None):
+        """fonction permettant d'ajouter un certain nombre de systèmes de freinage spécifiques
+
+        Parameters
+        ----------
+        bogie: `Bogie`
+            bogie auquel les nouveaux systèmes de freinage sont connectés
+        brakes_type: `type`
+            type de système de freinage à rajouter dans la liste
+        brakes_count: `int`
+            Nombre de systèmes de freinage à rajouter (doit être positif, si négatif, valeur absolue)
+        brakes_parameters: `list | tuple | None`
+            Paramètres pour chacun des sous-systèmes de freinage. Format dépendant de sa fonction d'initialisation
+        """
+        # Essaye de rajouter autant de systèmes de freinages que nécessaires
+        try:
+            for _ in range(abs(brakes_count)):
+                self.get_brake_list(brakes_type).append(brakes_type(bogie, brakes_parameters))
+        except TypeError as error:
+            log.debug(f"Impossible de rajouter le système de freinage envoyé ({brakes_type}).", exception=error)
+
+    def remove_brakes(self, bogie, brakes_type, brakes_count=1):
+        """fonction permettant d'enlever un certain nombre de systèmes de freinage spécifiques
+
+        Parameters
+        ----------
+        bogie: `Bogie`
+            bogie auquel les systèmes de freinages sont connectés
+        brakes_type: `type`
+            type de système de freinage à rajouter dans la liste
+        brakes_count: `int`
+            Nombre de systèmes de freinage à rajouter (doit être positif, si négatif, valeur absolue)
+        """
+        # Récupère la liste des systèmes de freinages connecté au bogie
+        bogies_brakes_count = len(self.get_bogie_brake_list(bogie, brakes_type))
+
+        # Laisse un message de debug si l'utilisateur essaye d'enlever plus de systèmes de freinages que ce qu'il y a
+        if brakes_count > bogies_brakes_count:
+            log.debug(f"Pas suffisament de systèmes de freinages à enlever ({brakes_count} > {bogies_brakes_count})." +
+                      f" Nombre de systèmes de freinage remis à 0.")
+
+        # Enlève autant de systèmes de freinaque de demandés (tous si pas suffisant)
+        for _ in range(min(bogies_brakes_count, abs(brakes_count))):
+            self.get_brake_list(brakes_type).remove(self.get_bogie_brake_list(bogie, brakes_type)[-1])
