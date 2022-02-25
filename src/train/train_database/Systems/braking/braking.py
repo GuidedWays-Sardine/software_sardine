@@ -125,19 +125,36 @@ class Braking:
         else:
             return [0, 0, 0, 0] if brake_type is None else [0]
 
-    def add_braking_systems(self, bogie, brakes_list, brakes_parameters):
-        """fonction permettant à partir d'une liste de systèmes de freinage et de ses paramètres de les ajouter
+    def modify_brakes_count(self, bogie, brakes_list, brakes_parameters=None):
+        """fonction permettant à partir d'une liste de systèmes de freinage de rajouter ou d'enlever le bon nombre
+        de systèmes de freinage (enlève si négatif, rajoute si positif)
 
         Parameters
         ----------
         bogie: `Bogie`
             bogie auquel les nouveaux systèmes de freinage sont connectés
         brakes_list: `list | tuple`
-            Liste du nombre de systèmes de freinage à rajouter pour chaque types de freinage
+            Liste du nombre de systèmes de freinage à rajouter (ajoutés si positifs, enlevés si négatifs).
             format : [pad, disk, magnetic, foucault]
+        brakes_parameters: `list | tuple`
+            Liste des paramètres pour chacun des sous-systèmes de freinage
+            format : [(pad...), (disk...), (magnetic...), (foucault...)]
         """
+        # Si aucun paramètre de freinage n'est envoyé, prépare une liste de None ou des paramètres des autres systèmes de freinage du bogie
+        if brakes_parameters is None:
+            brakes_parameters = [b_s[0].get_general_brake_values if b_s else None for b_s in self.get_bogie_brake_list(bogie)]
+
+        # S'assure qu'il y bien suffisament de systèmes de freinages et de paramètres
+        if not (isinstance(brakes_list, (tuple, list)) and isinstance(brakes_parameters, (tuple, list)) and
+                len(brakes_list) == len(brakes_parameters) == 4):
+            log.debug("Impossible de rajouter des systèmes de freinage. Paramètres de mauvais type (tuple | list) ou "
+                      f"de mauvaise longueur (4) (brakes_list={brakes_list} ; brakes_parameters={brakes_parameters}).")
+            return
+
         # Pour chacun des systèmes de freinage
-        for i, brake in enumerate([Pad, Disk, Magnetic, Foucault]):
-            # Ajoute autant du bon type de freinage
-            for _ in range(brakes_list[i]):
-                self.get_brake_list(brake).append(brake(bogie, brakes_parameters))
+        for b_type, b_count, b_parameters in zip([Pad, Disk, Magnetic, Foucault], brakes_list, brakes_parameters):
+            # Ajoute ou enlève des systèmes selon la différence demandée
+            if b_count > 0:
+                self.add_brakes(bogie, b_type, b_count, b_parameters)
+            elif b_count < 0:
+                self.remove_brakes(bogie, b_type, -b_count)
