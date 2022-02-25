@@ -182,5 +182,11 @@ class SettingsDictionary(dict):
         if data.lower() == "none":
             return None
 
+        if data[0] == "(" and data[-1] == ")":
+            return tuple(SettingsDictionary.convert_type(ele.strip()) for ele in data[1:-1].split(",") if ele)
+
+        if data[0] == "[" and data[-1] == "]":
+            return list(SettingsDictionary.convert_type(ele.strip()) for ele in data[1:-1].split(",") if ele)
+
         # Dans tous les cas (si aucun des autres cas n'a été intercepté) retourne le string
         return data
