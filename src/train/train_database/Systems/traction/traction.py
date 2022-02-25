@@ -100,7 +100,7 @@ class Traction:
         else:
             log.debug(f"{type(bogie)} n'est pas un bogie valide. Il doit être de type Bogie.")
 
-    def split_bogies(self, linked_coaches):
+    def split_bogies(self, linked_coaches, train_database):
         """Fonction permettant de diviser un bogie jacobien en deux bogies.
 
         Parameters
@@ -108,6 +108,8 @@ class Traction:
         linked_coaches: `list`
             Index des deux voitures dont le bogie articulé doit être séparé.
             elle doit contenir deux voitures consécutives. Si aucun bogie articulé n'est trouvé, rien ne se passera.
+        train_database: `tdb.TrainDatabase`
+            Base de données train dans lequel le bogie est contenu (nécessaire pour dupliquer les systèmes de freinage)
         """
         # Vérifie que la liste d'index est bien composé de deux index consécutif
         if isinstance(linked_coaches, list) and len(linked_coaches) == 2 and int(min(linked_coaches)) == int(max(linked_coaches) - 1):
@@ -118,12 +120,16 @@ class Traction:
                 bogie_data = jacob_bogie[0].get_general_values()
 
                 # met à jour les données du bogie récupérer pour le mettre à l'arrière de la voiture avant
-                jacob_bogie[0].set_general_values(tdb.Position.BACK, int(min(linked_coaches)), bogie_data[3], None, bogie_data[4])
+                jacob_bogie[0].set_general_values(tdb.Position.BACK, int(min(linked_coaches)), bogie_data[2], None, bogie_data[3])
 
                 # Rajoute un nouveau bogie à l'avant de la voiture arrière avec les mêmes données
-                self.add_bogie(Bogie(tdb.Position.FRONT, int(max(linked_coaches)), bogie_data[3], None, bogie_data[4]))
+                duplicate_brakes = train_database.systems.braking.get_bogie_brakes_count()
+                brakes_parameters = train_database.systems.braking.get_bogie_brake_list()
+                brakes_parameters = [(brake[0].get_general_brake_values() if len(brake) > 0 else None) for brake in brakes_parameters]
+                train_database.systems.braking.modify_brakes_count(duplicate_brakes, brakes_parameters)
+                self.add_bogie(Bogie(tdb.Position.FRONT, int(max(linked_coaches)), bogie_data[2], None, bogie_data[3]))
         else:
-            log.debug(f"Impossible de séparer les deus bogies. Liste de voitures invalide ({linked_coaches}).")
+            log.debug(f"Impossible de séparer les deux bogies. Liste de voitures invalide ({linked_coaches}).")
 
     def merge_bogies(self, linked_coaches):
         """Fonction permettant de fusioner deux bogies pour en faire un bogie articulé.
