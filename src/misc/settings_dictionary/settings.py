@@ -179,7 +179,7 @@ class SettingsDictionary(dict):
             return float(data)
 
         # Regarde s'il peut être convertit en NoneType
-        if data.lower == "none":
+        if data.lower() == "none":
             return None
 
         # Dans tous les cas (si aucun des autres cas n'a été intercepté) retourne le string
