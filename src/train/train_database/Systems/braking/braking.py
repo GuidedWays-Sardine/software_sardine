@@ -106,22 +106,24 @@ class Braking:
             log.debug(f"Erreur dans le type de système de freinage demandé ({brake_type})", exception=error)
             return []
 
-    def get_bogie_brakes_count(self, bogie):
+    def get_bogie_brakes_count(self, bogie=None, brake_type=None):
         """Retourne le compte de chacun des systèmes de freinage pour le bogie en question
 
         Parameters
         ----------
-        bogie: `Bogie`
-            bogie dont les systèmes de freinages doivent être comptés
+        bogie: `Bogie | None`
+            bogie dont les systèmes de freinages doivent être comptés (freinages de tous les bogies si à None)
+        brake_type: `type | None`
+            type de bogie recherché (laisser à None pour tous)
         """
         # Récupère la liste des systèmes de freinage du bogie
-        bogie_brake_list = self.get_bogie_brake_list(bogie)
+        bogie_brake_list = self.get_bogie_brake_list(bogie, brake_type)
 
         # Si la liste est vide (dû à une erreur) retourne une liste de 4 zéros, sinon compte chacun des systèmes
         if bogie_brake_list:
             return [len(b_l) for b_l in bogie_brake_list]
         else:
-            return [0, 0, 0, 0]
+            return [0, 0, 0, 0] if brake_type is None else [0]
 
     def add_braking_systems(self, bogie, brakes_list, brakes_parameters):
         """fonction permettant à partir d'une liste de systèmes de freinage et de ses paramètres de les ajouter
