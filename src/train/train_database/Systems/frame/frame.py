@@ -78,3 +78,19 @@ class Frame:
             liste des types de positions de chacunes des voitures du train
         """
         return [rc.position_type.value for rc in self.railcars]
+
+    def get_values(self):
+        """Fonction permettant de récupérer tous les paramètres des systèmes de structure du train
+
+        Returns
+        -------
+        settings_dictionary: `sd.SettingsDictionary`
+            dictionaire des paramètres avec tous les paramètres de toutes les voitures du train
+        """
+        parameters = sd.SettingsDictionary()
+
+        # Pour chacune des voitures du train, appelle sa fonction de récupération de données
+        for railcar in self.railcars:
+            parameters.update(railcar.get_values())
+
+        return parameters
