@@ -203,3 +203,32 @@ class Braking:
         # Enlève autant de systèmes de freinaque de demandés (tous si pas suffisant)
         for _ in range(min(bogies_brakes_count, abs(brakes_count))):
             self.get_brake_list(brakes_type).remove(self.get_bogie_brake_list(bogie, brakes_type)[-1])
+
+    def get_values(self, bogie, list_index):
+        """Fonction permettant de récupérer toutes les valeurs de freinages d'un bogie en particulier
+
+        Parameters
+        ----------
+        bogie: `Bogie`
+            bogie auquel les systèmes de freinages sont connectés
+        list_index: `int`
+            Index du bogie dans la liste (permet de distinguer les différents bogies dans le fichier paramètres)
+
+        Returns
+        -------
+        settings_dictionary: `sd.SettingsDictionary`
+            dictionaire des paramètres avec tous les paramètres de tous les bogies et de leurs systèmes de freinage.
+        """
+        parameters = sd.SettingsDictionary()
+        prefix = f"bogie{list_index}"
+
+        # Récupère la liste des systèmes de freinages et leurs caractéristiques
+        brakes_list = self.get_bogie_brake_list(bogie)
+
+        # Pour chacun des systèmes de freinage, enregistrent leur quantité et leur paramètre s'il y en a au moins un
+        for b_i, b_t in enumerate(["pad", "disk", "magnetic", "foucault"]):
+            parameters[f"{prefix}.{b_t}.count"] = len(brakes_list[b_i])
+            if len(brakes_list[b_i]):
+                parameters.update(brakes_list[b_i][0].get_values(list_index))
+
+        return parameters
