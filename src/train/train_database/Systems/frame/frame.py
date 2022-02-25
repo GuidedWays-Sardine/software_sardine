@@ -7,6 +7,7 @@ import sys
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
+import src.misc.settings_dictionary.settings as sd
 from src.train.train_database.Systems.frame.railcar.railcar import Railcar
 
 
@@ -70,7 +71,7 @@ class Frame:
         return [rc.mission_type.value for rc in self.railcars]
 
     def get_position_list(self):
-        """Fonction retournant la liste des tupes de positions (Front, Middle, Back) de chacunes des voitures
+        """Fonction retournant la liste des types de positions (Front, Middle, Back) de chacunes des voitures
 
         Returns
         -------
