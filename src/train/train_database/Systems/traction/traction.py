@@ -131,7 +131,7 @@ class Traction:
         else:
             log.debug(f"Impossible de séparer les deux bogies. Liste de voitures invalide ({linked_coaches}).")
 
-    def merge_bogies(self, linked_coaches):
+    def merge_bogies(self, linked_coaches, train_database):
         """Fonction permettant de fusioner deux bogies pour en faire un bogie articulé.
         Si aucun bogie existe sur les deus voitures, un bogie articulé sera créé
 
@@ -140,6 +140,8 @@ class Traction:
         linked_coaches: `list`
             Index des deux voitures dont les bogies doivent être fusionés.
             elle doit contenir deux voitures consécutives. Si l'une des voitures sont suspendus, créera un nouveau bogie
+        train_database: `tdb.TrainDatabase`
+            Base de données train dans lequel le bogie est contenu (nécessaire pour enlever les systèmes de freinage)
         """
         # S'assure que la liste des voitures représente deux entiers
         if len(linked_coaches) == 2:
@@ -159,13 +161,14 @@ class Traction:
             if front_bogie or back_bogie:
                 # Commence par supprimer le bogie arrière si les deux bogies non articulés existe (évite le duplicata)
                 if front_bogie and back_bogie:
-                    self.remove_bogie(back_bogie[0])
+                    self.remove_bogie(back_bogie[0], train_database)
 
                 # Utilise ce bogie comme base pour créer le bogie articulé
-                bogie_data = front_bogie[0].get_general_values() if front_bogie else back_bogie[0].get_general_values()
+                bogie = front_bogie[0] if front_bogie else back_bogie[0]
+                bogie_data = bogie.get_general_values()
 
                 # met à jour les données du bogie récupérer pour le mettre à l'arrière de la voiture avant
-                front_bogie[0].set_general_values(None, linked_coaches, bogie_data[3], None, bogie_data[4])
+                bogie.set_general_values(None, linked_coaches, bogie_data[2], None, bogie_data[3])
             # Si les deux bogies n'existent pas (les deux voitures suspendus)
             else:
                 # Génère un essieu porteur
