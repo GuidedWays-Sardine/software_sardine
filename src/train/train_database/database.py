@@ -72,3 +72,17 @@ class TrainDatabase:
                  f"{brakes_count} éléments de freinage ({pad_brakes_count} semelles, {disk_brakes_count} disques, {magnetic_brakes_count} magnétiques, {foucault_brakes_count} foucault) ; " +
                  f">",
                  prefix="Initialisation BDD train")
+
+    def get_values(self):
+        """Fonction permettant de récupérer tous les paramètres du train
+
+        Returns: `sd.SettingsDictionary`
+            Tous les paramètres du train
+        """
+        parameters = sd.SettingsDictionary()
+
+        # Récupère les données états des sous-systèmes et les données dynamiques et statiques
+        parameters.update(self.systems.get_values())
+        # TODO : récupérer les valeurs statiques et dynamiques du train
+
+        return parameters
