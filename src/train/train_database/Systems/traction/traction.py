@@ -7,8 +7,10 @@ import os
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
+import src.misc.settings_dictionary.settings as sd
 import src.train.train_database.database as tdb
 from src.train.train_database.Systems.traction.bogie.bogie import Bogie
+from src.train.train_database.Systems.braking.braking import Braking
 
 
 class Traction:
@@ -161,3 +163,25 @@ class Traction:
                 self.add_bogie(Bogie(None, linked_coaches, axles_count, 0, 0.0))
         else:
             log.debug(f"Impossible de fusionner deux voitures. Liste de voitures invalide ({linked_coaches}).")
+
+    def get_values(self, braking_systems):
+        """Fonction permettant de récupérer toutes les valeurs de tous les bogies et de leurs systèmes de freinage.
+
+        Parameters
+        ----------
+        braking_systems: `Braking`
+            Liste de tous les systèmes de freinages du train pour les sauvegarder en même temps
+
+        Returns
+        -------
+        settings_dictionary: `sd.SettingsDictionary`
+            dictionaire des paramètres avec tous les paramètres de tous les bogies et de leurs systèmes de freinage.
+        """
+        parameters = sd.SettingsDictionary()
+
+        # Pour chacun des bogies du train, récupère les données du bogie et celle de ses systèmes de freinages associés
+        for b_i, bogie in enumerate(self.bogies):
+            parameters.update(bogie.get_values(b_i))
+            parameters.update(braking_systems.get_values(bogie, b_i))
+
+        return parameters
