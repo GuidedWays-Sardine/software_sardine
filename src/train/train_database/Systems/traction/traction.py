@@ -80,16 +80,20 @@ class Traction:
         else:
             log.debug(f"bogie envoyé de mauvais type ({type(bogie)} au lieu de Bogie ou tuple de taille 6).")
 
-    def remove_bogie(self, bogie):
+    def remove_bogie(self, bogie, train_database):
         """fonction permettant d'enlever un bogie de la liste des bogies (par bogie)
 
         Parameters
         ----------
         bogie: `Bogie`
             Bogie -> bogie à enlever (à récupérer avec la méthodes get_bogies()[...]
+        train_database: `tdb.TrainDatabase`
+            Base de données train dans lequel le bogie est contenu (nécessaire pour enlever les systèmes de freinage)
         """
         # Enlève le bogie envoyé en s'assurant qu'il existe bien encore dans la liste
         if isinstance(bogie, Bogie) and bogie in self.bogies:
+            remove_brakes = [-b_c for b_c in train_database.systems.braking.get_bogie_brakes_count(bogie)]
+            train_database.systems.braking.modify_brakes_count(bogie, remove_brakes)
             self.bogies.remove(bogie)
         elif isinstance(bogie, Bogie) and bogie not in self.bogies:
             log.debug(f"Impossible de supprimer le bogie {bogie} qui n'est pas dans la liste.")
