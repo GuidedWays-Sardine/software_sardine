@@ -6,8 +6,6 @@ import os
 # Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
-import src.misc.log.log as log
-import src.train.train_database.database as tdb
 import src.misc.settings_dictionary.settings as sd
 from src.train.train_database.Systems.traction.bogie.bogie import Bogie
 
@@ -28,8 +26,9 @@ class Foucault:
         bogie_linked: `Bogie`
             Bogie sur lequel se situe
 
-        brake_parameters: `sd.SettingsDictionary`
+        brake_parameters: `tuple | list`
             Tous les arguments sur la position du système de freinage dans le train
+            format : (...) # TODO : trouver le format des arguments
         """
         # Indique le bogie auquel le système de freinage est connecté
         self.bogie_linked = bogie_linked
@@ -37,12 +36,46 @@ class Foucault:
         # Change les valeurs du système de freinage
         self.set_general_brake_values(brake_parameters)
 
-    def set_general_brake_values(self, brake_parameters):
+    def set_general_brake_values(self, brake_parameters=None):
         """Fonction permettant de changer les paramètres de freinage
 
         Parameters
         ----------
-        brake_parameters: `sd.SettingsDictionary`
-            Tous les arguments sur la position du système de freinage dans le train
+        brake_parameters: `tuple | list`
+            Tous les arguments sur les spécificités du système de freinage. Valeurs par défaut si vide
+            format : (...) # TODO : trouver le format des arguments
         """
-        pass  # TODO : définir les paramètres nécessaires pour le freinage par courrant de foucault
+        if brake_parameters is not None:
+            pass        # TODO : définir les paramètres nécessaires à définir
+
+    def get_general_brake_values(self):
+        """Fonction permettant de retourner les paramètres de freinage
+
+        Returns
+        -------
+        brake_parameters: `tuple | list`
+            Tous les arguments sur les spécificités du système de freinage
+            format : (...) # TODO : trouver le format des arguments (identique au seter pour simplification)
+        """
+        return ()   # TODO : définir les paramètres nécessaires à retourner
+
+    def get_values(self, list_index):
+        """Fonction permettant de récupérer toutes les valeurs du système de freinage de foucault.
+
+        Parameters
+        ----------
+        list_index: `int`
+            Index du bogie dans la liste (permet de distinguer les différents bogies dans le fichier paramètres)
+
+        Returns
+        -------
+        settings_dictionary: `sd.SettingsDictionary`
+            dictionaire des paramètres avec tous les paramètres techniques du système de freinage de foucault.
+        """
+        parameters = sd.SettingsDictionary()
+        prefix = f"bogie{list_index}.foucault"
+
+        # Récupère tous les paramètres du système de freinage du bogie
+        # TODO : ajouter tous les paramètres techniques du système de freinage
+
+        return parameters
