@@ -66,11 +66,11 @@ Pantographe ?;Pantograph ?
 Thermique ?;Thermic ?
 
 Systèmes de freinage;Braking systems
-Nplaquettes;Npads
-Npatins magnétiques;Nmagnetic brakes
-Récupération ?;Regenerative ?
+Nplaquettes (paires);Npads (pairs)
 Ndisques;Ndisks
-Nfoucault;Nfoucault brakes
+Récupération ?;Regenerative ?
+Nmagnétique (paires);Nmagnetics (pairs)
+Nfoucault (paires);Nfoucault (pairs)
 Rhéostatique ?; Dynamic ?
 
 Paramétrage;Configuration

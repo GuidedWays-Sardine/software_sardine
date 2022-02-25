@@ -65,10 +65,10 @@ Item {
     property string articulated_text: "Articulé ?"
     property string axle_text: "Nessieux"
     property string motor_text: "Pmoteur"
-    property string pad_text: "Nplaquettes"
+    property string pad_text: "Nplaquettes (paires)"
     property string disk_text: "Ndisques"
-    property string magnetic_text: "Npatins magnétiques"
-    property string foucault_text: "Nfoucault"
+    property string magnetic_text: "Nmagnétique (paires)"
+    property string foucault_text: "Nfoucault (paires)"
 
 
     //Fonction pour réinitialiser le module
