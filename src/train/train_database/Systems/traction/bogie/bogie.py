@@ -6,6 +6,7 @@ import os
 # Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
+import src.misc.settings_dictionary.settings as sd
 import src.train.train_database.database as tdb
 
 
@@ -129,3 +130,28 @@ class Bogie:
             retourne vrai si l'essieu est articulé, sinon faux
         """
         return len(self.linked_railcars) == 2
+
+    def get_values(self, list_index):
+        """Fonction permettant de récupérer les paramètres du bogie.
+
+        Parameters
+        ----------
+        list_index: `int`
+            Index du bogie dans la liste (permet de distinguer les différents bogies dans le fichier paramètres)
+
+        Returns
+        -------
+        settings_dictionary: `sd.SettingsDictionary`
+            dictionaire des paramètres avec tous les paramètres du bogie
+        """
+        parameters = sd.SettingsDictionary()
+        prefix = f"bogie{list_index}"      # stocke dans une variable compacte l'index de la voiture
+
+        # Récupère chacun des paramètres dans l'ordre
+        parameters[f"{prefix}.linked_railcars"] = self.linked_railcars
+        parameters[f"{prefix}.position_type"] = self.position_type
+        parameters[f"{prefix}.axles_count"] = self.axles_count
+        parameters[f"{prefix}.is_jacob"] = self.is_jacob_bogie()
+        parameters[f"{prefix}.axles_power"] = self.axles_power
+
+        return parameters
