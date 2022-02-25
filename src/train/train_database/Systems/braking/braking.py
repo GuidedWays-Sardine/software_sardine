@@ -74,36 +74,7 @@ class Braking:
         else:
             raise TypeError(f"le type {brake_type} n'est pas un système freinage connu.")
 
-    def add_brake_system(self, brake):
-        """Fonction permettant de rajouter un système de freinage (par système ou par paramètres)
-
-        Parameters
-        ----------
-        brake: `Pad | Disk | Magnetic | Foucault`
-            Système de freinage à ajouter à la liste des systèmes de freinage
-        """
-        try:
-            self.get_brake_list(type(brake)).append(brake)
-        except TypeError as error:
-            log.debug(f"Impossible de rajouter le système de freinage envoyé ({brake}).", exception=error)
-
-    def remove_brake_system(self, brake):
-        """Fonction permettant d'enlever un système de freinage (par système)
-
-        Parameters
-        ----------
-        brake: `Pad | Disk | Magnetic | Foucault`
-            Système de freinage à enlever de la liste des systèmes de freinage
-        """
-        try:
-            if brake in self.get_brake_list(type(brake)):
-                self.get_brake_list(type(brake)).remove(brake)
-            else:
-                log.debug(f"Le système de freinage envoyé n'est pas dans la liste ({brake}).")
-        except TypeError as error:
-            log.debug(f"Impossible d'enlever le système de freinage envoyé ({brake})", exception=error)
-
-    def get_bogie_brake_list(self, bogie, brake_type=None):
+    def get_bogie_brake_list(self, bogie=None, brake_type=None):
         """Fonction permettant de retourner les systèmes de freinages appartenant à un bogie
 
         Parameters
