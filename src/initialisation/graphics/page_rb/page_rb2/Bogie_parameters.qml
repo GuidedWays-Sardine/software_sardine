@@ -91,6 +91,7 @@ Item {
 
             //Change la valeur pour les tableaux de motorisations et de puissances moteur
             root.axles_count = axles_count
+            axles_count_integerinput.change_value(root.axles_count[0])
             root.motorized_axles = motorized_axles
             root.motorized_axles_powers = motorized_axles_powers
 
@@ -151,7 +152,7 @@ Item {
         default_x: root.default_x
         default_y: root.default_y
         default_height: root.any ? 104 : 16
-        default_width: root.any ? 120 : 16
+        default_width: root.any ? 140 : 16
 
         is_activable: false
         is_positive: false
@@ -229,7 +230,7 @@ Item {
 
         default_x: left_bogie_arrow_button.default_x + left_bogie_arrow_button.default_width
         default_y: plus_minus_button.default_y
-        default_width: 2 * plus_minus_button.default_width
+        default_width: 2 * plus_minus_button.default_width + 8
         default_height: plus_minus_button.default_height
 
         text: root.current_bogie_index + root.any
@@ -277,7 +278,7 @@ Item {
 
         default_x: bogie_index_button.default_x + bogie_index_button.default_width
         default_y: plus_minus_button.default_y
-        default_width: 0.5 * plus_minus_button.default_width
+        default_width: 0.5 * plus_minus_button.default_width + 4
         default_height: plus_minus_button.default_height
 
         text: "/"
