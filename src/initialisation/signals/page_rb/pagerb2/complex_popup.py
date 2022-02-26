@@ -153,25 +153,44 @@ class ComplexPopup:
         """Fonction permettant de récupérer toutes les informations de la configuration simple
 
         Returns
+        -------
+        train_parameters: `sd.SettingsDictionary`
+            Dictionaire de paramètre avec tous les paramètres complexes du train, vide si aucun train initialisé
+        """
+        if self.train_database:
+            return self.train_database.get_values()
+        else:
+            return sd.SettingsDictionary()
+
+    def set_complex_mode_values(self, train_parameters):
+        """Fonction permettant de changer les valeurs du train
+
+        Parameters
         ----------
         train_parameters: `sd.SettingsDictionary`
-            Dictionaire de paramètre avec tous les paramètres complexes du train
+            Dictionaire contenant toutes les données complexes du train
         """
-        parameters = sd.SettingsDictionary()
+        try:
+            self.train_database = tdb.TrainDatabase(train_parameters)
+        except Exception as error:
+            log.warning("Impossible de générer le train complexe à partir du fichier de paramètres envoyé.",
+                        exception=error)
+        else:
+            # Récupère la liste de chacunes des positions des voitures
+            self.win.setProperty("mission_list", self.train_database.systems.frame.get_mission_list())
+            self.win.setProperty("position_list", self.train_database.systems.frame.get_position_list())
 
-        # TODO : sauvegarder les données
-
-        return parameters
-
-    def set_complex_mode_values(self, train_data):
-        """"""
+            # Appelle la fonction de mise à jour pour montrer la voiture avec l'index actuel
+            self.update_constants(train_parameters)
+            self.win.findChild(QObject, "train_preview").setProperty("current_index", 0)
+            self.update_popup(0)
 
     def change_language(self, translation_data):
         """Fonction permettant de traduire la page de paramétrage train complet (appelé dans la page_rb2
 
         Parameters
         ----------
-        translation_data: `td.TranslationData`
+        translation_data: `td.TranslationDictionary`
             Dicionnaire de traduction contenant toutes les traductions nécessaires"""
         # Commence par traduire les différents textes visibles (fenêtre de génération)
         for widget_id in ["generate_button", "generate_l1", "generate_l2"]:
