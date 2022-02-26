@@ -327,3 +327,16 @@ class Systems:
 
         # Appelle la fonction d'initialisation des systèmes électriques
         # TODO : initialiser le système électriques (pantographes etc...) et le pupitre
+
+    def get_values(self):
+        """Fonction permettant de récupérer tous les paramètres des systèmes du train.
+
+        Returns: `sd.SettingsDictionary`
+            Paramètres de tous les sous-systèmes du train
+        """
+        parameters = sd.SettingsDictionary()
+
+        parameters.update(self.frame.get_values())
+        parameters.update(self.traction.get_values(self.braking))   # S'occupe des systèmes de traction et de freinage
+
+        return parameters
