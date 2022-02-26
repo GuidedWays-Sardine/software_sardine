@@ -209,9 +209,8 @@ class ComplexPopup:
         railcar_index: `int`
             index de la voiture dont les données seront récupérés (0 à Nrailcar - 1)
         """
-        # TODO : remettre à jour l'algorithme pour inclure les systèmes de freinage
-        # TODO : faire l'électrification
-        # TODO : faire les données générales
+        # TODO : mettre à jour les données générales
+        # TODO : mettre à jour les données de l'électrification
 
         #S'occupe du bogie avant
         # Récupère les données du bogie sur la popup complexe
@@ -219,25 +218,32 @@ class ComplexPopup:
         # Si les données sont vides ou que articulé est désactivé :
         if not front_bogie_data or not front_bogie_data[4]:
             # Essaye de diviser le bogie en deux bogies et récupère le bogie de devant
-            self.train_database.systems.traction.split_bogies([railcar_index, railcar_index - 1])
+            self.train_database.systems.traction.split_bogies([railcar_index, railcar_index - 1], self.train_database)
             front_bogie = self.train_database.systems.traction.get_bogies(railcar_index, tdb.Position.FRONT)
 
-            # Si aucun paramtètre n'a été récupéré, le supprime sinon change ses valeurs/en crée un nouveau
-            if not front_bogie_data:
-                self.train_database.systems.traction.remove_bogie(front_bogie[0])
+            # Si aucun paramtètre n'a été récupéré, supprime le bogie et ses freins sinon change ses valeurs/crée le
+            if not front_bogie_data and front_bogie:
+                # Si aucun paramètre récupéré, supprime le bogie et tous ses systèmes de freins
+                self.train_database.systems.traction.remove_bogie(front_bogie[0], self.train_database)
             elif front_bogie_data and front_bogie:
+                front_modify_brakes = [b_a-b_c for b_a, b_c in zip(front_bogie_data[3][0], self.train_database.systems.braking.get_bogie_brakes_count(front_bogie[0]))]
                 front_bogie[0].set_general_values(tdb.Position.FRONT, railcar_index,
                                                   front_bogie_data[0][0], front_bogie_data[1][0], front_bogie_data[2][0])
+                self.train_database.systems.braking.modify_brakes_count(front_bogie[0], front_modify_brakes)
             elif front_bogie_data and not front_bogie:
                 self.train_database.systems.traction.add_bogie((tdb.Position.FRONT, railcar_index,
                                                                 front_bogie_data[0][0], front_bogie_data[1][0], front_bogie_data[2][0]))
+                self.train_database.systems.braking.modify_brakes_count(self.train_database.systems.traction.get_bogies(railcar_index, tdb.Position.FRONT)[0],
+                                                                        front_bogie_data[3][0])
         # Si les données sont les paramètres d'un bogie articulé
         else:
-            # Crée un bogie articulé, le récupère et mets à jour ses données
-            self.train_database.systems.traction.merge_bogies([railcar_index - 1, railcar_index])
+            # Crée un bogie articulé, le récupère et mets à jour ses données et ses systèmes de freinage
+            self.train_database.systems.traction.merge_bogies([railcar_index - 1, railcar_index], self.train_database)
             front_bogie = self.train_database.systems.traction.get_bogies([railcar_index - 1, railcar_index])
             front_bogie[0].set_general_values(None, [railcar_index - 1, railcar_index],
                                               front_bogie_data[0][0], front_bogie_data[1][0], front_bogie_data[2][0])
+            front_modify_brakes = [b_a - b_c for b_a, b_c in zip(front_bogie_data[3][0], self.train_database.systems.braking.get_bogie_brakes_count(front_bogie[0]))]
+            self.train_database.systems.braking.modify_brakes_count(front_bogie[0], front_modify_brakes)
 
         # S'occupe des bogies centraux
         # Récupère d'abord les bogies centraux déjà existants pour la voiture
@@ -248,17 +254,20 @@ class ComplexPopup:
         if middle_bogies_data:
             # Commence par modifier les données des bogies déjà existants
             for r_i in range(min(len(middle_bogies_data), len(middle_bogies))):
+                middle_modify_brakes = [b_a - b_c for b_a, b_c in zip(middle_bogies_data[3][r_i], self.train_database.systems.braking.get_bogie_brakes_count(middle_bogies[r_i]))]
                 middle_bogies[r_i].set_general_values(tdb.Position.MIDDLE, railcar_index,
                                                       middle_bogies_data[0][r_i], middle_bogies_data[1][r_i], middle_bogies_data[2][r_i])
+                self.train_database.systems.braking.modify_brakes_count(middle_bogies[r_i], middle_modify_brakes)
 
             # Puis rajoute les bogies nécessaires (boucle sauté si aucun bogie à rajouter)
             for r_i in range(len(middle_bogies), len(middle_bogies_data[0])):
                 self.train_database.systems.traction.add_bogie((tdb.Position.MIDDLE, railcar_index,
                                                                 middle_bogies_data[0][r_i], middle_bogies_data[1][r_i], middle_bogies_data[2][r_i]))
+                self.train_database.systems.braking.modify_brakes_count(self.train_database.systems.traction.get_bogies(railcar_index, tdb.Position.MIDDLE)[r_i], middle_bogies_data[3][r_i])
 
         # Si trop de bogies centraux existent, les suppriment
         for r_i in range(0 if not middle_bogies_data else len(middle_bogies_data[0]), len(middle_bogies)):
-            self.train_database.systems.traction.remove_bogie(middle_bogies[r_i])
+            self.train_database.systems.traction.remove_bogie(middle_bogies[r_i], self.train_database)
 
         # S'occupe du bogie arrière (très similairement au bogie avant)
         # Récupère les données du bogie sur la popup complexe
@@ -266,25 +275,32 @@ class ComplexPopup:
         # Si les données sont vides ou que articulé est désactivé :
         if not back_bogie_data or not back_bogie_data[4]:
             # Essaye de diviser le bogie en deux bogies et récupère le bogie de devant
-            self.train_database.systems.traction.split_bogies([railcar_index, railcar_index + 1])
+            self.train_database.systems.traction.split_bogies([railcar_index, railcar_index + 1], self.train_database)
             back_bogie = self.train_database.systems.traction.get_bogies(railcar_index, tdb.Position.BACK)
 
             # Si aucun paramtètre n'a été récupéré, le supprime sinon change ses valeurs/en crée un nouveau
-            if not back_bogie_data:
-                self.train_database.systems.traction.remove_bogie(back_bogie[0])
+            if not back_bogie_data and back_bogie:
+                self.train_database.systems.traction.remove_bogie(back_bogie[0], self.train_database)
             elif back_bogie_data and back_bogie:
+                back_modify_brakes = [b_a - b_c for b_a, b_c in zip(back_bogie_data[3][0], self.train_database.systems.braking.get_bogie_brakes_count(back_bogie[0]))]
                 back_bogie[0].set_general_values(tdb.Position.BACK, railcar_index,
                                                  back_bogie_data[0][0], back_bogie_data[1][0], back_bogie_data[2][0])
+                self.train_database.systems.braking.modify_brakes_count(back_bogie[0], back_modify_brakes)
             elif back_bogie_data and not back_bogie:
                 self.train_database.systems.traction.add_bogie((tdb.Position.BACK, railcar_index,
                                                                 back_bogie_data[0][0], back_bogie_data[1][0], back_bogie_data[2][0]))
+                self.train_database.systems.braking.modify_brakes_count(self.train_database.systems.traction.get_bogies(railcar_index, tdb.Position.BACK)[0],
+                                                                        back_bogie_data[3][0])
         # Si les données sont les paramètres d'un bogie articulé
         else:
             # Crée un bogie articulé, le récupère et mets à jour ses données
-            self.train_database.systems.traction.merge_bogies([railcar_index, railcar_index + 1])
+            self.train_database.systems.traction.merge_bogies([railcar_index, railcar_index + 1], self.train_database)
             back_bogie = self.train_database.systems.traction.get_bogies([railcar_index, railcar_index + 1])
             back_bogie[0].set_general_values(None, [railcar_index, railcar_index + 1],
                                              back_bogie_data[0][0], back_bogie_data[1][0], back_bogie_data[2][0])
+            back_modify_brakes = [b_a - b_c for b_a, b_c in zip(back_bogie_data[3][0], self.train_database.systems.braking.get_bogie_brakes_count(back_bogie[0]))]
+            self.train_database.systems.braking.modify_brakes_count(back_bogie[0], back_modify_brakes)
+
 
     def update_popup(self, index):
         """Fonction permettant de récupérer les valeurs de la base de données et de les mettre sur la popup
