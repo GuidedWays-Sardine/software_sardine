@@ -189,7 +189,9 @@ class ComplexPopup:
 
     @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
     def on_railcar_changed(self):
-        """signal appelé lorsque la voiture paramétrée dans la popup complexe a changée"""
+        """signal appelé lorsque la voiture paramétrée dans la popup complexe a changée.
+        Récupère les données du popup, les changent dans la base de données et met à jour le popup et page de paramètres
+        """
         # Récupère d'abord les index de la voiture à décharger et de celle à charger
         previous_railcar_index = self.win.property("previous_railcar_index")
         current_railcar_index = self.win.property("current_railcar_index")
@@ -199,6 +201,8 @@ class ComplexPopup:
 
         # Appelle ensuite la fonction pour mettre à jour la popup avec les nouvelles données
         self.update_popup(current_railcar_index)
+
+        # FEATURE : aussi mettre à jour les données simple (pour rendre le truc plus dynamique et correct)
 
     def update_database(self, railcar_index):
         """Fonction permettant de récupérer les valeurs de la popup et de les stoquer dans la base de données
