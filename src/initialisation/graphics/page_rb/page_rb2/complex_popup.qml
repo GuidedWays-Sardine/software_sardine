@@ -240,7 +240,7 @@ Window{
         id: middle_bogie
         objectName: "middle_bogie"
 
-        default_x: (640 - 120) * 0.5
+        default_x: (640 - 140) * 0.5
         default_y: train_preview.default_y - 104
         generated: complex_popup.generated
 
