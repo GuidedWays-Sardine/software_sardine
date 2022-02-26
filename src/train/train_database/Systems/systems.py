@@ -60,7 +60,54 @@ class Systems:
             self.generate(train_data)
             return
 
-        # TODO : faire la fonction e lecture des trains complexes
+        # Commence par les voitures
+        index = 0
+        try:
+            while f"railcar{index}.mission_type" in train_data:
+                self.frame.add_railcar((tdb.MissionType[train_data[f"railcar{index}.mission_type"][12:]],
+                                        tdb.Position[train_data[f"railcar{index}.position_type"][9:]],
+                                        train_data[f"railcar{index}.position_type"],
+                                        train_data[f"railcar{index}.levels"], train_data[f"railcar{index}.doors"],
+                                        train_data[f"railcar{index}.Mtare"], train_data[f"railcar{index}.Mfull"],
+                                        train_data[f"railcar{index}.length"],
+                                        [train_data[f"railcar{index}.{leter}empty"] for leter in ["A", "B", "C"]],
+                                        train_data[f"railcar{index}.multiply_mass_empty"],
+                                        [train_data[f"railcar{index}.{leter}full"] for leter in ["A", "B", "C"]],
+                                        train_data[f"railcar{index}.multiply_mass_full"]))
+                index += 1
+        except KeyError as error:
+            log.warning(f"Impossible de charger la voiture {index}. Les paramètres de celle-ci sont incomplets",
+                        exception=error)
+
+        # Continue avec les bogies et leurs systèmes de freinage
+        index = 0
+        try:
+            while f"bogie{index}.linked_railcars" in train_data:
+                self.traction.add_bogie((None if train_data[f"bogie{index}.position_type"] is None else tdb.Position.MIDDLE#tdb.Position[train_data[f"bogie{index}.position_type"][9:]]
+                                         ,
+                                         train_data[f"bogie{index}.linked_railcars"],
+                                         train_data[f"bogie{index}.axles_count"],
+                                         None, train_data[f"bogie{index}.axles_power"]))
+
+                # Récupère les paramètres de chacun des systèmes de freinages et ajoute le nombre de systèmes nécessaire
+                brakes_parameters = [None if not train_data[f"bogie{index}.pad.count"] else
+                                     (),  # TODO récupérer tous les paramètres du freinage par plaquette
+                                     None if not train_data[f"bogie{index}.disk.count"] else
+                                     (),  # TODO récupérer tous les paramètres du freinage par disque
+                                     None if not train_data[f"bogie{index}.magnetic.count"] else
+                                     (),  # TODO récupérer tous les paramètres du freinage par patins magnétiques
+                                     None if not train_data[f"bogie{index}.foucault.count"] else
+                                     (),  # TODO récupérer tous les paramètres du freinage par courant de foucault,
+                                    ]
+                self.braking.modify_brakes_count(self.traction.bogies[-1],
+                                                 [train_data[f"bogie{index}.{brake}.count"] for brake in ["pad", "disk", "magnetic", "foucault"]],
+                                                 brakes_parameters)
+                index += 1
+        except KeyError as error:
+            log.warning(f"Impossible de charger le bogie {index}. Les paramètres de celle-ci sont incomplets",
+                        exception=error)
+
+        # TODO : ajouter la lecture des autres systèmes (électriques, freinage...)
 
     def generate(self, train_data):
         """Fonction permettant d'initialiser les systèmes d'un train grâce aux paramètres simples
