@@ -266,7 +266,7 @@ Window{
         id: back_bogie
         objectName: "back_bogie"
 
-        default_x: 640 - 120 - 16
+        default_x: 640 - 140 - 16
         default_y: train_preview.default_y - 104
         generated: complex_popup.generated
 
