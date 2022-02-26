@@ -241,7 +241,6 @@ class PageRB2:
                 self.page.findChild(QObject, "mode_switchbutton").change_selection(1)  # 1 représentant le mode complexe
                 self.page.setProperty("generated", True)
                 self.complex_popup.win.setProperty("generated", True)
-                self.complex_popup.win.show()
                 self.complex_popup.set_complex_mode_values(train_data)
             else:
                 # Sinon repasse en mode paramétrage simple et réinitialise la popup complexe si nécessaire
@@ -452,6 +451,10 @@ class PageRB2:
 
             # Sauvegarde le fichier de paramètres train
             self.open_train_data_file(file_path[0])
+
+            # Si la popup complexe a été chargé, la montre
+            if self.complex_popup is not None and self.complex_popup.loaded:
+                self.complex_popup.win.show()
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_mode_switchbutton_clicked(self):
