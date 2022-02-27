@@ -109,14 +109,14 @@ Item {
     }
 
 
-    //Boite pour la dynamique
+    //Boite pour les coefficients de résistance à l'avancement à vide
     INI_button {
-        id: dynamic_data_box
-        objectName: "dynamic_data_box"
+        id: dynamic_empty_data_box
+        objectName: "dynamic_empty_data_box"
 
         default_x: root.default_x
         default_y: length_floatinput.default_y + length_floatinput.default_height
-        default_width: 640
+        default_width: 320
         default_height: 52
 
         is_visible: root.generated
@@ -129,7 +129,7 @@ Item {
             objectName: "modify_check"
 
             default_x: 1
-            default_y: dynamic_data_box.default_y + dynamic_data_box.default_height - box_length - 1
+            default_y: dynamic_empty_data_box.default_y + dynamic_empty_data_box.default_height - box_length - 1
             box_length: 16
 
             title: "coefficients à vide modifiables ?"
@@ -144,7 +144,7 @@ Item {
             text: "m       (                                                                       )"
             font_size: 10
 
-            default_x: dynamic_data_box.default_x + 5
+            default_x: dynamic_empty_data_box.default_x + 5
             default_y: a_empty_floatinput.default_y + (a_empty_floatinput.default_height - font_size) * 0.5 - 4
 
             is_dark_grey: !modify_check.is_checked || !m_empty_check.is_checked
@@ -169,7 +169,7 @@ Item {
             id: m_empty_check
             objectName: "m_empty_check"
 
-            default_x: dynamic_data_box.default_x + 20
+            default_x: dynamic_empty_data_box.default_x + 20
             default_y: v0_empty.default_y + 2
             box_length: a_empty_floatinput.font_size + 4
 
@@ -184,7 +184,7 @@ Item {
             objectName: "a_empty_floatinput"
 
             default_x: m_empty_check.default_x + m_empty_check.box_length + 16
-            default_y: dynamic_data_box.default_y + 4 + font_size
+            default_y: dynamic_empty_data_box.default_y + 4 + font_size
             default_width: 3 * default_height
             default_height: 16
 
@@ -291,16 +291,32 @@ Item {
             is_dark_grey: !modify_check.is_checked
             is_visible: root.generated
         }
+    }
 
 
+
+    //Boite pour les coefficients de résistance à l'avancement chargé
+    INI_button {
+        id: dynamic_full_data_box
+        objectName: "dynamic_full_data_box"
+
+        default_x: root.default_x + 320
+        default_y: length_floatinput.default_y + length_floatinput.default_height
+        default_width: 320
+        default_height: 52
+        background_color: "transparent"
+
+        is_visible: root.generated
+        is_positive: false
+        is_activable: false
 
         //checkbutton pour savoir si les valeurs à charge sont identiques
         INI_checkbutton {
             id: different_check
             objectName: "different_check"
 
-            default_x: 321
-            default_y: dynamic_data_box.default_y + dynamic_data_box.default_height - box_length - 1
+            default_x: dynamic_full_data_box.default_x + 1
+            default_y: dynamic_full_data_box.default_y + dynamic_full_data_box.default_height - box_length - 1
             box_length: 16
 
             title: "coefficients à charge différents ?"
@@ -315,7 +331,7 @@ Item {
             text: "m       (                                                                       )"
             font_size: 10
 
-            default_x: dynamic_data_box.default_x + 325
+            default_x: dynamic_full_data_box.default_x + 5
             default_y: a_full_floatinput.default_y + (a_full_floatinput.default_height - font_size) * 0.5 - 4
 
             is_dark_grey: !different_check.is_checked || !m_full_check.is_checked
@@ -340,7 +356,7 @@ Item {
             id: m_full_check
             objectName: "m_full_check"
 
-            default_x: dynamic_data_box.default_x + 340
+            default_x: dynamic_full_data_box.default_x + 20
             default_y: v0_full.default_y + 2
             box_length: a_full_floatinput.font_size + 4
 
@@ -354,7 +370,7 @@ Item {
             objectName: "a_full_floatinput"
 
             default_x: m_full_check.default_x + m_full_check.box_length + 16
-            default_y: dynamic_data_box.default_y + 4 + font_size
+            default_y: dynamic_full_data_box.default_y + 4 + font_size
             default_width: 3 * default_height
             default_height: 16
 
@@ -461,21 +477,5 @@ Item {
             is_dark_grey: !different_check.is_checked
             is_visible: root.generated
         }
-    }
-
-    //Boite pour la dynamique
-    INI_button {
-        id: box
-        objectName: "box"
-
-        default_x: root.default_x + 320
-        default_y: length_floatinput.default_y + length_floatinput.default_height
-        default_width: 320
-        default_height: 52
-        background_color: "transparent"
-
-        is_visible: root.generated
-        is_positive: false
-        is_activable: false
     }
 }
