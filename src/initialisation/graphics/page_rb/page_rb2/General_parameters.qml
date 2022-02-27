@@ -249,4 +249,136 @@ Item {
             is_dark_grey: !modify_check.is_checked
             is_visible: root.generated
         }
+
+
+
+        //checkbutton pour savoir si les valeurs à charge sont identiques
+        INI_checkbutton {
+            id: different_check
+            objectName: "different_check"
+
+            default_x: 321
+            default_y: dynamic_data_box.default_y + dynamic_data_box.default_height - box_length - 1
+            box_length: 16
+
+            title: "coefficients à charge différents ?"
+            font_size: 10
+        }
+
+
+
+        //floatinput pour le coefficient A vide
+        INI_floatinput{
+            id: a_full_floatinput
+            objectName: "a_full_floatinput"
+
+            default_x: dynamic_data_box.default_x + 321
+            default_y: dynamic_data_box.default_y + 4 + font_size
+            default_width: 3 * default_height
+            default_height: 16
+
+            maximum_value: root.a_max
+            minimum_value: 0
+            decimals: root.abc_decimals
+
+            title: "A(plein)"
+            unit: "kN"
+            font_size: 10
+
+            is_max_default: false
+            is_activable: different_check.is_checked
+            is_positive: false
+            is_visible: root.generated
+        }
+
+        INI_text{
+            id: v0_full
+            objectName: "v0_full"
+
+            text: " + "
+            font_size: 10
+
+            default_x: (a_full_floatinput.default_x + a_full_floatinput.default_width + b_full_floatinput.default_x - default_text_width) * 0.5
+            default_y: a_full_floatinput.default_y + (a_full_floatinput.default_height - font_size) * 0.5 - 4
+
+            is_dark_grey: !different_check.is_checked
+            is_visible: root.generated
+        }
+
+        //floatinput pour le coefficient B vide
+        INI_floatinput{
+            id: b_full_floatinput
+            objectName: "b_full_floatinput"
+
+            default_x: a_full_floatinput.default_x + 80
+            default_y: a_full_floatinput.default_y
+            default_width: a_full_floatinput.default_width
+            default_height: a_full_floatinput.default_height
+
+            maximum_value: root.b_max
+            minimum_value: 0
+            decimals: root.abc_decimals
+
+            title: "B(plein)"
+            unit: "kN/(km/h)"
+            font_size: 10
+
+            is_max_default: false
+            is_activable: different_check.is_checked
+            is_positive: false
+            is_visible: root.generated
+        }
+
+        INI_text{
+            id: v1_full
+            objectName: "v1_full"
+
+            text: "V + "
+            font_size: v0_full.font_size
+
+            default_x: (b_full_floatinput.default_x + b_full_floatinput.default_width + c_full_floatinput.default_x - default_text_width) * 0.5
+            default_y: b_full_floatinput.default_y + (b_full_floatinput.default_height - font_size) * 0.5 - 4
+
+            is_dark_grey: !different_check.is_checked
+            is_visible: root.generated
+        }
+
+        // floatinput pour le coefficient C
+        INI_floatinput{
+            id: c_full_floatinput
+            objectName: "c_full_floatinput"
+
+            default_x: b_full_floatinput.default_x + 80
+            default_y: b_full_floatinput.default_y
+            default_width: b_full_floatinput.default_width
+            default_height: b_full_floatinput.default_height
+
+            maximum_value: root.c_max
+            minimum_value: 0
+            decimals: root.abc_decimals
+
+            title: "C(plein)"
+            unit: "kN/(km/h)²"
+            font_size: 10
+
+            is_max_default: false
+            is_activable: different_check.is_checked
+            is_positive: false
+            is_visible: root.generated
+        }
+
+        INI_text{
+            id: v2_full
+            objectName: "v2_full"
+
+            text: "V²"
+            font_size: v1_full.font_size
+
+            default_x: c_full_floatinput.default_x + c_full_floatinput.default_width + (default_text_width) * 0.5
+            default_y: c_full_floatinput.default_y + (c_full_floatinput.default_height - font_size) * 0.5 - 4
+
+            is_dark_grey: !different_check.is_checked
+            is_visible: root.generated
+        }
+    }
 }
