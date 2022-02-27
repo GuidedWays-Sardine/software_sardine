@@ -145,7 +145,7 @@ Window{
         objectName: "left_arrow"
 
         default_x: 0
-        default_y: general_data.default_y - default_height - 12
+        default_y: general_data.default_y - default_height - 14
         default_width: 30
         default_height: 180
 
@@ -170,9 +170,10 @@ Window{
         default_height: left_arrow.default_height
         default_width: 580
 
-        image: "test2.png"
+        image: "test.png"
 
         is_visible: complex_popup.generated
+        is_activable: false
     }
 
     INI_button {
