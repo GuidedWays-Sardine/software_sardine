@@ -163,7 +163,7 @@ Item {
         indicator: Canvas {
             id: canvas
 
-            x: root.width - width - body.rightPadding
+            x: root.width - width - body.height/3
             y: body.topPadding + (body.availableHeight - height) / 2
             width: 12 * root.ratio
             height: 8 * root.ratio
