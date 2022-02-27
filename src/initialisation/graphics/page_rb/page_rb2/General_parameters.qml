@@ -134,6 +134,13 @@ Item {
 
             title: "coefficients à vide modifiables ?"
             font_size: 10
+
+            //signal appelé lorsque le checkbutton est cliqué
+            onValue_changed: {
+                if(!is_checked) {
+                    different_check.is_checked = false
+                }
+            }
         }
 
         //checkbutton pour indiquer si les coéfficients doivent être multipliés par la masse de la voiture
@@ -175,6 +182,28 @@ Item {
 
             is_dark_grey: !is_checked
             is_activable: modify_check.is_checked
+
+            // Signal appelé lorsque le checkbutton est cliqué
+            onValue_changed : {
+                //dans le cas où les coefficients à charge sont identiques, change l'état de la multiplication par m
+                if(!different_check.is_checked) {
+                    m_full_check.is_checked = m_empty_check.is_checked
+                }
+
+                //différencie le cas où les facteurs sont multipliés par la masse ou pas
+                if(is_checked) {
+                    //Divise chacun des coefficients par la masse minimale
+                    a_empty_floatinput.change_value(a_empty_floatinput.value / empty_weight_floatinput.value)
+                    b_empty_floatinput.change_value(b_empty_floatinput.value / empty_weight_floatinput.value)
+                    c_empty_floatinput.change_value(c_empty_floatinput.value / empty_weight_floatinput.value)
+                }
+                else {
+                    //Multiplie chacun des coefficients par la masse minimale
+                    a_empty_floatinput.change_value(a_empty_floatinput.value * empty_weight_floatinput.value)
+                    b_empty_floatinput.change_value(b_empty_floatinput.value * empty_weight_floatinput.value)
+                    c_empty_floatinput.change_value(c_empty_floatinput.value * empty_weight_floatinput.value)
+                }
+            }
         }
 
 
@@ -192,7 +221,7 @@ Item {
             minimum_value: 0
             decimals: root.abc_decimals
 
-            title: "A(vide)"
+            title: "A(vide) :"
             unit: "kN"
             font_size: 10
 
@@ -200,6 +229,14 @@ Item {
             is_activable: modify_check.is_checked
             is_positive: false
             is_visible: root.generated
+
+            //signal appelé lorsque la valeur est changée
+            onValue_changed: {
+                // Si la valeur à vide et à charge sont les même, mets aussi à jour la valeur à charge
+                if(!different_check.is_checked) {
+                    a_full_floatinput.change_value(a_empty_floatinput.value)
+                }
+            }
         }
 
         INI_text{
@@ -230,7 +267,7 @@ Item {
             minimum_value: 0
             decimals: root.abc_decimals
 
-            title: "B(vide)"
+            title: "B(vide) :"
             unit: "kN/(km/h)"
             font_size: 10
 
@@ -238,6 +275,14 @@ Item {
             is_activable: modify_check.is_checked
             is_positive: false
             is_visible: root.generated
+
+            //signal appelé lorsque la valeur est changée
+            onValue_changed: {
+                // Si la valeur à vide et à charge sont les même, mets aussi à jour la valeur à charge
+                if(!different_check.is_checked) {
+                    b_full_floatinput.change_value(b_empty_floatinput.value)
+                }
+            }
         }
 
         INI_text{
@@ -268,7 +313,7 @@ Item {
             minimum_value: 0
             decimals: root.abc_decimals
 
-            title: "C(vide)"
+            title: "C(vide) :"
             unit: "kN/(km/h)²"
             font_size: 10
 
@@ -276,6 +321,14 @@ Item {
             is_activable: modify_check.is_checked
             is_positive: false
             is_visible: root.generated
+
+            //signal appelé lorsque la valeur est changée
+            onValue_changed: {
+                // Si la valeur à vide et à charge sont les même, mets aussi à jour la valeur à charge
+                if(!different_check.is_checked) {
+                    c_full_floatinput.change_value(c_empty_floatinput.value)
+                }
+            }
         }
 
         INI_text{
@@ -321,7 +374,25 @@ Item {
 
             title: "coefficients à charge différents ?"
             font_size: 10
+
+            is_visible: root.generated
+            is_activable: modify_check.is_checked
+
+            // Signal appelé lorsque le checkbutton est cliqué
+            onValue_changed: {
+                // Dans le cas où le checkbutton est décoché, normalise les données pleines avec les données vides
+                if(!is_checked) {
+                    //Normalise le checlbutton pour multiplier les coefficients par la masse
+                    m_full_check.is_checked = m_empty_check.is_checked
+
+                    //normalise les valeurs des différents coefficients
+                    a_full_floatinput.change_value(a_empty_floatinput.value)
+                    b_full_floatinput.change_value(b_empty_floatinput.value)
+                    c_full_floatinput.change_value(c_empty_floatinput.value)
+                }
+            }
         }
+
 
         //checkbutton pour indiquer si les coéfficients doivent être multipliés par la masse de la voiture
         INI_text {
@@ -362,7 +433,25 @@ Item {
 
             is_dark_grey: !is_checked
             is_activable: different_check.is_checked
+
+            // Signal appelé lorsque le checkbutton est cliqué
+            onValue_changed : {
+                //différencie le cas où les facteurs sont multipliés par la masse
+                if(is_checked) {
+                    //Divise chacun des coefficients par la masse maximale
+                    a_full_floatinput.change_value(a_full_floatinput.value / full_weight_floatinput.value)
+                    b_full_floatinput.change_value(b_full_floatinput.value / full_weight_floatinput.value)
+                    c_full_floatinput.change_value(c_full_floatinput.value / full_weight_floatinput.value)
+                }
+                else {
+                    //Multiplie chacun des coefficients par la masse maximale
+                    a_full_floatinput.change_value(a_full_floatinput.value * full_weight_floatinput.value)
+                    b_full_floatinput.change_value(b_full_floatinput.value * full_weight_floatinput.value)
+                    c_full_floatinput.change_value(c_full_floatinput.value * full_weight_floatinput.value)
+                }
+            }
         }
+
 
         //floatinput pour le coefficient A vide
         INI_floatinput{
@@ -378,7 +467,7 @@ Item {
             minimum_value: 0
             decimals: root.abc_decimals
 
-            title: "A(plein)"
+            title: "A(plein) :"
             unit: "kN"
             font_size: 10
 
@@ -416,7 +505,7 @@ Item {
             minimum_value: 0
             decimals: root.abc_decimals
 
-            title: "B(plein)"
+            title: "B(plein) :"
             unit: "kN/(km/h)"
             font_size: 10
 
@@ -454,7 +543,7 @@ Item {
             minimum_value: 0
             decimals: root.abc_decimals
 
-            title: "C(plein)"
+            title: "C(plein) :"
             unit: "kN/(km/h)²"
             font_size: 10
 
