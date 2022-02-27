@@ -6,7 +6,7 @@ import "../../../components"
 Item {
     id: root
 
-    //propriétés sur la position ddu composant
+    //propriétés sur la position du composant
     property int default_x: 0
     property int default_y: 0
     anchors.fill: parent
@@ -31,7 +31,11 @@ Item {
                 axles_power_floatinput.change_value(0)
             }
         }
-    
+
+    //prioriétés sur la voiture paramétrée (pour savoir si l'essieu peut être paramétré)
+    property int railcars_count: 0
+    property int railcar_index: 0
+
     //propriétés du bogie
     readonly property bool articulated: root.any && (root.position == "front" || root.position == "back") && articulated_check.is_checked
     function set_articulated(articulated) {articulated_check.is_checked = articulated;} //fonction pour correctement indiquer si le bogie est articulé ou non
@@ -194,7 +198,7 @@ Item {
         font_size: 8
 
         is_checked: false
-        is_activable: true
+        is_activable: !((root.position == "front" && root.railcar_index == 0) || (root.position == "back" && root.railcar_index == (root.railcars_count - 1)))
         is_positive: false
         is_visible: root.generated && root.any && (root.position == "front" || root.position == "back")
     }

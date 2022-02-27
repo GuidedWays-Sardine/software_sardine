@@ -219,6 +219,8 @@ Window{
         generated: complex_popup.generated
 
         position: "front"
+        railcars_count: train_preview.train_length
+        railcar_index: train_preview.current_index
 
         default_axles_count: complex_popup.default_axles_count
         default_axles_power: complex_popup.default_axles_power
@@ -246,6 +248,8 @@ Window{
         generated: complex_popup.generated
 
         position: "middle"
+        railcars_count: train_preview.train_length
+        railcar_index: train_preview.current_index
 
         default_axles_count: complex_popup.default_axles_count
         default_axles_power: complex_popup.default_axles_power
@@ -271,7 +275,9 @@ Window{
         default_y: train_preview.default_y - 104
         generated: complex_popup.generated
 
-        position: "front"
+        position: "back"
+        railcars_count: train_preview.train_length
+        railcar_index: train_preview.current_index
 
         default_axles_count: complex_popup.default_axles_count
         default_axles_power: complex_popup.default_axles_power
