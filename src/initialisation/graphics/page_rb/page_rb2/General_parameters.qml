@@ -132,16 +132,58 @@ Item {
             default_y: dynamic_data_box.default_y + dynamic_data_box.default_height - box_length - 1
             box_length: 16
 
-            title: "coefficients modifiables ?"
+            title: "coefficients à vide modifiables ?"
             font_size: 10
         }
+
+        //checkbutton pour indiquer si les coéfficients doivent être multipliés par la masse de la voiture
+        INI_text {
+            id: m_empty_text
+            objectName: "m_empty_text"
+
+            text: "m       (                                                                       )"
+            font_size: 10
+
+            default_x: dynamic_data_box.default_x + 5
+            default_y: a_empty_floatinput.default_y + (a_empty_floatinput.default_height - font_size) * 0.5 - 4
+
+            is_dark_grey: !modify_check.is_checked || !m_empty_check.is_checked
+            is_visible: root.generated
+        }
+
+        INI_text {
+            id: m_empty_unit
+            objectName: "m_empty_unit"
+
+            text: "t"
+            font_size: 4
+
+            default_x: m_empty_check.default_x - default_text_width - 4
+            default_y: a_empty_floatinput.default_y + (a_empty_floatinput.default_height - font_size) * 0.5 - 1
+
+            is_dark_grey: true
+            is_visible: root.generated
+        }
+
+        INI_checkbutton {
+            id: m_empty_check
+            objectName: "m_empty_check"
+
+            default_x: dynamic_data_box.default_x + 20
+            default_y: v0_empty.default_y + 2
+            box_length: a_empty_floatinput.font_size + 4
+
+            is_dark_grey: !is_checked
+            is_activable: modify_check.is_checked
+        }
+
 
         //floatinput pour le coefficient A vide
         INI_floatinput{
             id: a_empty_floatinput
             objectName: "a_empty_floatinput"
 
-            default_x: dynamic_data_box.default_x + 1
+            default_x: m_empty_check.default_x + m_empty_check.box_length + 16
             default_y: dynamic_data_box.default_y + 4 + font_size
             default_width: 3 * default_height
             default_height: 16
@@ -265,14 +307,53 @@ Item {
             font_size: 10
         }
 
+        //checkbutton pour indiquer si les coéfficients doivent être multipliés par la masse de la voiture
+        INI_text {
+            id: m_full_text
+            objectName: "m_full_text"
 
+            text: "m       (                                                                       )"
+            font_size: 10
+
+            default_x: dynamic_data_box.default_x + 325
+            default_y: a_full_floatinput.default_y + (a_full_floatinput.default_height - font_size) * 0.5 - 4
+
+            is_dark_grey: !different_check.is_checked || !m_full_check.is_checked
+            is_visible: root.generated
+        }
+
+        INI_text {
+            id: m_full_unit
+            objectName: "m_full_unit"
+
+            text: "t"
+            font_size: 4
+
+            default_x: m_full_check.default_x - default_text_width - 4
+            default_y: a_full_floatinput.default_y + (a_full_floatinput.default_height - font_size) * 0.5 - 1
+
+            is_dark_grey: true
+            is_visible: root.generated
+        }
+
+        INI_checkbutton {
+            id: m_full_check
+            objectName: "m_full_check"
+
+            default_x: dynamic_data_box.default_x + 340
+            default_y: v0_full.default_y + 2
+            box_length: a_full_floatinput.font_size + 4
+
+            is_dark_grey: !is_checked
+            is_activable: different_check.is_checked
+        }
 
         //floatinput pour le coefficient A vide
         INI_floatinput{
             id: a_full_floatinput
             objectName: "a_full_floatinput"
 
-            default_x: dynamic_data_box.default_x + 321
+            default_x: m_full_check.default_x + m_full_check.box_length + 16
             default_y: dynamic_data_box.default_y + 4 + font_size
             default_width: 3 * default_height
             default_height: 16
@@ -380,5 +461,21 @@ Item {
             is_dark_grey: !different_check.is_checked
             is_visible: root.generated
         }
+    }
+
+    //Boite pour la dynamique
+    INI_button {
+        id: box
+        objectName: "box"
+
+        default_x: root.default_x + 320
+        default_y: length_floatinput.default_y + length_floatinput.default_height
+        default_width: 320
+        default_height: 52
+        background_color: "transparent"
+
+        is_visible: root.generated
+        is_positive: false
+        is_activable: false
     }
 }
