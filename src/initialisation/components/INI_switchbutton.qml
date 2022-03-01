@@ -19,18 +19,34 @@ Item {
         //Cas où la nouvelle liste est vide (vide le texte et n'appelle pas le signal selection_changed)
         if(root.elements.length === 0) {
             body.text = ""
+            body.image = ""
         }
         //Cas où la valeur actuelle n'est pas dans la nouvelle liste (met le texte au premier élément et appelle le signal selection_changed)
-        else if(!root.elements.includes(body.text)) {
-            body.text = root.elements[0]
+        else if((!root.elements.includes(body.text) && !image_mode) || (!root.elements.includes(body.image) && image_mode)) {
+            body.image = image_mode ? root.elements[0] : ""
+            body.text = image_mode ? "" : root.elements[0]
             root.selection_changed()
         }
     }
     readonly property int elements_count: elements.length
+    property bool image_mode: false
+    onImage_modeChanged: {
+        //swap both the image and the text
+        if(image_mode) {
+            body.image = body.text
+            body.text = ""
+        }
+        else {
+            body.text = body.image
+            body.image = ""
+        }
+    }
 
     //Propriétés sur les textes valides (texte visible sur le switchbutton et titre)
-    readonly property string selection_text: body.text
-    readonly property int selection_index: elements.includes(body.text) ? elements.indexOf(body.text) : -1
+    readonly property string selection_text: image_mode ? body.image : body.text
+    readonly property int selection_index: image_mode ? (elements.includes(body.image) ? elements.indexOf(body.image) : -1) :
+                                                        (elements.includes(body.text) ? elements.indexOf(body.text) : -1)
+
     property string title: ""
     property int font_size: 12              //police du texte
 
@@ -57,23 +73,29 @@ Item {
 
     //Différents signal handlers (à écrire en python)
     signal clicked()                        //détecte quand le bouton est cliqué
-    signal selection_changed()                  //détecte si la valeur a été changée
+    signal selection_changed()              //détecte si la valeur a été changée
 
 
     //Fonction permettant de changer la valeur active (peut prendre l'index de l'élément ou sa valeur)
     function change_selection(new_selection){
         // Si la nouvelle sélection est un int et que la valeur à l'index n'est pas la même que celle déjà visible, change la valeur et appelle le signal associé
-        if(typeof new_selection === typeof root.font_size && new_selection < root.elements.length && root.elements[new_selection].toUpperCase() !== body.text.toUpperCase()){
-            body.text = root.elements[new_selection]
-            root.selection_changed()
+        if(typeof new_selection === typeof root.font_size && new_selection < root.elements.length){
+            var previous_selection = (image_mode ? body.image : body.text).toLowerCase()
+            body.text = image_mode ? "" : root.elements[new_selection]
+            body.image = image_mode ? root.elements[new_selection] : ""
+
+            if((image_mode ? body.image : body.text).toLowerCase() != previous_selection){
+                root.selection_changed()
+            }
         }
         //Si la nouvelle sélection est un string et que la valeur ne correspond pas à celle déjà entrée, cherche l'élément avec le même index (recherche sans prendre en compte les majuscules et minuscules)
-        else if(typeof new_selection === typeof root.selection_text && new_selection.toUpperCase() !== body.text.toUpperCase()){
+        else if(typeof new_selection === typeof root.selection_text && new_selection.toUpperCase() !== (image_mode ? body.image : body.text).toUpperCase()){
             var uppercased = root.elements.map(name => name.toUpperCase())
             //Vérifie que le texte en majuscule est dans la liste, si oui, le change et appelle le signal associé
             if(uppercased.includes(new_selection.toUpperCase())) {
                 var new_index = uppercased.indexOf(new_selection.toUpperCase())
-                body.text = root.elements[new_index]
+                body.text = image_mode ? "" : root.elements[new_index]
+                body.image = image_mode ? root.elements[new_index] : ""
                 root.selection_changed()
             }
         }
@@ -102,6 +124,7 @@ Item {
         default_width: root.default_width
 
         text: ""
+        image: ""
 
         is_activable: root.is_activable && root.elements.length > 1
         is_dark_grey: root.is_dark_grey || root.elements.length <= 1
@@ -111,9 +134,14 @@ Item {
         onClicked: {
             //récupère l'index de l'élément actuel et affiche le suivant (ou le premier s'il est au bout du tableau)
             body.stop_blink()
-            var index = root.elements.indexOf(text)
+            var index = root.elements.indexOf(root.image_mode ? image : text)
             index = (index + 1) % root.elements.length
-            text = root.elements[index]
+            if(image_mode) {
+                image = root.elements[index]
+            }
+            else {
+                text = root.elements[index]
+            }
 
             //Appelle les signaux reliés au switchbutton
             root.clicked()
