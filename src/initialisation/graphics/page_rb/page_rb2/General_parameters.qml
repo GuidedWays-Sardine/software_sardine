@@ -9,6 +9,7 @@ Item {
     //propriétés sur la position ddu composant
     property int default_x: 0
     property int default_y: 0
+    property int train_preview_height: 180
     anchors.fill: parent
 
     //Propriétés sur l'état des paramètres simple
@@ -17,10 +18,19 @@ Item {
     //Propriétés sur les valeurs maximales
     property double max_weight: 1e9            //t
     property double max_length: 1e9            //m
-    readonly property double a_max: 1e3                 //kN
-    readonly property double b_max: 1e3                 //kN/(km/h)
-    readonly property double c_max: 1e3                 //kM/(km/h)²
+    readonly property double a_max: 1e3        //kN
+    readonly property double b_max: 1e3        //kN/(km/h)
+    readonly property double c_max: 1e3        //kM/(km/h)²
     readonly property int abc_decimals: 8
+    property var positions_list: []         //Liste des liens vers les icones de positions du train (selon la mission)
+    property var missions_list: []          // Liste des différentes missions possible pour la voiture (traduisible)
+    property var missions_list_values: []   //Liste des différentes missions EN ANGLAIS (nécessaire pour la position
+    property var max_doors_list: []         // Liste du nombre de portes maximales selon la mission
+    property var max_levels_list: []        // Liste du nombre de niveaux maximum selon la mission
+
+
+
+
 
     INI_text {
         id: length_bar
@@ -106,6 +116,101 @@ Item {
         is_activable: true
         is_positive: false
         is_visible: root.generated
+    }
+
+
+    INI_button {
+        id: general_data_box
+        objectName: "general_data_box"
+
+        default_x: 640 - default_width - 31
+        default_y: dynamic_empty_data_box.default_y - root.train_preview_height - 27
+        default_height: 36
+        default_width: 220
+
+        is_visible: root.generated
+        is_positive: false
+        is_activable: false
+
+
+        //combobox pour indiquer la mission de la voiture (à titre visuel)
+        INI_combobox {
+            id: mission_combo
+            objectName: "mission_combo"
+
+            default_x: general_data_box.default_x + 1
+            default_y: general_data_box.default_y + 16
+            default_width: 68
+            default_height: 20
+
+            elements: root.missions_list
+            title: "mission"
+            font_size: 10
+
+            is_positive: false
+            is_activable: true
+            is_visible: root.generated
+        }
+
+        //switchbutton pour indiquer le type de position de la voiture (avant, arrière, milieu)
+        INI_switchbutton {
+            id: position_switch
+            objectName: "position_switch"
+
+            default_x: mission_combo.default_x + mission_combo.default_width + 6
+            default_y: mission_combo.default_y
+            default_width: 44
+            default_height: mission_combo.default_height
+
+            elements: root.positions_list
+            image_mode: true
+            title: "position"
+            font_size: 10
+
+            is_positive: false
+            is_activable: true
+            is_visible: root.generated
+        }
+
+        INI_integerinput {
+            id: levels_integerinput
+            objectName: "levels_integerinput"
+
+            default_x: position_switch.default_x + position_switch.default_width + 6
+            default_y: mission_combo.default_y
+            default_width: 44
+            default_height: mission_combo.default_height
+
+            minimum_value: 0
+            maximum_value: mission_combo.selection_index != -1 ? root.max_levels_list[mission_combo.selection_index] : 0
+            is_max_default: false
+            title: "niveaux"
+            font_size: 10
+
+            is_positive: false
+            is_activable: maximum_value > 0
+            is_visible: root.generated
+        }
+
+        INI_integerinput {
+            id: doors_integerinput
+            objectName: "doors_integerinput"
+
+            default_x: levels_integerinput.default_x + levels_integerinput.default_width + 6
+            default_y: mission_combo.default_y
+            default_width: 44
+            default_height: mission_combo.default_height
+
+            minimum_value: 0
+            maximum_value: mission_combo.selection_index != -1 ? root.max_doors_list[mission_combo.selection_index] : 0
+            is_max_default: false
+            title: "portes"
+            font_size: 10
+
+            is_positive: false
+            is_activable: maximum_value > 0
+            is_visible: root.generated
+        }
     }
 
 
