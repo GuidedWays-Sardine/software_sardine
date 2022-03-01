@@ -22,7 +22,7 @@ class Position(Enum):
     BACK = "back"
 
 
-class MissionType(Enum):
+class Mission(Enum):
     """Enum permettant de connaitre le type de mission (pour la génération"""
     # Feature : ajouter les autres modes de transports ci-dessous. Ils seront automatiquement détectés par les modules
     PASSENGER = "Passengers"

@@ -86,7 +86,7 @@ class PageRB2:
         self.train_name_widget = self.page.findChild(QObject, "train_name_stringinput")
 
         # Initialise la combobox avec les types de trains
-        self.page.findChild(QObject, "mission_type_combo").setProperty("elements", [translation_data[key.value] for key in tdb.MissionType])
+        self.page.findChild(QObject, "mission_type_combo").setProperty("elements", [translation_data[key.value] for key in tdb.Mission])
 
         # Tente d'initialiser la fenêtre de paramétrage complexe
         try:
@@ -402,7 +402,7 @@ class PageRB2:
             Propriétés du train
         """
         # Change le type de mission (en récupérant l'index de l'élément sauvegardé et en le changeant sur le combobox
-        mission_index = tdb.MissionType[train_data.get_value("mission", str(tdb.MissionType.PASSENGER))[12:]].value
+        mission_index = tdb.Mission[train_data.get_value("mission", "Mission.PASSENGER")[8:]].value
         self.page.findChild(QObject, "mission_type_combo").change_selection(mission_index)
 
         # Change les données de la fenêtre principale du paramétrage train

@@ -64,7 +64,7 @@ class Systems:
         index = 0
         try:
             while f"railcar{index}.mission_type" in train_data:
-                self.frame.add_railcar((tdb.MissionType[train_data[f"railcar{index}.mission_type"][12:]],
+                self.frame.add_railcar((tdb.Mission[train_data[f"railcar{index}.mission_type"][8:]],
                                         tdb.Position[train_data[f"railcar{index}.position_type"][9:]],
                                         train_data[f"railcar{index}.position_type"],
                                         train_data[f"railcar{index}.levels"], train_data[f"railcar{index}.doors"],
@@ -83,7 +83,7 @@ class Systems:
         index = 0
         try:
             while f"bogie{index}.linked_railcars" in train_data:
-                self.traction.add_bogie((None if train_data[f"bogie{index}.position_type"] is None else tdb.Position.MIDDLE#tdb.Position[train_data[f"bogie{index}.position_type"][9:]]
+                self.traction.add_bogie((None if train_data[f"bogie{index}.position_type"] is None else tdb.Position[train_data[f"bogie{index}.position_type"][9:]]
                                          ,
                                          train_data[f"bogie{index}.linked_railcars"],
                                          train_data[f"bogie{index}.axles_count"],
@@ -183,7 +183,7 @@ class Systems:
         next_bogies_count = train_data["bogies_count"]
 
         # stocke dans une varible temporaire la mission générale du train (pour simplifier sa lecture
-        general_mission = tdb.MissionType[str(train_data.get_value("mission", "MissionType.PASSENGER"))[12:]]
+        general_mission = tdb.Mission[str(train_data.get_value("mission", "Mission.PASSENGER"))[8:]]
 
         # Passe par chacune des voitures du train
         for car_index in range(train_data["railcars_count"]):
@@ -315,8 +315,8 @@ class Systems:
                                                                 tdb.Position.BACK if car_index == (train_data["railcars_count"] - 1)
                                                                 else tdb.Position.MIDDLE),
                                                  position_index=car_index,
-                                                 levels=1 if general_mission != tdb.MissionType.FREIGHT else 0,
-                                                 doors=2 if general_mission != tdb.MissionType.FREIGHT else 0,
+                                                 levels=1 if general_mission != tdb.Mission.FREIGHT else 0,
+                                                 doors=2 if general_mission != tdb.Mission.FREIGHT else 0,
                                                  Mtare=railcar_weight,
                                                  Mfull=railcar_weight,
                                                  length=train_data["length"] / train_data["railcars_count"],

@@ -47,7 +47,7 @@ class Railcar:
 
         Parameters
         ----------
-        mission_type: `tdb.MissionType`
+        mission_type: `tdb.Mission`
             Type de mission associé à la voiture
         position_type: `tdb.Position`
             Permet d'indiquer la forme de la voiture (avant : pupitre à gauche ; arrière : pupitre à droite)
@@ -81,7 +81,7 @@ class Railcar:
 
         Parameters
         ----------
-        mission_type: `tdb.MissionType`
+        mission_type: `tdb.Mission`
             Type de mission associé à la voiture
         position_type: `tdb.Position`
             Permet d'indiquer la forme de la voiture (avant : pupitre à gauche ; arrière : pupitre à droite)
