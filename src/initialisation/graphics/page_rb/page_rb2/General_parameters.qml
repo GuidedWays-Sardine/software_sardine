@@ -29,6 +29,70 @@ Item {
     property var max_levels_list: []        // Liste du nombre de niveaux maximum selon la mission
 
 
+    //Fonction pour réinitialiser le module
+    function clear() {
+        //Décoche tous les checkbuttons
+        m_full_check.is_checked = false
+        m_empty_check.is_checked = false
+        different_check.is_checked = false
+        modify_check.is_checked = false
+
+        //Remet la mission à la première et repasse le nombre de niveaux et de portes à 0
+        position_switch.change_selection(1)
+        mission_combo.change_selection(0)
+        levels_integerinput.change_value(0)
+        doors_integerinput.change_value(0)
+
+        //Remet les valeurs des différents coefficients à 0
+        a_empty_floatinput.change_value(0.0)
+        b_empty_floatinput.change_value(0.0)
+        c_empty_floatinput.change_value(0.0)
+        a_full_floatinput.change_value(0.0)
+        b_full_floatinput.change_value(0.0)
+        c_full_floatinput.change_value(0.0)
+    }
+
+
+    //Fonction permettant de changer les valeurs du module
+    //Format : int(tdb.Position), int(mission_type), levels, doors, [ABCempty] bool(xm_empty), [ABCfull], bool(xm_full)
+    function change_values(position_int, mission_int, levels, doors, ABCempty, xm_empty, ABCfull, xm_full) {
+        //commence par les informations générales
+        position_switch.change_selection(position_int)
+        mission_combo.change_selection(mission_int)
+        levels_integerinput.change_value(0)
+        doors_integerinput.change_value(0)
+
+        //si les valeurs sont différentes active les checkbuttons
+        if(xm_empty != xm_full || ABCempty.length != 3 || ABCfull.length != 3 || ABCempty != ABCfull) {
+            modify_check.is_checked = true
+            different_check.is_checked = true
+        }
+
+        //Change les facteurs vides
+        if(ABCempty.length == 3) {
+            m_empty_check.is_checked = xm_empty
+            a_empty_floatinput.change_value(ABCempty[0])
+            b_empty_floatinput.change_value(ABCempty[1])
+            c_empty_floatinput.change_value(ABCempty[2])
+        }
+
+        //Change les facteurs à charge
+        if(ABCfull.length == 3) {
+            m_full_check.is_checked = xm_full
+            a_full_floatinput.change_value(ABCfull[0])
+            b_full_floatinput.change_value(ABCfull[1])
+            c_full_floatinput.change_value(ABCfull[2])
+        }
+    }
+
+
+    //Fonction permettant de récupérer les valeurs
+    function get_values() {
+        //Format : [int(tdb.Position), int(mission_type), levels, doors, [ABCempty] bool(xm_empty), [ABCfull], bool(xm_full)]
+        return [position_switch.selection_index, mission_combo.selection_index, levels_floatinput.value, doors_floatinput.value,
+                [a_empty_floatinput.value, b_empty_floatinput.value, c_empty_floatinput.value], m_empty_check,
+                [a_full_floatinput.value, b_full_floatinput.value, c_full_floatinput.value], m_full_check]
+    }
 
 
 
