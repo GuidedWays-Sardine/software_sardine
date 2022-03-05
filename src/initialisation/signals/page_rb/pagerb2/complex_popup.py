@@ -73,6 +73,16 @@ class ComplexPopup:
             self.win.railcar_changed.connect(self.on_railcar_changed)
             self.win.update.connect(self.update_popup)
 
+            # Indique les choix de matériel roulant et de positions possible
+            self.win.setProperty("positions_type", [key.value for key in tdb.Position])
+            self.win.setProperty("missions_type", [key.value for key in tdb.Mission])
+            # Feature : rajouter le nombre maximum de portes et de niveaux pour les différents systèmes
+            self.win.setProperty("max_doors_list", [0 if key == tdb.Mission.FREIGHT else
+                                                    4 for key in tdb.Mission])
+            self.win.setProperty("max_levels_list", [2 if key == tdb.Mission.PASSENGER else
+                                                     0 if key == tdb.Mission.FREIGHT else
+                                                     1 for key in tdb.Mission])
+
             # Indique que la fenêtre est complètement
             self.loaded = True
             log.info("Chargement de la popup de paramétrage complexe réussi avec succès.")
