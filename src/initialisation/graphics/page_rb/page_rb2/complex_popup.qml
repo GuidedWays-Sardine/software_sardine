@@ -153,9 +153,9 @@ Window{
         objectName: "left_arrow"
 
         default_x: 0
-        default_y: general_data.default_y - default_height - 14
+        default_y: railcar_view.default_y
         default_width: 30
-        default_height: 180
+        default_height: railcar_view.default_height
 
         image_activable: "Navigation/grey_left_arrow.bmp"
         image_not_activable: "Navigation/dark_grey_left_arrow.bmp"
@@ -170,15 +170,13 @@ Window{
         }
     }
 
-    INI_button {
-        id: test
+    INI_button {        //TODO : replace with real railcar_view widget
+        id: railcar_view
 
         default_x: 30
-        default_y: left_arrow.default_y
-        default_height: left_arrow.default_height
-        default_width: 580
-
-        image: "test.png"
+        default_y: general_data.default_y - default_height - 14
+        default_width: 640 - (2 * 30)
+        default_height: 180
 
         is_visible: complex_popup.generated
         is_activable: false
@@ -189,9 +187,9 @@ Window{
         objectName: "right_arrow"
 
         default_x: 640 - default_width
-        default_y: left_arrow.default_y
+        default_y: railcar_view.default_y
         default_width: 30
-        default_height: 180
+        default_height: railcar_view.default_height
 
         image_activable: "Navigation/grey_right_arrow.bmp"
         image_not_activable: "Navigation/dark_grey_right_arrow.bmp"
