@@ -251,10 +251,20 @@ class ComplexPopup:
         railcar_index: `int`
             index de la voiture dont les données seront récupérés (0 à Nrailcar - 1)
         """
-        # TODO : mettre à jour les données générales
         # TODO : mettre à jour les données de l'électrification
 
-        #S'occupe du bogie avant
+        # Récupère les paramètres de la voiture, les stockes et les mets à jour dans la voiture
+        parameters = self.win.findChild(QObject, "general_data").get_values().toVariant()
+        self.train_database.systems.frame.railcars[railcar_index].set_general_values(tdb.mission_getter[parameters[0]],
+                                                                                     tdb.Position.FRONT if parameters[1] == 0 else
+                                                                                     tdb.Position.BACK if parameters[1] == 2 else
+                                                                                     tdb.Position.MIDDLE,
+                                                                                     railcar_index, parameters[5], parameters[6],
+                                                                                     parameters[2], parameters[3], parameters[4],
+                                                                                     parameters[7], parameters[8],
+                                                                                     parameters[9], parameters[10])
+
+        # S'occupe du bogie avant
         # Récupère les données du bogie sur la popup complexe
         front_bogie_data = self.win.findChild(QObject, "front_bogie").get_values().toVariant()
         # Si les données sont vides ou que articulé est désactivé :
@@ -343,7 +353,6 @@ class ComplexPopup:
             back_modify_brakes = [b_a - b_c for b_a, b_c in zip(back_bogie_data[3][0], self.train_database.systems.braking.get_bogie_brakes_count(back_bogie[0]))]
             self.train_database.systems.braking.modify_brakes_count(back_bogie[0], back_modify_brakes)
 
-
     def update_popup(self, index):
         """Fonction permettant de récupérer les valeurs de la base de données et de les mettre sur la popup
         Attention, l'appel de cette fonction écrase les données visibles sur la popup de paramétrage complexe
@@ -353,9 +362,16 @@ class ComplexPopup:
         index: `int`
             index de la voiture dont les données seront lus (0 à Nrailcar - 1)
         """
-        # TODO : inclure les systèmes de freinage
         # TODO : faire l'électrification
-        # TODO : faire les données générales
+
+        # S'occupe des donnés générales
+        parameters = self.train_database.systems.frame.railcars[index].get_general_values()
+        self.win.findChild(QObject, "general_data").change_values(tdb.mission_getter[parameters[0]],
+                                                                  parameters[1].value,
+                                                                  [parameters[5], parameters[6]], parameters[7],
+                                                                  parameters[3], parameters[4],
+                                                                  parameters[8], parameters[9],
+                                                                  parameters[10], parameters[11])
 
         # S'occupe maintenant du bogie avant.
         front_bogie = self.train_database.systems.traction.get_bogies(index, tdb.Position.FRONT)
