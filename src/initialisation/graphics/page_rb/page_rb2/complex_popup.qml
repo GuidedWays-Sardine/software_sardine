@@ -13,6 +13,7 @@ Window{
     visible: false
     color: "#031122"
     title: "Outil de paramétrage complexe de train Sardine"
+    property bool generated: false
 
     // Différentes propriétés sur le train complet
     property var mission_list: []   // Liste contenant le type de chacune des voitures (fret, passager, ...)
@@ -58,6 +59,8 @@ Window{
 
 
     //Propriétés sur les différentes valeurs par défaut (définit lorsque la gfenêtre est générée
+    property var positions_type: []         //Liste des différentes positions possibles
+    property var missions_type: []          //Liste des différentes missions EN ANGLAIS (nécessaire pour la position
     property int default_axles_count: 2
     property double default_axles_power: 750.0
     property int default_pad_brakes_count: 0
@@ -66,17 +69,22 @@ Window{
     property int default_foucault_brake_count: 0
 
     //Propriétés sur les différentes limites de paramétrabilité
+    property double max_railcar_weight: 1e9   //t
+    property double max_railcar_length: 1e9   //m
+    property double a_max: 1e3        //kN
+    property double b_max: 1e3        //kN/(km/h)
+    property double c_max: 1e3        //kM/(km/h)²
+    property int abc_decimals: 8
+    property var max_doors_list: []         //Liste du nombre de portes maximales selon la mission
+    property var max_levels_list: []        //Liste du nombre de niveaux maximum selon la mission
     property int max_bogies_per_railcar: 1e1
-    onMax_bogies_per_railcarChanged: {if(max_bogies_per_railcar) {max_bogies_per_railcar = 3;}} //Pour s'assure qu'il est au moins à 3
+    onMax_bogies_per_railcarChanged: {if(max_bogies_per_railcar < 3) {max_bogies_per_railcar = 3;}} //Pour s'assure qu'il est au moins à 3
     property int max_axles_per_bogie: 1e1
     property double max_axles_power: 1e4
     property int max_pad_brakes_per_axle: 2
     property int max_disk_brakes_per_axle: 4
     property int max_magnetic_brakes_per_axle: 2       //Identique pour le freinage de foucault
 
-
-    // Propriété permettant de savoir si la fenêtre a été générée
-    property bool generated: false
 
     //Signal utilisé pour détecter quand le fenêtre est fermée et quitter l'application
     signal closed()
@@ -205,8 +213,29 @@ Window{
 
         default_x: 0
         default_y: front_bogie.default_y - 66
-
+        railcar_view_height: railcar_view.default_height
         generated: complex_popup.generated
+        railcar_index: train_preview.current_index
+
+        max_railcar_weight: complex_popup.max_railcar_weight
+        max_railcar_length: complex_popup.max_railcar_length
+        a_max: complex_popup.a_max
+        b_max: complex_popup.b_max
+        c_max: complex_popup.c_max
+        abc_decimals: complex_popup.abc_decimals
+
+        positions_type: complex_popup.positions_type
+        missions_type: complex_popup.missions_type
+        missions_type_trad: complex_popup.missions_type
+        max_doors_list: complex_popup.max_doors_list
+        max_levels_list: complex_popup.max_levels_list
+
+        onUpdate_icon: {
+            complex_popup.mission_list[railcar_index] = railcar_mission_type
+            complex_popup.position_list[railcar_index] = railcar_position_type
+            train_preview.mission_listChanged()
+            train_preview.position_listChanged()
+        }
     }
 
     //Paramètres pour le bogie avant du train
