@@ -30,6 +30,11 @@ Item {
     property var max_levels_list: []        //Liste du nombre de niveaux maximum selon la mission
 
 
+    //signal et variables nécessaire pour mettre à jour l'icone
+    readonly property string railcar_position_type: positions_type.length > 0 ? positions_type[position_switch.selection_index] : ""
+    readonly property string railcar_mission_type: missions_type.length > 0 ? missions_type[mission_combo.selection_index] : ""
+    signal update_icon()
+
     //Fonction pour réinitialiser le module
     function clear() {
         //Décoche tous les checkbuttons
@@ -202,7 +207,7 @@ Item {
         default_x: 640 - default_width - 31
         default_y: dynamic_empty_data_box.default_y - root.railcar_view_height - 27
         default_height: 36
-        default_width: 220
+        default_width: 240
 
         is_visible: root.generated
         is_positive: false
@@ -226,6 +231,22 @@ Item {
             is_positive: false
             is_activable: true
             is_visible: root.generated
+
+            // Signal appelé lorsque la sélection du combobox change
+            onSelection_changed: {
+                // mets à jour la liste des images et remet l'image visible
+                var index = position_switch.selection_index
+                position_switch.elements = [("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_front.png"),
+                                            ("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_middle.png"),
+                                            ("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_back.png")]
+                position_switch.change_selection(index)
+            }
+
+            // Signal appelé lorsque la combobox est fermée
+            onCombobox_closed: {
+                // Appelle le signal pour mettre à jour l'icone
+                root.update_icon()
+            }
         }
 
         //switchbutton pour indiquer le type de position de la voiture (avant, arrière, milieu)
@@ -246,6 +267,21 @@ Item {
             is_positive: false
             is_activable: root.railcar_index != 0
             is_visible: root.generated
+
+            // Signal appelé lorsque l'activabilité du switchbutton change
+            onIs_activableChanged: {
+                // mets à jour la liste des images et remet l'image visible
+                var index = position_switch.selection_index
+                position_switch.elements = [("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (is_activable ? "" : "dark_") + "grey_front.png"),
+                                            ("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (is_activable ? "" : "dark_") + "grey_middle.png"),
+                                            ("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (is_activable ? "" : "dark_") + "grey_back.png")]
+                position_switch.change_selection(index)
+            }
+
+            // Signal appelé lorsque le switchbutton est cliqué
+            onClicked: {
+                root.update_icon()
+            }
         }
 
         INI_integerinput {
