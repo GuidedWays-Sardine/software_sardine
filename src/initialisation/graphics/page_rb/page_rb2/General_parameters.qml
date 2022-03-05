@@ -58,18 +58,24 @@ Item {
 
 
     //Fonction permettant de changer les valeurs du module
-    //Format : int(tdb.Position), int(mission_type), levels, doors, [ABCempty] bool(xm_empty), [ABCfull], bool(xm_full)
-    function change_values(position_int, mission_int, levels, doors, ABCempty, xm_empty, ABCfull, xm_full) {
+    //Format : int(tdb.Mission.value), str(tdb.Position.value), [empty_weight, full_weight], length, levels, doors, [ABCempty] bool(xm_empty), [ABCfull], bool(xm_full)
+    function change_values(mission_int, position_type, weight, length, levels, doors, ABCempty, xm_empty, ABCfull, xm_full) {
         //commence par les informations générales
-        position_switch.change_selection(position_int)
         mission_combo.change_selection(mission_int)
-        levels_integerinput.change_value(0)
-        doors_integerinput.change_value(0)
+        position_switch.change_selection(root.positions_type.includes(position_type) ? root.positions_type.indexOf(position_type) : 1)
+        levels_integerinput.change_value(levels)
+        doors_integerinput.change_value(doors)
+        empty_weight_floatinput.change_value(weight[0])
+        full_weight_floatinput.change_value(weight[1])
+        length_floatinput.change_value(levels)
 
         //si les valeurs sont différentes active les checkbuttons
-        if(xm_empty != xm_full || ABCempty.length != 3 || ABCfull.length != 3 || ABCempty != ABCfull) {
+        if(xm_empty != xm_full || ABCempty.length != 3 || ABCfull.length != 3 || ABCempty[0] != ABCfull[0] || ABCempty[1] != ABCfull[1] || ABCempty[2] != ABCfull[2]) {
             modify_check.is_checked = true
             different_check.is_checked = true
+        }
+        else {
+            different_check.is_checked = false
         }
 
         //Change les facteurs vides
