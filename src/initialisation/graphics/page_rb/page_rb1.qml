@@ -92,6 +92,7 @@ Item {
         default_height: 50
 
         elements: ["Complet"]
+        image_mode: false
         title: "Niveau de registre"
 
         is_activable: true

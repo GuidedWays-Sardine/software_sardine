@@ -63,10 +63,8 @@ Item {
     //Fonction pour changer l'index de la combobox en fonction de l'index ou du texte de la sélection souhaité
     function change_selection(new_selection){
         // Si la nouvelle sélection est un int, change le currentIndex en fonction de l'index envoyé
-        if(typeof new_selection === typeof root.font_size){
-            if(new_selection < combo.count){
-                combo.currentIndex = new_selection
-            }
+        if(typeof new_selection === typeof root.font_size && new_selection < combo.count && new_selection >= 0){
+            combo.currentIndex = new_selection
         }
         // Si la nouvelle sélection est un string, cherche l'élément avec le même index
         else if(typeof new_selection === typeof root.selection_text){
@@ -163,7 +161,7 @@ Item {
         indicator: Canvas {
             id: canvas
 
-            x: root.width - width - body.rightPadding
+            x: root.width - width - body.height/3
             y: body.topPadding + (body.availableHeight - height) / 2
             width: 12 * root.ratio
             height: 8 * root.ratio

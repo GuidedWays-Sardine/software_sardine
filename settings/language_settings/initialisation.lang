@@ -48,7 +48,7 @@ Nom du train (utilisé pour le nom du fichier);Train name (used for the file nam
 Informations générales;General informations
 Mconvoi;Mconvoy
 Lconvoi;Lconvoy
-Nvoitures;Ncoaches
+Nvoitures;Nrailcars
 Nbogies;Nbogies
 Nessieux/bogies;Naxles/bogies
 Nessieux moteurs;Nmotorized axles
@@ -66,11 +66,11 @@ Pantographe ?;Pantograph ?
 Thermique ?;Thermic ?
 
 Systèmes de freinage;Braking systems
-Nplaquettes;Npads
-Npatins magnétiques;Nmagnetic brakes
-Récupération ?;Regenerative ?
+Nplaquettes (paires);Npads (pairs)
 Ndisques;Ndisks
-Nfoucault;Nfoucault brakes
+Récupération ?;Regenerative ?
+Nmagnétique (paires);Nmagnetics (pairs)
+Nfoucault (paires);Nfoucault (pairs)
 Rhéostatique ?; Dynamic ?
 
 Paramétrage;Configuration
@@ -88,10 +88,10 @@ Une fois le train généré, Certains paramètres seront inchangeables ou utilis
 Articulé ?;Jacob ?
 Nessieux;Naxles
 Pmoteur;Pmotor
-Nplaquettes;Npads
-Npatins magnétiques;Nmagnetic brakes
+Nplaquettes (paires);Npads (pairs)
 Ndisques;Ndisks
-Nfoucault;Nfoucault
+Nmagnétique (paires);Nmagnetics (pairs)
+Nfoucault (paires);Nfoucault (pairs)
 
 
 #page_rb8

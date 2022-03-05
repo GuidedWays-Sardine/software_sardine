@@ -13,9 +13,10 @@ Window{
     visible: false
     color: "#031122"
     title: "Outil de paramétrage complexe de train Sardine"
+    property bool generated: false
 
     // Différentes propriétés sur le train complet
-    property var type_list: []      // Liste contenant le type de chacune des voitures (fret, passager, ...)
+    property var mission_list: []   // Liste contenant le type de chacune des voitures (fret, passager, ...)
     property var position_list: []  // Liste contenant la position de chacune des voitures (avant, arrière, milieu)
 
     // Propriétés sur les bogies
@@ -47,30 +48,49 @@ Window{
         }
     }
 
+    //Propriétés sur l'index
+    property int previous_railcar_index: 0
+    property int current_railcar_index: train_preview.current_index
+    onCurrent_railcar_indexChanged: {
+        // lorsque l'index de la voiture paramétrée est changée, appelle la fonction update et change le précédent index
+        complex_popup.railcar_changed()
+        complex_popup.previous_railcar_index = complex_popup.current_railcar_index
+    }
+
+
     //Propriétés sur les différentes valeurs par défaut (définit lorsque la gfenêtre est générée
-    property int default_axle_count: 2
-    property double default_axle_power: 750.0
-    property int default_pad_brake_count: 0
-    property int default_disk_brake_count: 0
+    property var positions_type: []         //Liste des différentes positions possibles
+    property var missions_type: []          //Liste des différentes missions EN ANGLAIS (nécessaire pour la position
+    property int default_axles_count: 2
+    property double default_axles_power: 750.0
+    property int default_pad_brakes_count: 0
+    property int default_disk_brakes_count: 0
     property int default_magnetic_brake_count: 0
     property int default_foucault_brake_count: 0
 
     //Propriétés sur les différentes limites de paramétrabilité
-    property int max_bogies_per_coaches: 1e1
-    onMax_bogies_per_coachesChanged: {if(max_bogies_per_coaches) {max_bogies_per_coaches = 3;}} //Pour s'assure qu'il est au moins à 3
-    property int max_axles_per_bogies: 1e1
-    property double max_axle_power: 1e4
-    property int max_pad_per_axle: 2
-    property int max_disk_per_axle: 4
-    property int max_magnetic_between_axle: 2       //Identique pour le freinage de foucault
+    property double max_railcar_weight: 1e9   //t
+    property double max_railcar_length: 1e9   //m
+    property double a_max: 1e3        //kN
+    property double b_max: 1e3        //kN/(km/h)
+    property double c_max: 1e3        //kM/(km/h)²
+    property int abc_decimals: 8
+    property var max_doors_list: []         //Liste du nombre de portes maximales selon la mission
+    property var max_levels_list: []        //Liste du nombre de niveaux maximum selon la mission
+    property int max_bogies_per_railcar: 1e1
+    onMax_bogies_per_railcarChanged: {if(max_bogies_per_railcar < 3) {max_bogies_per_railcar = 3;}} //Pour s'assure qu'il est au moins à 3
+    property int max_axles_per_bogie: 1e1
+    property double max_axles_power: 1e4
+    property int max_pad_brakes_per_axle: 2
+    property int max_disk_brakes_per_axle: 4
+    property int max_magnetic_brakes_per_axle: 2       //Identique pour le freinage de foucault
 
-
-
-    // Propriété permettant de savoir si la fenêtre a été générée
-    property bool generated: false
 
     //Signal utilisé pour détecter quand le fenêtre est fermée et quitter l'application
     signal closed()
+    signal railcar_changed()
+    signal update()
+
 
     onVisibilityChanged: {
         if(!complex_popup.visible) {
@@ -133,9 +153,9 @@ Window{
         objectName: "left_arrow"
 
         default_x: 0
-        default_y: general_data.default_y - default_height - 12
+        default_y: railcar_view.default_y
         default_width: 30
-        default_height: 180
+        default_height: railcar_view.default_height
 
         image_activable: "Navigation/grey_left_arrow.bmp"
         image_not_activable: "Navigation/dark_grey_left_arrow.bmp"
@@ -150,14 +170,26 @@ Window{
         }
     }
 
+    INI_button {        //TODO : replace with real railcar_view widget
+        id: railcar_view
+
+        default_x: 30
+        default_y: general_data.default_y - default_height - 14
+        default_width: 640 - (2 * 30)
+        default_height: 180
+
+        is_visible: complex_popup.generated
+        is_activable: false
+    }
+
     INI_button {
         id: right_arrow
         objectName: "right_arrow"
 
         default_x: 640 - default_width
-        default_y: left_arrow.default_y
+        default_y: railcar_view.default_y
         default_width: 30
-        default_height: 180
+        default_height: railcar_view.default_height
 
         image_activable: "Navigation/grey_right_arrow.bmp"
         image_not_activable: "Navigation/dark_grey_right_arrow.bmp"
@@ -179,8 +211,29 @@ Window{
 
         default_x: 0
         default_y: front_bogie.default_y - 66
-
+        railcar_view_height: railcar_view.default_height
         generated: complex_popup.generated
+        railcar_index: train_preview.current_index
+
+        max_railcar_weight: complex_popup.max_railcar_weight
+        max_railcar_length: complex_popup.max_railcar_length
+        a_max: complex_popup.a_max
+        b_max: complex_popup.b_max
+        c_max: complex_popup.c_max
+        abc_decimals: complex_popup.abc_decimals
+
+        positions_type: complex_popup.positions_type
+        missions_type: complex_popup.missions_type
+        missions_type_trad: complex_popup.missions_type
+        max_doors_list: complex_popup.max_doors_list
+        max_levels_list: complex_popup.max_levels_list
+
+        onUpdate_icon: {
+            complex_popup.mission_list[railcar_index] = railcar_mission_type
+            complex_popup.position_list[railcar_index] = railcar_position_type
+            train_preview.mission_listChanged()
+            train_preview.position_listChanged()
+        }
     }
 
     //Paramètres pour le bogie avant du train
@@ -193,20 +246,22 @@ Window{
         generated: complex_popup.generated
 
         position: "front"
+        railcars_count: train_preview.train_length
+        railcar_index: train_preview.current_index
 
-        default_axle_count: complex_popup.default_axle_count
-        default_axle_power: complex_popup.default_axle_power
-        default_pad_brake_count: complex_popup.default_pad_brake_count
-        default_disk_brake_count: complex_popup.default_disk_brake_count
+        default_axles_count: complex_popup.default_axles_count
+        default_axles_power: complex_popup.default_axles_power
+        default_pad_brakes_count: complex_popup.default_pad_brakes_count
+        default_disk_brakes_count: complex_popup.default_disk_brakes_count
         default_magnetic_brake_count: complex_popup.default_magnetic_brake_count
         default_foucault_brake_count: complex_popup.default_foucault_brake_count
 
-        max_central_bogies: complex_popup.max_bogies_per_coaches - 2
-        max_axles_per_bogies: complex_popup.max_axles_per_bogies
-        max_axle_power: complex_popup.max_axle_power
-        max_pad_per_axle: complex_popup.max_pad_per_axle
-        max_disk_per_axle: complex_popup.max_disk_per_axle
-        max_magnetic_between_axle: complex_popup.max_magnetic_between_axle
+        max_central_bogies: complex_popup.max_bogies_per_railcar - 2
+        max_axles_per_bogie: complex_popup.max_axles_per_bogie
+        max_axles_power: complex_popup.max_axles_power
+        max_pad_brakes_per_axle: complex_popup.max_pad_brakes_per_axle
+        max_disk_brakes_per_axle: complex_popup.max_disk_brakes_per_axle
+        max_magnetic_brakes_per_axle: complex_popup.max_magnetic_brakes_per_axle
     }
 
 
@@ -215,25 +270,27 @@ Window{
         id: middle_bogie
         objectName: "middle_bogie"
 
-        default_x: (640 - 120) * 0.5
+        default_x: (640 - 140) * 0.5
         default_y: train_preview.default_y - 104
         generated: complex_popup.generated
 
         position: "middle"
+        railcars_count: train_preview.train_length
+        railcar_index: train_preview.current_index
 
-        default_axle_count: complex_popup.default_axle_count
-        default_axle_power: complex_popup.default_axle_power
-        default_pad_brake_count: complex_popup.default_pad_brake_count
-        default_disk_brake_count: complex_popup.default_disk_brake_count
+        default_axles_count: complex_popup.default_axles_count
+        default_axles_power: complex_popup.default_axles_power
+        default_pad_brakes_count: complex_popup.default_pad_brakes_count
+        default_disk_brakes_count: complex_popup.default_disk_brakes_count
         default_magnetic_brake_count: complex_popup.default_magnetic_brake_count
         default_foucault_brake_count: complex_popup.default_foucault_brake_count
 
-        max_central_bogies: complex_popup.max_bogies_per_coaches - 2
-        max_axles_per_bogies: complex_popup.max_axles_per_bogies
-        max_axle_power: complex_popup.max_axle_power
-        max_pad_per_axle: complex_popup.max_pad_per_axle
-        max_disk_per_axle: complex_popup.max_disk_per_axle
-        max_magnetic_between_axle: complex_popup.max_magnetic_between_axle
+        max_central_bogies: complex_popup.max_bogies_per_railcar - 2
+        max_axles_per_bogie: complex_popup.max_axles_per_bogie
+        max_axles_power: complex_popup.max_axles_power
+        max_pad_brakes_per_axle: complex_popup.max_pad_brakes_per_axle
+        max_disk_brakes_per_axle: complex_popup.max_disk_brakes_per_axle
+        max_magnetic_brakes_per_axle: complex_popup.max_magnetic_brakes_per_axle
     }
 
     //Paramètres pour les différents bogies du train
@@ -241,25 +298,27 @@ Window{
         id: back_bogie
         objectName: "back_bogie"
 
-        default_x: 640 - 120 - 16
+        default_x: 640 - 140 - 16
         default_y: train_preview.default_y - 104
         generated: complex_popup.generated
 
-        position: "front"
+        position: "back"
+        railcars_count: train_preview.train_length
+        railcar_index: train_preview.current_index
 
-        default_axle_count: complex_popup.default_axle_count
-        default_axle_power: complex_popup.default_axle_power
-        default_pad_brake_count: complex_popup.default_pad_brake_count
-        default_disk_brake_count: complex_popup.default_disk_brake_count
+        default_axles_count: complex_popup.default_axles_count
+        default_axles_power: complex_popup.default_axles_power
+        default_pad_brakes_count: complex_popup.default_pad_brakes_count
+        default_disk_brakes_count: complex_popup.default_disk_brakes_count
         default_magnetic_brake_count: complex_popup.default_magnetic_brake_count
         default_foucault_brake_count: complex_popup.default_foucault_brake_count
 
-        max_central_bogies: complex_popup.max_bogies_per_coaches - 2
-        max_axles_per_bogies: complex_popup.max_axles_per_bogies
-        max_axle_power: complex_popup.max_axle_power
-        max_pad_per_axle: complex_popup.max_pad_per_axle
-        max_disk_per_axle: complex_popup.max_disk_per_axle
-        max_magnetic_between_axle: complex_popup.max_magnetic_between_axle
+        max_central_bogies: complex_popup.max_bogies_per_railcar - 2
+        max_axles_per_bogie: complex_popup.max_axles_per_bogie
+        max_axles_power: complex_popup.max_axles_power
+        max_pad_brakes_per_axle: complex_popup.max_pad_brakes_per_axle
+        max_disk_brakes_per_axle: complex_popup.max_disk_brakes_per_axle
+        max_magnetic_brakes_per_axle: complex_popup.max_magnetic_brakes_per_axle
     }
 
 
@@ -273,7 +332,7 @@ Window{
         default_width: 640
         default_height: 32
 
-        type_list: complex_popup.type_list
+        mission_list: complex_popup.mission_list
         position_list: complex_popup.position_list
 
         is_visible: complex_popup.generated

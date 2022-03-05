@@ -1,7 +1,6 @@
 # Librairies par défaut
 import sys
 import os
-from typing import Union
 
 
 # Librairies graphiques
@@ -164,7 +163,7 @@ class SettingsDictionary(dict):
 
         Returns
         -------
-        converted_data : `Union[bool, int, float, None, str]`
+        converted_data : `bool | int | float | str | None`
             donnée convertie (string si aucun moyen de le convertir)
         """
         # Regarde s'il peut être convertir en bool?
@@ -180,16 +179,14 @@ class SettingsDictionary(dict):
             return float(data)
 
         # Regarde s'il peut être convertit en NoneType
-        if data.lower == "none":
+        if data.lower() == "none":
             return None
 
-        # Regarde s'il peut contenir une liste d'éléments
-        if data.startswith("[") and data.endswith("]"):
-            return [SettingsDictionary.convert_type(v.strip()) for v in data[1:-1].split(",")]
+        if data[0] == "(" and data[-1] == ")":
+            return tuple(SettingsDictionary.convert_type(ele.strip()) for ele in data[1:-1].split(",") if ele)
 
-        # Regarde s'il peut contenir un tuple d'éléments
-        if data.startswith("(") and data.endswith(")"):
-            return tuple(SettingsDictionary.convert_type(v.strip()) for v in data[1:-1].split(","))
+        if data[0] == "[" and data[-1] == "]":
+            return list(SettingsDictionary.convert_type(ele.strip()) for ele in data[1:-1].split(",") if ele)
 
         # Dans tous les cas (si aucun des autres cas n'a été intercepté) retourne le string
         return data

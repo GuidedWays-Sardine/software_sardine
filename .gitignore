@@ -1,6 +1,14 @@
 /venv/
-/.idea/misc.xml
+/.idea/
 /log/*.log
 /results/*.xlsx
-/settings/general_settings/*.settings
-/settings/train_settings/*.train
+
+/settings/general_settings/*
+!/settings/general_settings/.dummy
+
+/settings/train_settings/*
+!/settings/train_settings/.dummy
+
+/results/documentation_images/*
+!/results/documentation_images/initialisation/.dummy
+

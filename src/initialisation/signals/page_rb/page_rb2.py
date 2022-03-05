@@ -16,7 +16,7 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.initialisation.initialisation_window as ini
 import src.initialisation.signals.page_rb.pagerb2.complex_popup as cp
-import src.initialisation.signals.page_rb.pagerb2.complex_data as cd
+import src.train.train_database.database as tdb
 import src.misc.settings_dictionary.settings as sd
 import src.misc.translation_dictionary.translation as td
 import src.misc.log.log as log
@@ -76,24 +76,25 @@ class PageRB2:
         self.engine = engine
 
         # Commence par associer chaque widget à son widget_id (permettant une optimisation dû au surplus de composants)
-        for widget_id in ["weight_floatinput", "length_floatinput", "coaches_integerinput",
-                          "bogies_count_integerinput", "axles_per_bogies_integerinput", "motorized_axles_count_integerinput",
-                          "motorized_axle_weight_floatinput", "axle_power_floatinput", "power_floatinput",
+        for widget_id in ["weight_floatinput", "length_floatinput", "railcars_count_integerinput",
+                          "bogies_count_integerinput", "axles_per_bogie_integerinput", "motorized_axles_count_integerinput",
+                          "motorized_axle_weight_floatinput", "axles_power_floatinput", "power_floatinput",
                           "a_floatinput", "b_floatinput", "c_floatinput", "pantograph_check", "thermic_check",
-                          "pad_brake_integerinput", "magnetic_brake_integerinput", "regenerative_check",
-                          "disk_brake_integerinput", "foucault_brake_integerinput", "dynamic_check"]:
+                          "pad_brakes_count_integerinput", "magnetic_brakes_count_integerinput", "regenerative_check",
+                          "disk_brakes_count_integerinput", "foucault_brakes_count_integerinput", "dynamic_check"]:
             self.data_widgets[widget_id] = self.page.findChild(QObject, widget_id)
         self.train_name_widget = self.page.findChild(QObject, "train_name_stringinput")
 
         # Initialise la combobox avec les types de trains
-        self.page.findChild(QObject, "mission_type_combo").setProperty("elements", [translation_data[key.value] for key in cd.MissionType])
+        self.page.findChild(QObject, "mission_type_combo").setProperty("elements", [translation_data[key.value] for key in tdb.Mission])
 
         # Tente d'initialiser la fenêtre de paramétrage complexe
         try:
             self.complex_popup = cp.ComplexPopup(self)
         except Exception as error:
-            log.error("Erreur lors du chargement de la popup complexe (page_rb2).",
+            log.error(f"Erreur lors du chargement de la popup complexe (page_rb{self.index}).",
                       exception=error, prefix="Initialisation popup paramétrage train")
+            log.change_log_prefix("Initialisation")
         finally:
             # Vérifie que celle-ci a été chargée et si oui, active le changement de mode et le connecte à son signal
             if self.complex_popup is not None and self.complex_popup.loaded:
@@ -240,7 +241,6 @@ class PageRB2:
                 self.page.findChild(QObject, "mode_switchbutton").change_selection(1)  # 1 représentant le mode complexe
                 self.page.setProperty("generated", True)
                 self.complex_popup.win.setProperty("generated", True)
-                self.complex_popup.win.show()
                 self.complex_popup.set_complex_mode_values(train_data)
             else:
                 # Sinon repasse en mode paramétrage simple et réinitialise la popup complexe si nécessaire
@@ -378,8 +378,9 @@ class PageRB2:
         """
         train_data = sd.SettingsDictionary()
 
-        # Rajoute le type de mission
-        train_data["mission"] = cd.mission_getter[self.page.findChild(QObject, "mission_type_combo").property("selection_index")]
+        # Rajoute le type de mission du train ainsi que le mode de paramétrage
+        train_data["mission"] = tdb.mission_getter[self.page.findChild(QObject, "mission_type_combo").property("selection_index")]
+        train_data["mode"] = str(self.current_mode)
 
         # Change les données de la fenêtre principale du paramétrage train
         for widget_id, widget in self.data_widgets.items():
@@ -401,7 +402,7 @@ class PageRB2:
             Propriétés du train
         """
         # Change le type de mission (en récupérant l'index de l'élément sauvegardé et en le changeant sur le combobox
-        mission_index = cd.MissionType[train_data.get_value("mission", str(cd.MissionType.PASSENGER))[12:]].value
+        mission_index = tdb.Mission[train_data.get_value("mission", "Mission.PASSENGER")[8:]].value
         self.page.findChild(QObject, "mission_type_combo").change_selection(mission_index)
 
         # Change les données de la fenêtre principale du paramétrage train
@@ -451,6 +452,10 @@ class PageRB2:
             # Sauvegarde le fichier de paramètres train
             self.open_train_data_file(file_path[0])
 
+            # Si la popup complexe a été chargé, la montre
+            if self.complex_popup is not None and self.complex_popup.loaded:
+                self.complex_popup.win.show()
+
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_mode_switchbutton_clicked(self):
         """signal appelé lorsque le bouton du choix du mode de paramétrage est cliqué.
@@ -468,6 +473,7 @@ class PageRB2:
                 self.complex_popup.win.hide()
                 self.complex_popup.win.setProperty("generated", False)
                 self.page.setProperty("generated", False)
+                self.complex_popup.win.findChild(QObject, "train_preview").setProperty("current_index", 0)
                 self.complex_popup.reset()
 
         # FEATURE : faire la fonction connectée au bouton "Freinage" pour ouvrir la fenêtre de paramétrage freinage
