@@ -41,16 +41,19 @@ Item {
         //Remet la mission à la première et repasse le nombre de niveaux et de portes à 0
         position_switch.change_selection(1)
         mission_combo.change_selection(0)
-        levels_integerinput.change_value(0)
-        doors_integerinput.change_value(0)
+        levels_integerinput.clear()
+        doors_integerinput.clear()
+        empty_weight_floatinput.clear()
+        full_weight_floatinput.clear()
+        length_floatinput.clear()
 
         //Remet les valeurs des différents coefficients à 0
-        a_empty_floatinput.change_value(0.0)
-        b_empty_floatinput.change_value(0.0)
-        c_empty_floatinput.change_value(0.0)
-        a_full_floatinput.change_value(0.0)
-        b_full_floatinput.change_value(0.0)
-        c_full_floatinput.change_value(0.0)
+        a_empty_floatinput.clear()
+        b_empty_floatinput.clear()
+        c_empty_floatinput.clear()
+        a_full_floatinput.clear()
+        b_full_floatinput.clear()
+        c_full_floatinput.clear()
     }
 
 
