@@ -9,24 +9,25 @@ Item {
     //propriétés sur la position ddu composant
     property int default_x: 0
     property int default_y: 0
-    property int train_preview_height: 180
+    property int railcar_view_height: 180
     anchors.fill: parent
 
     //Propriétés sur l'état des paramètres simple
     property bool generated: false
+    property int railcar_index: 0
 
     //Propriétés sur les valeurs maximales
-    property double max_weight: 1e9            //t
-    property double max_length: 1e9            //m
-    readonly property double a_max: 1e3        //kN
-    readonly property double b_max: 1e3        //kN/(km/h)
-    readonly property double c_max: 1e3        //kM/(km/h)²
-    readonly property int abc_decimals: 8
-    property var positions_list: []         //Liste des liens vers les icones de positions du train (selon la mission)
-    property var missions_list: []          // Liste des différentes missions possible pour la voiture (traduisible)
-    property var missions_list_values: []   //Liste des différentes missions EN ANGLAIS (nécessaire pour la position
-    property var max_doors_list: []         // Liste du nombre de portes maximales selon la mission
-    property var max_levels_list: []        // Liste du nombre de niveaux maximum selon la mission
+    property double max_railcar_weight: 1e9   //t
+    property double max_railcar_length: 1e9   //m
+    property double a_max: 1e3        //kN
+    property double b_max: 1e3        //kN/(km/h)
+    property double c_max: 1e3        //kM/(km/h)²
+    property int abc_decimals: 6
+    property var positions_type: []         //Liste des différentes positions possibles
+    property var missions_type: []          //Liste des différentes missions EN ANGLAIS (nécessaire pour la position
+    property var missions_type_trad: []     //Liste des différentes missions EN ANGLAIS (nécessaire pour la position
+    property var max_doors_list: []         //Liste du nombre de portes maximales selon la mission
+    property var max_levels_list: []        //Liste du nombre de niveaux maximum selon la mission
 
 
     //Fonction pour réinitialiser le module
