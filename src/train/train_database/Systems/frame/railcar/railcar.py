@@ -144,12 +144,12 @@ class Railcar:
         -------
         qml_values: `list`
             (mission_type, position_type, position_index, levels, doors, Mtare, Mfull, length,
-            Aempty, Bempty, Cempty, multiply_mass_empty,
-            Afull, Bfull, Cfull, multiply_mass_full)
+            [Aempty, Bempty, Cempty], multiply_mass_empty,
+            [Afull, Bfull, Cfull], multiply_mass_full)
         """
         return (self.mission_type, self.position_type, self.position_index,  self.levels, self.doors, self.Mtare, self.Mfull, self.length,
-                self.Aempty, self.Bempty, self.Cempty, self.multiply_mass_empty,
-                self.Afull, self.Bfull, self.Cfull, self.multiply_mass_full)
+                [self.Aempty, self.Bempty, self.Cempty], self.multiply_mass_empty,
+                [self.Afull, self.Bfull, self.Cfull], self.multiply_mass_full)
 
     def get_values(self):
         """Fonction permettant de récupérer toutes les valeurs de la voiture.
