@@ -132,7 +132,7 @@ Item {
         default_width: 54
         default_height: 16
 
-        maximum_value: root.max_length
+        maximum_value: root.max_railcar_length
         minimum_value: 0.001
         decimals: 3
 
@@ -156,7 +156,7 @@ Item {
         default_width: 54
         default_height: 16
 
-        maximum_value: root.max_weight
+        maximum_value: root.max_railcar_weight
         minimum_value: 0.001
         decimals: 3
 
@@ -180,7 +180,7 @@ Item {
         default_width: 54
         default_height: 16
 
-        maximum_value: root.max_weight
+        maximum_value: root.max_railcar_weight
         minimum_value: empty_weight_floatinput.value
         decimals: 3
 
@@ -200,7 +200,7 @@ Item {
         objectName: "general_data_box"
 
         default_x: 640 - default_width - 31
-        default_y: dynamic_empty_data_box.default_y - root.train_preview_height - 27
+        default_y: dynamic_empty_data_box.default_y - root.railcar_view_height - 27
         default_height: 36
         default_width: 220
 
@@ -216,10 +216,10 @@ Item {
 
             default_x: general_data_box.default_x + 1
             default_y: general_data_box.default_y + 16
-            default_width: 68
+            default_width: 88
             default_height: 20
 
-            elements: root.missions_list
+            elements: root.missions_type_trad
             title: "mission"
             font_size: 10
 
@@ -238,13 +238,13 @@ Item {
             default_width: 44
             default_height: mission_combo.default_height
 
-            elements: root.positions_list
+            elements: []
             image_mode: true
             title: "position"
             font_size: 10
 
             is_positive: false
-            is_activable: true
+            is_activable: root.railcar_index != 0
             is_visible: root.generated
         }
 
