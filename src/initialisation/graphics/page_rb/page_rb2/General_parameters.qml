@@ -98,10 +98,12 @@ Item {
 
     //Fonction permettant de récupérer les valeurs
     function get_values() {
-        //Format : [int(tdb.Position), int(mission_type), levels, doors, [ABCempty] bool(xm_empty), [ABCfull], bool(xm_full)]
-        return [position_switch.selection_index, mission_combo.selection_index, levels_floatinput.value, doors_floatinput.value,
-                [a_empty_floatinput.value, b_empty_floatinput.value, c_empty_floatinput.value], m_empty_check,
-                [a_full_floatinput.value, b_full_floatinput.value, c_full_floatinput.value], m_full_check]
+        //Format : [int(mission_type), int(tdb.Position), empty_weight, full_weight, length, levels, doors, [ABCempty] bool(xm_empty), [ABCfull], bool(xm_full)]
+        return [mission_combo.selection_index, position_switch.selection_index,
+                empty_weight_floatinput.value, full_weight_floatinput.value, length_floatinput.value,
+                levels_integerinput.value, doors_integerinput.value,
+                [a_empty_floatinput.value, b_empty_floatinput.value, c_empty_floatinput.value], m_empty_check.is_checked,
+                [a_full_floatinput.value, b_full_floatinput.value, c_full_floatinput.value], m_full_check.is_checked]
     }
 
 
