@@ -147,6 +147,15 @@ class ComplexPopup:
         self.win.setProperty("default_foucault_brakes_count", round(train_data.get_value("foucault_brakes_count", 0) / train_data.get_value("bogies_count", 1)))
 
         # Puis met à jour les différentes limites
+        # A-B-C non linéaire au nombre
+        self.win.setProperty("a_max", self.parent.page.property("a_max"))
+        self.win.setProperty("b_max", self.parent.page.property("b_max"))
+        self.win.setProperty("c_max", self.parent.page.property("c_max"))
+        self.win.setProperty("abc_decimals", self.parent.page.property("abc_decimals"))
+        # Tout le reste ~linéaire au nombre de voitures, d'où la valeur divisée
+        self.win.setProperty("max_railcar_weight", self.parent.page.property("max_weight") / train_data["railcars_count"])
+        self.win.setProperty("max_railcar_length", self.parent.page.property("max_length") / train_data["railcars_count"])
+        # Valeurs maximals déjà par défaut selon la voiture/le nombre de bogies
         self.win.setProperty("max_bogies_per_railcar", max(self.parent.page.property("max_bogies_per_railcar"), 2))
         self.win.setProperty("max_axles_per_bogies", self.parent.page.property("max_axles_per_bogie"))
         self.win.setProperty("max_axles_power", self.parent.page.property("max_axles_power"))
