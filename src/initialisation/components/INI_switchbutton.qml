@@ -79,7 +79,7 @@ Item {
     //Fonction permettant de changer la valeur active (peut prendre l'index de l'élément ou sa valeur)
     function change_selection(new_selection){
         // Si la nouvelle sélection est un int et que la valeur à l'index n'est pas la même que celle déjà visible, change la valeur et appelle le signal associé
-        if(typeof new_selection === typeof root.font_size && new_selection < root.elements.length){
+        if(typeof new_selection === typeof root.font_size && new_selection < root.elements.length && new_selection >= 0){
             var previous_selection = (image_mode ? body.image : body.text).toLowerCase()
             body.text = image_mode ? "" : root.elements[new_selection]
             body.image = image_mode ? root.elements[new_selection] : ""
