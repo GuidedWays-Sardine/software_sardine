@@ -279,6 +279,11 @@ class Systems:
                                   average_brakes[2] + (bonus_brakes[2] > (previous_bogies_count + (not previous_articulated) + middle_bogies_count)),
                                   average_brakes[3] + (train_data["bogies_count"] - (bonus_brakes[3]) <= (previous_bogies_count + (not previous_articulated) + middle_bogies_count))])
 
+            # Répartition des coefficients A, B, C de la façon suivante (totalement arbitraire et arrondi à 5 décimales)
+            # 85% des effors résistants seront sur la première voiture
+            # 15% seront répartis équitablement sur chacune des autres voitures
+            abc = [round(train_data[abc_i] * (0.85 if not car_index else 0.15 / (train_data["railcars_count"] - 1)), 5) for abc_i in ["a", "b", "c"]]
+
             # Incrémente le nombre d'essieux déjà paramétrés par les nouveaux essieux
             previous_bogies_count += new_bogies_count
 
@@ -320,9 +325,9 @@ class Systems:
                                                  Mtare=railcar_weight,
                                                  Mfull=railcar_weight,
                                                  length=train_data["length"] / train_data["railcars_count"],
-                                                 ABCempty=[train_data["a"], train_data["b"], train_data["c"]],
+                                                 ABCempty=abc,
                                                  multiply_mass_empty=False,
-                                                 ABCfull=[train_data["a"], train_data["b"], train_data["c"]],
+                                                 ABCfull=abc,
                                                  multiply_mass_full=False))
 
         # Appelle la fonction d'initialisation des systèmes électriques
