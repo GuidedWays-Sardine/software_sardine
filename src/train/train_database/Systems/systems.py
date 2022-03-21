@@ -54,6 +54,11 @@ class Systems:
         ----------
         train_data: `sd.SettingsDictionary`
             Tous les paramètres du train
+
+        Raises
+        ------
+        ValueError
+            Jeté lorsque l'un des éléments du train n'est pas en quantité suffisante
         """
         # Si le mauvais type d'initialisation a été appelé, appelle la fonction de génération de train
         if train_data.get_value("mode", "Mode.SIMPLE").lower() != 'mode.complex':
@@ -76,8 +81,13 @@ class Systems:
                                         train_data[f"railcar{index}.multiply_mass_full"]))
                 index += 1
         except KeyError as error:
+            # Dans le cas où un paramètres manque, laisse un message d'erreur et arrête de regarder
             log.warning(f"Impossible de charger la voiture {index}. Les paramètres de celle-ci sont incomplets",
                         exception=error)
+
+        # S'assure qu'au moins une voiture a été paramétrée
+        if index < 1:
+            raise ValueError("Un train ne peut pas avoir aucune voiture paramétrées.")
 
         # Continue avec les bogies et leurs systèmes de freinage
         index = 0
@@ -106,6 +116,10 @@ class Systems:
         except KeyError as error:
             log.warning(f"Impossible de charger le bogie {index}. Les paramètres de celle-ci sont incomplets",
                         exception=error)
+
+        # S'assure qu'au moins deux bogies ont été paramétrés
+        if index < 2:
+            raise ValueError("Un train ne peut pas avoir moins de deux bogies paramétrés.")
 
         # TODO : ajouter la lecture des autres systèmes (électriques, freinage...)
 
