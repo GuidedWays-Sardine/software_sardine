@@ -1,0 +1,22 @@
+board.name; Regio2N
+board.type ; Other
+board.digital_pins ; (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
+board.analog_pins ; (1, 2, 3, 4, 5)
+board.pwm_pins ; (11, 10, 9, 6, 5, 3)
+board.disabled_pins ; (0, 1)
+button1.type; SwitchButton
+button1.read_mode; continuous
+button1.pins; (12, 11, 10, 9)
+button1.function1.values; (True, False, False, False)
+button1.function1.function; Actions.PR2
+button1.function2.values; (False, True, False, False)
+button1.function2.function; Actions.PR1
+button1.function3.values; (False, False, True, False)
+button1.function3.function; Actions.PC
+button1.function4.values; (False, False, False, True)
+button1.function4.function; Actions.PL1
+button1.function5.values; (False, False, False, False)
+button1.function5.function; Actions.PL2
+
+
+virtual.active; False

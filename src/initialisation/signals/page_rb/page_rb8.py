@@ -93,10 +93,10 @@ class PageRB8:
             for line in (l for l in file.readlines() if l != "\n" and l[0] != "#"):
                 # Rajoute les paramètres par défaut et crée une ligne de paramètres (incomplet par défaut)
                 info = list(map(str.strip, line.rstrip("\n").split(";")))
-                if len(info) >= 4:
+                if len(info) >= 5:
                     try:
-                        windows_defaults[translation_data[info[0]]] = [True, int(info[1]), int(info[2]), info[3].lower() == "true"]
-                        windows_settings[translation_data[info[0]]] = [0, False, [0, 0], [0, 0]]
+                        windows_defaults[translation_data[info[0]]] = [True, int(info[1]), int(info[2]), info[3].lower() == "true", info[4].lower() == "true"]
+                        windows_settings[translation_data[info[0]]] = [0, False, [0, 0], [0, 0], False]
                     except Exception as error:
                         # Si jamais une des données n'est pas au bon format, laisse un message d'erreur
                         log.warning(f"Paramètres écrans au mauvais format sur la ligne :\n\t\t{line}", exception=error)
@@ -217,6 +217,7 @@ class PageRB8:
                 page_parameters[windows_settings_key + "w"] = windows_settings_values[3][0] if is_activable else 0
                 page_parameters[windows_settings_key + "h"] = windows_settings_values[3][1] if is_activable else 0
                 page_parameters[windows_settings_key + "mandatory"] = self.windows_defaults[category_key][screen_key][3]
+                page_parameters[windows_settings_key + "extern"] = self.windows_defaults[category_key][screen_key][4]
 
         return page_parameters
 

@@ -40,7 +40,7 @@ def main():
     settings["sardine simulator.virtual buttons.h"] = 1080
 
     command_board_settings = sd.SettingsDictionary()
-    command_board_settings.open(f"{PROJECT_DIR}\\src\\train\\command_board\\Regio2N\\Regio2N.board")
+    command_board_settings.open(f"{PROJECT_DIR}\\src\\train\\command_board\\Light\\Light.board")
 
     # Génère une instance du pupitre et la lance
     command_board = CommandBoard(traindatabase, settings, command_board_settings, application)

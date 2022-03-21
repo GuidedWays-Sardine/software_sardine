@@ -1,32 +1,65 @@
 # Librairies par défaut
 import sys
 import os
+import time
+import threading
 
 
-# Librairie de commande pupitre
-# https://www.youtube.com/watch?v=823ProFM4us
+# Librairies graphiques
+from PyQt5.QtWidgets import QApplication
 
 
 # Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
+import src.misc.settings_dictionary.settings as sd
+from src.train.command_board.Generic.controls.electronics.control import Control    # TODO ; changer l'import pour le pupitre clavier
 
 
-# TODO : classe et code permettant de recevoir les informations du pupitre. Cett classe doit contenir 3 fonctions
-# Une fonction initialise qui va chercher le port de l'arduino et va s'y connecter
-# Une fonction run qui va lancer sur un nouveau thread la fonction update()
-# une fonction update contenant une boucle qui tournera jusqu'à ce que la simulation s'arrête
+class CommandBoard(Control):
+    """instance du pupitre lourd"""
+    pass
 
 
 def main():
     # Lance un fichier de registre
-    log.initialise(log_level=log.Level.DEBUG, save=True)
-    log.info("Lancement des essais du pupitre léger")
+    log.initialise(log_level=log.Level.DEBUG, save=False)
+    log.info(f"Lancement des essais du pupitre léger.\n")
 
-    # TODO : initialiser une instance de la base de donnée train et appeler son constructeur afin de tester le pupitre avec différents matériels roulants
+    # Crée une instance d'une application  et d'une base de données
+    application = QApplication(sys.argv)
+    traindatabase = None        # TODO : remplacer par la vrai base de données
 
-    # TODO : appeler la fonction d'initialisation du pupitre
+    # Génère les paramètres nécessaires aux essais
+    settings = sd.SettingsDictionary()
+    settings["sardine simulator.virtual buttons.screen_index"] = 1
+    settings["sardine simulator.virtual buttons.x"] = 1440
+    settings["sardine simulator.virtual buttons.y"] = 0
+    settings["sardine simulator.virtual buttons.w"] = 480
+    settings["sardine simulator.virtual buttons.h"] = 1080
 
-    # TODO : lancer le pupitre
+    command_board_settings = sd.SettingsDictionary()
+    command_board_settings.open(f"{PROJECT_DIR}\\src\\train\\command_board\\Keyboard\\Keyvoard.board")
 
+    # Génère une instance du pupitre et la lance
+    command_board = CommandBoard(traindatabase, settings, command_board_settings, application)
+    command_board.run()
+
+    # lance le thread de la mise à jour graphique
+    update_thread = threading.Thread(target=update, args=(command_board,))
+    update_thread.start()
+    update_thread.join()
+
+
+def update(command_board):
+    """Fonction d'essai permettant de mettre à jour les entrées du pupitre"""
+    i = 0
+    while i < 100:
+        # Imprime les entrées lues, met à jour et attends avant de faire la mise à jour suivante
+        command_board.update()
+        time.sleep(0.25)
+
+
+if __name__ == "__main__":
+    main()

@@ -87,3 +87,25 @@ class TrainDatabase:
         # TODO : récupérer les valeurs statiques et dynamiques du train
 
         return parameters
+
+    def get_graph_value(self, key):
+        """Fonction permettant d'obtenir une donnée en fonction de sa clé.
+        Utilisé pour le module de visualisation des données
+
+        Parameters
+        ----------
+        key: `str`
+            Clé de la valeur à retourner
+
+        Raises
+        ------
+        KeyError:
+            Jeté lorsque la clé ne correspond à aucune valeur de la Base de Données train
+        """
+        # FEATURE : inclure ci-dessous la valeur à retourner pour chacune des clés
+        if key == "":
+            pass
+        elif key == "":
+            pass
+        else:
+            raise KeyError(f"La clé \"{key}\" ne correspond à aucun paramètre de la Base de Données train.")
