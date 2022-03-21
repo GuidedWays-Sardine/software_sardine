@@ -23,6 +23,7 @@ def main():
     # Lance le registre selon les constantes définit en amont
     log.initialise(log_level=INITIAL_LOG_LEVEL, save=SAVE)
     log.info(f"Lancement de l'application d'initialisation du simulateur.\n\n\n")
+    os.environ["QT_DEBUG_PLUGINS"] = "1"
     application = QApplication(sys.argv)        # Une seule QApplication peut être créée durant toute la simulation
 
     # Application d'initialisation : Permet de rentrer tous les paramètres de simulation de façon simple
