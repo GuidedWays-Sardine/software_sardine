@@ -76,18 +76,17 @@ class UIupdate:
         # Cependant le pyqtSignal doit être initialisé lors du chargement du fichier
         # pour prendre en compte chaque situation, plusieurs pyqtSignal avec un nombre d'arguments différent est généré
         __MAX_PARAMETERS = 10
-        function = None
+        __function = None
         # OPTIMIZE : Les exec ajoutent 0.4ms par appel de fonction. Cependant certaines contraintes existent :
         #   - le pyqtSignal ne peut pas être généré dans le constructeur, obligatoirement ci-dessous
         #   - le pyqtSignal ne peut pas être généré dans un tuple
         for i in range(__MAX_PARAMETERS + 1):
-            exec(f"signal{i} = pyqtSignal(*((object,) * {i}))")
+            exec(f"__signal{i} = pyqtSignal(*((object,) * {i}))")
 
         # Nombre et liste des arguments (hors self si méthode d'une classe) pour l'appel de la fonction
-        in_class = True
-        arguments_count = 0
-        arguments = ()
-        output = ()
+        __in_class = True
+        __arguments_count = 0
+        __arguments = ()
 
         def __init__(self, function):
             """Fonction permettant d'initialiser le QThread et le décorateur UI.
@@ -105,6 +104,7 @@ class UIupdate:
                 ou que la limite d'argument configurée (__MAX_PARAMETERS) n'est pas suffisant"""
             # Initialise le QThread
             super().__init__()
+            self.__function = function
 
             # Chaque élément de la librairie pyQt (ou autre lib graphique) doit être initialisé sur le thread principal
             # Il est donc vital que le QThread et le pyqtSignal soit initialisé sur le thread principal
@@ -114,18 +114,17 @@ class UIupdate:
 
             # Compte le nombre de paramètres de la fonction (hors self, qui est un cas particulier).
             # Le pyqtSignal doit être initialisé selon le nombre de paramètres. D'où ce comptage.
-            self.in_class = "self" in str(inspect.signature(function))
-            self.arguments_count = len(inspect.signature(function).parameters) - self.in_class
+            self.__in_class = "self" in str(inspect.signature(self.__function))
+            self.__arguments_count = len(inspect.signature(self.__function).parameters) - self.__in_class
 
             # Dans le cas où la fonction a trop d'arguments, jete une erreur.
             # Pour corriger l'erreur, augmenter la valeur de __MAX_PARAMETERS (attention à l'utilisation mémoire)
-            if self.arguments_count > self.__MAX_PARAMETERS:
-                raise RuntimeError(f"La fonction envoyée a trop de paramètres. {self.arguments} nécessaires pour " +
+            if self.__arguments_count > self.__MAX_PARAMETERS:
+                raise RuntimeError(f"La fonction envoyée a trop de paramètres. {self.__arguments} nécessaires pour " +
                                    f"{self.__MAX_PARAMETERS} maximums. Changer la valeur de __MAX_PARAMETERS")
 
             # Sinon connecte la fonction au bon pyqtSignal (index = nombre d'arguments permis)
-            self.function = function
-            exec(f"self.signal{self.arguments_count + self.in_class}.connect(self.function)")
+            exec(f"self.__signal{self.__arguments_count + self.__in_class}.connect(self._UIThread__function)")
 
         def set_arguments(self, *args):
             """Fonction pour changer les arguments pour le prochain appel de la fonction
@@ -142,23 +141,23 @@ class UIupdate:
                 Jeté lorsque le nombre d'arguments ne correspond pas au nombre d'arguments de la fonction
             """
             # Commence par vérifier que le nombre d'arguments envoyé est le bon
-            if self.arguments_count + self.in_class != len(args):
-                raise TypeError(f"{self.function} takes {self.arguments_count + self.in_class} " +
+            if self.__arguments_count + self.__in_class != len(args):
+                raise TypeError(f"{self.__function} takes {self.__arguments_count + self.__in_class} " +
                                 f"positional arguments but {len(args)} was given")
 
             # Stoque les arguments dans la classe comme ceux-ci ne peuvent pas être envoyés dans la fonction run()
-            self.arguments = args
+            self.__arguments = args
 
         def run(self):
             """Fonction permettant d'émettre le signal et donc d'appeler la fonction avec les paramètres sauvegardés"""
             # Emet le signal, ce qui va appeler la fonction
-            exec(f"self.signal{self.arguments_count + self.in_class}.emit(*self.arguments)")
+            exec(f"self.__signal{self.__arguments_count + self.__in_class}.emit(*self._UIThread__arguments)")
 
             # réinitialise les arguments pour éviter de rappeler la fonction avec les mêmes arguments
-            self.arguments = ()
+            self.__arguments = ()
 
     # Stocke une instance de la classe précédente
-    ui_thread = None
+    __ui_thread = None
 
     def __init__(self, function):
         """fonction appelée lors de l'initialisation de la fonction ciblée par le décorateur
@@ -169,14 +168,14 @@ class UIupdate:
             fonction à appeler de façon sécurisé
         """
         # Initialise le QThread
-        self.ui_thread = self.UIThread(function)
+        self.__ui_thread = self.UIThread(function)
 
     def __call__(self, *args, **kwargs):
         """fonction appelée lors de l'appel de la fonction ciblée par le décorateur"""
         # Démarre le QThread (appelant sa fonction run() et donc la fonction envoyée) et attend que l'appel se finisse
-        self.ui_thread.set_arguments(*args)
-        self.ui_thread.start()
-        self.ui_thread.wait()
+        self.__ui_thread.set_arguments(*args)
+        self.__ui_thread.start()
+        self.__ui_thread.wait()
 
     def __get__(self, obj, objtype):
         """Support instance methods."""
