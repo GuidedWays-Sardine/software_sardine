@@ -2,6 +2,13 @@
 import os
 import sys
 from functools import wraps
+import inspect
+import functools
+import threading
+
+
+# Librairies graphiques
+from PyQt5.QtCore import QThread, pyqtSignal
 
 
 # Librairies SARDINE
@@ -56,3 +63,121 @@ def CommandBoardComponent():
 
         return signal_wraper
     return signal_decorator
+
+
+# Appel : @decorators.UIupdate
+class UIupdate:
+    """décorateur à obligatoirement utiliser pour toutes les fonctions mettant à jour des éléments grahiques"""
+
+    class UIThread(QThread):
+        """Classe contenant tous les éléments nécessaires pour faire fonctionner le décorateur"""
+        # Informations nécessaires pour la génération des pyqtSignal
+        # Les arguments de pyqtSignal dépendent du nombre d'arguments de la fonction
+        # Cependant le pyqtSignal doit être initialisé lors du chargement du fichier
+        # pour prendre en compte chaque situation, plusieurs pyqtSignal avec un nombre d'arguments différent est généré
+        __MAX_PARAMETERS = 10
+        function = None
+        # OPTIMIZE : Les exec ajoutent 0.4ms par appel de fonction. Cependant certaines contraintes existent :
+        #   - le pyqtSignal ne peut pas être généré dans le constructeur, obligatoirement ci-dessous
+        #   - le pyqtSignal ne peut pas être généré dans un tuple
+        for i in range(__MAX_PARAMETERS + 1):
+            exec(f"signal{i} = pyqtSignal(*((object,) * {i}))")
+
+        # Nombre et liste des arguments (hors self si méthode d'une classe) pour l'appel de la fonction
+        in_class = True
+        arguments_count = 0
+        arguments = ()
+        output = ()
+
+        def __init__(self, function):
+            """Fonction permettant d'initialiser le QThread et le décorateur UI.
+            Il connecte la fonction au thread principal à l'aide d'un pyqtSignal.
+
+            Parameters
+            ----------
+            function: `function`
+                Fonction influençant un module graphique à connecter avec le thread principal
+
+            Raises
+            ------
+            RuntimeError
+                Jeté lorsque le thread dans lequel l'initialisation se fait n'est pas le thread principal
+                ou que la limite d'argument configurée (__MAX_PARAMETERS) n'est pas suffisant"""
+            # Initialise le QThread
+            super().__init__()
+
+            # Chaque élément de la librairie pyQt (ou autre lib graphique) doit être initialisé sur le thread principal
+            # Il est donc vital que le QThread et le pyqtSignal soit initialisé sur le thread principal
+            # On vérifie donc le "nom" du thread, qui s'appelle "_MainThread" pour le thread principal
+            if threading.current_thread().__class__.__name__ != '_MainThread':
+                raise RuntimeError("Les composants pyQt doivent obligatoirement être initialisés sur thread principal")
+
+            # Compte le nombre de paramètres de la fonction (hors self, qui est un cas particulier).
+            # Le pyqtSignal doit être initialisé selon le nombre de paramètres. D'où ce comptage.
+            self.in_class = "self" in str(inspect.signature(function))
+            self.arguments_count = len(inspect.signature(function).parameters) - self.in_class
+
+            # Dans le cas où la fonction a trop d'arguments, jete une erreur.
+            # Pour corriger l'erreur, augmenter la valeur de __MAX_PARAMETERS (attention à l'utilisation mémoire)
+            if self.arguments_count > self.__MAX_PARAMETERS:
+                raise RuntimeError(f"La fonction envoyée a trop de paramètres. {self.arguments} nécessaires pour " +
+                                   f"{self.__MAX_PARAMETERS} maximums. Changer la valeur de __MAX_PARAMETERS")
+
+            # Sinon connecte la fonction au bon pyqtSignal (index = nombre d'arguments permis)
+            self.function = function
+            exec(f"self.signal{self.arguments_count + self.in_class}.connect(self.function)")
+
+        def set_arguments(self, *args):
+            """Fonction pour changer les arguments pour le prochain appel de la fonction
+            (impossible à envoyer dans la fonction run(), définit par défaut par QThread et appelé avec QThread.start())
+
+            Parameters
+            ----------
+            *args: Any
+                les différents arguments à envoyer lors de l'appel de la fonction
+
+            Raises
+            ------
+            TypeError:
+                Jeté lorsque le nombre d'arguments ne correspond pas au nombre d'arguments de la fonction
+            """
+            # Commence par vérifier que le nombre d'arguments envoyé est le bon
+            if self.arguments_count + self.in_class != len(args):
+                raise TypeError(f"{self.function} takes {self.arguments_count + self.in_class} " +
+                                f"positional arguments but {len(args)} was given")
+
+            # Stoque les arguments dans la classe comme ceux-ci ne peuvent pas être envoyés dans la fonction run()
+            self.arguments = args
+
+        def run(self):
+            """Fonction permettant d'émettre le signal et donc d'appeler la fonction avec les paramètres sauvegardés"""
+            # Emet le signal, ce qui va appeler la fonction
+            exec(f"self.signal{self.arguments_count + self.in_class}.emit(*self.arguments)")
+
+            # réinitialise les arguments pour éviter de rappeler la fonction avec les mêmes arguments
+            self.arguments = ()
+
+    # Stocke une instance de la classe précédente
+    ui_thread = None
+
+    def __init__(self, function):
+        """fonction appelée lors de l'initialisation de la fonction ciblée par le décorateur
+
+        Parameters
+        ----------
+        function: `function`
+            fonction à appeler de façon sécurisé
+        """
+        # Initialise le QThread
+        self.ui_thread = self.UIThread(function)
+
+    def __call__(self, *args, **kwargs):
+        """fonction appelée lors de l'appel de la fonction ciblée par le décorateur"""
+        # Démarre le QThread (appelant sa fonction run() et donc la fonction envoyée) et attend que l'appel se finisse
+        self.ui_thread.set_arguments(*args)
+        self.ui_thread.start()
+        self.ui_thread.wait()
+
+    def __get__(self, obj, objtype):
+        """Support instance methods."""
+        return functools.partial(self.__call__, obj)
