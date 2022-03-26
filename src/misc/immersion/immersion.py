@@ -260,6 +260,7 @@ class ImmersionWindow(QMainWindow):
                                                   width, height))
 
     @decorators.UIupdate
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def set_loading(self):
         """Fonction permettant de lancer la vidéo de chargement, puis de se mettre en mode ImmersionMode.STILL"""
         # Si la vidéo de chargement n'existe pas, passe directement en mode still
@@ -280,6 +281,7 @@ class ImmersionWindow(QMainWindow):
         self.show()
 
     @decorators.UIupdate
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def set_unloading(self):
         """Fonction permettant de lancer la vidéo de chargement, puis de se mettre en mode ImmersionMode.STILL"""
         # Si la vidéo de déchargement n'existe pas, passe directement en mode empty
@@ -300,6 +302,7 @@ class ImmersionWindow(QMainWindow):
         self.show()
 
     @decorators.UIupdate
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def set_still(self):
         """Fonction permettant de vider la fenêtre d'immersion"""
         # Si le logo n'existe pas, passe en mode empty
@@ -319,6 +322,7 @@ class ImmersionWindow(QMainWindow):
         self.show()
 
     @decorators.UIupdate
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def set_empty(self):
         """Fonction permettant de vider la fenêtre d'immersion"""
         # Arrête la vidéo si elle tourne, cache la vidéo et l'image et montre la fenêtre
@@ -333,6 +337,7 @@ class ImmersionWindow(QMainWindow):
         self.show()
 
     @decorators.UIupdate
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def set_deactivated(self):
         """Fonction permettant de vider la fenêtre d'immersion"""
         # Arrête la vidéo si elle tourne et cache la fenêtre, la vidéo et l'image
@@ -349,7 +354,7 @@ class ImmersionWindow(QMainWindow):
 
 def main():
     # Create the application, a thread to do the actions and starts the application
-    log.initialise()
+    log.initialise(save = False)
     app = QApplication(sys.argv)
     change_mode(ImmersionMode.EMPTY)
 
