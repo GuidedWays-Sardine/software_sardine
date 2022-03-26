@@ -1,6 +1,7 @@
 # Librairies par défaut
 import sys
 import os
+import re
 
 
 # Librairies graphiques
@@ -11,6 +12,7 @@ from PyQt5.QtCore import QObject
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
+import src.misc.decorators.decorators as decorators
 
 
 class SettingsDictionary(dict):
@@ -26,10 +28,10 @@ class SettingsDictionary(dict):
         value: `Any`
             Sa valeur
         """
-        if isinstance(key, str):
-            super(SettingsDictionary, self).__setitem__(key.lower().replace(";", " "), value)
-        else:
-            log.debug(f"la clé : {key}, n'est pas de type string : {type(key)}.")
+        # Enlève les charactères problématiques de la clé (ici ";" et "\t")
+        key = re.sub("[;\t]", "", str(key).lower())
+
+        super(SettingsDictionary, self).__setitem__(key, value)
 
     def __getitem__(self, key):
         """Opérateur value = self["key"] permettant de lire des valeurs du dictionnaire de paramètres
@@ -49,7 +51,8 @@ class SettingsDictionary(dict):
         KeyError :
             Jetté si la clé n'a pas de valeur associée
         """
-        return super(SettingsDictionary, self).__getitem__(key.lower())
+        # Retourne la valeur avec la clé envoyée et nétoyée
+        return super(SettingsDictionary, self).__getitem__(re.sub("[;\t]", "", str(key).lower()))
 
     def get_value(self, key, default=None):
         """Méthode pour récupérer une valeur à partir de sa clé, et de mettre un message dans le registre s'il n'existe pas
