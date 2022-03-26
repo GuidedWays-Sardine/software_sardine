@@ -111,11 +111,11 @@ class SettingsDictionary(dict):
             # Essaye de créer (ou d'écraser) le fichier avec les paramètres actuels
             with open(file_path, "w", encoding="utf-8-sig") as file:
                 # Ecrit chacune des clés à l'intérieur séparé par le délimiteur
-                for key in self.keys():
-                    file.write(f"{key}{delimiter}{self[key]}\n")
+                for key, value in self.items():
+                    file.write(f"{key}{delimiter}{value}\n")
         except Exception as error:
             # Cas où le fichier ouvert n'est pas accessible
-            log.warning(f"Impossible d'enregistrer le fichier : {file_path}",
+            log.warning(f"Impossible d'enregistrer le fichier, l'action ne sera pas prise en compte.\n\t{file_path}",
                         exception=error, prefix="Sauvegarde des données")
         else:
             log.info(f"Enregistrement de {len(self)} données dans : {file_path}")
