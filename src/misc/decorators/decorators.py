@@ -25,7 +25,7 @@ def CommandBoardComponent():
         def signal_wraper(*args):
             try:
                 # Appelle la fonction normalement et récupère une potentielle erreur
-                init(*args)
+                return init(*args)
             except Exception as error:
                 # Laisse un message en niveau log.WARNING pour indiquer que le composant n'a pas su être chargé
                 log.warning("Un des composant pour le pupitre n'a pas pu être chargé correctement : \n" +
