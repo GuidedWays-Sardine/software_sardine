@@ -31,6 +31,10 @@ class SettingsDictionary(dict):
         # Enlève les charactères problématiques de la clé (ici ";" et "\t")
         key = re.sub("[;\t]", "", str(key).lower())
 
+        # Vérifie si la clé a déjà une valeur et si c'est le cas, laisse un message de debug l'indiquant
+        if key in self:
+            log.debug(f"La clé \"{key}\" a déjà une valeur asignée qui sera écrasée ({self[key]} -> {value}).")
+
         super(SettingsDictionary, self).__setitem__(key, value)
 
     def __getitem__(self, key):
