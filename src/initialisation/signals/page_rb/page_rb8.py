@@ -232,7 +232,7 @@ class PageRB8:
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
         """
         # Change la valeur pour les écrans noirs
-        data.update_parameter(self.page, "immersion_check", "is_checked", "immersion")
+        data.update_ui_parameter(self.page.findChild("immersion_check"), "is_checked", "immersion")
 
         # Inverse les données de traduction pour avoir un dictionnaire langue actuelle -> Français
         invert_translation = td.TranslationDictionary()

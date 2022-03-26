@@ -167,10 +167,10 @@ class PageRB1:
             self.page.findChild(QObject, "command_board_combo").change_selection(command_board)
 
         # Paramètre pour Renard (savoir si le pupitre est connecté à Renard)
-        data.update_parameter(self.page, "renard_check", "is_checked", "renard")
+        data.update_ui_parameter(self.page.findChild(QObject, "renard_check"), "is_checked", "renard")
 
         # Paramètre pour la caméra (savoir si elle est connecté ou si on a un visu direct sur Renard)
-        data.update_parameter(self.page, "camera_check", "is_checked", "camera")
+        data.update_ui_parameter(self.page.findChild(QObject, "camera_check"), "is_checked", "camera")
 
         # Paramètre pour le DMI (savoir quelle Interface sera utilisée pour le pupitre
         if data.get_value("dmi") is not None:
@@ -187,12 +187,12 @@ class PageRB1:
                 log.debug(f"Le niveau de registre du fichier de paramètre \"{data['log_level']}\" n'existe pas.\n")
 
         # Paramètre pour le PCC (savoir s'il sera activé)
-        data.update_parameter(self.page, "ccs_check", "is_checked", "ccs")
+        data.update_ui_parameter(self.page.findChild(QObject, "css_check"), "is_checked", "ccs")
 
         # Paramètres pour l'affichage des données en direct (genre vitesse, ...)
-        data.update_parameter(self.page, "data_check", "is_checked", "live_data")
-        data.update_parameter(self.page, "dashboard_check", "is_checked", "dashboard")
-        data.update_parameter(self.page, "data_save_check", "is_checked", "save_data")
+        data.update_ui_parameter(self.page.findChild(QObject, "data_check"), "is_checked", "live_data")
+        data.update_ui_parameter(self.page.findChild(QObject, "dashboard_check"), "is_checked", "dashboard")
+        data.update_ui_parameter(self.page.findChild(QObject, "data_save_check"), "is_checked", "save_data")
 
     def change_language(self, translation_data):
         """Permet à partir d'un dictionaire de traduction, de traduire les textes de la page de paramètres
