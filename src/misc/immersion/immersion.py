@@ -17,14 +17,18 @@ from PyQt5.QtGui import QFont, QPixmap
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
+import src.misc.decorators.decorators as decorators
 
 
 # Constantes pour l'état  de la fenêtre du mode immersion
-RATIO = 0.6     # Ratio entre la taille de des images/vidéos et de la fenêtre d'immersion
-#                 Préférer garder < 0.75 pour ne pas que ça dépasse des écrans en 4:3
+VOLUME = 0      # Intensité du volume sur une base 100
+RATIO = 1    # Ratio entre la taille de des images/vidéos et de la fenêtre d'immersion
+#                 Préférer garder < 0.75 pour ne pas que ça dépasse pour les fenêtre en 4:3 (DMI)
+
 LOADING_PATH = "loading.wmv"        # Taille identique à image STILL ; image de fin identique à image STILL
 STILL_PATH = "logo.png"
 UNLOADING_PATH = "unloading.mov"    # Taille identique à image STILL ; image de début identique à image STILL
+
 BACKGROUND_COLOR = "#000000"        # Il est conseillé de mettre du noir pour simuler un écran éteint
 TEXT_COLOR = "#2b2b2b"              # Couleur du texte (version du code principalement), gris foncé de préférence
 
@@ -34,7 +38,7 @@ SKIP_LIST = []
 
 
 class ImmersionMode(Enum):
-    """Classe contenant les différents modes pour le module d'immersion"""
+    """Enum contenant les différents modes pour le module d'immersion"""
     DEACTIVATED = 0
     EMPTY = 1
     LOADING = 2
@@ -61,10 +65,12 @@ def change_mode(new_mode):
     """
     # First verify if an instance of QApplication has been initialised
     if QApplication.instance() is None:
-        raise RuntimeError("Aucune instan ce de <PyQt5.QtWidgets.QApplication> n'a été initialisée")
+        raise RuntimeError("Aucune instance de <PyQt5.QtWidgets.QApplication> n'a été initialisée")
 
     # First generate the windows if they aren't generated
     if not IMMERSION:
+        # FIXME : trouver un moyen de changer le plugin de lecture pour windows media fountation
+        # os.environ["QT_MULTIMEDIA_PREFERRED_PLUGINS"] = "windowsmediafoundation"      # Not working
         initial_time = time.perf_counter()
         for screen_index in range(QDesktopWidget().screenCount()):
             sg = QDesktopWidget().screenGeometry(screen_index).getCoords()
@@ -94,7 +100,7 @@ def change_mode(new_mode):
                 window.set_empty()
             else:
                 window.set_deactivated()
-        log.info("Changement du mode immersion en mode fenêtre vide (fond unique et version du logiciel).\n")
+        log.info("Changement du mode immersion : mode fenêtres vides (fond unique et version du logiciel).\n")
     elif new_mode == ImmersionMode.LOADING:
         # Montre toutes les fenêtres qui ne sont pas dans la skiplist, avec la vidéo de chargement, sinon la cache
         for i, window in enumerate(IMMERSION):
@@ -102,7 +108,7 @@ def change_mode(new_mode):
                 window.set_loading()
             else:
                 window.set_deactivated()
-        log.info("Changement du mode immersion en mode chargement (vidéo de chargement -> logo du simulateur).\n")
+        log.info("Changement du mode immersion : mode chargement (vidéo de chargement -> logo du simulateur).\n")
     elif new_mode == ImmersionMode.STILL:
         # Montre toutes les fenêtres qui ne sont pas dans la skiplist, avec le logo du simulateur centré, sinon la cache
         for i, window in enumerate(IMMERSION):
@@ -110,7 +116,7 @@ def change_mode(new_mode):
                 window.set_still()
             else:
                 window.set_deactivated()
-        log.info("Changement du mode immersion en mode simulation (logo du simulateur).\n\n")
+        log.info("Changement du mode immersion : mode simulation (logo du simulateur).\n")
     elif new_mode == ImmersionMode.UNLOADING:
         # Montre toutes les fenêtres qui ne sont pas dans la skiplist, avec l'animation de fermeture, sinon la cache
         for i, window in enumerate(IMMERSION):
@@ -118,12 +124,12 @@ def change_mode(new_mode):
                 window.set_unloading()
             else:
                 window.set_deactivated()
-        log.info("Changement du mode immersion en mode déchargement (vidéo de déchargement -> fenêtre vide).\n")
+        log.info("Changement du mode immersion : mode déchargement (vidéo de déchargement -> fenêtre vide).\n")
     else:
         # Cache toutes les fenêtres
         for window in IMMERSION:
             window.set_deactivated()
-            log.info("Changement du mode immersion en mode fenêtre vide.\n")
+            log.info("Changement du mode immersion : mode désactivé.\n")
 
 
 def change_skip_list(skip_list=(), new_mode=ImmersionMode.EMPTY):
@@ -144,7 +150,7 @@ def change_skip_list(skip_list=(), new_mode=ImmersionMode.EMPTY):
     SKIP_LIST.clear()
     for i in skip_list:
         SKIP_LIST.append(int(i))
-    log.info(f"Immersion mode now deactivated for screens {SKIP_LIST}")
+    log.info(f"Mode immersion désactivé pour les écrans : {tuple(index + 1 for index in SKIP_LIST)}")
 
     # Change le mode de chargement
     change_mode(new_mode)
@@ -158,8 +164,13 @@ class ImmersionWindow(QMainWindow):
 
     # Liste des différents composants de la fenêtre
     version = None
-    mediaplayer = None
-    video = None
+
+    load_mediaplayer = None
+    load_video = None
+
+    unload_mediaplayer = None
+    unload_video = None
+
     imageviewer = None
     image = None
 
@@ -184,6 +195,7 @@ class ImmersionWindow(QMainWindow):
         self.setWindowFlag(Qt.FramelessWindowHint)
         self.setWindowFlag(Qt.WindowDoesNotAcceptFocus)
         # Défini la taille et la position des écran pour remplir l'écran en entire
+        height = int(RATIO * size[1])
         self.setGeometry(int(position[0]),
                          int(position[1]),
                          int(size[0]),
@@ -191,44 +203,69 @@ class ImmersionWindow(QMainWindow):
         # Change the background color to the one indicated in the BACKGROUD_COLOR constant
         self.setStyleSheet(f"QMainWindow {{background: '{BACKGROUND_COLOR}';}}")
 
-        # Continue par le joueur de vidéo
-        # Crée un joueur de vidéo et une vidéo, et les lies ensemble
-        self.mediaplayer = QMediaPlayer(self, QMediaPlayer.VideoSurface)
-        self.video = QVideoWidget(self)
-        self.mediaplayer.setVideoOutput(self.video)
-        # Change la taille et position pour centrer la vidéo et mettre sa taille selon le ration en constante
-        width = int(RATIO * size[0])
-        height = int(RATIO * size[1])
-        self.video.setGeometry(int((size[0] - width)/2),
-                               int((size[1] - height)/2),
-                               width,
-                               height)
-        # Cache la vidéo par défaut
-        self.video.hide()
+        # Continue par le joueur de vidéo de chargement (si la vidéo de chargement est trouvée)
+        if os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{LOADING_PATH}"):
+            # Crée un joueur de vidéo et une vidéo, et les lies ensemble
+            self.load_mediaplayer = QMediaPlayer(self, QMediaPlayer.VideoSurface)
+            self.load_video = QVideoWidget(self)
+            self.load_mediaplayer.setVideoOutput(self.load_video)
+            # Change la taille et position pour centrer la vidéo et mettre sa taille selon le ration en constante
+            video_ratio = self.load_video.width() / self.load_video.height()
+            self.load_video.setGeometry(QRect(int((self.size[0] - height * video_ratio) / 2),
+                                              int((self.size[1] - height) / 2),
+                                              int(height * video_ratio),
+                                              int(height)))
+            # Change la vidéo pour la vidéo de chargement
+            self.load_mediaplayer.setMedia(QMediaContent(QUrl.fromLocalFile(f"{PROJECT_DIR}\\src\\misc\\immersion\\{LOADING_PATH}")))
+            # Définit le volume du son comme celui indiqué
+            self.load_mediaplayer.setVolume(min(max(VOLUME, 0), 100))
+            # Cache la vidéo par défaut
+            self.load_video.hide()
 
-        # Continue par l'image du logo (pour le mode still)
-        # Crée un regardeur d'image et une image
-        self.imageviewer = QLabel(self)
-        self.image = QPixmap(f"{PROJECT_DIR}src\\misc\\immersion\\{STILL_PATH}")
-        # Change la taille de l'image pour être identique à celle de la vidéo (en prennant en compte le ratio de l'image
-        self.imageviewer.setGeometry(QRect(int((size[0] - height * self.image.width() / self.image.height())/2),
-                                           int((size[1] - height)/2),
-                                           int(height * self.image.width() / self.image.height()),
-                                           int(height)))
-        self.imageviewer.setPixmap(self.image.scaled(self.imageviewer.size(), Qt.KeepAspectRatio))
-        # Cache l'image par défaut
-        self.imageviewer.hide()
+        # Continue par le joueur de vidéo de fermeture (si la vidéo de fermeture est trouvée)
+        if os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{UNLOADING_PATH}"):
+            # Crée un joueur de vidéo et une vidéo, et les lies ensemble
+            self.unload_mediaplayer = QMediaPlayer(self, QMediaPlayer.VideoSurface)
+            self.unload_video = QVideoWidget(self)
+            self.unload_mediaplayer.setVideoOutput(self.unload_video)
+            # Change la taille et position pour centrer la vidéo et mettre sa taille selon le ration en constante
+            video_ratio = self.unload_video.width() / self.unload_video.height()
+            self.unload_video.setGeometry(QRect(int((self.size[0] - height * video_ratio) / 2),
+                                                int((self.size[1] - height) / 2),
+                                                int(height * video_ratio),
+                                                int(height)))
+            # Change la vidéo pour la vidéo de chargement
+            self.unload_mediaplayer.setMedia(QMediaContent(QUrl.fromLocalFile(f"{PROJECT_DIR}\\src\\misc\\immersion\\{UNLOADING_PATH}")))
+            # Définit le volume du son comme celui indiqué
+            self.unload_mediaplayer.setVolume(min(max(VOLUME, 0), 100))
+            # Cache la vidéo par défaut
+            self.unload_video.hide()
 
-        # Ajouter un texte avec la version du code dans le coins en bas à droite
-        self.version = QLabel(log.VERSION, self)
-        self.version.setStyleSheet(f"QLabel {{color : {TEXT_COLOR}; }}")
-        self.version.setFont(QFont("Verdana", 12))
-        # Le place dans le coins en bas à droite (Le Qt.AlignRight et Qt.AlignBottom ne fonctionnent pas)
-        width = self.version.fontMetrics().boundingRect(self.version.text()).width()
-        height = self.version.fontMetrics().boundingRect(self.version.text()).height()
-        self.version.setGeometry(QRect(size[0] - width, size[1] - height,
-                                       width, height))
+        # Continue par l'image du logo (pour le mode still) si l'image existe
+        if os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{STILL_PATH}"):
+            # Crée un regardeur d'image et une image
+            self.imageviewer = QLabel(self)
+            self.image = QPixmap(f"{PROJECT_DIR}src\\misc\\immersion\\{STILL_PATH}")
+            # Change la taille de l'image pour être identique à celle de la vidéo
+            self.imageviewer.setGeometry(QRect(int((size[0] - height * self.image.width() / self.image.height())/2),
+                                               int((size[1] - height)/2),
+                                               int(height * self.image.width() / self.image.height()),
+                                               int(height)))
+            self.imageviewer.setPixmap(self.image.scaled(self.imageviewer.size(), Qt.KeepAspectRatio))
+            # Cache l'image par défaut
+            self.imageviewer.hide()
 
+            # Ajouter un texte avec la version du code dans le coins en bas à droite
+            self.version = QLabel(log.VERSION, self)
+            self.version.setStyleSheet(f"QLabel {{color : {TEXT_COLOR}; }}")
+            self.version.setFont(QFont("Verdana", 12))
+            # Le place dans le coins en bas à droite (Le Qt.AlignRight et Qt.AlignBottom ne fonctionnent pas)
+            width = self.version.fontMetrics().boundingRect(self.version.text()).width()
+            height = self.version.fontMetrics().boundingRect(self.version.text()).height()
+            self.version.setGeometry(QRect(size[0] - width, size[1] - height,
+                                           width, height))
+
+    @decorators.UIupdate
     def set_loading(self):
         """Fonction permettant de lancer la vidéo de chargement, puis de se mettre en mode ImmersionMode.STILL"""
         # Si la vidéo de chargement n'existe pas, passe directement en mode still
@@ -236,46 +273,39 @@ class ImmersionWindow(QMainWindow):
             self.set_still()
             return
 
-        # Déconnecte tous les signaux du mediaplayer pour éviter d'appeler un signal lors du lancement de la vidéo
-        self.mediaplayer.disconnect()
+        # Cache toutes vidéos et images et joue la vidéo de chargement
+        if self.load_mediaplayer is not None:
+            self.load_mediaplayer.stop()
+            self.load_video.show()
+            self.load_mediaplayer.play()
+        if self.unload_mediaplayer is not None:
+            self.unload_video.hide()
+            self.unload_mediaplayer.stop()
+        if self.image is not None:
+            self.imageviewer.hide()
+        self.show()
 
-        # Charge la vidéo de chargement, redimenssione le mediaplayer à la vidéo, le monde et lance la vidéo
-        self.mediaplayer.setMedia(QMediaContent(QUrl.fromLocalFile(f"{PROJECT_DIR}\\src\\misc\\immersion\\{LOADING_PATH}")))
-        height = int(RATIO * self.size[1])      # Prend la hauteur comme référence (la largeur dépendra du ratio vidéo)
-        self.mediaplayer.setGeometry(QRect(int((self.size[0] - height * self.video.width() / self.video.height())/2),
-                                           int((self.size[1] - height)/2),
-                                           int(height * self.video.width() / self.video.height()),
-                                           int(height)))
-        self.video.show()
-        self.mediaplayer.play()
-
-        # Connecte le signal de fin de vidéo à la fonction pour faire apparaitre l'image
-        self.mediaplayer.stateChanged.connect(self.set_still)
-
+    @decorators.UIupdate
     def set_unloading(self):
         """Fonction permettant de lancer la vidéo de chargement, puis de se mettre en mode ImmersionMode.STILL"""
         # Si la vidéo de déchargement n'existe pas, passe directement en mode empty
-        if not os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{LOADING_PATH}"):
+        if not os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{UNLOADING_PATH}"):
             self.set_empty()
             return
 
-        # Déconnecte tous les signaux du mediaplayer pour éviter d'appeler un signal lors du lancement de la vidéo
-        self.mediaplayer.disconnect()
+        # Cache toutes vidéos et images et joue la vidéo de déchargement
+        if self.unload_mediaplayer is not None:
+            self.unload_mediaplayer.stop()
+            self.unload_video.show()
+            self.unload_mediaplayer.play()
+        if self.load_mediaplayer is not None:
+            self.load_video.hide()
+            self.load_mediaplayer.stop()
+        if self.image is not None:
+            self.imageviewer.hide()
+        self.show()
 
-        # Charge la vidéo de déchargement, redimenssione le mediaplayer à la vidéo, le monde et lance la vidéo
-        self.mediaplayer.setMedia(
-            QMediaContent(QUrl.fromLocalFile(f"{PROJECT_DIR}\\src\\misc\\immersion\\{UNLOADING_PATH}")))
-        height = int(RATIO * self.size[1])      # Prend la hauteur comme référence (la largeur dépendra du ratio vidéo)
-        self.mediaplayer.setGeometry(QRect(int((self.size[0] - height * self.video.width() / self.video.height()) / 2),
-                                           int((self.size[1] - height) / 2),
-                                           height * self.video.width() / self.video.height(),
-                                           height))
-        self.video.show()
-        self.mediaplayer.play()
-
-        # Connecte le signal de fin de vidéo à la fonction pour faire apparaitre l'image
-        self.mediaplayer.stateChanged.connect(self.set_empty)
-
+    @decorators.UIupdate
     def set_still(self):
         """Fonction permettant de vider la fenêtre d'immersion"""
         # Si le logo n'existe pas, passe en mode empty
@@ -283,52 +313,71 @@ class ImmersionWindow(QMainWindow):
             self.set_empty()
             return
 
-        # Arrête la vidéo si elle tourne, cache la vidéo, montre l'image et la fenêtre
-        if self.mediaplayer.state() == QMediaPlayer.PlayingState:
-            self.mediaPlayer.pause()
-        self.video.hide()
-        self.imageviewer.show()
+        # Arrête les vidéo si elles tourne, cache les vidéo, montre l'image et la fenêtre
+        if self.load_mediaplayer is not None:
+            self.load_video.hide()
+            self.load_mediaplayer.stop()
+        if self.unload_mediaplayer is not None:
+            self.unload_video.hide()
+            self.unload_mediaplayer.stop()
+        if self.image is not None:
+            self.imageviewer.show()
         self.show()
 
+    @decorators.UIupdate
     def set_empty(self):
         """Fonction permettant de vider la fenêtre d'immersion"""
         # Arrête la vidéo si elle tourne, cache la vidéo et l'image et montre la fenêtre
-        if self.mediaplayer.state() == QMediaPlayer.PlayingState:
-            self.mediaPlayer.pause()
-        self.video.hide()
-        self.imageviewer.hide()
+        if self.load_mediaplayer is not None:
+            self.load_video.hide()
+            self.load_mediaplayer.stop()
+        if self.unload_mediaplayer is not None:
+            self.unload_video.hide()
+            self.unload_mediaplayer.stop()
+        if self.image is not None:
+            self.imageviewer.hide()
         self.show()
 
+    @decorators.UIupdate
     def set_deactivated(self):
         """Fonction permettant de vider la fenêtre d'immersion"""
         # Arrête la vidéo si elle tourne et cache la fenêtre, la vidéo et l'image
-        if self.mediaplayer.state() == QMediaPlayer.PlayingState:
-            self.mediaPlayer.pause()
+        if self.load_mediaplayer is not None:
+            self.load_video.hide()
+            self.load_mediaplayer.stop()
+        if self.unload_mediaplayer is not None:
+            self.unload_video.hide()
+            self.unload_video.stop()
+        if self.image is not None:
+            self.imageviewer.hide()
         self.hide()
-        self.video.hide()
-        self.imageviewer.hide()
 
 
 def main():
     # Create the application, a thread to do the actions and starts the application
+    os.environ["QT_MULTIMEDIA_PREFERRED_PLUGINS"] = "windowsmediafoundation"
     app = QApplication(sys.argv)
     change_mode(ImmersionMode.EMPTY)
 
     import threading
-    worker = threading.Thread(target = actions)
-    worker.start()
+    worker_thread = threading.Thread(target=worker)
+    worker_thread.start()
 
     app.exec()
 
 
-def actions():
-    # FIXME : PAS THREAD SAFE!!!!!!!!!!!!!!!!!
-    time.sleep(1)
-    change_mode(ImmersionMode.STILL)
-    time.sleep(1)
-    change_skip_list([1], ImmersionMode.EMPTY)
-    time.sleep(1)
+def worker():
     change_mode(ImmersionMode.LOADING)
+    time.sleep(7)
+    change_mode(ImmersionMode.STILL)
+    time.sleep(3)
+    change_skip_list((1,), ImmersionMode.UNLOADING)
+    time.sleep(4)
+    change_mode(ImmersionMode.EMPTY)
+    time.sleep(3)
+    change_mode(ImmersionMode.DEACTIVATED)
+    time.sleep(3)
+    exit(1)
 
 
 if __name__ == "__main__":
