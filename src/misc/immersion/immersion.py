@@ -158,10 +158,6 @@ def change_skip_list(skip_list=(), new_mode=ImmersionMode.EMPTY):
 
 class ImmersionWindow(QMainWindow):
     """Classe permettant de générer une fenêtre d'immersion"""
-    # Informations sur la position et la taille de la fenêtre
-    position = ()
-    size = ()
-
     # Liste des différents composants de la fenêtre
     version = None
 
@@ -187,8 +183,6 @@ class ImmersionWindow(QMainWindow):
         # Initialise la fenêtre
         super().__init__()
         self.hide()
-        self.position = position
-        self.size = size
 
         # Commence par la fenêtre en elle-même
         # Tags pour enlever les bordures et rendre la fenêtre incliquable (pour éviter qu'elle cache d'autres modules)
@@ -211,8 +205,8 @@ class ImmersionWindow(QMainWindow):
             self.load_mediaplayer.setVideoOutput(self.load_video)
             # Change la taille et position pour centrer la vidéo et mettre sa taille selon le ration en constante
             video_ratio = self.load_video.width() / self.load_video.height()
-            self.load_video.setGeometry(QRect(int((self.size[0] - height * video_ratio) / 2),
-                                              int((self.size[1] - height) / 2),
+            self.load_video.setGeometry(QRect(int((size[0] - height * video_ratio) / 2),
+                                              int((size[1] - height) / 2),
                                               int(height * video_ratio),
                                               int(height)))
             # Change la vidéo pour la vidéo de chargement
@@ -230,8 +224,8 @@ class ImmersionWindow(QMainWindow):
             self.unload_mediaplayer.setVideoOutput(self.unload_video)
             # Change la taille et position pour centrer la vidéo et mettre sa taille selon le ration en constante
             video_ratio = self.unload_video.width() / self.unload_video.height()
-            self.unload_video.setGeometry(QRect(int((self.size[0] - height * video_ratio) / 2),
-                                                int((self.size[1] - height) / 2),
+            self.unload_video.setGeometry(QRect(int((size[0] - height * video_ratio) / 2),
+                                                int((size[1] - height) / 2),
                                                 int(height * video_ratio),
                                                 int(height)))
             # Change la vidéo pour la vidéo de chargement
