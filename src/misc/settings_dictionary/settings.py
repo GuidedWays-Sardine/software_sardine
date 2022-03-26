@@ -79,7 +79,9 @@ class SettingsDictionary(dict):
             log.debug(f"Aucun paramètre \"{key.lower()}\" dans le dictionnaire de paramètres ouvert.")
             return default
 
-    def update_parameter(self, page, widget_id, property, key):
+    @decorators.UIupdate
+    @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
+    def update_ui_parameter(self, component, property_name, key):
         """Méthode pour mettre à jour une propriété d'un composant qml à partir de son ID et de la propriété.
 
         Parameters
