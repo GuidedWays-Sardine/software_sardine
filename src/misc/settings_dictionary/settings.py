@@ -84,20 +84,18 @@ class SettingsDictionary(dict):
 
         Parameters
         ----------
-        page: `QObject`
-            la page contenant le composant
-        widget_id: `string`
-            l'id du composant qui doit être mis à jour
-        property: `string`
+        component: `QObject`
+            Le composant à mettre à jour
+        property_name: `string`
             le nom de la propriété  à mettre à jour
         key: `Any`
             la clé vers la nouvelle valeur
         """
         try:
-            page.findChild(QObject, widget_id).setProperty(property, self[key])
+            component.setProperty(property_name, self[key])
         except KeyError:
-            log.debug(f"Impossible de changer le paramètre : {property} du composant {widget_id}\n" +
-                      f"\t\tPas de valeurs pour le paramètre : \"{key}\" dans le fichier ouvert.")
+            log.debug(f"Impossible de changer le paramètre : \"{property_name}\" du composant envoyé.\n\t" +
+                      f"Pas de valeurs pour le paramètre : \"{key}\" dans le fichier ouvert.")
 
     def save(self, file_path, delimiter=";"):
         """Méthode permettant de sauvegarder les paramètres dans un fichier
