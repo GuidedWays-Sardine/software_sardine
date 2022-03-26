@@ -120,15 +120,15 @@ class SettingsDictionary(dict):
         else:
             log.info(f"Enregistrement de {len(self)} données dans : {file_path}")
 
-    def open(self, file_path, delimiter=";"):
+    def open(self, file_path, delimiter=(";", "\t")):
         """Méthode permettant d'ouvrir un fichier de paramètres et de rajouter les paramètres au dictionnaire
 
         Parameters
         ----------
         file_path: `string`
             chemin d'accès vers le fichier de paramètres
-        delimiter: `str`
-            délimiteur séparant les différentes paramètres ";" par défaut
+        delimiter: `str | tuple | list`
+            potentiels délimiteurs séparant les différentes paramètres ";" ou "\t" par défaut
         """
         # Récupère la longueur actuelle
         current_length = len(self)
@@ -136,9 +136,24 @@ class SettingsDictionary(dict):
         try:
             # Essaye d'ouvrir le fichier avec les paramètres
             with open(file_path, "r", encoding="utf-8-sig") as file:
+                # Récupère chacune des lignes du fichier
+                lines = file.readlines()
+
+                # Si plusieurs délimiteurs ont été envoyés, trouve celui utilisé pour le fichier
+                if lines and isinstance(delimiter, (tuple, list)):
+                    for delim in reversed(delimiter):
+                        # Si ce délimiteur se trouve dans la ligne, le choisit comme nouveau délimiteur par défaut
+                        if delim in lines[0]:
+                            delimiter = delim
+
+                    # Si aucun des délimiteurs ne se trouve sur la ligne, définit le premier comme celui utilisé
+                    if isinstance(delimiter, (tuple, list)):
+                        # Dans le cas où une liste vide de délimiteur a été envoyée utilise ";"
+                        delimiter = ";" if not delimiter else delimiter[0]
+
                 # Si le fichier est ouvert, récupère chaque lignes de celui-ci
-                for line in file:
-                    # Si la ligne ne contient pas le délimiteur (ici ;) l'indique dans les logs et saute la ligne
+                for line in lines:
+                    # Si la ligne ne contient pas le délimiteur (ici ; ou \t) l'indique dans les logs et saute la ligne
                     if delimiter in line:
                         # Récupère les deux éléments de la ligne et les ajoutent comme clé et valeur
                         line = list(map(str.strip, line.rstrip('\n').split(delimiter, maxsplit=1)))
@@ -149,7 +164,7 @@ class SettingsDictionary(dict):
 
         except Exception as error:
             # Cas où le fichier ouvert n'existe pas ou qu'il n'est pas accessible
-            log.warning(f"Impossible d'ouvrir le fichier : {file_path}",
+            log.warning(f"Impossible d'ouvrir le fichier, action non prise en comtpe. \n\t{file_path}",
                         exception=error, prefix="Lecture des données")
         else:
             # Indique en debug le nombre d'éléments récupérés
