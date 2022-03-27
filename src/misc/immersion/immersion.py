@@ -346,7 +346,7 @@ class ImmersionWindow(QMainWindow):
             self.__load_mediaplayer.stop()
         if self.__unload_mediaplayer is not None:
             self.__unload_video.hide()
-            self.__unload_video.stop()
+            self.__unload_mediaplayer.stop()
         if self.__image is not None:
             self.__imageviewer.hide()
         self.hide()
