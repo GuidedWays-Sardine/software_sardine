@@ -77,11 +77,9 @@ class UIupdate:
         # pour prendre en compte chaque situation, plusieurs pyqtSignal avec un nombre d'arguments différent est généré
         __MAX_PARAMETERS = 10
         __function = None
-        # OPTIMIZE : Les exec ajoutent 0.4ms par appel de fonction. Cependant certaines contraintes existent :
-        #   - le pyqtSignal ne peut pas être généré dans le constructeur, obligatoirement ci-dessous
-        #   - le pyqtSignal ne peut pas être généré dans un tuple
         for i in range(__MAX_PARAMETERS + 1):
             exec(f"__signal{i} = PyQt5.QtCore.pyqtSignal(*((object,) * {i}))")
+        __signal = None
 
         # Nombre et liste des arguments (hors self si méthode d'une classe) pour l'appel de la fonction
         __in_class = True
@@ -126,6 +124,11 @@ class UIupdate:
             # Sinon connecte la fonction au bon pyqtSignal (index = nombre d'arguments permis)
             exec(f"self.__signal{self.__arguments_count + self.__in_class}.connect(self._UIThread__function)")
 
+            # Pré-compile les exec d'émissions de signal pour une optimisation du temps d'appel du signal
+            self.__signal = compile(f"self.__signal{self.__arguments_count + self.__in_class}.emit(*self._UIThread__arguments)",
+                                    filename=f"signal{self.__arguments_count + self.__in_class}",
+                                    mode="eval")
+
         def set_arguments(self, *args):
             """Fonction pour changer les arguments pour le prochain appel de la fonction
             (impossible à envoyer dans la fonction run(), définit par défaut par QThread et appelé avec QThread.start())
@@ -151,7 +154,7 @@ class UIupdate:
         def run(self):
             """Fonction permettant d'émettre le signal et donc d'appeler la fonction avec les paramètres sauvegardés"""
             # Emet le signal, ce qui va appeler la fonction
-            exec(f"self.__signal{self.__arguments_count + self.__in_class}.emit(*self._UIThread__arguments)")
+            exec(self.__signal)
 
             # réinitialise les arguments pour éviter de rappeler la fonction avec les mêmes arguments
             self.__arguments = ()
