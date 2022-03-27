@@ -8,7 +8,7 @@ import threading
 
 
 # Librairies graphiques
-from PyQt5.QtCore import QThread, pyqtSignal
+import PyQt5.QtCore
 
 
 # Librairies SARDINE
@@ -69,7 +69,7 @@ def QtSignal(log_level=log.Level.ERROR, end_process=False):
 class UIupdate:
     """décorateur à obligatoirement utiliser pour toutes les fonctions mettant à jour des éléments grahiques"""
 
-    class UIThread(QThread):
+    class UIThread(PyQt5.QtCore.QThread):
         """Classe contenant tous les éléments nécessaires pour faire fonctionner le décorateur"""
         # Informations nécessaires pour la génération des pyqtSignal
         # Les arguments de pyqtSignal dépendent du nombre d'arguments de la fonction
@@ -81,7 +81,7 @@ class UIupdate:
         #   - le pyqtSignal ne peut pas être généré dans le constructeur, obligatoirement ci-dessous
         #   - le pyqtSignal ne peut pas être généré dans un tuple
         for i in range(__MAX_PARAMETERS + 1):
-            exec(f"__signal{i} = pyqtSignal(*((object,) * {i}))")
+            exec(f"__signal{i} = PyQt5.QtCore.pyqtSignal(*((object,) * {i}))")
 
         # Nombre et liste des arguments (hors self si méthode d'une classe) pour l'appel de la fonction
         __in_class = True
