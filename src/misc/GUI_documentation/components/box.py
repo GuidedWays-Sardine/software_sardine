@@ -5,29 +5,25 @@ from .. import colors
 
 class BoxDrawer:
 
-    box_corners = []
+    box_corners = ()
     text = ""
     fill = False
 
-    def __init__(self, x, y, w, h, draw_text="", fill=False):
+    def __init__(self, position, size, draw_text="", fill=False):
         """Permet d'initialiser la boite à dessiner
 
         Parameters
         ----------
-        x: `int`
-            coordonnée x de la boite
-        y: `int`
-            coordonnée y de la boite
-        w: `int`
-            largeur de la boite
-        h: `ìnt`
-            hauteur de la boite
+        position: `list | tuple`
+            position de la boite (x, y)
+        size: `list | tuple`
+            dimensions de la boite (w, h)
         draw_text : `string`
             texte à afficher au milieu de la boite (texte vide par défaut)
         fill : `bool`
             la boite doit-elle être remplie en bleu clair (Non par défaut)
         """
-        self.box_corners = [x, y, x + w - 1, y + h - 1]
+        self.box_corners = (position[0], position[1], position[0] + size[0] - 1, position[1] + size[1] - 1)
         self.text = draw_text
         self.fill = fill
 
