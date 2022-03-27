@@ -27,7 +27,7 @@ RATIO = 1    # Ratio entre la taille de des images/vidéos et de la fenêtre d'i
 
 LOADING_PATH = "loading.wmv"        # Taille identique à image STILL ; image de fin identique à image STILL
 STILL_PATH = "logo.png"
-UNLOADING_PATH = "unloading.mov"    # Taille identique à image STILL ; image de début identique à image STILL
+UNLOADING_PATH = "unloading.wmv"    # Taille identique à image STILL ; image de début identique à image STILL
 
 BACKGROUND_COLOR = "#000000"        # Il est conseillé de mettre du noir pour simuler un écran éteint
 TEXT_COLOR = "#2b2b2b"              # Couleur du texte (version du code principalement), gris foncé de préférence
@@ -354,7 +354,7 @@ class ImmersionWindow(QMainWindow):
 
 def main():
     # Create the application, a thread to do the actions and starts the application
-    log.initialise(save = False)
+    log.initialise(save=False)
     app = QApplication(sys.argv)
     change_mode(ImmersionMode.EMPTY)
 
