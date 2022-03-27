@@ -1,5 +1,6 @@
 # Librairies par défaut
 from PIL import ImageFont
+from .. import colors
 
 
 class BoxDrawer:
@@ -47,8 +48,8 @@ class BoxDrawer:
         # Dessine le rectangle
         drawing.rectangle(self.box_corners,
                           width=1 * scale_factor,
-                          outline=(255, 255, 255),
-                          fill=(97, 193, 193) if self.fill else (3, 17, 34))
+                          outline=colors.OUTLINE_COLOR,
+                          fill=colors.BACKGROUND_LIGHT_COLOR if self.fill else colors.BACKGROUND_DARK_COLOR)
 
         # Dessine le texte
         w, h = drawing.textsize(self.text)
@@ -56,4 +57,5 @@ class BoxDrawer:
                                 self.box_corners[1] + (self.box_corners[3]-self.box_corners[1]-(h+1) * scale_factor)/2),
                                self.text,
                                align="center",
-                               font=ImageFont.truetype("arial.ttf", 12 * scale_factor))
+                               font=ImageFont.truetype("arial.ttf", 12 * scale_factor),
+                               fill=colors.TEXT_COLOR)

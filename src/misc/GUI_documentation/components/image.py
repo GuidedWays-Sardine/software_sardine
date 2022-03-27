@@ -1,5 +1,6 @@
 # pip install Pillow
 from PIL import Image, ImageDraw
+from .. import colors
 
 
 class ImageDrawer:
@@ -28,7 +29,9 @@ class ImageDrawer:
         self.scale_factor = max(scale_factor, 1)
 
         # Initialise l'image
-        self.image = Image.new("RGB", (width * self.scale_factor, height * self.scale_factor), (3, 17, 34))
+        self.image = Image.new("RGB",
+                               (width * self.scale_factor, height * self.scale_factor),
+                               colors.BACKGROUND_DARK_COLOR)
         self.drawing = ImageDraw.Draw(self.image)
 
     def draw(self, shapes):
