@@ -22,7 +22,7 @@ import src.misc.decorators.decorators as decorators
 
 # Constantes pour l'état  de la fenêtre du mode immersion
 VOLUME = 0      # Intensité du volume sur une base 100
-RATIO = 1    # Ratio entre la taille de des images/vidéos et de la fenêtre d'immersion
+RATIO = 0.8    # Ratio entre la taille de des images/vidéos et de la fenêtre d'immersion
 #                 Préférer garder < 0.75 pour ne pas que ça dépasse pour les fenêtre en 4:3 (DMI)
 
 LOADING_PATH = "loading.wmv"        # Taille identique à image STILL ; image de fin identique à image STILL
@@ -37,7 +37,7 @@ IMMERSION = []
 SKIP_LIST = []
 
 
-class ImmersionMode(Enum):
+class Mode(Enum):
     """Enum contenant les différents modes pour le module d'immersion"""
     DEACTIVATED = 0
     EMPTY = 1
@@ -51,7 +51,7 @@ def change_mode(new_mode):
 
     Parameters
     ----------
-    new_mode: `ImmersionMode`
+    new_mode: `Mode`
         DEACTIVATED -> Toutes les fenêtres d'immersion sont cachées. Le mode immersion est désactivé
         EMPTY -> Les fenêtres sont visibles (sauf celles à sauter) avec un fond uni
         LOADING -> Les fenêtres sont visibles (sauf celles à sauter) avec l'animation de chargement -> mode STILL
@@ -93,7 +93,7 @@ def change_mode(new_mode):
                         f"{PROJECT_DIR}src\\misc\\immersion\\{UNLOADING_PATH}")
 
     # Now find what immersion mode was sent and change the behavior of the immersion mode depending on it
-    if new_mode == ImmersionMode.EMPTY:
+    if new_mode == Mode.EMPTY:
         # Montre toutes les fenêtres qui ne sont pas dans la skiplist, sans video, ni image, sinon la cache
         for i, window in enumerate(IMMERSION):
             if i not in SKIP_LIST:
@@ -101,7 +101,7 @@ def change_mode(new_mode):
             else:
                 window.set_deactivated()
         log.info("Changement du mode immersion : mode fenêtres vides (fond unique et version du logiciel).\n")
-    elif new_mode == ImmersionMode.LOADING:
+    elif new_mode == Mode.LOADING:
         # Montre toutes les fenêtres qui ne sont pas dans la skiplist, avec la vidéo de chargement, sinon la cache
         for i, window in enumerate(IMMERSION):
             if i not in SKIP_LIST:
@@ -109,7 +109,7 @@ def change_mode(new_mode):
             else:
                 window.set_deactivated()
         log.info("Changement du mode immersion : mode chargement (vidéo de chargement -> logo du simulateur).\n")
-    elif new_mode == ImmersionMode.STILL:
+    elif new_mode == Mode.STILL:
         # Montre toutes les fenêtres qui ne sont pas dans la skiplist, avec le logo du simulateur centré, sinon la cache
         for i, window in enumerate(IMMERSION):
             if i not in SKIP_LIST:
@@ -117,7 +117,7 @@ def change_mode(new_mode):
             else:
                 window.set_deactivated()
         log.info("Changement du mode immersion : mode simulation (logo du simulateur).\n")
-    elif new_mode == ImmersionMode.UNLOADING:
+    elif new_mode == Mode.UNLOADING:
         # Montre toutes les fenêtres qui ne sont pas dans la skiplist, avec l'animation de fermeture, sinon la cache
         for i, window in enumerate(IMMERSION):
             if i not in SKIP_LIST:
@@ -132,14 +132,14 @@ def change_mode(new_mode):
             log.info("Changement du mode immersion : mode désactivé.\n")
 
 
-def change_skip_list(skip_list=(), new_mode=ImmersionMode.EMPTY):
+def change_skip_list(skip_list=(), new_mode=Mode.EMPTY):
     """Fonction permettant de rajouter des écrans à désactiver (et donc à sauter)
 
     Parameters
     ----------
     skip_list: `tuple | list`
         Liste des écrans à sauter (de 0 à Nécrans - 1). Par défaut aucun
-    new_mode: `ImmersionMode`
+    new_mode: `Mode`
         DEACTIVATED -> Toutes les fenêtres d'immersion sont cachées. Le mode immersion est désactivé
         EMPTY -> Les fenêtres sont visibles (sauf celles à sauter) avec un fond uni
         LOADING -> Les fenêtres sont visibles (sauf celles à sauter) avec l'animation de chargement -> mode STILL
@@ -262,7 +262,7 @@ class ImmersionWindow(QMainWindow):
     @decorators.UIupdate
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def set_loading(self):
-        """Fonction permettant de lancer la vidéo de chargement, puis de se mettre en mode ImmersionMode.STILL"""
+        """Fonction permettant de lancer la vidéo de chargement, puis de se mettre en mode Mode.STILL"""
         # Si la vidéo de chargement n'existe pas, passe directement en mode still
         if not os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{LOADING_PATH}"):
             self.set_still()
@@ -283,7 +283,7 @@ class ImmersionWindow(QMainWindow):
     @decorators.UIupdate
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def set_unloading(self):
-        """Fonction permettant de lancer la vidéo de chargement, puis de se mettre en mode ImmersionMode.STILL"""
+        """Fonction permettant de lancer la vidéo de chargement, puis de se mettre en mode Mode.STILL"""
         # Si la vidéo de déchargement n'existe pas, passe directement en mode empty
         if not os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{UNLOADING_PATH}"):
             self.set_empty()
@@ -356,7 +356,7 @@ def main():
     # Create the application, a thread to do the actions and starts the application
     log.initialise(save=False)
     app = QApplication(sys.argv)
-    change_mode(ImmersionMode.EMPTY)
+    change_mode(Mode.EMPTY)
 
     import threading
     worker_thread = threading.Thread(target=worker)
@@ -366,15 +366,15 @@ def main():
 
 
 def worker():
-    change_mode(ImmersionMode.LOADING)
+    change_mode(Mode.LOADING)
     time.sleep(7)
-    change_mode(ImmersionMode.STILL)
+    change_mode(Mode.STILL)
     time.sleep(3)
-    change_skip_list((1,), ImmersionMode.UNLOADING)
+    change_skip_list((1,), Mode.UNLOADING)
     time.sleep(4)
-    change_mode(ImmersionMode.EMPTY)
+    change_mode(Mode.EMPTY)
     time.sleep(3)
-    change_mode(ImmersionMode.DEACTIVATED)
+    change_mode(Mode.DEACTIVATED)
     time.sleep(3)
     exit(1)
 
