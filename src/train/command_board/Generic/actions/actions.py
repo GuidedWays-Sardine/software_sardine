@@ -5,7 +5,7 @@ from enum import Enum
 
 
 # Librairies SARDINE
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src\\")[0]
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.train.command_board.Generic.actions.electric as electric
 import src.train.command_board.Generic.actions.pneumatic as pneumatic
