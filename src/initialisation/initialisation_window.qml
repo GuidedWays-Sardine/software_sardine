@@ -9,9 +9,10 @@ Window {
     id: window
     minimumWidth: 640
     minimumHeight: 480
-    visible: false
     color: "#031122"
     title: "Initialisation Sardine"
+    //Flags permettant de laisser la fenêtre toujours au dessus et de laisser uniquement le bouton de fermeture
+    flags: Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint | Qt.CustomizeWindowHint | Qt.Dialog | Qt.WindowTitleHint
 
 
     //Signal utilisé pour détecter quand le fenêtre est fermée et quitter l'application

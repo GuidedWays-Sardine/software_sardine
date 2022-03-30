@@ -10,7 +10,6 @@ Window {
 
     minimumWidth: 246
     minimumHeight: 143
-    visible: false
     color: "#031122"
     flags: Qt.FramelessWindowHint | Qt.Window | Qt.WindowStaysOnTopHint
 
