@@ -14,6 +14,7 @@ from PyQt5.QtQml import QQmlApplicationEngine
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
+import src.misc.immersion.immersion as immersion
 import src.misc.settings_dictionary.settings as sd
 import src.misc.translation_dictionary.translation as td
 from src.initialisation.signals import right_buttons as rb
@@ -67,6 +68,9 @@ class InitialisationWindow:
         initial_time = time.perf_counter()
         log.change_log_prefix("Initialisation application d'initialisation")
         log.info(f"Début du chargement de l'application d'intialisation.")
+
+        # Commence par initialiser le mode immersion en mode EMPTY
+        immersion.change_mode(immersion.Mode.EMPTY)
 
         # Charge tous les écrans connectés à l'ordinateur (utile pour la positionnement de certaines popup)
         for screen_index in range(0, QDesktopWidget().screenCount()):

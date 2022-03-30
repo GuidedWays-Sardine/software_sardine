@@ -16,6 +16,7 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.settings_dictionary.settings as sd
 import src.misc.log.log as log
+import src.misc.immersion.immersion as immersion
 
 
 class Simulation:
@@ -62,15 +63,28 @@ class Simulation:
         initial_time = time.perf_counter()
         log.change_log_prefix("initialisation simulation")
         log.info("Début de l'initialisation de la simulation.\n\n")
-
-        # Stocke les différents paramètres utiles à l'application
         self.app = app
         self.parameters = data
+
+        # Change le mode d'immersion en mode chargement s'il est activé, sinon le désactive
+        if "immersion" in self.parameters and self.parameters["immersion"]:
+            # Récupère la liste des catégories/écrans de tous les écrans utilisant un logiciel externe
+            # information stocké dans "category.window.extern"
+            keys = (key.rsplit(".", 1)[-1] for key in list(self.parameters)
+                    if key.endswith(".extern") and self.parameters[key])
+            # récupère l'index de l'écran utilisé pour chacun des écrans externe si celui-ci est utilisé
+            skip_list = (self.parameters[f"{key}.screen_index"] - 1 for key in keys
+                         if f"{key}.screen_index" in self.parameters and self.parameters[f"{key}.screen_index"] != 0)
+
+            # Change la skip_list et se met en mode loading
+            immersion.change_skip_list(skip_list=tuple(skip_list),
+                                       new_mode=immersion.Mode.LOADING)
+        else:
+            immersion.change_mode(immersion.Mode.DEACTIVATED)
+
+        # Génère et stocke les différents BDD nécessaire à la simulation
         # FEATURE : initialiser la base de données train ici
         # FEATURE : initialiser la base de données ligne ici (à partir de l'identifiant ligne)
-
-        # Initialise les fenêtre éteintes (Si elles le mode immersion a été activé)
-        self.initialise_off_screens()
 
         # A partir d'ici initialise tous les modules un par un (ils seront lancées dans la fonction run())
         # FEATURE : appeler les différentes fonctions d'initialisation de modules
@@ -100,13 +114,14 @@ class Simulation:
         log.change_log_prefix("lancement simulation")
         log.info("Début du lancement de la simulation.\n\n")
 
-        # Montre les écrans d'immersion (si le mode a été désactivé, aucune fenêtre n'apparaitra
-        self.run_off_screens()
-
         # Lance tous les modules en appelant la fonction run()
         # Chaque module doit avoir une fonction run() sinon la simulation ne se lance pas
         for module in self.components:
             self.components[module].run()
+
+        # Si le mode immersion est activé, le change en mode STILL
+        if "immersion" in self.parameters and self.parameters["immersion"]:
+            immersion.change_mode(immersion.Mode.STILL)
 
         # Indique le temps de lancement de l'application (celui-ci doit être le plus court possible)
         log.info(f"Lancements des modules de simulation en " +
@@ -166,6 +181,10 @@ class Simulation:
         log.change_log_prefix("fermeture simulation")
         log.info("Fermeture de l'initialisation de la simulation.\n\n")
 
+        # Change le mode immersion en mode fermeture si le mode immersion est activé
+        if "immersion" in self.parameters and self.parameters["immersion"]:
+            immersion.change_mode(immersion.Mode.UNLOADING)
+
         # Indique le nombre de mises à jours réussies et le temps moyen de mise à jour
         log.info(f"Simulation mises à jour {self.update_count} fois avec un temps moyen de {(self.update_average_time * 1000):.2f} millisecondes.\n")
 
@@ -203,41 +222,3 @@ class Simulation:
             else:
                 log.error(f"Impossible de charger le DMI : {self.parameters['dmi']}. Aucun DMI ne sera chargé.\n",
                           exception=error, prefix="initialisation simulation")
-
-    def initialise_off_screens(self):
-        """Permet d'initialiser toutes les fenêtres d'immersions (fenêtres noires en plein écran).
-        Si le mode immersion est introuvable ou est désactivé, aucune fenêtre ne sera initialisée.
-        """
-        try:
-            if self.parameters["immersion"]:
-                # crée une liste d'exception. Celle-ci évitera d'éteindre les écrans contenant des modules indépendant
-                # du python (tel que la ligne virtuelle sur UE5 ou le train caméra).
-                exception_list = []
-
-                # Vérifie pour chaque exception si elle existe et où elle se situe
-                # FEATURE : indiquer ici les potentielles exceptions sur les fenêtres nécessitant une autre application
-                try:
-                    # Vérification pour la ligne virtuelle (sur UE5)
-                    if self.parameters["sardine simulator.virtual line (ue5).screen_index"]:
-                        exception_list.append(self.parameters["sardine simulator.virtual line (ue5).screen_index"] - 1)
-                except KeyError:
-                    pass
-
-                # Génère une fenêtre noire par écran n'étant pas dans la liste d'exceptions.
-                for screen_index in (i for i in range(0, QDesktopWidget().screenCount()) if i not in exception_list):
-                    sg = QDesktopWidget().screenGeometry(screen_index).getCoords()
-                    self.black_screens.append(QMainWindow())
-                    index = len(self.black_screens) - 1
-                    self.black_screens[index].setWindowFlag(Qt.FramelessWindowHint)
-                    self.black_screens[index].setGeometry(sg[0], sg[1], sg[2] - sg[0] + 1, sg[3] - sg[1] + 1)
-                    self.black_screens[index].setStyleSheet("QMainWindow {background: 'black';}")
-                    self.black_screens[index].hide()
-        except KeyError:
-            log.debug("Pas de paramètres \"immersion\". Le mode immersion est désactivé par défaut.\n")
-
-    def run_off_screens(self):
-        """Fonction permettant de montrer toutes les fenêtres d'immersions (fenêtres noires en plein écran).
-        Dans le cas où le mode immersion est désactivé ou qu'aucune fenêtre n'est à montrer, rien ne se produira.
-        """
-        for screen in self.black_screens:
-            screen.show()
