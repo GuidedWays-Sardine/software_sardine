@@ -7,8 +7,13 @@ def main():
     Ce module est entièrement indépendant du reste du code et ne dois pas être appelé par celui-ci.
     Les images sont stockées dans {PROJECT_DIR}/results/documentation_images
     """
-    ini.page_rb1()
-    ini.page_rb8()
+
+    if True:
+        ini.general_layout()
+        ini.page_rb_focus_layout()
+        ini.detailed_layout()
+        ini.page_rb1()
+        ini.page_rb8()
 
 
 if __name__ == "__main__":

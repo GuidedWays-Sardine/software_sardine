@@ -13,7 +13,7 @@ import src.misc.GUI_documentation.components.INI as INI
 
 # Layouts généraux de l'application d'initialisation
 def general_layout():
-    general_layout_image = ImageDrawer("general_layout.png")
+    general_layout_image = ImageDrawer("initialisation/general_layout.png", scale_factor=4)
     general_layout_image.draw([BoxDrawer((0, 0), (640, 480), ""),                       # contour de l'application
                                BoxDrawer((0, 0), (640, 15), "(640x15)"),                # bande vide supérieure
                                BoxDrawer((0, 465), (640, 15), "(640x15)"),              # bande vide inférieure
@@ -23,8 +23,19 @@ def general_layout():
     general_layout_image.save()
 
 
+def page_rb_focus_layout():
+    general_layout_image = ImageDrawer("initialisation/general_layout.png", scale_factor=4)
+    general_layout_image.draw([BoxDrawer((0, 0), (640, 480), ""),                       # contour de l'application
+                               BoxDrawer((0, 0), (640, 15), "(640x15)", True),          # bande vide supérieure
+                               BoxDrawer((0, 465), (640, 15), "(640x15)", True),        # bande vide inférieure
+                               BoxDrawer((0, 415), (640, 50), "bb\n(640x50)", True),    # zone bb
+                               BoxDrawer((580, 15), (60, 400), "rb\n(60x400)", True),   # zone rb
+                               BoxDrawer((0, 15), (580, 400), "page_rb\n(580x400)")])   # zone page_rb
+    general_layout_image.save()
+
+
 def detailed_layout():
-    detailed_layout_image = ImageDrawer("detailed_layout.png")
+    detailed_layout_image = ImageDrawer("initialisation/detailed_layout.png", scale_factor=4)
     detailed_layout_image.draw([BoxDrawer((0, 0), (640, 480), ""),                      # contour de l'application
                                 BoxDrawer((0, 0), (640, 15), "(640x15)"),               # bande vide supérieure
                                 BoxDrawer((0, 465), (640, 15), "(640x15)"),             # bande vide inférieure
