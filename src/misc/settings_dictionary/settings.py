@@ -13,6 +13,7 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
 import src.misc.decorators.decorators as decorators
+import src.misc.translation_dictionary.translation as td
 
 
 class SettingsDictionary(dict):
@@ -81,7 +82,7 @@ class SettingsDictionary(dict):
 
     @decorators.UIupdate
     @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
-    def update_ui_parameter(self, component, property_name, key):
+    def update_ui_parameter(self, component, property_name, key, translations=None):
         """Méthode pour mettre à jour une propriété d'un composant qml à partir de son ID et de la propriété.
 
         Parameters
@@ -92,12 +93,37 @@ class SettingsDictionary(dict):
             le nom de la propriété  à mettre à jour
         key: `Any`
             la clé vers la nouvelle valeur
+        translations: `td.TranslationDictionary | None`
+            traductions (clés = anglais -> valeurs = langue actuelle)
+            Utile pour traduire la sélection dans le cas d'un composant à choix
         """
+        # Différencie les cas des composants avec un "selection_value"
         try:
-            component.setProperty(property_name, self[key])
+            # Cas des valueinput, dont la valeur doit être changée avec la fonction change_value
+            if property_name == "value":
+                component.change_value(self[key])
+            # Cas du changement de sélection de la combobox (obligatoirement avec la fonction change_selection)
+            elif "selection" in property_name:
+                # Récupère la valeur en tant qu'entier ou string selon si selection_index ou selection_
+                value = int(self["key"]) if property_name == "selection_index" else str(self["key"])
+                if isinstance(translations, td.TranslationDictionary):
+                    # Cas où un dictionnaire de traduction a été envoyé, pour traduire la sélection
+                    component.change_selection(translations[value])
+                else:
+                    # Cas où l'utilisateur a oublié d'envoyer un dictionaire de paramètres
+                    log.debug(f"Changement de sélection avec la clé \"{key}\", sans dictionaire de paramètres.")
+                    component.change_selection(value)
+            # Cas général où la propriété peut être changée sans fonction
+            else:
+                component.setProperty(property_name, self[key])
         except KeyError:
+            # Cas où la clé ne mène a aucun paramètre
             log.debug(f"Impossible de changer le paramètre : \"{property_name}\" du composant envoyé.\n\t" +
                       f"Pas de valeurs pour le paramètre : \"{key}\" dans le fichier ouvert.")
+        except AttributeError:
+            # Cas où le composant n'est pas valide
+            log.debug(f"Le composant envoyé n'existe pas (None reçu) lors de la mise à jour du paramètre " +
+                      f"\"{property_name}\" avec la clé \"{key}\".")
 
     def save(self, file_path, delimiter=";"):
         """Méthode permettant de sauvegarder les paramètres dans un fichier
