@@ -26,7 +26,7 @@ class PageRB8:
     name = "Écrans"
     engine = None
     page = None
-    current_button = None
+    page_button = None
 
     # Eléments nécessaire au stockage des popup d'index
     screen_index_engine = None
@@ -42,29 +42,29 @@ class PageRB8:
     screen_index_file_path = f"{PROJECT_DIR}src\\initialisation\\graphics\\page_rb\\page_rb8\\screen_index_window.qml"
     windows_settings_folder_path = f"{PROJECT_DIR}settings\\windows_settings\\"
 
-    def __init__(self, application, engine, index, current_button, translation_data):
-        """Fonction d'initialisation de la page de paramtètres 1 (page paramètres général)
+    def __init__(self, application, engine, index, page_button, translations):
+        """Fonction d'initialisation de la page de paramtètres 8
 
         Parameters
         ----------
         application: `ini.InitialisationWindow`
-            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+            L'instance source de l'application d'initialisation
         engine: `QQmlApplicationEngine`
             La QQmlApplicationEngine de la page à charger
         index: `int`
-            index de la page (1 pour le bouton d'en haut -> 8 pour le bouton d'en bas
-        current_button: `QObject`
-            Le bouton auquel sera relié la page (généralement d'id : page_rb + index)
-        translation_data: `td.TranslationDictionary`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive
-            Utile pour traduire les noms de dossiers et de fenêtres sauvegardés en anglais
+            Index de la page (1 pour le bouton haut -> 8 pour le bouton bas
+        button: `QObject`
+            Le bouton auquel sera relié la page (id : page_rb + index)
+        translations : ``td.TranslationDictionary`
+            Traductions (clés = anglais -> valeurs = langue actuelle).
+            Utile pour traduire les noms de dossiers et de modules.
         """
         # Stocke les informations nécessaires au fonctionnement de la page
         self.index = index
         self.engine = engine
         self.page = engine.rootObjects()[0]
-        self.current_button = current_button
-        self.current_button.setProperty("text", self.name)
+        self.page_button = page_button
+        self.page_button.setProperty("text", self.name)
 
         # Passe sur chacun des écrans connectés à l'ordinateur et génère la fenêtre graphique associée
         self.screen_index_engine = QQmlApplicationEngine()
@@ -95,8 +95,8 @@ class PageRB8:
                 info = list(map(str.strip, line.rstrip("\n").split(";")))
                 if len(info) >= 5:
                     try:
-                        windows_defaults[translation_data[info[0]]] = [True, int(info[1]), int(info[2]), info[3].lower() == "true", info[4].lower() == "true"]
-                        windows_settings[translation_data[info[0]]] = [0, False, [0, 0], [0, 0], False]
+                        windows_defaults[translations[info[0]]] = [True, int(info[1]), int(info[2]), info[3].lower() == "true", info[4].lower() == "true"]
+                        windows_settings[translations[info[0]]] = [0, False, [0, 0], [0, 0], False]
                     except Exception as error:
                         # Si jamais une des données n'est pas au bon format, laisse un message d'erreur
                         log.warning(f"Paramètres écrans au mauvais format sur la ligne :\n\t\t{line}", exception=error)
@@ -105,9 +105,9 @@ class PageRB8:
 
             # Rajouter cette série d'écran à la catégorie
             log.info(f"{len(windows_defaults)} fenêtres trouvées ({windows_defaults.keys()}) dans la catégorie" +
-                     f"{translation_data[file_path.replace('_', ' ')[3:-8]]}. Dans le fichier\n\t{file_path}")
-            self.windows_defaults[translation_data[file_path.replace("_", " ")[3:-8]]] = windows_defaults
-            self.windows_settings[translation_data[file_path.replace("_", " ")[3:-8]]] = windows_settings
+                     f"{translations[file_path.replace('_', ' ')[3:-8]]}. Dans le fichier\n\t{file_path}")
+            self.windows_defaults[translations[file_path.replace("_", " ")[3:-8]]] = windows_defaults
+            self.windows_settings[translations[file_path.replace("_", " ")[3:-8]]] = windows_settings
 
         # Définit le fonctionnement de base des boutons supérieurs et inférieurs
         if self.windows_defaults:
@@ -180,22 +180,22 @@ class PageRB8:
             for screen_graph in self.windows_defaults[category]:
                 self.windows_defaults[category][screen_graph][0] = False
 
-    def get_values(self, translation_data):
+    def get_settings(self, translations):
         """Récupère les paramètres de la page de paramètres page_rb8
 
         Parameters
         ----------
-        translation_data: `td.TranslationDictionary`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
+        translations: `td.TranslationDictionnary`
+            traductions (clés = langue actuelle -> valeurs = anglais)
 
         Returns
         -------
-        parameters : `sd.SettingsDictionary`
-            un dictionaire de paramètres de la page de paramètres page_rb8
+        page_settings : `sd.SettingsDictionnary`
+            dictionaire de paramètres de la page de paramètres page_rb8
         """
         # Initialise les paramètres récupérés et récupère le paramètre sur si les écrans sont éteins
-        page_parameters = sd.SettingsDictionary()
-        page_parameters["immersion"] = self.page.findChild(QObject, "immersion_check").property("is_checked")
+        page_settings = sd.SettingsDictionary()
+        page_settings["immersion"] = self.page.findChild(QObject, "immersion_check").property("is_checked")
 
         # Récupère les valeurs actuellement sur l'écran
         old_screens_values = self.page.get_values().toVariant()
@@ -207,37 +207,37 @@ class PageRB8:
             # Pour chaque écrans de cette catégorie
             for screen_key in self.windows_settings[category_key]:
                 # Récupère les paramètres de l'écran et les sauvegardes (dépend de si l'écran est sélectionable ou non
-                windows_settings_key = f"{translation_data[category_key]}.{translation_data[screen_key]}."
+                windows_settings_key = f"{translations[category_key]}.{translations[screen_key]}."
                 is_activable = self.windows_defaults[category_key][screen_key][0]
                 windows_settings_values = self.windows_settings[category_key][screen_key]
-                page_parameters[windows_settings_key + "screen_index"] = windows_settings_values[0] if is_activable else 0
-                page_parameters[windows_settings_key + "full_screen"] = windows_settings_values[1] if is_activable else False
-                page_parameters[windows_settings_key + "x"] = windows_settings_values[2][0] if is_activable else 0
-                page_parameters[windows_settings_key + "y"] = windows_settings_values[2][1] if is_activable else 0
-                page_parameters[windows_settings_key + "w"] = windows_settings_values[3][0] if is_activable else 0
-                page_parameters[windows_settings_key + "h"] = windows_settings_values[3][1] if is_activable else 0
-                page_parameters[windows_settings_key + "mandatory"] = self.windows_defaults[category_key][screen_key][3]
-                page_parameters[windows_settings_key + "extern"] = self.windows_defaults[category_key][screen_key][4]
+                page_settings[windows_settings_key + "screen_index"] = windows_settings_values[0] if is_activable else 0
+                page_settings[windows_settings_key + "full_screen"] = windows_settings_values[1] if is_activable else False
+                page_settings[windows_settings_key + "x"] = windows_settings_values[2][0] if is_activable else 0
+                page_settings[windows_settings_key + "y"] = windows_settings_values[2][1] if is_activable else 0
+                page_settings[windows_settings_key + "w"] = windows_settings_values[3][0] if is_activable else 0
+                page_settings[windows_settings_key + "h"] = windows_settings_values[3][1] if is_activable else 0
+                page_settings[windows_settings_key + "mandatory"] = self.windows_defaults[category_key][screen_key][3]
+                page_settings[windows_settings_key + "extern"] = self.windows_defaults[category_key][screen_key][4]
 
-        return page_parameters
+        return page_settings
 
-    def set_values(self, data, translation_data):
-        """A partir d'un dictionnaire de valeur, essaye de changer les settings de la page de paramètres 8
+    def set_settings(self, settings, translations):
+        """Change les paramètres de la page de paramètres page_rb8
 
         Parameters
         ----------
-        data: `sd.SettingsDictionary`
-            Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
-        translation_data: `td.TranslationDictionary`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
+        settings: `sd.SettingsDictionary`
+            Dictionnaire contenant les nouveaux paramètres à utiliser.
+        translations: `td.TranslationDictionary`
+            Traductions (clés = anglais -> valeurs = langue actuelle)
         """
         # Change la valeur pour les écrans noirs
-        data.update_ui_parameter(self.page.findChild("immersion_check"), "is_checked", "immersion")
+        settings.update_ui_parameter(self.page.findChild(QObject, "immersion_check"), "is_checked", "immersion")
 
         # Inverse les données de traduction pour avoir un dictionnaire langue actuelle -> Français
         invert_translation = td.TranslationDictionary()
         invert_translation.create_translation(f"{PROJECT_DIR}settings\\language_settings\\initialisation.lang",
-                                              translation_data["English"], "English")
+                                              translations["English"], "English")
 
         # Pour chaque catégorie d'écrans
         for category_key in self.windows_settings:
@@ -248,74 +248,76 @@ class PageRB8:
 
                 # Essaye de récupérer les donnés reliées à l'écran
                 try:
-                    if int(data[windows_settings_key + "screen_index"]) <= len(self.screen_index_windows):
-                        self.windows_settings[category_key][screen_key][0] = data[windows_settings_key + "screen_index"]
-                        self.windows_settings[category_key][screen_key][1] = data[windows_settings_key + "full_screen"]
-                        self.windows_settings[category_key][screen_key][2][0] = data[windows_settings_key + "x"]
-                        self.windows_settings[category_key][screen_key][2][1] = data[windows_settings_key + "y"]
-                        self.windows_settings[category_key][screen_key][3][0] = data[windows_settings_key + "w"]
-                        self.windows_settings[category_key][screen_key][3][1] = data[windows_settings_key + "h"]
+                    if int(settings[windows_settings_key + "screen_index"]) <= len(self.screen_index_windows):
+                        self.windows_settings[category_key][screen_key][0] = settings[windows_settings_key + "screen_index"]
+                        self.windows_settings[category_key][screen_key][1] = settings[windows_settings_key + "full_screen"]
+                        self.windows_settings[category_key][screen_key][2][0] = settings[windows_settings_key + "x"]
+                        self.windows_settings[category_key][screen_key][2][1] = settings[windows_settings_key + "y"]
+                        self.windows_settings[category_key][screen_key][3][0] = settings[windows_settings_key + "w"]
+                        self.windows_settings[category_key][screen_key][3][1] = settings[windows_settings_key + "h"]
                 except KeyError:
                     log.debug(f"L'écran : {windows_settings_key} n'a pas de paramètres sauvegardés.")
 
         # Met à jour la page visible de settings
         self.change_visible_screen_list()
 
-    def change_language(self, translation_data):
+    def change_language(self, translations):
         """Permet à partir d'un dictionaire de traduction, de traduire les textes de la page de paramètres
 
         Parameters
         ----------
-        translation_data: `td.TranslationDictionary`
+        translations: `td.TranslationDictionary`
             dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
         """
         # Traduit le nom de la catégorie
-        self.current_button.setProperty("text", translation_data[self.current_button.property("text")])
+        self.page_button.setProperty("text", translations[self.page_button.property("text")])
 
         # Change la traduction des différents textes de l'écran
-        self.page.setProperty("none_text", translation_data[self.page.property("none_text")])
-        self.page.setProperty("fullscreen_text", translation_data[self.page.property("fullscreen_text")])
-        self.page.setProperty("window_index_text", translation_data[self.page.property("window_index_text")])
-        self.page.setProperty("immersion_text", translation_data[self.page.property("immersion_text")])
+        self.page.setProperty("none_text", translations[self.page.property("none_text")])
+        self.page.setProperty("fullscreen_text", translations[self.page.property("fullscreen_text")])
+        self.page.setProperty("window_index_text", translations[self.page.property("window_index_text")])
+        self.page.setProperty("immersion_text", translations[self.page.property("immersion_text")])
 
         # Pour chaque catégories
         for category_key in list(self.windows_defaults):
             # Pour chaque écrans de chaques catégories
             for screen_key in list(self.windows_defaults[category_key]):
                 # Traduit la clé d'écran pour le dictionaire de paramètres choisis et de paramètres par défaut
-                self.windows_defaults[category_key][translation_data[screen_key]] = self.windows_defaults[category_key][screen_key]
-                self.windows_settings[category_key][translation_data[screen_key]] = self.windows_settings[category_key][screen_key]
+                self.windows_defaults[category_key][translations[screen_key]] = self.windows_defaults[category_key][screen_key]
+                self.windows_settings[category_key][translations[screen_key]] = self.windows_settings[category_key][screen_key]
 
                 # Si la clé d'écran a été traduite avec succès, enlève la version non traduite
-                if screen_key != translation_data[screen_key]:
+                if screen_key != translations[screen_key]:
                     self.windows_defaults[category_key].pop(screen_key)
                     self.windows_settings[category_key].pop(screen_key)
 
             # Traduit la clé de catégorie pour le dictionaire de paramètres choisis et de paramètres par défaut
-            self.windows_defaults[translation_data[category_key]] = self.windows_defaults[category_key]
-            self.windows_settings[translation_data[category_key]] = self.windows_settings[category_key]
+            self.windows_defaults[translations[category_key]] = self.windows_defaults[category_key]
+            self.windows_settings[translations[category_key]] = self.windows_settings[category_key]
 
             # Si la clé de la catégorie a été traduite avec succès, enlève la version non traduite
-            if category_key != translation_data[category_key]:
+            if category_key != translations[category_key]:
                 self.windows_defaults.pop(category_key)
                 self.windows_settings.pop(category_key)
 
             # Si la catégorie est la catégorie active, traduit la catégorie active
             if self.category_active == category_key:
-                self.category_active = translation_data[self.category_active]
+                self.category_active = translations[self.category_active]
 
         # Remets à jour la page actuelle et le titre de la catégorie
         self.page.findChild(QObject, "category_title").setProperty("text", self.category_active)
         self.change_visible_screen_list()
 
     def is_page_valid(self):
-        """Méthode permettant d'indiquer si la pagede paramètre est complétés
+        """Méthode permettant d'indiquer si la page de paramètres est complétée.
+        Valide si toutes les fenêtres obligatoires de modules utilisés pour la simulation sont paramétrés.
 
         Returns
         -------
         is_page_valid: `bool`
             Est ce que la page de paramètre est complétée ?
         """
+
         # Récupère les valeurs actuellement sur l'écran
         old_screens_values = self.page.get_values().toVariant()
         for index in range(0, len(old_screens_values)):

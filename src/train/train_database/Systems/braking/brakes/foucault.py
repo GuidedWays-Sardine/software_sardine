@@ -59,7 +59,7 @@ class Foucault:
         """
         return ()   # TODO : définir les paramètres nécessaires à retourner
 
-    def get_values(self, list_index):
+    def get_settings(self, list_index):
         """Fonction permettant de récupérer toutes les valeurs du système de freinage de foucault.
 
         Parameters

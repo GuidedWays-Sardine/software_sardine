@@ -41,21 +41,21 @@ class TrainDatabase:
     static = None
     systems = None
 
-    def __init__(self, train_data):
+    def __init__(self, train_settings):
         """Fonction d'initialisation de la abse de données train
 
         Parameters
         ----------
-        train_data: `sd.SettingsDictionary`
+        train_settings: `sd.SettingsDictionary`
             Dictionaire de paramètres train
         """
         initial_time = time.perf_counter()
         log.info("Initialisation Base de Données train", prefix="Initialisation BDD train")
 
         # Initialise chacun des types de données (dynamiques, statiques, et systèmes)
-        self.dynamic = dynamic.Dynamic(train_data)
-        self.static = static.Static(train_data)
-        self.systems = systems.Systems(train_data)
+        self.dynamic = dynamic.Dynamic(train_settings)
+        self.static = static.Static(train_settings)
+        self.systems = systems.Systems(train_settings)
 
         # Récupère la quantité de chacun des systèmes du train
         railcar_count = len(self.systems.frame.railcars)
@@ -74,7 +74,7 @@ class TrainDatabase:
                  f">",
                  prefix="Initialisation BDD train")
 
-    def get_values(self):
+    def get_settings(self):
         """Fonction permettant de récupérer tous les paramètres du train
 
         Returns: `sd.SettingsDictionary`
@@ -83,7 +83,7 @@ class TrainDatabase:
         parameters = sd.SettingsDictionary()
 
         # Récupère les données états des sous-systèmes et les données dynamiques et statiques
-        parameters.update(self.systems.get_values())
+        parameters.update(self.systems.get_settings())
         # TODO : récupérer les valeurs statiques et dynamiques du train
 
         return parameters
@@ -100,7 +100,7 @@ class TrainDatabase:
         Raises
         ------
         KeyError:
-            Jeté lorsque la clé ne correspond à aucune valeur de la Base de Données train
+            Jetée lorsque la clé ne correspond à aucune valeur de la Base de Données train
         """
         # FEATURE : inclure ci-dessous la valeur à retourner pour chacune des clés
         if key == "":

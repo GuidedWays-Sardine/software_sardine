@@ -45,11 +45,11 @@ class LED:
         Raises
         ------
         pyfirmata.InvalidPinDefError:
-            Jeté lorsque l'index du pin envoyé ne correspond à aucun pin sur la carte électronique
+            Jetée lorsque l'index du pin envoyé ne correspond à aucun pin sur la carte électronique
         pyfirmata.PinAlreadyTakenError:
-            Jeté si le pin utilisé par la LED est déjà utilisé par un autre composant
+            Jetée si le pin utilisé par la LED est déjà utilisé par un autre composant
         TypeError:
-            Jeté si l'action envoyée ne correspond à aucune action valide
+            Jetée si l'action envoyée ne correspond à aucune action valide
         """
         # Récupère le pin à partir de son index
         self.__pin = board.get_pin(f"d:{int(pin_index)}:o")

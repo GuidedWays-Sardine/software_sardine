@@ -131,7 +131,7 @@ class Bogie:
         """
         return len(self.linked_railcars) == 2
 
-    def get_values(self, list_index):
+    def get_settings(self, list_index):
         """Fonction permettant de récupérer les paramètres du bogie.
 
         Parameters

@@ -130,21 +130,21 @@ class ComplexPopup:
             self.win.findChild(QObject, "train_preview").setProperty("current_index", 0)
             self.update_popup(0)
 
-    def update_constants(self, train_data):
+    def update_constants(self, train_settings):
         """Fonction permettant de mettre à jour les différentes constantes de la popup complexe
 
         Parameters
         ----------
-        train_data: `sd.SettingsDictionary`
+        train_settings: `sd.SettingsDictionary`
             Les paramètres du train (certains paramètres doivent être convertis du train à la voiture/au bogie
         """
         # Commence par mettre à jour les valeurs par défaut selon la moyenne des paramètres entrés
-        self.win.setProperty("default_axles_count", train_data.get_value("axles_per_bogie", 2))
-        self.win.setProperty("default_axles_power", train_data.get_value("axles_power", 750.0))
-        self.win.setProperty("default_pad_brakes_count", round(train_data.get_value("pad_brakes_count", 0) / train_data.get_value("bogies_count", 1)))
-        self.win.setProperty("default_disk_brakes_count", round(train_data.get_value("disk_brakes_count", 0) / train_data.get_value("bogies_count", 1)))
-        self.win.setProperty("default_magnetic_brakes_count", round(train_data.get_value("magnetic_brakes_count", 0) / train_data.get_value("bogies_count", 1)))
-        self.win.setProperty("default_foucault_brakes_count", round(train_data.get_value("foucault_brakes_count", 0) / train_data.get_value("bogies_count", 1)))
+        self.win.setProperty("default_axles_count", train_settings.get_value("axles_per_bogie", 2))
+        self.win.setProperty("default_axles_power", train_settings.get_value("axles_power", 750.0))
+        self.win.setProperty("default_pad_brakes_count", round(train_settings.get_value("pad_brakes_count", 0) / train_settings.get_value("bogies_count", 1)))
+        self.win.setProperty("default_disk_brakes_count", round(train_settings.get_value("disk_brakes_count", 0) / train_settings.get_value("bogies_count", 1)))
+        self.win.setProperty("default_magnetic_brakes_count", round(train_settings.get_value("magnetic_brakes_count", 0) / train_settings.get_value("bogies_count", 1)))
+        self.win.setProperty("default_foucault_brakes_count", round(train_settings.get_value("foucault_brakes_count", 0) / train_settings.get_value("bogies_count", 1)))
 
         # Puis met à jour les différentes limites
         # A-B-C non linéaire au nombre
@@ -153,8 +153,8 @@ class ComplexPopup:
         self.win.setProperty("c_max", self.parent.page.property("c_max"))
         self.win.setProperty("abc_decimals", self.parent.page.property("abc_decimals"))
         # Tout le reste ~linéaire au nombre de voitures, d'où la valeur divisée
-        self.win.setProperty("max_railcar_weight", self.parent.page.property("max_weight") / train_data["railcars_count"])
-        self.win.setProperty("max_railcar_length", self.parent.page.property("max_length") / train_data["railcars_count"])
+        self.win.setProperty("max_railcar_weight", self.parent.page.property("max_weight") / train_settings["railcars_count"])
+        self.win.setProperty("max_railcar_length", self.parent.page.property("max_length") / train_settings["railcars_count"])
         # Valeurs maximals déjà par défaut selon la voiture/le nombre de bogies
         self.win.setProperty("max_bogies_per_railcar", max(self.parent.page.property("max_bogies_per_railcar"), 2))
         self.win.setProperty("max_axles_per_bogies", self.parent.page.property("max_axles_per_bogie"))
@@ -177,7 +177,7 @@ class ComplexPopup:
             Dictionaire de paramètre avec tous les paramètres complexes du train, vide si aucun train initialisé
         """
         if self.train_database:
-            return self.train_database.get_values()
+            return self.train_database.get_settings()
         else:
             return sd.SettingsDictionary()
 
@@ -204,17 +204,17 @@ class ComplexPopup:
             self.win.findChild(QObject, "train_preview").setProperty("current_index", 0)
             self.update_popup(0)
 
-    def change_language(self, translation_data):
+    def change_language(self, translations):
         """Fonction permettant de traduire la page de paramétrage train complet (appelé dans la page_rb2
 
         Parameters
         ----------
-        translation_data: `td.TranslationDictionary`
+        translations: `td.TranslationDictionary`
             Dicionnaire de traduction contenant toutes les traductions nécessaires"""
         # Commence par traduire les différents textes visibles (fenêtre de génération)
         for widget_id in ["generate_button", "generate_l1", "generate_l2"]:
             widget = self.win.findChild(QObject, widget_id)
-            widget.setProperty("text", translation_data[widget.property("text")])
+            widget.setProperty("text", translations[widget.property("text")])
 
         # Continue par traduire les textes des paramètres bogies
         for widget_id in ["front_bogie", "middle_bogie", "back_bogie"]:
@@ -223,7 +223,7 @@ class ComplexPopup:
             # Traduit chacuns des mots contenue dans le widget bogie parameters
             for parameter in ["articulated_text", "axle_text", "motor_text",
                               "pad_text", "disk_text", "magnetic_text", "foucault_text"]:
-                widget.setProperty(parameter, translation_data[widget.property(parameter)])
+                widget.setProperty(parameter, translations[widget.property(parameter)])
 
     @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
     def on_railcar_changed(self):

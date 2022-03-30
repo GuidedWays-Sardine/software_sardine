@@ -56,7 +56,7 @@ def QtSignal(log_level=log.Level.ERROR, end_process=False):
                 # Récupère le nom de la fonction pour plus d'indication et laisse un message de registre
                 function_name = str(signal)[10:].split(" at ")[0]
                 log.log(log_level=log_level,
-                        message=f"Exception jeté dans le signal : {function_name}().",
+                        message=f"Exception jetée dans le signal : {function_name}().",
                         exception=error)
                 if end_process:
                     exit(-1)
@@ -98,7 +98,7 @@ class UIupdate:
             Raises
             ------
             RuntimeError
-                Jeté lorsque le thread dans lequel l'initialisation se fait n'est pas le thread principal
+                Jetée lorsque le thread dans lequel l'initialisation se fait n'est pas le thread principal
                 ou que la limite d'argument configurée (__MAX_PARAMETERS) n'est pas suffisant"""
             # Initialise le QThread
             super().__init__()
@@ -141,7 +141,7 @@ class UIupdate:
             Raises
             ------
             TypeError:
-                Jeté lorsque le nombre d'arguments ne correspond pas au nombre d'arguments de la fonction
+                Jetée lorsque le nombre d'arguments ne correspond pas au nombre d'arguments de la fonction
             """
             # Commence par vérifier que le nombre d'arguments envoyé est le bon
             if self.__arguments_count + self.__in_class != len(args):

@@ -97,11 +97,11 @@ class BottomButtons:
             application.app.quit()
         else:
             # Sinon récupère les pages non complètes, laisse un message de registre et se met sur la page non complétée
-            non_completed_pages = [index for index, completed in enumerate(page_complete) if not completed]
-            log.debug(f"Pages de paramètres : {' ; '.join([str(n + 1) for n in non_completed_pages])} non complétés.")
+            non_completed_pages = tuple(index + 1 for index, completed in enumerate(page_complete) if not completed)
+            log.debug(f"Les pages de paramètres : {non_completed_pages} ne sont pas complétées.")
             application.right_buttons.on_new_page_selected(application,
-                                                           application.pages_list[non_completed_pages[0]].engine,
-                                                           non_completed_pages[0] + 1)
+                                                           application.pages_list[non_completed_pages[0] - 1].engine,
+                                                           non_completed_pages[0])
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_open_clicked(self, application):
@@ -123,10 +123,10 @@ class BottomButtons:
             # Change le préfixe du registre pour indiquer que les données de l'applications d'initialisation sont changées
             log.change_log_prefix("Changement des données")
 
-            #Récupère les données dans le fichier sélectionné et les envoies à set_values
-            data = sd.SettingsDictionary()
-            data.open(file_path[0])
-            application.set_values(data)
+            #Récupère les données dans le fichier sélectionné et les envoies à set_settings
+            settings = sd.SettingsDictionary()
+            settings.open(file_path[0])
+            application.set_settings(settings)
 
             # Remet le préfixe de registre de la page active
             log.change_log_prefix(f"page_rb{application.active_page_index}")
@@ -152,25 +152,25 @@ class BottomButtons:
             log.change_log_prefix("Sauvegarde des données")
 
             # Récupère les paramètres de l'application d'initialisation, les stockes et les enregistres dans le fichier
-            data = sd.SettingsDictionary()
-            data.update(application.get_values())
-            data.save(file_path[0])
+            settings = sd.SettingsDictionary()
+            settings.update(application.get_settings())
+            settings.save(file_path[0])
 
             # Remet le préfixe de registre de la page active
             log.change_log_prefix(f"page_rb{application.active_page_index}")
 
-    def change_language(self, application, translation_data):
+    def change_language(self, application, translations):
         """Permet à partir d'un dictionnaire de traduction de traduire le textes des 4 boutons inférieurs.
 
         Parameters
         ----------
         application: `InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets
-        translation_data: `TranslationDictionary`
+        translations: `TranslationDictionary`
             dictionaire contenant les traductions
         """
-        # Pour chaque boutons : récupère le texte, prend sa traduction dans translation_data et change son texte
+        # Pour chaque boutons : récupère le texte, prend sa traduction dans translations et change son texte
         for button_id in ["quit_button", "launch_button", "open_button", "save_button"]:
             # Récupère le bouton associé à l'id et change son texte
             button = application.win.findChild(QObject, button_id)
-            button.setProperty("text", translation_data[button.property("text")])
+            button.setProperty("text", translations[button.property("text")])

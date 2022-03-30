@@ -26,17 +26,17 @@ class Braking:
     magnetic_brakes = None
     foucault_brakes = None
 
-    def __init__(self, train_data):
+    def __init__(self, train_settings):
         """Fonction permettant d'initialiser les systèmes de freinages
 
         Parameters
         ----------
-        train_data: `sd.SettingsDictionary`
+        train_settings: `sd.SettingsDictionary`
             Dictionaire de paramètres train
         """
         # Récupère les valeurs pour le freinage rhéostatique et par régénération
-        self.regenerative_activated = train_data.get_value("regenerative", False)
-        self.dynamic_activated = train_data.get_value("dynamic", False)
+        self.regenerative_activated = train_settings.get_value("regenerative", False)
+        self.dynamic_activated = train_settings.get_value("dynamic", False)
         # TODO : chercher comment le système de freinage rhéostatique et régénératif seront paramétrés
 
         # Initialise des listes vides pour chacuns des systèmes de freinage
@@ -61,7 +61,7 @@ class Braking:
         Raises
         ------
         TypeError:
-            Exception jetée si le système de freinage recherché n'est pas bon
+            Jetée si le système de freinage recherché n'est pas bon
         """
         # Selon le système de freinage recherché, retourne la liste de freinage, sinon jette une exception
         if brake_type is Pad:
@@ -204,7 +204,7 @@ class Braking:
         for _ in range(min(bogies_brakes_count, abs(brakes_count))):
             self.get_brake_list(brakes_type).remove(self.get_bogie_brake_list(bogie, brakes_type)[-1])
 
-    def get_values(self, bogie, list_index):
+    def get_settings(self, bogie, list_index):
         """Fonction permettant de récupérer toutes les valeurs de freinages d'un bogie en particulier
 
         Parameters
@@ -229,6 +229,6 @@ class Braking:
         for b_i, b_t in enumerate(["pad", "disk", "magnetic", "foucault"]):
             parameters[f"{prefix}.{b_t}.count"] = len(brakes_list[b_i])
             if len(brakes_list[b_i]):
-                parameters.update(brakes_list[b_i][0].get_values(list_index))
+                parameters.update(brakes_list[b_i][0].get_settings(list_index))
 
         return parameters

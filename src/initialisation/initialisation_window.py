@@ -98,9 +98,9 @@ class InitialisationWindow:
             self.win.hide()
 
         # Charge la traduction Anglais -> langue actuel (Français) et charge les pages de paramètres et les boutons.
-        translation_data = td.TranslationDictionary()
-        translation_data.create_translation(self.translation_file_path, "English", self.language)
-        self.right_buttons = rb.RightButtons(self, translation_data)
+        translations = td.TranslationDictionary()
+        translations.create_translation(self.translation_file_path, "English", self.language)
+        self.right_buttons = rb.RightButtons(self, translations)
         self.bottom_buttons = bb.BottomButtons(self)
 
         # Vérifie si un fichier de paramètres par défaut existe
@@ -110,7 +110,7 @@ class InitialisationWindow:
             log.info(f"Chargement des paramètres par défauts du fichier default.settings")
             default_settings = sd.SettingsDictionary()
             default_settings.open(self.default_settings_file_path)
-            self.set_values(default_settings)
+            self.set_settings(default_settings)
 
             # De plus si les paramètres pour la taille et la position de la fenêtre existent, essaye de les récupérer
             if all([(f"initialisation.{p}" in default_settings) for p in ["screen_index", "x", "y", "w", "h"]]):
@@ -167,20 +167,20 @@ class InitialisationWindow:
         # Quand l'application est fermée, cache la fenêtre de l'application d'initialisation et ses fenêtres annexes
         self.win.hide()
 
-    def get_values(self):
-        """Récupère les paramètres des différentes pages de paramètres en appelant chaque fonction get_values()
+    def get_settings(self):
+        """Récupère les paramètres des différentes pages de paramètres en appelant chaque fonction get_settings()
 
         Returns
         -------
-        parameters : `sd.SettingsDictionary`
+        settings : `sd.SettingsDictionary`
             un dictionaire de paramètres avec tous les paramètres du simulateur
         """
         log.add_empty_lines()
         initial_time = time.perf_counter()
-        parameters = sd.SettingsDictionary()
+        settings = sd.SettingsDictionary()
 
-        # Dans le cas où des fonctions get_values sont détectés, récupère les paramètres de l'application
-        if any(["get_values" in dir(page) for page in self.pages_list]):
+        # Dans le cas où des fonctions get_settings sont détectés, récupère les paramètres de l'application
+        if any(["get_settings" in dir(page) for page in self.pages_list]):
             log.info(f"Récupération des paramètres de l'application.")
 
             # Récupère l'écran sur lequel se situe la fenêtre d'initialisation.
@@ -194,49 +194,49 @@ class InitialisationWindow:
             # Si la fenêtre d'initialisation a été détecté sur un écran, récupère et stocke ses coordonées
             if screen_index:
                 sg = screens.screenGeometry(screen_index[0]).getCoords()
-                parameters["initialisation.screen_index"] = screen_index[0] + 1
-                parameters["initialisation.x"] = self.win.x() - sg[0]
-                parameters["initialisation.y"] = self.win.y() - sg[1]
-                parameters["initialisation.w"] = (self.win.width() if (self.win.x() + self.win.width() <= sg[2] + 1)
+                settings["initialisation.screen_index"] = screen_index[0] + 1
+                settings["initialisation.x"] = self.win.x() - sg[0]
+                settings["initialisation.y"] = self.win.y() - sg[1]
+                settings["initialisation.w"] = (self.win.width() if (self.win.x() + self.win.width() <= sg[2] + 1)
                                                   else self.win.property("minimumWidth"))
-                parameters["initialisation.h"] = (self.win.height() if (self.win.y() + self.win.height() <= sg[3] + 1)
+                settings["initialisation.h"] = (self.win.height() if (self.win.y() + self.win.height() <= sg[3] + 1)
                                                   else self.win.property("minimumHeight"))
 
                 log.info("emplacement de la fenêtre d'initialisation récupéré avec succès : " +
-                         str([parameters[f"initialisation.{p}"] for p in ["screen_index", "x", "y", "w", "h"]]))
+                         str([settings[f"initialisation.{p}"] for p in ["screen_index", "x", "y", "w", "h"]]))
             else:
                 log.warning(f"Impossible de localiser la fenêtre d'initialisation.")
 
             # Récupère la traduction anglaise car les paramètres textuels sont stockés en anglais
-            translation_data = td.TranslationDictionary()
-            translation_data.create_translation(self.translation_file_path, self.language, "English")
+            translations = td.TranslationDictionary()
+            translations.create_translation(self.translation_file_path, self.language, "English")
 
-            # Récupère le reste des données du simulateur (en appelant la fonction get_values pour chaque page
-            for page_index, page in ((i, p) for (i, p) in enumerate(self.pages_list) if "get_values" in dir(p)):
+            # Récupère le reste des données du simulateur (en appelant la fonction get_settings pour chaque page
+            for page_index, page in ((i, p) for (i, p) in enumerate(self.pages_list) if "get_settings" in dir(p)):
                 try:
-                    parameters.update(page.get_values(translation_data))
+                    settings.update(page.get_settings(translations))
                 except Exception as error:
                     # Récupère une potentielle erreur dans la fonction d'écriture des valeurs
                     log.warning(f"Erreur lors de la récupération des paramètres pour la page_rb{page_index}.",
                                 exception=error)
 
-            log.info(f"Chargement de {len(parameters)} paramètres en" +
+            log.info(f"Chargement de {len(settings)} paramètres en" +
                      f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n")
         elif os.path.isfile(self.default_settings_file_path):
             # Sinon récupère les paramètres du fichier par défaut s'il existe
-            parameters.open(self.default_settings_file_path)
+            settings.open(self.default_settings_file_path)
             log.add_empty_lines()
         else:
-            log.warning("Aucune page de paramètres correctement chargé et pas de fichier default.settings.\n")
+            log.warning("Aucune page de paramètres correctement chargée et pas de fichier default.settings.\n")
 
-        return parameters
+        return settings
 
-    def set_values(self, data):
+    def set_settings(self, settings):
         """A partir d'un dictionnaire de valeur, essaye de changer les settings des différentes pages
 
         Parameters
         ----------
-        data: `sd.SettingsDictionary`
+        settings: `sd.SettingsDictionary`
             Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
         """
         log.info(f"Changement de paramètres sur l'application d'initialisation.")
@@ -246,23 +246,23 @@ class InitialisationWindow:
         if self.pages_list[0] is not None and not isinstance(self.pages_list[0], QQmlApplicationEngine):
             # Si la langue est différente essaye de changer la langue du simulateur
             language_combo = self.pages_list[0].page.findChild(QObject, "language_combo")
-            language_combo.change_selection(data.get_value("language", language_combo.property("text")))
+            language_combo.change_selection(settings.get_value("language", language_combo.property("text")))
 
         initial_time = time.perf_counter()
         count = 0
 
         # Récupère la traduction par rapport à l'anglais car les paramètres textuels sont stockés en anglais
-        translation_data = td.TranslationDictionary()
-        translation_data.create_translation(self.translation_file_path, "English", self.language)
+        translations = td.TranslationDictionary()
+        translations.create_translation(self.translation_file_path, "English", self.language)
 
-        # Pour chaque page ayant une partie logique fonctionnelle et une fonction set_values:
-        for page in (p for p in self.pages_list if "set_values" in dir(p)):
+        # Pour chaque page ayant une partie logique fonctionnelle et une fonction set_settings:
+        for page in (p for p in self.pages_list if "set_settings" in dir(p)):
             try:
-                # Appelle la fonction get_values de la page et récupère une potentielle erreur sur la fonction
-                page.set_values(data, translation_data)
+                # Appelle la fonction get_settings de la page et récupère une potentielle erreur sur la fonction
+                page.set_settings(settings, translations)
                 count += 1
             except Exception as error:
-                # Permet de rattraper une potentielle erreur dans la fonction get_values()
+                # Permet de rattraper une potentielle erreur dans la fonction get_settings()
                 log.warning(f"Erreur lors du changement des paramètres pour la page_rb{page.index}.",
                             exception=error)
 
@@ -281,20 +281,20 @@ class InitialisationWindow:
         initial_time = time.perf_counter()
         log.info(f"Changement de la langue, mise à jour de la langue de l'application d'initialisation.")
 
-        translation_data = td.TranslationDictionary()
-        translation_data.create_translation(self.translation_file_path, self.language, new_language)
+        translations = td.TranslationDictionary()
+        translations.create_translation(self.translation_file_path, self.language, new_language)
 
-        if translation_data:
+        if translations:
             # Appel de la fonction set_languages pour les boutons du bas
-            self.bottom_buttons.change_language(self, translation_data)
+            self.bottom_buttons.change_language(self, translations)
 
             # Essaye de changer la langue pour chaque page ayant une partie fonctionnelle
             for page in (p for p in self.pages_list if "change_language" in dir(p)):
                 try:
-                    # Appelle la fonction get_values de la page et récupère une potentielle erreur sur la fonction
-                    page.change_language(translation_data)
+                    # Appelle la fonction get_settings de la page et récupère une potentielle erreur sur la fonction
+                    page.change_language(translations)
                 except Exception as error:
-                    # Permet de rattraper une potentielle erreur dans la fonction get_values()
+                    # Permet de rattraper une potentielle erreur dans la fonction get_settings()
                     log.warning(f"Erreur lors du changement de langue pour la page_rb{page.index}.",
                                 exception=error)
 
@@ -306,6 +306,7 @@ class InitialisationWindow:
         else:
             log.warning("Traduction impossible, aucune traduction trouvées.\n")
 
+
 def main():
     log.initialise(log_level=log.Level.DEBUG, save=True)
 
@@ -314,7 +315,7 @@ def main():
     application = InitialisationWindow(app)
 
     if application.launch_simulator:
-        log.info(str(application.get_values()), prefix="Données Collectées")
+        log.info(str(application.get_settings()), prefix="Données Collectées")
 
 
 if __name__ == "__main__":

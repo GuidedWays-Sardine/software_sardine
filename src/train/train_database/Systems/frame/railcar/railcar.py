@@ -151,7 +151,7 @@ class Railcar:
                 [self.Aempty, self.Bempty, self.Cempty], self.multiply_mass_empty,
                 [self.Afull, self.Bfull, self.Cfull], self.multiply_mass_full)
 
-    def get_values(self):
+    def get_settings(self):
         """Fonction permettant de récupérer toutes les valeurs de la voiture.
 
         Returns

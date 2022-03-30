@@ -80,7 +80,7 @@ class Frame:
         """
         return [rc.position_type.value for rc in self.railcars]
 
-    def get_values(self):
+    def get_settings(self):
         """Fonction permettant de récupérer tous les paramètres des systèmes de structure du train
 
         Returns
@@ -92,6 +92,6 @@ class Frame:
 
         # Pour chacune des voitures du train, appelle sa fonction de récupération de données
         for railcar in self.railcars:
-            parameters.update(railcar.get_values())
+            parameters.update(railcar.get_settings())
 
         return parameters

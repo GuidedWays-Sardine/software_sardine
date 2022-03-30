@@ -47,11 +47,11 @@ class SwitchButton:
         Raises
         ------
         pyfirmata.InvalidPinDefError:
-            Jeté lorsque l'index du pin envoyé ne correspond à aucun pin sur la carte électronique
+            Jetée lorsque l'index du pin envoyé ne correspond à aucun pin sur la carte électronique
         pyfirmata.PinAlreadyTakenError:
-            Jeté si le pin utilisé par le bouton est déjà utilisé par un autre composant
+            Jetée si le pin utilisé par le bouton est déjà utilisé par un autre composant
         TypeError:
-            Jeté si l'action envoyée ne correspond à aucune action valide
+            Jetée si l'action envoyée ne correspond à aucune action valide
         """
         # Récupère le pin sur la carte à partir de son index
         self.__pins = tuple([board.get_pin(f"d:{pins_index[p_i]}:i") for p_i in pins_index])

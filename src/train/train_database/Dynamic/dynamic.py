@@ -26,7 +26,7 @@ class Dynamic:
     V = 0
     Pk = 0
 
-    def __init__(self, train_data):
+    def __init__(self, train_settings):
         self.Along = 0
         self.Atrans = 0
         self.Avert = 0

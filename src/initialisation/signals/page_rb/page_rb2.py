@@ -31,7 +31,7 @@ class PageRB2:
     name = "Train"
     engine = None
     page = None
-    current_button = None
+    page_button = None
     data_widgets = {}         # Dictionaire avec tous les composants contenant des valeurs sur le train
     train_name_widget = None  # "train_name_stringinput". Permet une optimisation
 
@@ -47,33 +47,33 @@ class PageRB2:
     # Page de paramètres de freinage (situé dans pagerb2/braking_popup.py)
     brake_popup = None
     # FEATURE : ajouter la classe les import et les fichiers graphiques et logiques nécessaires
-    
+
     # Chemin vers les fichiers de paramètres train
     train_settings_folder_path = f"{PROJECT_DIR}settings\\train_settings\\"
 
-    def __init__(self, application, engine, index, current_button, translation_data):
-        """Fonction d'initialisation de la page de paramtètres 2 (page paramètres train)
+    def __init__(self, application, engine, index, page_button, translations):
+        """Fonction d'initialisation de la page de paramtètres 2
 
         Parameters
         ----------
         application: `ini.InitialisationWindow`
-            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+            L'instance source de l'application d'initialisation
         engine: `QQmlApplicationEngine`
             La QQmlApplicationEngine de la page à charger
         index: `int`
-            index de la page (1 pour le bouton d'en haut -> 8 pour le bouton d'en bas
-        current_button: `QObject`
-            Le bouton auquel sera relié la page (généralement d'id : page_rb + index)
-        translation_data: `td.TranslationDictionary`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive
-            Utile pour traduire les noms de dossiers et de fenêtres sauvegardés en anglais
+            Index de la page (1 pour le bouton haut -> 8 pour le bouton bas
+        page_button: `QObject`
+            Le bouton auquel sera relié la page (id : page_rb + index)
+        translations : ``td.TranslationDictionary`
+            Traductions (clés = anglais -> valeurs = langue actuelle).
+            Utile pour traduire les noms de dossiers et de modules.
         """
         # Stocke les informations nécessaires au fonctionnement de la page
         self.index = index
-        self.current_button = current_button
-        self.current_button.setProperty("text", self.name)
-        self.page = engine.rootObjects()[0]
         self.engine = engine
+        self.page = engine.rootObjects()[0]
+        self.page_button = page_button
+        self.page_button.setProperty("text", self.name)
 
         # Commence par associer chaque widget à son widget_id (permettant une optimisation dû au surplus de composants)
         for widget_id in ["weight_floatinput", "length_floatinput", "railcars_count_integerinput",
@@ -86,7 +86,7 @@ class PageRB2:
         self.train_name_widget = self.page.findChild(QObject, "train_name_stringinput")
 
         # Initialise la combobox avec les types de trains
-        self.page.findChild(QObject, "mission_type_combo").setProperty("elements", [translation_data[key.value] for key in tdb.Mission])
+        self.page.findChild(QObject, "mission_type_combo").setProperty("elements", [translations[key.value] for key in tdb.Mission])
 
         # Tente d'initialiser la fenêtre de paramétrage complexe
         try:
@@ -122,37 +122,37 @@ class PageRB2:
         self.page.findChild(QObject, "open_button").clicked.connect(self.on_open_button_clicked)
         self.page.findChild(QObject, "save_button").clicked.connect(self.on_save_button_clicked)
 
-    def get_values(self, translation_data):
-        """Récupère les paramètres de la page de paramètres page_rb1
+    def get_settings(self, translations):
+        """Récupère les paramètres de la page de paramètres page_rb2
 
         Parameters
         ----------
-        translation_data: `td.TranslationDictionary`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = anglais)
+        translations: `td.TranslationDictionnary`
+            traductions (clés = langue actuelle -> valeurs = anglais)
 
         Returns
         -------
-        parameters : `sd.SettingsDictionary`
-            un dictionaire de paramètres de la page de paramètres page_rb1
+        page_settings : `sd.SettingsDictionnary`
+            dictionaire de paramètres de la page de paramètres page_rb2
         """
-        page_parameters = sd.SettingsDictionary()
+        page_settings = sd.SettingsDictionary()
 
         # Vérifie si le fichier a eu un nom donné
         file_name = self.train_name_widget.property("text")
         if file_name:
             # Rajoute l'extension si nécessaire et appelle la fonction de sauvegarde (definit plus bas)
             file_name += ".train" if file_name and not file_name.lower().endswith(".train") else ""
-            self.save_train_data_file(f"{self.train_settings_folder_path}{file_name}")
+            self.save_train_settings_file(f"{self.train_settings_folder_path}{file_name}")
 
             # Ajoute le nom du fichier dans le dictionnaire de paramètres
-            page_parameters["train_name"] = self.train_name_widget.property('text')
+            page_settings["train_name"] = self.train_name_widget.property('text')
         else:
             log.warning("Impossible de sauvegarder le fichier de paramètres train, aucun nom de fichier entré.",
                         prefix="Sauvegarde des données train")
 
-        return page_parameters
+        return page_settings
 
-    def save_train_data_file(self, file_path):
+    def save_train_settings_file(self, file_path):
         """Fonction permettant de sauvegarder les données du train
 
         Parameters
@@ -164,17 +164,17 @@ class PageRB2:
         log.info(f"Tentative de sauvegarde des paramètres trains dans : {file_path}",
                  prefix="Sauvegarde des données train")
 
-        train_data = sd.SettingsDictionary()
-        train_data["train_name"] = self.train_name_widget.property('text')
+        train_settings= sd.SettingsDictionary()
+        train_settings["train_name"] = self.train_name_widget.property('text')
 
         # Commence par ajouter le mode de paramétrage
-        train_data["mode"] = str(self.current_mode)
+        train_settings["mode"] = str(self.current_mode)
 
         try:
             # Ajoute les paramètres simples et complexes si le mode a été activé
-            train_data.update(self.get_simple_mode_values())
+            train_settings.update(self.get_simple_mode_values())
             if self.current_mode == self.Mode.COMPLEX:
-                train_data.update(self.complex_popup.get_complex_mode_values())
+                train_settings.update(self.complex_popup.get_complex_mode_values())
 
             #FEATURE : Ajouter la récupération des valeurs de freinage ici
         except Exception as error:
@@ -184,35 +184,35 @@ class PageRB2:
             log.add_empty_lines()
         finally:
             # Sauvegarde le fichier et indique le temps nécessaire pour la récupération et la sauvegarde des données
-            train_data.save(file_path)
-            log.info(f"Récupération et sauvegarde de {len(train_data)} paramètres train en " +
+            train_settings.save(file_path)
+            log.info(f"Récupération et sauvegarde de {len(train_settings)} paramètres train en " +
                      f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n",
                      prefix="Sauvegarde des données train")
 
-    def set_values(self, data, translation_data):
-        """A partir d'un dictionnaire de valeur, essaye de changer les settings des différentes pages
+    def set_settings(self, settings, translations):
+        """Change les paramètres de la page de paramètres page_rb2
 
         Parameters
         ----------
-        data: `sd.SettingsDictionary`
-            Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
-        translation_data: `td.TranslationDictionary`
-            Un dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
+        settings: `sd.SettingsDictionary`
+            Dictionnaire contenant les nouveaux paramètres à utiliser.
+        translations: `td.TranslationDictionary`
+            Traductions (clés = anglais -> valeurs = langue actuelle)
         """
         # Récupère le nom du fichier train (et regard si le paramètre existe)
-        file_name = data.get_value("train_name")
+        file_name = settings.get_value("train_name")
         if file_name is not None:
             # Vérifie que le fichier de paramètres existe
             file_name += ".train" if file_name and not file_name.lower().endswith(".train") else ""
             if os.path.exists(f"{self.train_settings_folder_path}{file_name}"):
                 # Si c'est le cas, l'ouvre et change les différentes valeurs du paramétrage train sur la page
-                self.open_train_data_file(f"{self.train_settings_folder_path}{file_name}")
+                self.open_train_settings_file(f"{self.train_settings_folder_path}{file_name}")
             else:
                 # Sinon laisse un message d'erreur
                 log.warning(f"le fichier de paramètres n'existe plus.\n\t{self.train_settings_folder_path}{file_name}.",
                             prefix="Ouverture des données train")
 
-    def open_train_data_file(self, file_path):
+    def open_train_settings_file(self, file_path):
         """Fonction permettant d'ouvrir et de lire un fichier de paramètre train et de mettre à jour l'initialisation
 
         Parameters
@@ -221,27 +221,27 @@ class PageRB2:
             Cemin d'accès vers le fichier à ouvrir (doit exister)
         """
         initial_time = time.perf_counter()
-        train_data = sd.SettingsDictionary()
+        train_settings= sd.SettingsDictionary()
 
         # Ouvre le fichier de paramètres envoyé et récupère les différents paramètres
-        train_data.open(file_path)
+        train_settings.open(file_path)
 
         # Si aucun paramètres n'a été récupéré (fichier inexistant ou vide) retourne)
-        if not train_data:
+        if not train_settings:
             return
 
         try:
             # Change les valeurs en mode simple
-            self.set_simple_mode_values(train_data)
+            self.set_simple_mode_values(train_settings)
 
             # Change le mode actuel et vérifie s'il est en mode complexe et si le popup est chargé
-            self.current_mode = self.Mode[train_data["mode"][5:]]
+            self.current_mode = self.Mode[train_settings["mode"][5:]]
             if self.current_mode == self.Mode.COMPLEX and self.complex_popup is not None and self.complex_popup.loaded:
                 # Si c'est le cas, passe en mode complexe (graphiquement et logiquement), et change les valeurs complexe
                 self.page.findChild(QObject, "mode_switchbutton").change_selection(1)  # 1 représentant le mode complexe
                 self.page.setProperty("generated", True)
                 self.complex_popup.win.setProperty("generated", True)
-                self.complex_popup.set_complex_mode_values(train_data)
+                self.complex_popup.set_complex_mode_values(train_settings)
             else:
                 # Sinon repasse en mode paramétrage simple et réinitialise la popup complexe si nécessaire
                 self.page.findChild(QObject, "mode_switchbutton").change_selection(0)
@@ -260,61 +260,61 @@ class PageRB2:
 
         # S'occupe pour finir du changement des paramètres de freinage
         try:
-            raise NotImplementedError("La fenêtre de paramétrage freinage n'a pas été implémentée")
             # FEATURE : changer les valeurs de la fenêtre de paramétrage
+            pass
         except Exception as error:
             # Si le changement des paramètre a eu un soucis, laisse un message d'erreur
             log.warning("Erreur survenu lors du changement des paramètres de freinage.",
                         exception=error, prefix="Ouverture des données train")
 
-        log.info(f"Lecture et changement {len(train_data)} paramètres en " +
+        log.info(f"Lecture et changement {len(train_settings)} paramètres en " +
                  f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.",
                  prefix="Ouverture des données train")
 
-    def change_language(self, translation_data):
-        """Permet à partir d'un dictionaire de traduction, de traduire les textes de la page de paramètres
+    def change_language(self, translations):
+        """Permet de traduire les différents textes de la page de paramètres
 
         Parameters
         ----------
-        translation_data: `td.TranslationDictionary`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitiv
+        translations: `td.TranslationDictionary`
+            traductions (clés = langue actuelle -> valeurs = nouvelle langue)
         """
         # Traduit le nom de la catégorie
-        self.current_button.setProperty("text", translation_data[self.current_button.property("text")])
+        self.page_button.setProperty("text", translations[self.page_button.property("text")])
 
         # Traduit le placeholder texte ainsi que le titre pour le stringinput du nom du train
         self.train_name_widget.setProperty("placeholder_text",
-                                           translation_data[self.train_name_widget.property("placeholder_text")])
+                                           translations[self.train_name_widget.property("placeholder_text")])
         self.train_name_widget.setProperty("title",
-                                           translation_data[self.train_name_widget.property("title")])
+                                           translations[self.train_name_widget.property("title")])
 
         # Traduit le nom de chacune des catégories de paramètres
         for category in ["general_data_text", "dynamic_data_text", "alimentation_data_text", "brake_data_text"]:
-            self.page.setProperty(category, translation_data[self.page.property(category)])
+            self.page.setProperty(category, translations[self.page.property(category)])
 
         # Essaye de traduire chaque textes au dessus des widgets et check_button
         for widget_id, widget in self.data_widgets.items():
-            widget.setProperty("title", translation_data[widget.property("title")])
+            widget.setProperty("title", translations[widget.property("title")])
 
         # Traduit toutes les clés pour le switchbutton du mode ainsi que pour le combobox
         for widget_id in ["mode_switchbutton", "mission_type_combo"]:
             widget = self.page.findChild(QObject, widget_id)
             selection_index = widget.property("selection_index")
-            widget.setProperty("elements", [translation_data[e] for e in widget.property("elements").toVariant()])
+            widget.setProperty("elements", [translations[e] for e in widget.property("elements").toVariant()])
             widget.change_selection(selection_index)
-            
+
             # Fait un cas particulier pour le switchbutton qui a aussi un titre à traduire
             if widget_id == "mode_switchbutton":
-                widget.setProperty("title", translation_data[widget.property("title")])
+                widget.setProperty("title", translations[widget.property("title")])
 
         # Traduit le texte des trois boutons (ouvrir, fermer, paramétrage freinage)
         for widget_id in ["open_button", "save_button", "brake_button"]:
             widget = self.page.findChild(QObject, widget_id)
-            widget.setProperty("text", translation_data[widget.property("text")])
+            widget.setProperty("text", translations[widget.property("text")])
 
         # Traduit la fenêtre de paramétrage complexe
         if self.complex_popup is not None and self.complex_popup.loaded:
-            self.complex_popup.change_language(translation_data)
+            self.complex_popup.change_language(translations)
 
         # Traduit la fenêtre de paramétrage de freinage
         if self.brake_popup is not None and self.brake_popup.loaded:
@@ -354,7 +354,8 @@ class PageRB2:
             self.brake_popup.win.hide()
 
     def is_page_valid(self):
-        """Méthode permettant d'indiquer si la pagede paramètre est complétés
+        """Méthode permettant d'indiquer si la page de paramètres est complétée.
+        Valide si un nom de fichier de paramètres train est remplie. Toutes les autres valeurs on des limites valides.
 
         Returns
         -------
@@ -373,46 +374,46 @@ class PageRB2:
 
         Returns
         ----------
-        train_data: `sd.SettingsDictionary`
+        train_settings: `sd.SettingsDictionary`
             Dictionaire de paramètre avec tous les paramètres simples du train
         """
-        train_data = sd.SettingsDictionary()
+        train_settings= sd.SettingsDictionary()
 
         # Rajoute le type de mission du train ainsi que le mode de paramétrage
-        train_data["mission"] = tdb.mission_getter[self.page.findChild(QObject, "mission_type_combo").property("selection_index")]
-        train_data["mode"] = str(self.current_mode)
+        train_settings["mission"] = tdb.mission_getter[self.page.findChild(QObject, "mission_type_combo").property("selection_index")]
+        train_settings["mode"] = str(self.current_mode)
 
         # Change les données de la fenêtre principale du paramétrage train
         for widget_id, widget in self.data_widgets.items():
             # Cas des valueinput (floatinput, integerinput), change la propriétée "value"
             if "_integerinput" in widget_id or "_floatinput" in widget_id:
-                train_data[widget_id.rsplit("_", maxsplit=1)[0]] = widget.property("value")
+                train_settings[widget_id.rsplit("_", maxsplit=1)[0]] = widget.property("value")
             # Cas des checkbuttons
             elif "_check" in widget_id:
-                train_data[widget_id.rsplit("_", maxsplit=1)[0]] = widget.property("is_checked")
+                train_settings[widget_id.rsplit("_", maxsplit=1)[0]] = widget.property("is_checked")
 
-        return train_data
+        return train_settings
 
-    def set_simple_mode_values(self, train_data):
+    def set_simple_mode_values(self, train_settings):
         """Fonction permettant de mettre à jour les données trains en mode simple
 
         Parameters
         ----------
-        train_data: `sd.SettingsDictionary`
+        train_settings: `sd.SettingsDictionary`
             Propriétés du train
         """
         # Change le type de mission (en récupérant l'index de l'élément sauvegardé et en le changeant sur le combobox
-        mission_index = tdb.Mission[train_data.get_value("mission", "Mission.PASSENGER")[8:]].value
+        mission_index = tdb.Mission[train_settings.get_value("mission", "Mission.PASSENGER")[8:]].value
         self.page.findChild(QObject, "mission_type_combo").change_selection(mission_index)
 
         # Change les données de la fenêtre principale du paramétrage train
         for widget_id, widget in self.data_widgets.items():
             # Cas des valueinput (floatinput, integerinput), change la propriétée "value"
             if "_integerinput" in widget_id or "_floatinput" in widget_id:
-                widget.change_value(train_data.get_value(widget_id.rsplit("_", maxsplit=1)[0], widget.property("value")))
+                widget.change_value(train_settings.get_value(widget_id.rsplit("_", maxsplit=1)[0], widget.property("value")))
             # Cas des checkbuttons
             elif "_check" in widget_id:
-                widget.setProperty("is_checked", train_data.get_value(widget_id.rsplit("_", maxsplit=1)[0], False))
+                widget.setProperty("is_checked", train_settings.get_value(widget_id.rsplit("_", maxsplit=1)[0], False))
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_save_button_clicked(self):
@@ -433,7 +434,7 @@ class PageRB2:
             self.train_name_widget.change_value(file_name)
 
             # Sauvegarde le fichier de paramètres train
-            self.save_train_data_file(file_path[0])
+            self.save_train_settings_file(file_path[0])
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_open_button_clicked(self):
@@ -450,7 +451,7 @@ class PageRB2:
             self.train_name_widget.change_value(file_name)
 
             # Sauvegarde le fichier de paramètres train
-            self.open_train_data_file(file_path[0])
+            self.open_train_settings_file(file_path[0])
 
             # Si la popup complexe a été chargé, la montre
             if self.complex_popup is not None and self.complex_popup.loaded:

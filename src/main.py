@@ -34,7 +34,7 @@ def main():
 
         # Si le bouton lancer a été cliqué, récupère les informations, sinon sort
         if initialisation.launch_simulator:
-            parameters = initialisation.get_values()
+            parameters = initialisation.get_settings()
             del initialisation
         else:
             log.add_empty_lines()

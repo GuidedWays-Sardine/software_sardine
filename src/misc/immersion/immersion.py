@@ -61,7 +61,7 @@ def change_mode(new_mode):
     Raises
     ------
     RuntimeError
-        Jeté lorsqu'aucune instance de QApplication n'a été initialisée
+        Jetée lorsqu'aucune instance de QApplication n'a été initialisée
     """
     # First verify if an instance of QApplication has been initialised
     if QApplication.instance() is None:
@@ -186,8 +186,7 @@ class ImmersionWindow(QMainWindow):
 
         # Commence par la fenêtre en elle-même
         # Tags pour enlever les bordures et rendre la fenêtre incliquable (pour éviter qu'elle cache d'autres modules)
-        self.setWindowFlag(Qt.FramelessWindowHint)
-        self.setWindowFlag(Qt.WindowDoesNotAcceptFocus)
+        self.setWindowFlags(Qt.WindowDoesNotAcceptFocus | Qt.FramelessWindowHint)
         # Défini la taille et la position des écran pour remplir l'écran en entire
         height = int(RATIO * size[1])
         self.setGeometry(int(position[0]),

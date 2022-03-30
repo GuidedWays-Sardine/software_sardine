@@ -177,7 +177,7 @@ class Traction:
         else:
             log.debug(f"Impossible de fusionner deux voitures. Liste de voitures invalide ({linked_coaches}).")
 
-    def get_values(self, braking_systems):
+    def get_settings(self, braking_systems):
         """Fonction permettant de récupérer toutes les valeurs de tous les bogies et de leurs systèmes de freinage.
 
         Parameters
@@ -194,7 +194,7 @@ class Traction:
 
         # Pour chacun des bogies du train, récupère les données du bogie et celle de ses systèmes de freinages associés
         for b_i, bogie in enumerate(self.bogies):
-            parameters.update(bogie.get_values(b_i))
-            parameters.update(braking_systems.get_values(bogie, b_i))
+            parameters.update(bogie.get_settings(b_i))
+            parameters.update(braking_systems.get_settings(bogie, b_i))
 
         return parameters

@@ -170,7 +170,7 @@ class Simulation:
                                   prefix="simulation : update()")
 
         except Exception as error:
-            # Dans le cas où un des modules de mise à jour à jeté une erreur, ferme l'application et rejette l'erreur
+            # Dans le cas où un des modules de mise à jour a jeté une erreur, ferme l'application et rejette l'erreur
             self.app.quit()
             raise
 

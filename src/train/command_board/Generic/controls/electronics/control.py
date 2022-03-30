@@ -71,9 +71,9 @@ class Control:
         Raises
         ------
         KeyError
-            Jeté si certains arguments vitaux (tel que le type de carte électronique) ne sont pas présents
+            Jetée si certains arguments vitaux (tel que le type de carte électronique) ne sont pas présents
         PermissionError
-            Jeté s'il est impossible pour le pupitre de se connecter à la carte électronique de gestion de celle-ci
+            Jetée s'il est impossible pour le pupitre de se connecter à la carte électronique de gestion de celle-ci
         """
         initial_time = time.perf_counter()
         self.train_database = train_database
@@ -166,9 +166,9 @@ class Control:
         Raises
         ------
         KeyError
-            Jeté si certains arguments vitaux (tel que le type de carte électronique) ne sont pas présents
+            Jetée si certains arguments vitaux (tel que le type de carte électronique) ne sont pas présents
         PermissionError
-            Jeté s'il est impossible pour le pupitre de se connecter à la carte électronique de gestion de celle-ci
+            Jetée s'il est impossible pour le pupitre de se connecter à la carte électronique de gestion de celle-ci
         """
         log.change_log_prefix(f"Initialisation pupitre {self.board_name} (carte électronique)")
 
@@ -321,9 +321,9 @@ class Control:
         Raises
         ------
         KeyError
-            Jeté si certains arguments vitaux (tel que le type de carte électronique) ne sont pas présents
+            Jetée si certains arguments vitaux (tel que le type de carte électronique) ne sont pas présents
         PermissionError
-            Jeté s'il est impossible pour le pupitre de se connecter à la carte électronique de gestion de celle-ci
+            Jetée s'il est impossible pour le pupitre de se connecter à la carte électronique de gestion de celle-ci
         """
         # Vérifie si les boutons virtuels sont activés et si l'écran pour les boutons virtuels a été paramétré
         if command_board_settings.get_value("virtual.active", False) and \

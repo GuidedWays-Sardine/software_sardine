@@ -29,7 +29,7 @@ class RightButtons:
     graphic_page_folder_path = f"{PROJECT_DIR}src\\initialisation\\graphics\\page_rb\\"
     logic_page_folder_path = f"{PROJECT_DIR}src\\initialisation\\signals\\page_rb\\"
 
-    def __init__(self, application, translation_data):
+    def __init__(self, application, translations):
         """
         Permet d'initialiser les 8 boutons permanents (rb1 -> rb8) situés à droite de la fenêtre.
         Connecte chaque bouton à sa page de paramètres associés
@@ -38,8 +38,8 @@ class RightButtons:
         ----------
         application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
-        translation_data: `td.TranslationDictionary`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive
+        translations: `td.TranslationDictionary`
+            traductions (clés = anglais -> valeurs = langue actuelle)
             Utile pour traduire les noms de dossiers et de fenêtres sauvegardés en anglais
         """
         # Récupère les boutons de droite à partir de la fenêtre
@@ -61,15 +61,15 @@ class RightButtons:
             engine = QQmlApplicationEngine()
             page_path = f"{self.graphic_page_folder_path}page_rb{index}.qml"
             engine.load(page_path)
-            current_button = self.right_buttons.findChild(QObject, f"rb{index}")
+            page_button = self.right_buttons.findChild(QObject, f"rb{index}")
 
             initial_time = time.perf_counter()
             log.change_log_prefix(f"Initialisation page_rb{index}")
             log.info(f"Tentative du chargement de la page_rb{index}.")
 
             # Essaye d'initialiser la page et si elle est correctement initialisé, tente de charger les signals
-            if self.initialise_page(application, engine, index, page_path, current_button):
-                if self.initialise_signals(application, engine, index, page_path, current_button, translation_data):
+            if self.initialise_page(application, engine, index, page_path, page_button):
+                if self.initialise_signals(application, engine, index, page_path, page_button, translations):
                     log.info(f"Chargement complet (graphique et fonctionelle) de la  page_rb{index} en " +
                              f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n")
                 else:
@@ -78,7 +78,7 @@ class RightButtons:
 
         log.change_log_prefix("Initialisation application d'initialisation")
 
-    def initialise_page(self, application, engine, index, page_path, current_button):
+    def initialise_page(self, application, engine, index, page_path, page_button):
         """Fonction permettant d'initialiser une des pages de l'application d'initialisation lié à un bouton de droite.
         Celle-ci sera initialiser si elle existe et qu'elle a un format valide
 
@@ -92,7 +92,7 @@ class RightButtons:
             index de la page (1 pour le bouton d'en haut -> 8 pour le bouton d'en bas
         page_path: `string`
             Chemin vers la page de widgets stocké(.qml) à charger (par rapport au main.py)
-        current_button: `QObject`
+        page_button: `QObject`
             Le bouton auquel sera relié la page (généralement d'id : page_rb + index)
 
         Returns
@@ -103,7 +103,7 @@ class RightButtons:
         # Si la page est chargée, alors elle existe et elle est ajoutée
         if engine.rootObjects():
             # Définit le bouton comme activable
-            current_button.setProperty("is_activable", True)
+            page_button.setProperty("is_activable", True)
 
             # Si c'est la première page existante, la charge
             if application.pages_list == [None] * 8:
@@ -115,22 +115,22 @@ class RightButtons:
 
             # Connect le bouton de droite à une fonction permettant de charger la page et d'appeler d'autres fonctions :
             # Une pour décharger la page active, et l'autre pour charger la nouvelle page
-            current_button.clicked.connect(lambda new_page=engine, new_index=index:
+            page_button.clicked.connect(lambda new_page=engine, new_index=index:
                                            self.on_new_page_selected(application, new_page, new_index))
             return True
         else:
             # Sinon définit le bouton comme non activable et en négatif et enlève le potentiel texte
-            current_button.setProperty("is_positive", False)
-            current_button.setProperty("is_activable", False)
-            current_button.setProperty("text", "")
+            page_button.setProperty("is_positive", False)
+            page_button.setProperty("is_activable", False)
+            page_button.setProperty("text", "")
 
             # Si le fichier n'a été chargé correctement
             log.warning(f"Le fichier graphique contient des erreurs : {page_path}")
             return False
 
-    def initialise_signals(self, application, engine, index, page_path, current_button, translation_data):
+    def initialise_signals(self, application, engine, index, page_path, page_button, translations):
         """Permet lorsqu'une page de paramètres de l'application a été chargée, de charger les signals ainsi
-        que des fonctions de bases (get_values() et set_values()) si celle-ci existe
+        que des fonctions de bases (get_settings() et set_settings()) si celle-ci existe
 
         Parameters
         ----------
@@ -142,10 +142,10 @@ class RightButtons:
             index de la page (1 pour le bouton d'en haut -> 8 pour le bouton d'en bas
         page_path: `string`
             Chemin vers la page de widgets (.qml) à charger (par rapport au main.py)
-        current_button: `QObject`
+        page_button: `QObject`
             Le bouton auquel sera relié la page (généralement d'id : page_rb + index)
-        translation_data: `td.TranslationDictionary`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue) case sensitive
+        translations: `td.TranslationDictionary`
+            traductions (clés = anglais -> valeurs = langue actuelle)
             Utile pour traduire les noms de dossiers et de fenêtres sauvegardés en anglais
 
         Returns
@@ -161,7 +161,7 @@ class RightButtons:
                 # Appelle le constructeur de la page pour affilier tous les signals aux widgets
                 exec(f"from src.initialisation.signals.page_rb import page_rb{index} as rb{index}\n" +
                      f"application.pages_list[index - 1] = " +
-                     f"rb{index}.PageRB{index}(application, engine, index, current_button, translation_data)")
+                     f"rb{index}.PageRB{index}(application, engine, index, page_button, translations)")
             except Exception as error:
                 # Permet de rattraper une erreur si le code est incorrect où qu'il ne suit pas la documentation
                 log.warning(f"Erreur lors du chargement des signaux de la page : {page_path}",
@@ -170,7 +170,7 @@ class RightButtons:
             else:
                 # Vérifie (ou l'indique) si des fonctions manquent et rend le bouton relié à la page positif
                 self.are_page_functions_there(application.pages_list[index - 1])
-                current_button.setProperty("is_positive", True)
+                page_button.setProperty("is_positive", True)
                 return True
         else:
             # Sinon pas de signals handlers associé, le précise dans les logs
@@ -186,8 +186,8 @@ class RightButtons:
         page: `PageRBX`
             page à vérifier (celle-ci doit être de type PageRBX)
         """
-        # Dans l'ordre : get_values, set_values, change_language, on_page_opened, on_page_closed
-        for function in ["get_values", "set_values", "change_language", "on_page_opened", "on_page_closed"]:
+        # Dans l'ordre : get_settings, set_settings, change_language, on_page_opened, on_page_closed
+        for function in ["get_settings", "set_settings", "change_language", "on_page_opened", "on_page_closed"]:
             if function not in dir(page):
                 log.debug(f"Aucune fonction \"{function}\" dans la page_rb{page.index}.")
 
