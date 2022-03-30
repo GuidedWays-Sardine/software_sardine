@@ -98,5 +98,5 @@ class TranslationDictionary(dict):
                         exception=error,  prefix="dictionaire de traduction")
         else:
             # Indique en debug le nombre d'éléments récupérées
-            log.debug(f"{len(self) - current_length} nouvelles traductions récupérées dans le fichoer :\n\t {file_path}",
+            log.debug(f"{len(self) - current_length} nouvelles traductions récupérées dans le fichier :\n\t {file_path}",
                       prefix="dictionaire de traduction")
