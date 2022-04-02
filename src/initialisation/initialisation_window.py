@@ -1,5 +1,5 @@
 # Librairies par défaut
-import os.path
+import os
 import sys
 import time
 
