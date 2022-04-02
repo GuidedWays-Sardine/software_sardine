@@ -173,7 +173,7 @@ Item{
 
         //Cas où la valeur minimale est supérieure à la valeur maximale
         if(root.minimum_value > root.maximum_value){
-            root.mimimum_value = root.maximum_value
+            root.minimum_value = root.maximum_value
         }
 
         //cas où la valeur actuelle rentrée est inférieure à la nouvelle valeur minimale
