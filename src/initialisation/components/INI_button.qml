@@ -15,14 +15,19 @@ Item {
     id: root
 
     //Propriétés liés à la position et à la taille de l'objet
-    property double default_x: 0               //position du bouton pour les dimensions minimales de la fenêtre (640*480)
+    property double default_x: 0               //position du bouton pour les dimensions minimales de la fenêtre (w_min*h_min)
     property double default_y: 0
-    property double default_width: 100         //dimensions du bouton pour les dimensions minimales de la fenêtre (640*480)
+    property double default_width: 100         //dimensions du bouton pour les dimensions minimales de la fenêtre (w_min*h_min)
     property double default_height: 40
     anchors.fill: parent
 
     //permet à partir des valeurs de positions et dimensions par défauts de calculer la position et la taille peu importe la dimension de la fenêtre
-    readonly property double ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
+    readonly property int w_min: 640
+    readonly property int h_min: 480
+    readonly property double ratio: (parent.width >= w_min && parent.height >= h_min) ? parent.width/w_min * (parent.width/w_min < parent.height/h_min) + parent.height/h_min * (parent.width/w_min >= parent.height/h_min) : 1  //parent.height et parent.width représentent la taille de la fenêtre
+    //permet de centrer la fenêtre lorsque le ratio de la fenêtre n'est pas la même que celui utilisé
+    readonly property double x_offset: (parent.width/parent.height > w_min/h_min) && (parent.width >= w_min && parent.height >= h_min) ? (parent.width - w_min * root.ratio) / 2 : 0
+    readonly property double y_offset: (parent.width/parent.height < w_min/h_min) && (parent.width >= w_min && parent.height >= h_min) ? (parent.height - h_min * root.ratio) / 2 : 0
 
     //Propriétés liés à l'image et au texte que l'utilisateur peut rajouter sur le bouton
     property string image: ""       //image à afficher en tout temps sur le bouton si image_activable et image_not_activable sont vides (peut rester vide)
@@ -146,8 +151,8 @@ Item {
     Rectangle{
         id: body
 
-        x: root.default_x * root.ratio
-        y: root.default_y * root.ratio
+        x: root.x_offset + root.default_x * root.ratio
+        y: root.y_offset + root.default_y * root.ratio
         width: root.default_width * root.ratio
         height: root.default_height * root.ratio
 
@@ -291,8 +296,8 @@ Item {
     MouseArea{
         id: area
 
-        x: root.default_x * root.ratio
-        y: root.default_y * root.ratio
+        x: root.x_offset + root.default_x * root.ratio
+        y: root.y_offset + root.default_y * root.ratio
         width: root.default_width * root.ratio
         height: root.default_height * root.ratio
 

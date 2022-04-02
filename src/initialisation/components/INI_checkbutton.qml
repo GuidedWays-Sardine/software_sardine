@@ -70,9 +70,9 @@ Item {
     INI_button {
         id: body
 
-        default_x: root.default_x
+        default_x: root.default_x           //position du checkbouton pour les dimensions minimales de la fenêtre (w_min*h_min)
         default_y: root.default_y
-        default_width: root.box_length
+        default_width: root.box_length      //dimensions du checkbouton pour les dimensions minimales de la fenêtre (w_min*h_min)
         default_height: root.box_length
 
         image_activable: root.is_checked ? "Navigation/grey_cross.bmp" : ""

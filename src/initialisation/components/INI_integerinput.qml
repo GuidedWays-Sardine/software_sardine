@@ -13,14 +13,19 @@ Item{
     id: root
 
     //Propriétés liés à la position et à la taille de l'objet
-    property double default_x: 0                //position du bouton pour les dimensions quand la fenêtre fait du 640x480
+    property double default_x: 0                //position du integer_input pour les dimensions minimales de la fenêtre (w_min*h_min)
     property double default_y: 0
-    property double default_width: 100          //dimensions du bouton quand la fenêtre fait du 640x480
+    property double default_width: 100          //dimensions du integer_input pour les dimensions minimales de la fenêtre (w_min*h_min)
     property double default_height: 40
     anchors.fill: parent
 
     //permet à partir des valeurs de positions et dimensions par défauts de calculer
-    readonly property real ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
+    readonly property int w_min: 640
+    readonly property int h_min: 480
+    readonly property real ratio:  (parent.width >= w_min && parent.height >= h_min) ? parent.width/w_min * (parent.width/w_min < parent.height/h_min) + parent.height/h_min * (parent.width/w_min >= parent.height/h_min) : 1  //parent.height et parent.width représentent la taille de la fenêtre
+    //permet de centrer la fenêtre lorsque le ratio de la fenêtre n'est pas la même que celui utilisé
+    readonly property double x_offset: (parent.width/parent.height > w_min/h_min) && (parent.width >= w_min && parent.height >= h_min) ? (parent.width - w_min * root.ratio) / 2 : 0
+    readonly property double y_offset: (parent.width/parent.height < w_min/h_min) && (parent.width >= w_min && parent.height >= h_min) ? (parent.height - h_min * root.ratio) / 2 : 0
 
     //Propriétés liés aux valeurs limites et la valeur actuellement sélectionnée
     property int minimum_value: 0
@@ -226,8 +231,8 @@ Item{
     TextField {
         id: body
 
-        x: root.default_x * root.ratio
-        y: root.default_y * root.ratio
+        x: root.x_offset + root.default_x * root.ratio
+        y: root.y_offset + root.default_y * root.ratio
         width: root.default_width * root.ratio
         height: root.default_height * root.ratio
 

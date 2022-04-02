@@ -7,9 +7,9 @@ Item {
 
 
     //Propriétés liés à la position et à la taille de l'objet
-    property double default_x: 0               //position du switchbouton pour les dimensions minimales de la fenêtre (640*480)
+    property double default_x: 0               //position du switchbouton pour les dimensions minimales de la fenêtre (w_min*h_min)
     property double default_y: 0
-    property double default_width: 100         //dimensions du switchbouton pour les dimensions minimales de la fenêtre (640*480)
+    property double default_width: 100         //dimensions du switchbouton pour les dimensions minimales de la fenêtre (w_min*h_min)
     property double default_height: 40
     anchors.fill: parent
 

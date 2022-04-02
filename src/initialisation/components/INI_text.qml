@@ -10,12 +10,17 @@ Item {
     id:root
 
     //Propriétés liés à la position et à la taille de l'objet
-    property double default_x: 0          //Position du texte
+    property double default_x: 0          //Position du texte pour les dimensions minimales de la fenêtre (w_min*h_min)
     property double default_y: 0
     anchors.fill: parent
 
-    //permet à partir des valeurs de positions et dimensions par défauts de calculer
-    readonly property double ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
+    //A partir des dimensions par défaut et actuelles de la fenêtre
+    readonly property int w_min: 640
+    readonly property int h_min: 480
+    readonly property double ratio:  (parent.width >= w_min && parent.height >= h_min) ? parent.width/w_min * (parent.width/w_min < parent.height/h_min) + parent.height/h_min * (parent.width/w_min >= parent.height/h_min) : 1  //parent.height et parent.width représentent la taille de la fenêtre
+    //permet de centrer la fenêtre lorsque le ratio de la fenêtre n'est pas la même que celui utilisé
+    readonly property double x_offset: (parent.width/parent.height > w_min/h_min) && (parent.width >= w_min && parent.height >= h_min) ? (parent.width - w_min * root.ratio) / 2 : 0
+    readonly property double y_offset: (parent.width/parent.height < w_min/h_min) && (parent.width >= w_min && parent.height >= h_min) ? (parent.height - h_min * root.ratio) / 2 : 0
 
     //Propriétés liés au texte du DMI_text
     property string text: ""
@@ -43,8 +48,8 @@ Item {
     Text {
         id: body
 
-        x: root.default_x * root.ratio
-        y: root.default_y * root.ratio
+        x: root.x_offset + root.default_x * root.ratio
+        y: root.y_offset + root.default_y * root.ratio
 
         font.family: "Verdana"
         font.pixelSize: root.font_size * root.ratio
