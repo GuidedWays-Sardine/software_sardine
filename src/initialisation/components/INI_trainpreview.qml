@@ -177,7 +177,7 @@ Item {
     //Liste de boutons permettant de montrer les icones de chacune des voitures visibles
     Repeater{
         id: trains_showing
-        objectName: trains_showing
+        objectName: "trains_showing"
 
         anchors.fill: parent
         model: root.visible_count
@@ -190,7 +190,8 @@ Item {
             default_width: (root.default_width - 2 * root.default_height) / (root.visible_count + 2)
             default_height: root.default_height * 0.5
 
-            image_activable: "Train_icons/" + root.mission_list[button_index] + (root.prime_list.includes(button_index % (root.visible_count + 3)) ? "/empty/" : "/full/") + (is_dark_grey ? "dark_" : "") + "grey_" + root.position_list[button_index] + ".png"
+            image_activable: root.mission_list.length > button_index && root.position_list.length > button_index ?
+                             ("Train_icons/" + root.mission_list[button_index] + (root.prime_list.includes(button_index % (root.visible_count + 3)) ? "/empty/" : "/full/") + (is_dark_grey ? "dark_" : "") + "grey_" + root.position_list[button_index] + ".png") : ""
             image_not_activable: ""
             text: is_activable ? (button_index + 1).toString() : ""
             font_size: 8
