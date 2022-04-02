@@ -84,7 +84,7 @@ Item {
 
         is_activable: false
         is_positive: true
-        is_dark_grey: root.windows_name.length > 0
+        is_dark_grey: page_rb8.windows_name.length > 0
     }
 
     //Flèche de droite pour naviguer à droite sur les catégories d'écran
