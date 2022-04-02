@@ -22,10 +22,10 @@ def CommandBoardComponent():
     """décorateur permettant de récupérer les exceptions lors de l'initialision d'une des sous-classe pour le pupitre"""
     def signal_decorator(init):
         @wraps(init)
-        def signal_wraper(*args):
+        def signal_wraper(*args, **kwargs):
             try:
                 # Appelle la fonction normalement et récupère une potentielle erreur
-                return init(*args)
+                return init(*args, **kwargs)
             except Exception as error:
                 # Laisse un message en niveau log.WARNING pour indiquer que le composant n'a pas su être chargé
                 log.warning("Un des composant pour le pupitre n'a pas pu être chargé correctement : \n" +
@@ -48,10 +48,10 @@ def QtSignal(log_level=log.Level.ERROR, end_process=False):
     """
     def signal_decorator(signal):
         @wraps(signal)
-        def signal_wraper(*args):
+        def signal_wraper(*args, **kwargs):
             try:
                 # Appelle la fonction normalement et récupère une potentielle erreur
-                signal(*args)
+                signal(*args, **kwargs)
             except Exception as error:
                 # Récupère le nom de la fonction pour plus d'indication et laisse un message de registre
                 function_name = str(signal)[10:].split(" at ")[0]
@@ -129,13 +129,13 @@ class UIupdate:
                                     filename=f"signal{self.__arguments_count + self.__in_class}",
                                     mode="eval")
 
-        def set_arguments(self, *args):
+        def set_arguments(self, *args, **kwargs):
             """Fonction pour changer les arguments pour le prochain appel de la fonction
             (impossible à envoyer dans la fonction run(), définit par défaut par QThread et appelé avec QThread.start())
 
             Parameters
             ----------
-            *args: Any
+            *args, **kwargs: Any
                 les différents arguments à envoyer lors de l'appel de la fonction
 
             Raises
@@ -176,7 +176,7 @@ class UIupdate:
     def __call__(self, *args, **kwargs):
         """fonction appelée lors de l'appel de la fonction ciblée par le décorateur"""
         # Démarre le QThread (appelant sa fonction run() et donc la fonction envoyée) et attend que l'appel se finisse
-        self.__ui_thread.set_arguments(*args)
+        self.__ui_thread.set_arguments(*args, **kwargs)
         self.__ui_thread.start()
         self.__ui_thread.wait()
 
