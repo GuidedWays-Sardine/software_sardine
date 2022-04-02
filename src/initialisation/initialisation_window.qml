@@ -24,7 +24,7 @@ Window {
         }
     }
 
-    //affiche les différentes pages de settings de l'application d'initialisation
+    //affiche les différentes pages de paramètres de l'application d'initialisation
     INI_stackview{
         id: settings_pages
         objectName: "settings_pages"
@@ -35,15 +35,17 @@ Window {
         default_height: 400
     }
 
-    //stoque tous les boutons à droite de la page et affichant les différentes pages de settings
+    //stocke tous les boutons à droite de la page et affichant les différentes pages de settings
     Right_buttons{
         id: right_buttons
-        objectName: "right_buttons"
+
+        //position: (580, 15)     size: (60, 400)
     }
 
-    //stoque tous les boutons en bas de la page permettant de quitter/lancer l'applition et d'ouvrir un fichier settings
+    //stocke tous les boutons en bas de la page permettant de quitter/lancer l'applition et d'ouvrir un fichier settings
     Bottom_buttons{
         id: bottom_buttons
-        objectName: "right_buttons"
+
+        //position: (0, 415)      size: (640, 50)
     }
 }
