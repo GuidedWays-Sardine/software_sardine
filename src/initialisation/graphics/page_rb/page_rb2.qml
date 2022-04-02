@@ -795,7 +795,7 @@ Item {
 
             onIs_activableChanged: {
                 if(!dynamic_check.is_activable){
-                     dynamic_break.is_checked = false
+                     dynamic_check.is_checked = false
                 }
             }
         }
