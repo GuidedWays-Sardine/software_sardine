@@ -7,8 +7,18 @@ from datetime import datetime
 import re
 
 
+# librairies graphiques (pour récupérer les messages d'erreurs)
+from PyQt5 import QtCore
+
+
 VERSION = "1.1.0"
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
+QT_IGNORE = ("Found metadata in lib",
+             "Got keys from plugin meta data",
+             "loaded library",
+             "loaded plugins",
+             "QFactoryLoader::QFactoryLoader() looking at",
+             "QFactoryLoader::QFactoryLoader() checking directory path")   # List of all spammy debug messages to ignore
 
 
 class Level(Enum):
@@ -44,6 +54,10 @@ def initialise(path=f"{PROJECT_DIR}log\\", version=VERSION, log_level=Level.DEBU
         logging.getLogger().setLevel(log_level.value)
         logging.warning("Fichier de registre pour cette simulation déjà existant. Aucun besoin d'en créer un nouveau.\n")
         return
+
+    # Indique la fonction a appeler lorsqu'une fonction est initialisée
+    os.environ["QT_DEBUG_PLUGINS"] = "1"
+    QtCore.qInstallMessageHandler(__qt_message_handler)
 
     # Dans le cas où les logs doivent être enregistrées et que le niveau n'est pas mis à log.NOTSET
     if save and log_level is not Level.NOTSET:
@@ -253,3 +267,30 @@ def add_empty_lines(lines_count=1, log_level=Level.INFO):
 
     # Remet de nouveau le format actuel
     handler.setFormatter(logging.Formatter(datefmt="%H:%M:%S", fmt=current_format))
+
+
+def __qt_message_handler(mode, context, message):
+    """Fonction (non appelable) permettant de récupérer et d'afficher les messages d'erreurs des fichiers qml
+
+    Parameters
+    ----------
+    mode: `QtCore.QtInfoMsg`
+        Niveau du message d'erreur (convertit en niveau de registre
+    context: `QtCore.QMessageLogContext`
+        Contexte sur le message d'erreur (fichier, ligne, charactère
+    message: `str`
+        message associé à l'erreur
+    """
+    # Vérifie que l'erreur ne fait pas partie des erreurs à sauter (pour éviter le spam en niveau debug)
+    if not any(ignore in message for ignore in QT_IGNORE):
+        # Pour chaque mode, met le message d'erreur sous le bon format et l'indique dans le registre
+        if mode == QtCore.QtFatalMsg or mode == QtCore.QtFatalMsg:
+            critical(f"Erreur Critique dans un fichier graphique QML : \n\t{message}" +
+                     f"{(f'line:{context.line} ; file:{context.file} -> ' if context.file is not None else '')}{message}",
+                     prefix="QML")
+        elif mode == QtCore.QtWarningMsg:
+            warning(f"{(f'line:{context.line} ; file:{context.file} -> ' if context.file is not None else '')}{message}",
+                    prefix="QML")
+        else:
+            debug(f"{(f'line:{context.line} ; file:{context.file} -> ' if context.file is not None else '')}{message}",
+                  prefix="QML")
