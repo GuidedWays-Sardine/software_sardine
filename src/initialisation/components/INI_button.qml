@@ -173,7 +173,10 @@ Item {
         anchors.leftMargin: (1 + root.is_positive) * root.ratio
         fillMode: Image.PreserveAspectFit
 
-        source: (root.image_activable != "" || root.image_not_activable != "") ? root.symbols_path + (root.is_activable ? image_activable : image_not_activable) : root.symbols_path + root.image
+        source: (root.is_activable && root.image_activable) ? (root.symbols_path + root.image_activable) :
+                (!root.is_activable && root.image_not_activable) ? (root.symbols_path + root.image_not_activable) :
+                (root.image != "") ? (root.symbols_path + root.image) :
+                ""
     }
 
     //Texte visible sur le bouton
