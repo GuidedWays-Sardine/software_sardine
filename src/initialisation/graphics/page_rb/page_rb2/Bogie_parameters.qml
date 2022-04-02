@@ -512,8 +512,10 @@ Item {
         //Signal appelé lorsque le texte change (et donc que l'index d'essieu change
         onTextChanged: {
             //rend l'integerinput de la puissance moteur activable ou non selon si l'essieu est motorisé ou non et change sa valeur
-            axles_power_floatinput.is_activable = root.motorized_axles[root.current_bogie_index][root.current_axle_index]
-            axles_power_floatinput.change_value(root.motorized_axles_powers[root.current_bogie_index][root.current_axle_index])
+            if(root.motorized_axles.length > 0) {
+                axles_power_floatinput.is_activable = root.motorized_axles[root.current_bogie_index][root.current_axle_index]
+                axles_power_floatinput.change_value(root.motorized_axles_powers[root.current_bogie_index][root.current_axle_index])
+            }
         }
     }
 
@@ -558,7 +560,7 @@ Item {
 
         is_visible: root.generated && root.any
         is_positive: false
-        is_activable: root.motorized_axles[root.current_bogie_index][root.current_axle_index]
+        is_activable: root.motorized_axles.length > 0 ? root.motorized_axles[root.current_bogie_index][root.current_axle_index] : false
     }
 
     INI_text {
