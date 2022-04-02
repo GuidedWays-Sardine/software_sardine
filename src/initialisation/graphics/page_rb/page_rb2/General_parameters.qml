@@ -31,8 +31,8 @@ Item {
 
 
     //signal et variables nécessaire pour mettre à jour l'icone
-    readonly property string railcar_position_type: positions_type.length > 0 ? positions_type[position_switch.selection_index] : ""
-    readonly property string railcar_mission_type: missions_type.length > 0 ? missions_type[mission_combo.selection_index] : ""
+    readonly property string railcar_position_type: positions_type.length > 0 && position_switch.selection_index != -1 ? positions_type[position_switch.selection_index] : ""
+    readonly property string railcar_mission_type: missions_type.length > 0 && mission_combo.selection_index != -1 ? missions_type[mission_combo.selection_index] : ""
     signal update_icon()
 
     //Fonction pour réinitialiser le module
@@ -236,10 +236,12 @@ Item {
             onSelection_changed: {
                 // mets à jour la liste des images et remet l'image visible
                 var index = position_switch.selection_index
-                position_switch.elements = [("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_front.png"),
-                                            ("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_middle.png"),
-                                            ("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_back.png")]
-                position_switch.change_selection(index)
+                if(mission_combo.selection_index != -1 && root.missions_type.length > mission_combo.selection_index) {
+                    position_switch.elements = [("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_front.png"),
+                                                ("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_middle.png"),
+                                                ("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_back.png")]
+                    position_switch.change_selection(index)
+                }
             }
 
             // Signal appelé lorsque la combobox est fermée
@@ -272,10 +274,12 @@ Item {
             onIs_activableChanged: {
                 // mets à jour la liste des images et remet l'image visible
                 var index = position_switch.selection_index
-                position_switch.elements = [("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (is_activable ? "" : "dark_") + "grey_front.png"),
-                                            ("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (is_activable ? "" : "dark_") + "grey_middle.png"),
-                                            ("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (is_activable ? "" : "dark_") + "grey_back.png")]
-                position_switch.change_selection(index)
+                if(mission_combo.selection_index != -1 && root.missions_type.length > mission_combo.selection_index) {
+                    position_switch.elements = [("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_front.png"),
+                                                ("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_middle.png"),
+                                                ("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_back.png")]
+                    position_switch.change_selection(index)
+                }
             }
 
             // Signal appelé lorsque le switchbutton est cliqué
@@ -294,7 +298,7 @@ Item {
             default_height: mission_combo.default_height
 
             minimum_value: 0
-            maximum_value: mission_combo.selection_index != -1 ? root.max_levels_list[mission_combo.selection_index] : 0
+            maximum_value: root.max_levels_list.length > mission_combo.selection_index && mission_combo.selection_index != -1 ? root.max_levels_list[mission_combo.selection_index] : 0
             is_max_default: false
             title: "niveaux"
             font_size: 10
@@ -314,7 +318,7 @@ Item {
             default_height: mission_combo.default_height
 
             minimum_value: 0
-            maximum_value: mission_combo.selection_index != -1 ? root.max_doors_list[mission_combo.selection_index] : 0
+            maximum_value: root.max_doors_list.length > 0 && mission_combo.selection_index != -1 ? root.max_doors_list[mission_combo.selection_index] : 0
             is_max_default: false
             title: "portes"
             font_size: 10
