@@ -5,6 +5,7 @@ from functools import wraps
 import inspect
 import functools
 import threading
+import copy
 
 
 # Librairies graphiques
@@ -81,10 +82,9 @@ class UIupdate:
             exec(f"__signal{i} = PyQt5.QtCore.pyqtSignal(*((object,) * {i}))")
         __signal = None
 
-        # Nombre et liste des arguments (hors self si méthode d'une classe) pour l'appel de la fonction
-        __in_class = True
-        __arguments_count = 0
-        __arguments = ()
+        # Liste des arguments par défauts et des arguments pour l'appel de la fonction
+        __args_list = None
+        __args = None
 
         def __init__(self, function):
             """Fonction permettant d'initialiser le QThread et le décorateur UI.
@@ -110,23 +110,22 @@ class UIupdate:
             if threading.current_thread().__class__.__name__ != '_MainThread':
                 raise RuntimeError("Les composants pyQt doivent obligatoirement être initialisés sur thread principal")
 
-            # Compte le nombre de paramètres de la fonction (hors self, qui est un cas particulier).
-            # Le pyqtSignal doit être initialisé selon le nombre de paramètres. D'où ce comptage.
-            self.__in_class = "self" in str(inspect.signature(self.__function))
-            self.__arguments_count = len(inspect.signature(self.__function).parameters) - self.__in_class
+            # Récupère les arguments par défaut)
+            signature = inspect.signature(self.__function)
+            self.__args_list = {i + 1: (k, v.default) if v.default is not inspect.Parameter.empty else (k,)
+                                for i, (k, v) in enumerate(signature.parameters.items())}
 
-            # Dans le cas où la fonction a trop d'arguments, jete une erreur.
-            # Pour corriger l'erreur, augmenter la valeur de __MAX_PARAMETERS (attention à l'utilisation mémoire)
-            if self.__arguments_count > self.__MAX_PARAMETERS:
-                raise RuntimeError(f"La fonction envoyée a trop de paramètres. {self.__arguments} nécessaires pour " +
-                                   f"{self.__MAX_PARAMETERS} maximums. Changer la valeur de __MAX_PARAMETERS")
+            # Si le nombre d'arguments est supérieur au nombre maximum d'arguments, alors jette une erreur
+            if len(self.__args_list) > self.__MAX_PARAMETERS:
+                raise RuntimeError(f"La fonction envoyée a trop de paramètres. {len(self.__args_list)} nécessaires " +
+                                   f"pour {self.__MAX_PARAMETERS} maximums. Changer la valeur de __MAX_PARAMETERS")
 
             # Sinon connecte la fonction au bon pyqtSignal (index = nombre d'arguments permis)
-            exec(f"self.__signal{self.__arguments_count + self.__in_class}.connect(self._UIThread__function)")
+            exec(f"self.__signal{len(self.__args_list)}.connect(self._UIThread__function)")
 
             # Pré-compile les exec d'émissions de signal pour une optimisation du temps d'appel du signal
-            self.__signal = compile(f"self.__signal{self.__arguments_count + self.__in_class}.emit(*self._UIThread__arguments)",
-                                    filename=f"signal{self.__arguments_count + self.__in_class}",
+            self.__signal = compile(f"self.__signal{len(self.__args_list)}.emit(*self._UIThread__args)",
+                                    filename=f"signal{len(self.__args_list)}",
                                     mode="eval")
 
         def set_arguments(self, *args, **kwargs):
@@ -143,13 +142,28 @@ class UIupdate:
             TypeError:
                 Jetée lorsque le nombre d'arguments ne correspond pas au nombre d'arguments de la fonction
             """
-            # Commence par vérifier que le nombre d'arguments envoyé est le bon
-            if self.__arguments_count + self.__in_class != len(args):
-                raise TypeError(f"{self.__function} takes {self.__arguments_count + self.__in_class} " +
-                                f"positional arguments but {len(args)} was given")
+            # Transforme le tuple d'argument en une liste
+            arguments = list(args)
 
-            # Stoque les arguments dans la classe comme ceux-ci ne peuvent pas être envoyés dans la fonction run()
-            self.__arguments = args
+            # Rajoute le reste des arguments à l'aide de la liste d'argument par défaut, du kwarg et des valeurs défaut
+            for i in range(len(arguments) + 1, len(self.__args_list) + 1):
+                # Cas où la valeur a été envoyée dans le kwarg
+                if self.__args_list[i][0] in kwargs:
+                    arguments.append(kwargs[self.__args_list[i][0]])
+                # Si elle n'a pas été envoyée, mais qu'une valeur par défaut existe, rajoute une copie
+                elif len(self.__args_list[i]) == 2:
+                    arguments.append(copy.deepcopy(self.__args_list[i][1]))
+                # Sinon la valeur n'a pas été envoyée, laisse un message d'erreur (un crash se produira dans le signal)
+                else:
+                    log.warning(f"Argument \"{self.__args_list[i][0]}\" manquant dans appel fonction {self.__function}")
+
+            # Reconvertit la liste d'arguments en tuple et le stocke dans la classe
+            self.__args = tuple(arguments)
+
+            # # S'assure que le nombre d'argument qui sera envoyé sera le bon
+            if len(self.__args_list) != len(self.__args):
+                raise TypeError(f"{self.__function} takes {len(self.__args_list)} " +
+                                f"positional arguments but {len(args)} was given")
 
         def run(self):
             """Fonction permettant d'émettre le signal et donc d'appeler la fonction avec les paramètres sauvegardés"""
@@ -157,7 +171,7 @@ class UIupdate:
             exec(self.__signal)
 
             # réinitialise les arguments pour éviter de rappeler la fonction avec les mêmes arguments
-            self.__arguments = ()
+            self.__args = ()
 
     # Stocke une instance de la classe précédente
     __ui_thread = None
