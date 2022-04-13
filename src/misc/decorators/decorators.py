@@ -9,7 +9,7 @@ import copy
 
 
 # Librairies graphiques
-import PyQt5.QtCore
+from PyQt5 import QtCore
 
 
 # Librairies SARDINE
@@ -70,7 +70,7 @@ def QtSignal(log_level=log.Level.ERROR, end_process=False):
 class UIupdate:
     """décorateur à obligatoirement utiliser pour toutes les fonctions mettant à jour des éléments grahiques"""
 
-    class UIThread(PyQt5.QtCore.QThread):
+    class UIThread(QtCore.QThread):
         """Classe contenant tous les éléments nécessaires pour faire fonctionner le décorateur"""
         # Informations nécessaires pour la génération des pyqtSignal
         # Les arguments de pyqtSignal dépendent du nombre d'arguments de la fonction
@@ -79,7 +79,7 @@ class UIupdate:
         __MAX_PARAMETERS = 10
         __function = None
         for i in range(__MAX_PARAMETERS + 1):
-            exec(f"__signal{i} = PyQt5.QtCore.pyqtSignal(*((object,) * {i}))")
+            exec(f"__signal{i} = QtCore.pyqtSignal(*((object,) * {i}))")
         __signal = None
 
         # Liste des arguments par défauts et des arguments pour l'appel de la fonction
@@ -167,7 +167,7 @@ class UIupdate:
 
         def run(self):
             """Fonction permettant d'émettre le signal et donc d'appeler la fonction avec les paramètres sauvegardés"""
-            # Emet le signal, ce qui va appeler la fonction
+            # Emet le signal, l'executant et attend qu'il se finisse
             exec(self.__signal)
 
             # réinitialise les arguments pour éviter de rappeler la fonction avec les mêmes arguments
