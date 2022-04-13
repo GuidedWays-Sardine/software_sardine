@@ -12,6 +12,7 @@ from PyQt5.QtCore import QObject
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.initialisation.initialisation_window as ini
+import src.misc.screens_position.screens as sc
 import src.misc.settings_dictionary.settings as sd
 import src.misc.translation_dictionary.translation as td
 import src.misc.log.log as log
@@ -68,19 +69,18 @@ class PageRB8:
 
         # Passe sur chacun des écrans connectés à l'ordinateur et génère la fenêtre graphique associée
         self.screen_index_engine = QQmlApplicationEngine()
-        self.screen_index_windows = [QObject()] * len(application.screens_dimensions)
+        self.screen_index_windows = [QObject()] * len(sc.get_screens_informations())
         for screen_index in range(0, len(self.screen_index_windows)):
             # Charge une fenêtre d'index et mets le bon index et la place au bon endroit
             self.screen_index_engine.load(self.screen_index_file_path)
             self.screen_index_windows[screen_index] = self.screen_index_engine.rootObjects()[-1]
             self.screen_index_windows[screen_index].setProperty("index", screen_index + 1)
-            self.screen_index_windows[screen_index].show()
-            self.screen_index_windows[screen_index].setPosition(application.screens_dimensions[screen_index][0][0],
-                                                                application.screens_dimensions[screen_index][0][1])
+            self.screen_index_windows[screen_index].setPosition(sc.get_screens_informations()[screen_index][0][0],
+                                                                sc.get_screens_informations()[screen_index][0][1])
             self.screen_index_windows[screen_index].hide()
 
         # Envoie la dimension des fenêtre à la partie graphique de la page
-        self.page.setProperty("screens_size", [sd[1] for sd in application.screens_dimensions])
+        self.page.setProperty("screens_size", [sd[1] for sd in sc.get_screens_informations()])
 
         # Pour chacun des fichiers dans le répertoire de paramètres d'écrans
         for file_path in (f for f in os.listdir(self.windows_settings_folder_path) if f.endswith(".screens")):

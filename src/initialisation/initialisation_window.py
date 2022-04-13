@@ -17,6 +17,7 @@ import src.misc.log.log as log
 import src.misc.immersion.immersion as immersion
 import src.misc.settings_dictionary.settings as sd
 import src.misc.translation_dictionary.translation as td
+import src.misc.screens_position.screens as sc
 from src.initialisation.signals import right_buttons as rb
 from src.initialisation.signals import bottom_buttons as bb
 
@@ -32,7 +33,6 @@ class InitialisationWindow:
 
     # Stocke si la page est chargée et si elle est complète (pour lancer le simulateur
     pages_list = [None] * 8     # Stocke les pages que l'utilisateur peut afficher
-    screens_dimensions = []        # Données sur les écrans connectés : format : [[x, y], [w, h], ...]
 
     # Variable stockant l'index de la fenêtre de paramètres actuellement chargée
     active_page_index = None       # Stocke l'index de la page de paramètres active de 1 à 8
@@ -71,10 +71,8 @@ class InitialisationWindow:
         # Commence par initialiser le mode immersion en mode EMPTY
         immersion.change_mode(immersion.Mode.DEACTIVATED)
 
-        # Charge tous les écrans connectés à l'ordinateur (utile pour la positionnement de certaines popup)
-        for screen_index in range(0, QDesktopWidget().screenCount()):
-            # Charge les informations de l'écran (au format [x_min, y_min, x_max, y_max]
-            sg = QDesktopWidget().screenGeometry(screen_index).getCoords()
+        # Calls the function to get the screens once to log the amount of screens
+        sc.get_screens_informations()
 
         # Cherche pour le fichier QML avec tous les éléments de la fenêtre d'initialisation
         self.engine = QQmlApplicationEngine()
@@ -106,38 +104,8 @@ class InitialisationWindow:
             default_settings.open(self.default_settings_file_path)
             self.set_settings(default_settings)
 
-            # De plus si les paramètres pour la taille et la position de la fenêtre existent, essaye de les récupérer
-            if all([(f"initialisation.{p}" in default_settings) for p in ["screen_index", "x", "y", "w", "h"]]):
-                try:
-                    # Récupère l'index de l'écran et le met à 1 si pas assez d'écrans sont connectés
-                    screen_index = default_settings["initialisation.screen_index"]
-                    if not (1 <= default_settings["initialisation.screen_index"] <= len(self.screens_dimensions)):
-                        log.debug(f"L'écran {screen_index} n'existe pas ({len(self.screens_dimensions)} écrans).")
-                        screen_index = 1
-
-                    # Commence par calculer la taille théorique maximale selon la position de la fenêtre et la taille écran
-                    max_window_size = [self.screens_dimensions[screen_index - 1][1][0] - default_settings["initialisation.x"],
-                                       self.screens_dimensions[screen_index - 1][1][1] - default_settings["initialisation.y"]]
-
-                    # Puis garde la dimensions la plus faible entre sa taille demandée et la taille maximale possible
-                    window_size = [min(max_window_size[0], default_settings["initialisation.w"]),
-                                   min(max_window_size[1], default_settings["initialisation.h"])]
-
-                    # S'assure que la fenêtre (de taille minimale 640*480) rentre bien là où elle doit être placée
-                    if window_size[0] >= 640 and window_size[1] >= 480:
-                        # Repositione et redimensionne la fenêtre
-                        self.win.setPosition(self.screens_dimensions[screen_index - 1][0][0] + default_settings["initialisation.x"],
-                                             self.screens_dimensions[screen_index - 1][0][1] + default_settings["initialisation.y"])
-                        self.win.resize(window_size[0], window_size[1])
-                    else:
-                        log.debug(f"La fenêtre ne rentre pas à l'écran. ({window_size} au lieu de [640, 480] minimum).")
-                except Exception as error:
-                    # Récupère une exception si l'une des données n'est pas au bon format
-                    log.warning("Erreur lors du redimensionement de la fenêtre d'initialisation (surement dû aux paramètres)",
-                                exception=error)
-            # Sinon laisse un message de debug indiquant que certaines données sont manquantes
-            else:
-                log.debug(f"Aucune information stocké sur la taille par défaut de la fenêtre d'initialisation.")
+            # Essaye de changer la position de la fenêtre
+            sc.set_window_position(self.win, "initialisation.", default_settings, (640, 480))
 
         # Indique le temps de chargement de l'application
         log.info(f"Application d'initialisation chargée en " +
@@ -179,28 +147,7 @@ class InitialisationWindow:
             log.info(f"Récupération des paramètres de l'application.")
 
             # Récupère l'écran sur lequel se situe la fenêtre d'initialisation.
-            screens = QDesktopWidget()
-            screen_index = [i for i in range(0, screens.screenCount())
-                            if screens.screenGeometry(i).getCoords()[0] - 1 < self.win.x() <=
-                            screens.screenGeometry(i).getCoords()[2]
-                            and screens.screenGeometry(i).getCoords()[1] - 1 < self.win.y() <=
-                            screens.screenGeometry(i).getCoords()[3]]
-
-            # Si la fenêtre d'initialisation a été détecté sur un écran, récupère et stocke ses coordonées
-            if screen_index:
-                sg = screens.screenGeometry(screen_index[0]).getCoords()
-                settings["initialisation.screen_index"] = screen_index[0] + 1
-                settings["initialisation.x"] = self.win.x() - sg[0]
-                settings["initialisation.y"] = self.win.y() - sg[1]
-                settings["initialisation.w"] = (self.win.width() if (self.win.x() + self.win.width() <= sg[2] + 1)
-                                                  else self.win.property("minimumWidth"))
-                settings["initialisation.h"] = (self.win.height() if (self.win.y() + self.win.height() <= sg[3] + 1)
-                                                  else self.win.property("minimumHeight"))
-
-                log.info("emplacement de la fenêtre d'initialisation récupéré avec succès : " +
-                         str([settings[f"initialisation.{p}"] for p in ["screen_index", "x", "y", "w", "h"]]))
-            else:
-                log.warning(f"Impossible de localiser la fenêtre d'initialisation.")
+            sc.get_window_position(self.win, "initialisation.", settings)
 
             # Récupère la traduction anglaise car les paramètres textuels sont stockés en anglais
             translations = td.TranslationDictionary()
