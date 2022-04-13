@@ -39,11 +39,13 @@ def main():
             log.add_empty_lines()
             log.info(f"l'application d'initialisation a été fermée sans donner suite.",
                      prefix="Application d'initialisation")
+            log.stop()
             exit(0)
     except Exception as error:
         # Récupère une potentielle erreur ratée, la laisse dans le registre et arrête l'application
         log.critical(f"Erreur fatale lors du chargement de l'application d'initialisation simulateur.",
                      exception=error, prefix="Application d'initialisation")
+        log.stop()
         exit(-1)
 
     # Change le niveau de log à celui précisé par l'utilisateur et enlève tout préfixe
@@ -78,6 +80,7 @@ def main():
                 log.critical(f"Erreur fatale lors de la fermeture du simulateur.",
                              exception=error, prefix="Fermeture simulation")
                 crash = True
+            log.stop()
             exit(0 if not crash else -1)
 
 
