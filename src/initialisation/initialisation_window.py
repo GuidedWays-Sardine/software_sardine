@@ -17,7 +17,7 @@ import src.misc.log.log as log
 import src.misc.immersion.immersion as immersion
 import src.misc.settings_dictionary.settings as sd
 import src.misc.translation_dictionary.translation as td
-import src.misc.screens_position.screens as sc
+import src.misc.visual_position.screens as vp
 from src.initialisation.signals import right_buttons as rb
 from src.initialisation.signals import bottom_buttons as bb
 
@@ -72,7 +72,7 @@ class InitialisationWindow:
         immersion.change_mode(immersion.Mode.DEACTIVATED)
 
         # Calls the function to get the screens once to log the amount of screens
-        sc.get_screens_informations()
+        vp.get_screens_informations()
 
         # Cherche pour le fichier QML avec tous les éléments de la fenêtre d'initialisation
         self.engine = QQmlApplicationEngine()
@@ -105,7 +105,7 @@ class InitialisationWindow:
             self.set_settings(default_settings)
 
             # Essaye de changer la position de la fenêtre
-            sc.set_window_position(self.win, "initialisation.", default_settings, (640, 480))
+            vp.set_window_position(self.win, "initialisation.", default_settings, (640, 480))
 
         # Indique le temps de chargement de l'application
         log.info(f"Application d'initialisation chargée en " +
@@ -147,7 +147,7 @@ class InitialisationWindow:
             log.info(f"Récupération des paramètres de l'application.")
 
             # Récupère l'écran sur lequel se situe la fenêtre d'initialisation.
-            sc.get_window_position(self.win, "initialisation.", settings)
+            vp.get_window_position(self.win, "initialisation.", settings)
 
             # Récupère la traduction anglaise car les paramètres textuels sont stockés en anglais
             translations = td.TranslationDictionary()
