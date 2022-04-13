@@ -74,7 +74,10 @@ def set_window_position(window, key, settings, minimum_size=(0, 0)):
     key += "." if not key.endswith(".") else ""
 
     # Calcule la hauteur de la titlebar
-    title_bar_height = window.geometry().y() - window.pos().y()
+    if isinstance(window, QMainWindow):
+        titlebar_height = window.geometry().y() - window.pos().y()
+    else:
+        titlebar_height = window.geometry().y() - window.framePosition().y()
 
     # Vérifie que chacun des paramètres nécessaires sont présents dans le dictionaire de paramètres
     if all(((f"{key}{p}" in settings) for p in ("screen_index", "x", "y", "w", "h"))):
@@ -102,7 +105,7 @@ def set_window_position(window, key, settings, minimum_size=(0, 0)):
                            min(max_window_size[1], settings[f"{key}h"])]
 
             # S'assure que la nouvelle taille de la fenêtre est suffisante (si la fenêtre a une taille minimale=
-            if window_size[0] >= minimum_size[0] and (window_size[1] - title_bar_height) >= minimum_size[1]:
+            if window_size[0] >= minimum_size[0] and (window_size[1] - titlebar_height) >= minimum_size[1]:
                 # Repositione et redimensionne la fenêtre (fonctions différentes pour QMainWindow et QObject)
                 if isinstance(window, QMainWindow):
                     window.move(screens[screen_index - 1][0][0] + settings[f"{key}x"],
@@ -110,7 +113,8 @@ def set_window_position(window, key, settings, minimum_size=(0, 0)):
                 else:
                     window.setPosition(screens[screen_index - 1][0][0] + settings[f"{key}x"],
                                        screens[screen_index - 1][0][1] + settings[f"{key}y"])
-                window.resize(window_size[0], window_size[1] - title_bar_height)
+                window.resize(window_size[0], window_size[1] - titlebar_height)
+                log.debug(f"fenêtre \"{key[:-1]}\" placée avec succès.")
             else:
                 # indique dans le cas où les positions sur l'écran rendent impossible le positionnement de la fenêtre
                 log.debug(f"La fenêtre \"{key[:-1]}\" ne rentre pas à l'écran." +
@@ -152,12 +156,15 @@ def get_window_position(window, key, settings):
     key += "." if not key.endswith(".") else ""
 
     # Calcule la hauteur de la titlebar
-    title_bar_height = window.geometry().y() - window.pos().y()
+    if isinstance(window, QMainWindow):
+        titlebar_height = window.geometry().y() - window.pos().y()
+    else:
+        titlebar_height = window.geometry().y() - window.framePosition().y()
 
     # Récupère l'écran sur lequel se situe la fenêtre envoyée.
     screen_index = [i for i in range(len(screens))
                     if (screens[i][0][0] - 1) <= window.x() <= (screens[i][0][0] + screens[i][1][0])
-                    and (screens[i][0][1] - 1 - title_bar_height) <= window.y() <= (screens[i][0][1] + screens[i][1][1] - title_bar_height)]
+                    and (screens[i][0][1] - 1 - titlebar_height) <= window.y() <= (screens[i][0][1] + screens[i][1][1] - titlebar_height)]
 
     # Si la fenêtre a été détectée sur un écran, récupère et stocke ses coordonées
     # Pour la position, le max(..., 0) s'assure que le coin supérieur ne sorte pas du haut/de la droite de l'écran
@@ -169,7 +176,7 @@ def get_window_position(window, key, settings):
         settings[f"{key}x"] = max(window.x() - sg[0][0], 0)
         settings[f"{key}y"] = max((window.y() - sg[0][1]), 0)
         settings[f"{key}w"] = min(window.width(), sg[1][0])
-        settings[f"{key}h"] = min(window.height() + title_bar_height, sg[1][1])
+        settings[f"{key}h"] = min(window.height() + titlebar_height, sg[1][1])
 
         # Donne des indications sur la position et la taille de l'écran récupéré
         log.debug(f"Emplacement de la fenêtre \"{key[:-1]}\" récupéré avec succès :\n\t" +
@@ -205,7 +212,7 @@ def worker(win):
                                            "test.w": 300,
                                            "test.h": 210})
         time.sleep(0.5)
-    print(settings)
+    log.info(str(settings))
 
 
 if __name__ == "__main__":
