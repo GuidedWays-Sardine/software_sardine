@@ -69,7 +69,7 @@ class InitialisationWindow:
         log.info(f"Début du chargement de l'application d'intialisation.")
 
         # Commence par initialiser le mode immersion en mode EMPTY
-        immersion.change_mode(immersion.Mode.EMPTY)
+        immersion.change_mode(immersion.Mode.DEACTIVATED)
 
         # Charge tous les écrans connectés à l'ordinateur (utile pour la positionnement de certaines popup)
         for screen_index in range(0, QDesktopWidget().screenCount()):
@@ -155,7 +155,8 @@ class InitialisationWindow:
 
         # Montre la fenêtre principale,  et Lance l'application
         self.win.show()
-        self.win.closed.connect(lambda: QApplication.engine.quit())
+        self.win.closed.connect(lambda: QApplication.instance().quit())
+        immersion.change_mode(immersion.Mode.EMPTY)
         QApplication.instance().exec()
 
         # Quand l'application est fermée, cache la fenêtre de l'application d'initialisation et ses fenêtres annexes
