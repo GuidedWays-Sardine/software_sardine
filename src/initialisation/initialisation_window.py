@@ -25,7 +25,6 @@ class InitialisationWindow:
     """Classe contenant tous les éléments pour la fenêtre d'initialisation simulateur"""
 
     # Eléments utiles à la fenêtre et les QWidgets contenus sur celle-ci
-    app = None
     engine = None
     win = None
     bottom_buttons = None
@@ -50,7 +49,7 @@ class InitialisationWindow:
     # Variable stockant si le simulateur va être lancé
     launch_simulator = False
 
-    def __init__(self, app):
+    def __init__(self):
         """initialise toutes les fenêtre du programme d'initialisation du simulateur sardine
 
         Parameters
@@ -77,12 +76,7 @@ class InitialisationWindow:
             # Charge les informations de l'écran (au format [x_min, y_min, x_max, y_max]
             sg = QDesktopWidget().screenGeometry(screen_index).getCoords()
 
-            # Les stockes au bon format [[x, y], [w, h]]
-            self.screens_dimensions.append([[sg[0], sg[1]], [sg[2] - sg[0] + 1, sg[3] - sg[1] + 1]])
-        log.info(f"Détection de {len(self.screens_dimensions)} écrans connectés à l'ordinateur.")
-
-        # Lance l'application et cherche pour le fichier QML avec tous les éléments de la fenêtre d'initialisation
-        self.app = app
+        # Cherche pour le fichier QML avec tous les éléments de la fenêtre d'initialisation
         self.engine = QQmlApplicationEngine()
         self.engine.load(self.initialisation_window_file_path)
 
@@ -161,8 +155,8 @@ class InitialisationWindow:
 
         # Montre la fenêtre principale,  et Lance l'application
         self.win.show()
-        self.win.closed.connect(lambda: self.app.quit())
-        self.app.exec()
+        self.win.closed.connect(lambda: QApplication.engine.quit())
+        QApplication.instance().exec()
 
         # Quand l'application est fermée, cache la fenêtre de l'application d'initialisation et ses fenêtres annexes
         self.win.hide()
@@ -220,8 +214,8 @@ class InitialisationWindow:
                     log.warning(f"Erreur lors de la récupération des paramètres pour la page_rb{page_index}.",
                                 exception=error)
 
-            log.info(f"Chargement de {len(settings)} paramètres en" +
-                     f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n")
+            log.info(f"Récupération de {len(settings)} paramètres dans l'application d'initialisation en" +
+                     f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.")
         elif os.path.isfile(self.default_settings_file_path):
             # Sinon récupère les paramètres du fichier par défaut s'il existe
             settings.open(self.default_settings_file_path)
@@ -312,10 +306,12 @@ def main():
 
     # Lance l'application d'initialisation
     app = QApplication(sys.argv)
-    application = InitialisationWindow(app)
+    application = InitialisationWindow()
 
     if application.launch_simulator:
         log.info(str(application.get_settings()), prefix="Données Collectées")
+
+    log.stop()
 
 
 if __name__ == "__main__":

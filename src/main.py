@@ -29,7 +29,7 @@ def main():
     parameters = {}
     try:
         # Initialise et lance l'application d'initialisation.
-        initialisation = ini.InitialisationWindow(application)
+        initialisation = ini.InitialisationWindow()
 
         # Si le bouton lancer a été cliqué, récupère les informations, sinon sort
         if initialisation.launch_simulator:
@@ -57,7 +57,7 @@ def main():
     # Application de simulation : gère les différents modules de simulation
     try:
         # Initialise la simulation
-        simulation = sim.Simulation(application, parameters)
+        simulation = sim.Simulation(parameters)
     except Exception as error:
         # Récupère une potentielle erreur lors de l'initialisation, la laisse dans le registre et arrête l'application
         log.critical(f"Erreur fatale lors de l'initialisation du simulateur.\n",

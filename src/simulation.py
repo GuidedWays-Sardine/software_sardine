@@ -25,8 +25,7 @@ class Simulation:
     # Constante permettant de gérer le temps alloué à chaque tick (temps entre chaque mise à jour de tous les modules)
     DELAY = 0.250   # en s
 
-    # Elements utiles à toutes les GUIs (fenêtres graphiques or ligne)
-    app = None
+    # Elements utiles à toutes les GUIs (fenêtres graphiques hors ligne)
     components = {}
     parameters = {}
     running = True
@@ -42,14 +41,12 @@ class Simulation:
     # Elément stockant la liste des fenêtre permettant d'éteindre les écrans en mode immersion
     black_screens = []
 
-    def __init__(self, app, data):
+    def __init__(self, data):
         """Fonction de gestion de la simulation. S'occupe de l'initialisation, du lancemenet et de la mise à jour des
         différents modules de simulation.
 
         Parameters
         ----------
-        app: `QApplication`
-            L'application sur laquelle les modules graphiques de la simulation vont se lancer
         data: `sd.SettingsDictionary`
 
         Raises
@@ -63,7 +60,6 @@ class Simulation:
         initial_time = time.perf_counter()
         log.change_log_prefix("initialisation simulation")
         log.info("Début de l'initialisation de la simulation.\n\n")
-        self.app = app
         self.parameters = data
 
         # Change le mode d'immersion en mode chargement s'il est activé, sinon le désactive
@@ -130,7 +126,7 @@ class Simulation:
         # Lance le thread pour mettre à jour constament la simulation et lance la partié graphique
         update = threading.Thread(target=self.update)
         update.start()
-        self.app.exec()
+        QApplication.instance().exec()
 
         # Dans le cas où une fenêtre graphique est fermée par l'utilisateur, arrête la mise à jour de la simulation
         # et attend que celle-ci finisse de se réaliser, avant de sortir de la fonction run().
@@ -171,7 +167,7 @@ class Simulation:
 
         except Exception as error:
             # Dans le cas où un des modules de mise à jour a jeté une erreur, ferme l'application et rejette l'erreur
-            self.app.quit()
+            QApplication.instance().quit()
             raise
 
     def stop(self):
@@ -214,7 +210,7 @@ class Simulation:
             if self.parameters["sardine simulator.central dmi.mandatory"]:
                 raise ModuleNotFoundError("Le paramètre \"dmi\" n'existe pas alors qu'il est obligatoire.\n")
             else:
-                log.error("Impossible de charger le DMI, la paramètre \"dmi\" est introuvable. Aucun D%I ne sera chargé.\n")
+                log.error("Impossible de charger le DMI, la paramètre \"dmi\" est introuvable. Aucun DMI ne sera chargé.\n")
         except Exception as error:
             # Dans le cas où l'initialisation contient une erreur, crash si le dmi est obligatoire sinon laisse un message d'erreur
             if self.parameters["sardine simulator.central dmi.mandatory"]:
