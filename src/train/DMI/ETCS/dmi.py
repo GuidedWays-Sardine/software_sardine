@@ -5,7 +5,7 @@ import time
 
 
 # librairies graphiques
-from PyQt5.QtWidgets import QDesktopWidget
+from PyQt5.QtWidgets import QDesktopWidget, QApplication
 from PyQt5.QtCore import QObject
 from PyQt5.QtQml import QQmlApplicationEngine
 
@@ -53,7 +53,7 @@ class DriverMachineInterface:
         # Si le fichier qml a été compris, récupère la fenêtre et la cache le temps de charger le reste du module
         self.dmi_window = self.engine.rootObjects()[0]
         self.dmi_window.hide()
-        self.dmi_window.visibilityChanged.connect(lambda: simulation.app.quit())
+        self.dmi_window.visibilityChanged.connect(lambda: QApplication.instance().quit())
 
         # Récupère la liste des dmis disponibles dans la norme ETCS (dossier ETCS + liste de ceux dans le dossier STM)
         dmi_list = [f"{PROJECT_DIR}src\\train\\DMI\\ETCS\\STM\\{dmi}" for dmi in os.listdir(f"{PROJECT_DIR}src\\train\\DMI\\ETCS\\STM")]
@@ -258,7 +258,7 @@ def main():
 
     # Lance le DMI
     simulation.dmi.run()
-    simulation.app.exec()
+    QApplication.instance().exec()
 
 
 if __name__ == "__main__":
