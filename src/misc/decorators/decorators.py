@@ -121,7 +121,10 @@ class UIupdate:
                                    f"pour {self.__MAX_PARAMETERS} maximums. Changer la valeur de __MAX_PARAMETERS")
 
             # Sinon connecte la fonction au bon pyqtSignal (index = nombre d'arguments permis)
-            exec(f"self.__signal{len(self.__args_list)}.connect(self._UIThread__function)")
+            # tag : QtCore.Qt.BlockingQueuedConnection ; pour attendre la fin du signal pour continuer
+            # ATTENTION!!! Génère un Deadlock si appelé dans le thread principal
+            exec(f"self.__signal{len(self.__args_list)}.connect(self._UIThread__function, "
+                 f"                                             type=QtCore.Qt.BlockingQueuedConnection)")
 
             # Pré-compile les exec d'émissions de signal pour une optimisation du temps d'appel du signal
             self.__signal = compile(f"self.__signal{len(self.__args_list)}.emit(*self._UIThread__args)",
@@ -173,6 +176,12 @@ class UIupdate:
             # réinitialise les arguments pour éviter de rappeler la fonction avec les mêmes arguments
             self.__args = ()
 
+        def get_func(self):
+            return self.__function
+
+        def get_args(self):
+            return self.__args
+
     # Stocke une instance de la classe précédente
     __ui_thread = None
 
@@ -191,8 +200,11 @@ class UIupdate:
         """fonction appelée lors de l'appel de la fonction ciblée par le décorateur"""
         # Démarre le QThread (appelant sa fonction run() et donc la fonction envoyée) et attend que l'appel se finisse
         self.__ui_thread.set_arguments(*args, **kwargs)
-        self.__ui_thread.start()
-        self.__ui_thread.wait()
+        if threading.current_thread().__class__.__name__ == '_MainThread':
+            self.__ui_thread.get_func()(*self.__ui_thread.get_args())
+        else:
+            self.__ui_thread.start()
+            self.__ui_thread.wait()
 
     def __get__(self, obj, objtype):
         """Support instance methods."""
