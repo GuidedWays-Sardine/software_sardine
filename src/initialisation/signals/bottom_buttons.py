@@ -6,7 +6,7 @@ import time
 
 # Librairies graphiques
 from PyQt5.QtCore import QObject
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QFileDialog, QApplication
 
 
 # Librairies SARDINE
@@ -65,7 +65,7 @@ class BottomButtons:
             application.pages_list[application.active_page_index - 1].on_page_closed(application)
         log.info(f"Fermeture de la page de paramètres page_rb{application.active_page_index}.\n")
         log.change_log_prefix("")
-        application.app.quit()
+        QApplication.instance().quit()
 
     @decorators.QtSignal(log_level=log.Level.CRITICAL, end_process=True)
     def on_launch_clicked(self, application):
@@ -94,7 +94,7 @@ class BottomButtons:
 
             log.change_log_prefix("Récupération des données")
             application.launch_simulator = True
-            application.app.quit()
+            QApplication.instance().quit()
         else:
             # Sinon récupère les pages non complètes, laisse un message de registre et se met sur la page non complétée
             non_completed_pages = tuple(index + 1 for index, completed in enumerate(page_complete) if not completed)
