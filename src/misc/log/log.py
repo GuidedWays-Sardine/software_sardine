@@ -81,6 +81,15 @@ def initialise(path=f"{PROJECT_DIR}log\\", version=VERSION, log_level=Level.DEBU
                             format="%(asctime)s - %(levelname)s - %(message)s")
 
 
+def stop():
+    """Fonction permettant d'arrêter l'enregistrement des messages de registre"""
+    # Ferme la connexion entre QML et Python pour éviter l'erreur de segmentation
+    QtCore.qInstallMessageHandler(None)
+
+    # Passe le niveau de registre à NotSet
+    change_log_level(Level.NOTSET)
+
+
 def change_log_level(log_level):
     """Permet de changer le niveau de registre
 
