@@ -53,13 +53,13 @@ Item {
         objectName: "train_name_stringinput"
 
         default_x: 54
-        default_y: 38
+        default_y: 40
         default_width: save_button.default_x - default_x
-        default_height: 26
+        default_height: page_rb2.input_height
 
         max_text_length: 48
         placeholder_text: "Nom du train (utilisé pour le nom du fichier)"
-        title: "Configuration du train"
+        title: "Nom du train"
 
         is_activable: true
         is_positive: true
