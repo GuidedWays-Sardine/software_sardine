@@ -211,8 +211,11 @@ class PageRB1:
             widget = self.page.findChild(QObject, widget_id)
             widget.setProperty("title", translations[widget.property("title")])
 
-        # Traduit les clés du log_converter (Les valeurs sur le composant sont traduites juste en dessous)
+        # Traduit le texte du bouton d'ouverture du popup de pupitre
+        widget = self.page.findChild(QObject, "command_board_popup_button")
+        widget.setProperty("text", translations[widget.property("text")])
 
+        # Traduit les clés du log_converter (Les valeurs sur le composant sont traduites juste en dessous)
         keys = list(self.log_converter)
         self.log_converter = {translations[keys[0]]: self.log_converter[keys[0]],
                               translations[keys[1]]: self.log_converter[keys[1]],

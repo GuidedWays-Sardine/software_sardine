@@ -174,6 +174,22 @@ Item {
         is_positive: false
     }
 
+    //Button pour ouvrir la popup d'initialisation
+    INI_button {
+        id: command_board_popup_button
+        objectName: "command_board_popup_button"
+
+        default_x: 55 - 1 + 280 + 20
+        default_y: 39
+        default_width: 160
+        default_height: 50
+
+        text: "Paramétrage pupitre"
+
+        is_positive: false
+        is_activable: false
+    }
+
     //Combobox du pupitre utilisé
     INI_combobox{
         id: command_board_combo

@@ -22,6 +22,7 @@ Connecté à Renard ?;Connected to Renard ?
 Connecté par une caméra ?; Connected to a camera ?
 
 Interface pupitre;Command board interface
+Paramétrage pupitre;Command board settings
 ETCS;ETCS
 
 Niveau de registre;Log level
@@ -42,7 +43,7 @@ Sauvegarder les données ?; Save data ?
 #page_rb2
 Train;Train
 
-Configuration du train;Train configuration
+Nom du train;Name of the train
 Nom du train (utilisé pour le nom du fichier);Train name (used for the file name)
 
 Informations générales;General informations
