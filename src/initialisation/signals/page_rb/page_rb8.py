@@ -80,7 +80,7 @@ class PageRB8:
             self.screen_index_windows[screen_index].hide()
 
         # Envoie la dimension des fenêtre à la partie graphique de la page
-        self.page.setProperty("screens_size", [sd[1] for sd in vp.get_screens_informations()])
+        self.page.setProperty("screens_size", [list(sd[1]) for sd in vp.get_screens_informations()])
 
         # Pour chacun des fichiers dans le répertoire de paramètres d'écrans
         for file_path in (f for f in os.listdir(self.windows_settings_folder_path) if f.endswith(".screens")):
