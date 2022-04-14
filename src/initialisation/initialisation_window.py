@@ -102,7 +102,7 @@ class InitialisationWindow:
             log.info(f"Chargement des paramètres par défauts du fichier default.settings")
             default_settings = sd.SettingsDictionary()
             default_settings.open(self.default_settings_file_path)
-            self.set_settings(default_settings)
+            self.set_settings(default_settings, True)
 
             # Essaye de changer la position de la fenêtre
             vp.set_window_position(self.win, "initialisation.", default_settings, (640, 480))
@@ -173,13 +173,15 @@ class InitialisationWindow:
 
         return settings
 
-    def set_settings(self, settings):
+    def set_settings(self, settings, resize_popup=False):
         """A partir d'un dictionnaire de valeur, essaye de changer les settings des différentes pages
 
         Parameters
         ----------
         settings: `sd.SettingsDictionary`
             Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
+        resize_popup: `bool`
+            Les popups doivent-elles être redimensionnées ?
         """
         log.info(f"Changement de paramètres sur l'application d'initialisation.")
 
@@ -201,7 +203,7 @@ class InitialisationWindow:
         for page in (p for p in self.pages_list if "set_settings" in dir(p)):
             try:
                 # Appelle la fonction get_settings de la page et récupère une potentielle erreur sur la fonction
-                page.set_settings(settings, translations)
+                page.set_settings(settings, translations, resize_popup)
                 count += 1
             except Exception as error:
                 # Permet de rattraper une potentielle erreur dans la fonction get_settings()
@@ -260,6 +262,8 @@ def main():
         log.info(str(application.get_settings()), prefix="Données Collectées")
 
     log.stop()
+    application.get_settings()
+    application.set_settings(settings, resize_popup=False)
 
 
 if __name__ == "__main__":
