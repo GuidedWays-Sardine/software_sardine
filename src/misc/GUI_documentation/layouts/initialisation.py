@@ -24,7 +24,7 @@ def general_layout():
 
 
 def page_rb_focus_layout():
-    general_layout_image = ImageDrawer("initialisation/general_layout.png", scale_factor=4)
+    general_layout_image = ImageDrawer("initialisation/page_rb_focus_layout.png", scale_factor=4)
     general_layout_image.draw([BoxDrawer((0, 0), (640, 480), ""),                       # contour de l'application
                                BoxDrawer((0, 0), (640, 15), "(640x15)", True),          # bande vide supérieure
                                BoxDrawer((0, 465), (640, 15), "(640x15)", True),        # bande vide inférieure
