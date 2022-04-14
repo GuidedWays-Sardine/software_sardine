@@ -9,6 +9,7 @@ def main():
     """
 
     if True:
+        ini.page_rb2_structure()
         ini.general_layout()
         ini.page_rb_focus_layout()
         ini.detailed_layout()

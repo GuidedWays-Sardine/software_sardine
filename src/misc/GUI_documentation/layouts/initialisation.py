@@ -40,7 +40,7 @@ def detailed_layout():
                                 BoxDrawer((0, 0), (640, 15), "(640x15)"),               # bande vide supérieure
                                 BoxDrawer((0, 465), (640, 15), "(640x15)"),             # bande vide inférieure
                                 BoxDrawer((0, 415), (640, 50), "")] +                   # zone bb
-                                [BoxDrawer((120*(i-1) + (160 if i > 1 else 0), 415), (120, 50), f"bb{i}\n(120x50)") for i in range(4)] +                               # boutons zone bb
+                                [BoxDrawer((120 * i + (160 if i > 0 else 0), 415), (120, 50), f"bb{i}\n(120x50)") for i in range(4)] +                               # boutons zone bb
                                 [BoxDrawer((580, 15), (60, 400), "")] +                 # zone rb
                                 [BoxDrawer((580, 15+50*(i-1)), (60, 50), f"rb{i}\n(60x50)") for i in range(1, 9)] +
                                 [BoxDrawer((0, 15), (580, 400), "page_rb\n(580x400)")]) # zone page_rb
@@ -64,20 +64,41 @@ def page_rb1():
     layout_image = page_rb_initialise("page_rb1_layout.png")
 
     # Rajoute chacun des composants à l'image
-    layout_image.draw([INI.Combobox((50, 39), (280, 50), "Pupitre", 12, "rb1_A\n(280x50)"),
-                       INI.Checkbutton((50, 104), 20, "Connecté à Renard ?", 12, "rb1_B (280x20)"),
-                       INI.Checkbutton((335, 104), 20, "Connecté par une caméra ?", 12, "rb1_C (150x20)"),
-                       INI.Combobox((50, 169), (280, 60), "Interface pupitre", 12, "rb1_D\n(280x50)"),
-                       INI.Switchbutton((50, 260), (111, 50), "Niveau de registre", 12, "rb1_E\n(111x50)"),
-                       INI.Combobox((225, 260), (111, 50), "Langue", 12, "rb1_F\n(111x50)"),
-                       INI.Checkbutton((50, 329), 20, "Activation du PCC (Poste de Commande Centralisé) ?", 12, "rb1_G (320x20)"),
-                       INI.Checkbutton((50, 369), 20, "Affichage en direct des données ?", 12, "rb1_H (280*20)"),
-                       INI.Checkbutton((335, 354), 20, "Tableau de bord ?", 12, "rb1_I (280*20)"),
-                       INI.Checkbutton((335, 384), 20, "Sauvegarder les données ?", 12, "rb1_J (150*20)")])
+    layout_image.draw([INI.Combobox((55, 39), (280, 50), "Pupitre", 12, "rb1_A\n(280x50)"),
+                       INI.Button((355, 39), (160, 50), "rb1_B\n(160x50)"),
+                       INI.Checkbutton((55, 104), 20, "Connecté à Renard ?", 12, "rb1_C (280x20)"),
+                       INI.Checkbutton((335, 104), 20, "Connecté par une caméra ?", 12, "rb1_D (150x20)"),
+                       INI.Combobox((55, 169), (280, 60), "Interface pupitre", 12, "rb1_E\n(280x50)"),
+                       INI.Switchbutton((55, 260), (111, 50), "Niveau de registre", 12, "rb1_F\n(111x50)"),
+                       INI.Combobox((225, 260), (111, 50), "Langue", 12, "rb1_G\n(111x50)"),
+                       INI.Checkbutton((55, 329), 20, "Activation du PCC (Poste de Commande Centralisé) ?", 12, "rb1_H (320x20)"),
+                       INI.Checkbutton((55, 369), 20, "Affichage en direct des données ?", 12, "rb1_I (280*20)"),
+                       INI.Checkbutton((335, 354), 20, "Tableau de bord ?", 12, "rb1_J (280*20)"),
+                       INI.Checkbutton((335, 384), 20, "Sauvegarder les données ?", 12, "rb1_K (150*20)")])
 
     # Enregistre l'image
     layout_image.save()
 
+def page_rb2_structure():
+    # Définit les variables nécessaires
+    input_height = 24
+    gen_width = 480
+
+    # Initialise les éléments de base de l'image
+    layout_image = page_rb_initialise("page_rb2_structure.png")
+
+    # Rajoute chacun des composants à l'image
+    layout_image.draw([BoxDrawer((54, 40 + input_height), (gen_width - 54, 50 * 3), "rb2_values_A\n(426x150)", True),
+                       BoxDrawer((54, 40 + input_height + 3 * 50), (gen_width - 54, 50 * 1 + 12), "rb2_values_B\n(426x62)", True),
+                       BoxDrawer((54, 40 + input_height + 4 * 50 + 12), (gen_width - 54, 50 * 1 - 12), "rb2_values_C\n(426x38)", True),
+                       BoxDrawer((54, 40 + input_height + 5 * 50), (gen_width - 54, 50 * 2), "rb2_values_D\n(426*100)", True),
+                       INI.Stringinput((54, 40), (gen_width - 54, input_height), "Configuration du train", 12, "rb2_A (426x24)"),
+                       INI.Switchbutton((gen_width, 40), (100, input_height), "", 12, "rb2_B (100x24)"),
+                       INI.Combobox((gen_width, 14 + 1 * 50), (100, 50), "", 12, "rb2_C\n(100x50)"),
+                       INI.Button((gen_width, 14 + 3 * 50), (100, 50), "rb2_D\n(100x50)"),
+                       INI.Button((gen_width, 14 + 4 * 50), (100, 50), "rb2_E\n(100x50)"),
+                       INI.Button((gen_width, 14 + 6 * 50), (100, 50), "rb2_F\n(100x50)")])
+    layout_image.save()
 
 def page_rb8():
     # Initialise les éléments de base de l'image
