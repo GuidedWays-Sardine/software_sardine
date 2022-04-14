@@ -221,7 +221,7 @@ class PageRB8:
 
         return page_settings
 
-    def set_settings(self, settings, translations):
+    def set_settings(self, settings, translations, resize_popup=False):
         """Change les paramètres de la page de paramètres page_rb8
 
         Parameters
@@ -230,6 +230,8 @@ class PageRB8:
             Dictionnaire contenant les nouveaux paramètres à utiliser.
         translations: `td.TranslationDictionary`
             Traductions (clés = anglais -> valeurs = langue actuelle)
+        resize_popup: `bool`
+            Les popups doivent-elles être redimensionnées ?
         """
         # Change la valeur pour les écrans noirs
         settings.update_ui_parameter(self.page.findChild(QObject, "immersion_check"), "is_checked", "immersion")

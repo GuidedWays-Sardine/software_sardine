@@ -189,7 +189,7 @@ class PageRB2:
                      f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n",
                      prefix="Sauvegarde des données train")
 
-    def set_settings(self, settings, translations):
+    def set_settings(self, settings, translations, resize_popup=False):
         """Change les paramètres de la page de paramètres page_rb2
 
         Parameters
@@ -198,6 +198,8 @@ class PageRB2:
             Dictionnaire contenant les nouveaux paramètres à utiliser.
         translations: `td.TranslationDictionary`
             Traductions (clés = anglais -> valeurs = langue actuelle)
+        resize_popup: `bool`
+            Les popups doivent-elles être redimensionnées ?
         """
         # Récupère le nom du fichier train (et regard si le paramètre existe)
         file_name = settings.get_value("train_name")

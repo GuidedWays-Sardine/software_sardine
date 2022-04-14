@@ -151,7 +151,7 @@ class PageRB1:
 
         return page_settings
 
-    def set_settings(self, settings, translations):
+    def set_settings(self, settings, translations, resize_popup=False):
         """Change les paramètres de la page de paramètres page_rb1
 
         Parameters
@@ -160,6 +160,8 @@ class PageRB1:
             Dictionnaire contenant les nouveaux paramètres à utiliser.
         translations: `td.TranslationDictionary`
             Traductions (clés = anglais -> valeurs = langue actuelle)
+        resize_popup: `bool`
+            Les popups doivent-elles être redimensionnées ?
         """
         # Paramètre du pupitre (quel pupitre sera utilisé)
         if settings.get_value("command_board") is not None:
