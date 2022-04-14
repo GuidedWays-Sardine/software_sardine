@@ -162,6 +162,24 @@ class SettingsDictionary(dict):
         current_length = len(self)
 
         try:
+            # Because windows suck, Excel files (csv and txt files) are saved using ANSI encoding and not UTF-8
+            # If the file isn't encoded in utf-8 (if not saved from Excel) converts it to utf-_
+            try:
+                with open(file_path, "r", encoding="utf-8-sig") as file:
+                    file.readline()
+            except (UnicodeDecodeError, UnicodeError):
+                log.debug("Les fichiers enregistrés sous Excel ne sont pas en UTF-8 (ANSI - Windows-1252). " +
+                          "Merci d'éviter la modification et la sauvegarde de fichiers paramètres sous Excel.")
+
+                # Ouvre le fichier avec l'encoding ANSI (utilisé par Excel)
+                with open(file_path, "r", encoding="ANSI") as file:
+                    contents = file.readlines()
+
+                #L'enregistre dans le même fichier avec l'encoding utf-8-sig en décodant les lignes
+                with open(file_path, "w", encoding="utf-8-sig") as file:
+                    for line in contents:
+                        file.write(line.replace("\t", ";").replace("\"", ""))
+
             # Essaye d'ouvrir le fichier avec les paramètres
             with open(file_path, "r", encoding="utf-8-sig") as file:
                 # Récupère chacune des lignes du fichier
