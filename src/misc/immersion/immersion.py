@@ -3,34 +3,21 @@ import os
 import sys
 import time
 from enum import Enum
+from functools import lru_cache
 
 
 # Librairies graphiques
-from PyQt5.QtCore import Qt, QRect, QUrl
-from PyQt5.QtWidgets import QApplication, QMainWindow, QDesktopWidget, QLabel
-from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
-from PyQt5.QtMultimediaWidgets import QVideoWidget
-from PyQt5.QtGui import QFont, QPixmap
+from PyQt5.QtWidgets import QApplication
+import cv2 as cv
 
 
 # Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
-import src.misc.log.log as log
-import src.misc.decorators.decorators as decorators
+import src.misc.log as log
+import src.misc.window_manager as wm
+from src.misc.immersion.immersion_window import ImmersionWindow, LOADING_PATH, STILL_PATH, UNLOADING_PATH
 
-
-# Constantes pour l'état  de la fenêtre du mode immersion
-VOLUME = 0      # Intensité du volume sur une base 100
-RATIO = 0.8    # Ratio entre la taille de des images/vidéos et de la fenêtre d'immersion
-#                 Préférer garder < 0.75 pour ne pas que ça dépasse pour les fenêtre en 4:3 (DMI)
-
-LOADING_PATH = "loading.wmv"        # Taille identique à image STILL ; image de fin identique à image STILL
-STILL_PATH = "logo.png"
-UNLOADING_PATH = "unloading.wmv"    # Taille identique à image STILL ; image de début identique à image STILL
-
-BACKGROUND_COLOR = "#000000"        # Il est conseillé de mettre du noir pour simuler un écran éteint
-TEXT_COLOR = "#2b2b2b"              # Couleur du texte (version du code principalement), gris foncé de préférence
 
 # Liste des fenêtres pour le mode immersion et des index de fenêtres à sauter
 IMMERSION = []
