@@ -17,10 +17,11 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.initialisation.initialisation_window as ini
 import src.initialisation.signals.page_rb.pagerb2.complex_popup as cp
 import src.train.train_database.database as tdb
-import src.misc.settings_dictionary.settings as sd
-import src.misc.translation_dictionary.translation as td
-import src.misc.log.log as log
-import src.misc.decorators.decorators as decorators
+import src.misc.settings_dictionary as sd
+import src.misc.translation_dictionary as td
+import src.misc.window_manager as wm
+import src.misc.log as log
+import src.misc.decorators as decorators
 
 
 class PageRB2:

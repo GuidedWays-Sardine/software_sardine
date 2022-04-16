@@ -13,11 +13,11 @@ from PyQt5.QtQml import QQmlApplicationEngine
 # Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
-import src.misc.log.log as log
-import src.misc.immersion.immersion as immersion
-import src.misc.settings_dictionary.settings as sd
-import src.misc.translation_dictionary.translation as td
-import src.misc.visual_position.screens as vp
+import src.misc.log as log
+import src.misc.immersion as immersion
+import src.misc.settings_dictionary as sd
+import src.misc.translation_dictionary as td
+import src.misc.window_manager as wm
 from src.initialisation.signals import right_buttons as rb
 from src.initialisation.signals import bottom_buttons as bb
 

@@ -14,8 +14,8 @@ from PyQt5.QtQml import QQmlApplicationEngine
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.window_manager as wm
-import src.misc.log.log as log
-import src.misc.settings_dictionary.settings as sd
+import src.misc.log as log
+import src.misc.settings_dictionary as sd
 
 
 def main():

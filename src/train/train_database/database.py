@@ -8,8 +8,8 @@ from enum import Enum
 # Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
-import src.misc.log.log as log
-import src.misc.settings_dictionary.settings as sd
+import src.misc.log as log
+import src.misc.settings_dictionary as sd
 import src.train.train_database.Dynamic.dynamic as dynamic
 import src.train.train_database.Static.static as static
 import src.train.train_database.Systems.systems as systems

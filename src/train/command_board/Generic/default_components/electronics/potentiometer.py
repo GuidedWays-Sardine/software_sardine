@@ -11,9 +11,9 @@ import pyfirmata
 # Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
-import src.misc.log.log as log
+import src.misc.log as log
 import src.train.command_board.Generic.actions.actions as actions
-import src.misc.decorators.decorators as decorators
+import src.misc.decorators as decorators
 
 
 class Potentiometer:

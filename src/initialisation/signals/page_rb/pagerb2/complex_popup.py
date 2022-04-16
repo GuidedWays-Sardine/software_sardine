@@ -12,10 +12,10 @@ from PyQt5.QtQml import QQmlApplicationEngine
 #Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
-import src.misc.log.log as log
-import src.misc.settings_dictionary.settings as sd
-import src.misc.translation_dictionary.translation as td
-import src.misc.decorators.decorators as decorators
+import src.misc.log as log
+import src.misc.settings_dictionary as sd
+import src.misc.translation_dictionary as td
+import src.misc.decorators as decorators
 import src.train.train_database.database as tdb
 import src.initialisation.signals.page_rb.page_rb2 as prb2
 

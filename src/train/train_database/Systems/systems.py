@@ -6,8 +6,8 @@ import os
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 
-import src.misc.log.log as log
-import src.misc.settings_dictionary.settings as sd
+import src.misc.log as log
+import src.misc.settings_dictionary as sd
 import src.train.train_database.database as tdb
 import src.train.train_database.Systems.frame.frame as frame
 import src.train.train_database.Systems.electric.electric as electric

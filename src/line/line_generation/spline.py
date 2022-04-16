@@ -10,7 +10,7 @@ import numpy as np
 # librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
-import src.misc.log.log as log
+import src.misc.log as log
 import src.line.line_generation.database as DB
 
 

@@ -16,7 +16,7 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log as log
 from src.misc.log.log import VERSION
-import src.misc.decorators.decorators as decorators
+import src.misc.decorators as decorators
 
 
 # Constantes pour l'état  de la fenêtre du mode immersion

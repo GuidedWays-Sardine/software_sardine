@@ -11,10 +11,10 @@ from PyQt5.QtCore import QObject
 # Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
-import src.misc.log.log as log
+import src.misc.log as log
 import src.misc.window_manager.screen as wms
-import src.misc.settings_dictionary.settings as sd
-import src.misc.decorators.decorators as decorators
+import src.misc.settings_dictionary as sd
+import src.misc.decorators as decorators
 
 
 @decorators.UIupdate
