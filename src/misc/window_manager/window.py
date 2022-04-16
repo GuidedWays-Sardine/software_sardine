@@ -35,10 +35,21 @@ def set_window_position(window, settings, key, minimum_size=(124, 48)) -> None:
         Liste des dimensions minimales de la fenêtre. format : (min_w, min_h)
     """
     # récupère la liste de la position et de la taille de chacun des écrans
-    screens = get_screens_informations()
+    screens = wms.screens_list()
 
     # Dans le cas où la clé ne se finit pas par un point, l'ajoute
     key += "." if not key.endswith(".") else ""
+
+    # Pour windows, les dimensions minimales d'une fenêtre sont : 124x48. S'assure que c'est le cas
+    minimum_size = (max(minimum_size[0], 124), max(minimum_size[1], 48))
+
+    # Si la fenêtre est cachée, il est impossible de récupérer ses informations. Montre la temporairement
+    if isinstance(window, QMainWindow):
+        is_visible = window.isVisible()
+    else:
+        is_visible = window.property("visible")
+    if not is_visible:
+        window.show()
 
     # Calcule la hauteur de la titlebar
     if isinstance(window, QMainWindow):
@@ -49,10 +60,11 @@ def set_window_position(window, settings, key, minimum_size=(124, 48)) -> None:
     # Vérifie que chacun des paramètres nécessaires sont présents dans le dictionaire de paramètres
     if all(((f"{key}{p}" in settings) for p in ("screen_index", "x", "y", "w", "h"))):
         try:
-            # Récupère l'index de l'écran, retourne s'il vaut 0 et le met à 1 si trop peu d'écrans sont connectés
+            # Récupère l'index de l'écran, cache la fenêtre s'il vaut 0, le met à 1 si trop peu d'écrans sont connectés.
             screen_index = settings[f"{key}screen_index"]
             if screen_index <= 0:
                 log.debug(f"La fenêtre \"{key[:-1]}\" n'est pas activée (screen_index à 0), dimensionnement annulé.")
+                window.hide()
                 return
 
             if not (1 <= settings[f"{key}screen_index"] <= len(screens)):
@@ -94,6 +106,10 @@ def set_window_position(window, settings, key, minimum_size=(124, 48)) -> None:
         # Sinon laisse un message de debug indiquant que certaines données sont manquantes
         log.debug(f"Paramètres manquants pour la position et la taille de la fenêtre \"{key[:-1]}\".")
 
+    # Si la fenêtre était cachée (motrée temporairement), la recache
+    if not is_visible:
+        window.hide()
+
 
 @decorators.UIupdate
 @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
@@ -117,10 +133,18 @@ def get_window_position(window, settings, key):
     # - La taille d'une fenêtre ne prend pas en compte la titlebar, contrairement à sa position
 
     # récupère la liste de la position et de la taille de chacun des écrans
-    screens = get_screens_informations()
+    screens = wms.screens_list()
 
     # Dans le cas où la clé ne se finit pas par un point, l'ajoute
     key += "." if not key.endswith(".") else ""
+
+    # Si la fenêtre est cachée, il est impossible de récupérer ses informations. Montre la temporairement
+    if isinstance(window, QMainWindow):
+        is_visible = window.isVisible()
+    else:
+        is_visible = window.property("visible")
+    if not is_visible:
+        window.show()
 
     # Calcule la hauteur de la titlebar
     if isinstance(window, QMainWindow):
@@ -154,3 +178,6 @@ def get_window_position(window, settings, key):
         # Indique si la recherche de l'écran  n'a pas été concluant (coin supérieur droit hors de tout écran)
         log.debug(f"Impossible de localiser la fenêtre \"{key[:-1]}\".")
 
+    # Si la fenêtre était cachée (motrée temporairement), la recache
+    if not is_visible:
+        window.hide()
