@@ -59,6 +59,11 @@ class TranslationDictionary(dict):
             la langue dans laquelle il faut récupérer les traductions
         delimiter: `str`
             délimteur séparant les différentes traductions ";" par défaut
+
+        Returns
+        -------
+        successful: `bool`
+            Retourne si la lecture du fichier de traductions a été réussie (sinon erreur détectée)
         """
         try:
             # essaye d'ouvrir le fichier avec les traductions
@@ -72,7 +77,7 @@ class TranslationDictionary(dict):
                 except ValueError:
                     # Si l'une des langues n'existe envoyée n'existe pas
                     log.warning(f"La langue : {current_language} ou {new_language} n'existe pas : \n\t{language_list}")
-                    return
+                    return False
 
                 # Récupère la longueur actuelle
                 current_length = len(self)
@@ -85,7 +90,7 @@ class TranslationDictionary(dict):
                     # récupère toutes les traductions présentes sur la ligne
                     translations = list(map(str.strip, line.rstrip('\n').split(delimiter)))
 
-                    # Si la ligne contient le bon nombre de traduction, récupère les 2 traductions nécessaires et les ajoute
+                    # Si la ligne contient le bon nombre de traduction, récupère les 2 traductions nécessaires
                     if len(translations) == len(language_list):
                         self[translations[current_index]] = translations[new_index]
                     else:
@@ -93,10 +98,12 @@ class TranslationDictionary(dict):
                         log.debug(f"Certaines traductions manquantes ({len(translations)}/{len(language_list)}) " +
                                   f"sur la ligne : \n\t{line}")
         except Exception as error:
-            # Cas où le fichier ouvert n'est pas accessible
+            # Cas où le fichier ouvert n'est pas accessible, indique la raison et retourne false
             log.warning(f"Impossible d'ouvrir le fichier de traduction : {file_path}",
                         exception=error,  prefix="dictionaire de traduction")
+            return False
         else:
-            # Indique en debug le nombre d'éléments récupérées
+            # Indique le nombre d'éléments récupérées dans le registre et retourne vrai
             log.debug(f"{len(self) - current_length} nouvelles traductions récupérées dans le fichier :\n\t {file_path}",
                       prefix="dictionaire de traduction")
+            return True
