@@ -17,38 +17,6 @@ import src.misc.settings_dictionary.settings as sd
 import src.misc.decorators.decorators as decorators
 
 
-@functools.lru_cache(maxsize=1)
-def get_screens_informations():
-    """fonction permettant de récupérer les informations sur tous les écrans détectés (position et taille)
-
-    Returns
-    -------
-    screens_informations: `tuple[tuple[tuple[int, int], tuple[int, int]]`
-        information sur les écrans, indiquant leur position et taille
-        format : (((x, y), (w, h)), ...)
-
-    Raises
-    ------
-    RuntimeError :
-        Jetée si le premier appel de la fonction se fait avant l'initialisation du QApplication (nécessaire).
-    """
-    # Vérifie qu'un QApplication a déjà été généré (vital à la récupération des écrans)
-    if QApplication.instance() is None:
-        raise RuntimeError("Le QApplication doit être initialisé pour permettre la récupération de la liste des écrans")
-
-    window_size = []
-    # Charge tous les écrans connectés à l'ordinateur (utile pour la positionnement de certaines popup)
-    for screen_index in range(0, QDesktopWidget().screenCount()):
-        # Charge les informations de l'écran (au format [x_min, y_min, x_max, y_max]
-        sg = QDesktopWidget().screenGeometry(screen_index).getCoords()
-
-        # Les stockes au bon format ((x, y), (w, h))
-        window_size.append(((sg[0], sg[1]), (sg[2] - sg[0] + 1, sg[3] - sg[1] + 1)))
-
-    log.info(f"Détection de {len(window_size)} écrans connectés à l'ordinateur.")
-    return tuple(window_size)
-
-
 @decorators.UIupdate
 @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
 def set_window_position(window, key, settings, minimum_size=(0, 0)):
