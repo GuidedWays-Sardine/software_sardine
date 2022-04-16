@@ -30,9 +30,9 @@ def main():
     engine.load(f"{PROJECT_DIR}src/misc/visual_position/test.qml")
     win_qml = engine.rootObjects()[0]
 
-    wm.get_window_position(win_qml, "win_qml", settings)
-    wm.get_window_position(win_python, "win_py", settings)
-    print(settings)
+    wm.get_window_position(win_qml, settings, "win_qml")
+    wm.get_window_position(win_python, settings, "win_py")
+    log.info(str(settings))
 
     # Génère deux thread pour positioner et placer les différentes fenêtres et les lancent
     thread = threading.Thread(target=worker, daemon=True, args=(win_python, win_qml))
@@ -54,15 +54,15 @@ def worker(win_python, win_qml):
     log.info("Essais sur la fenêtre python (QMainWindow).")
     for i in range(5):
         # Do some random tests
-        wm.get_window_position(win_python, f"test{i}", settings)
+        wm.get_window_position(win_python, settings, f"test{i}")
         time.sleep(0.5)
         wm.set_window_position(window=win_python,
-                               key=f"test",
                                settings={"test.screen_index": 1,
                                          "test.x": 35 * i,
                                          "test.y": 35 * i,
                                          "test.w": 300,
-                                         "test.h": 210})
+                                         "test.h": 210},
+                               key=f"test")
         time.sleep(0.5)
     log.info(str(settings) + "\n")
 
@@ -70,15 +70,15 @@ def worker(win_python, win_qml):
     log.info("Essais sur la fenêtre qml (QWindow).")
     for i in range(5):
         # Do some random tests
-        wm.get_window_position(win_qml, f"test{i}", settings)
+        wm.get_window_position(win_qml, settings, f"test{i}")
         time.sleep(0.5)
         wm.set_window_position(window=win_qml,
-                               key=f"test",
                                settings={"test.screen_index": 1,
                                          "test.x": 35 * i,
                                          "test.y": 35 * i,
                                          "test.w": 300,
-                                         "test.h": 210})
+                                         "test.h": 210},
+                               key=f"test")
         time.sleep(0.5)
     log.info(str(settings))
 
