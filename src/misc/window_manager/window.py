@@ -78,8 +78,8 @@ def set_window_position(window, settings, key, minimum_size=(124, 48)) -> None:
                     window.move(screens[screen_index - 1][0][0] + settings[f"{key}x"],
                                 screens[screen_index - 1][0][1] + settings[f"{key}y"])
                 else:
-                    window.setPosition(screens[screen_index - 1][0][0] + settings[f"{key}x"],
-                                       screens[screen_index - 1][0][1] + settings[f"{key}y"])
+                    window.setPosition(screens[screen_index - 1][0][0] + settings[f"{key}x"] + 1,
+                                       screens[screen_index - 1][0][1] + settings[f"{key}y"] + titlebar_height)
                 window.resize(window_size[0], window_size[1] - titlebar_height)
                 log.debug(f"fenêtre \"{key[:-1]}\" placée avec succès.")
             else:
@@ -129,9 +129,11 @@ def get_window_position(window, settings, key):
         titlebar_height = window.geometry().y() - window.framePosition().y()
 
     # Récupère l'écran sur lequel se situe la fenêtre envoyée.
+    # Windows décallant légèrement les coordonées de certaines fenêtres et les dimensions minimales étant de 124*48
+    # On rajoutera une marge de 24 pixels en haut et à gauche et on enlèvera la même marge en bas et à droite
     screen_index = [i for i in range(len(screens))
-                    if (screens[i][0][0] - 1) <= window.x() <= (screens[i][0][0] + screens[i][1][0])
-                    and (screens[i][0][1] - 1 - titlebar_height) <= window.y() <= (screens[i][0][1] + screens[i][1][1] - titlebar_height)]
+                    if (screens[i][0][0] - 1 - 24) <= window.x() <= (screens[i][0][0] + screens[i][1][0] - 24)
+                    and (screens[i][0][1] - 1 - 24) <= window.y() <= (screens[i][0][1] + screens[i][1][1] - 24)]
 
     # Si la fenêtre a été détectée sur un écran, récupère et stocke ses coordonées
     # Pour la position, le max(..., 0) s'assure que le coin supérieur ne sorte pas du haut/de la droite de l'écran
@@ -140,8 +142,8 @@ def get_window_position(window, settings, key):
     if screen_index:
         sg = screens[screen_index[0]]
         settings[f"{key}screen_index"] = screen_index[0] + 1
-        settings[f"{key}x"] = max(window.x() - sg[0][0], 0)
-        settings[f"{key}y"] = max((window.y() - sg[0][1]), 0)
+        settings[f"{key}x"] = max(window.x() - sg[0][0] - (not isinstance(window, QMainWindow)), 0)
+        settings[f"{key}y"] = max(window.y() - sg[0][1] - titlebar_height * (not isinstance(window, QMainWindow)), 0)
         settings[f"{key}w"] = min(window.width(), sg[1][0])
         settings[f"{key}h"] = min(window.height() + titlebar_height, sg[1][1])
 
