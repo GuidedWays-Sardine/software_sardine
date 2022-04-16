@@ -13,7 +13,7 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log.log as log
 import src.misc.decorators.decorators as decorators
-import src.misc.translation_dictionary.translation as td
+import src.misc.translation_dictionary as td
 
 
 class SettingsDictionary(dict):
@@ -134,6 +134,11 @@ class SettingsDictionary(dict):
             Chemin d'accès vers le fichier de paramètres (celui-ci sera écrasé)
         delimiter: `str`
             délimiteur séparant les différentes paramètres ";" par défaut
+
+        Returns
+        -------
+        succesfull: `bool`
+            Retourne si la sauvegarde du fichier paramètres a été réussie (sinon erreur détectée)
         """
         try:
             # Essaye de créer (ou d'écraser) le fichier avec les paramètres actuels
@@ -145,8 +150,10 @@ class SettingsDictionary(dict):
             # Cas où le fichier ouvert n'est pas accessible
             log.warning(f"Impossible d'enregistrer le fichier, l'action ne sera pas prise en compte.\n\t{file_path}",
                         exception=error, prefix="Sauvegarde des données")
+            return False
         else:
             log.info(f"Enregistrement de {len(self)} données dans : {file_path}")
+            return True
 
     def open(self, file_path, delimiter=(";", "\t")):
         """Méthode permettant d'ouvrir un fichier de paramètres et de rajouter les paramètres au dictionnaire
@@ -157,13 +164,18 @@ class SettingsDictionary(dict):
             chemin d'accès vers le fichier de paramètres
         delimiter: `str | tuple | list`
             potentiels délimiteurs séparant les différentes paramètres ";" ou "\t" par défaut
+
+        Returns
+        -------
+        succesfull: `bool`
+            Retourne si l'ouverture du fichier paramètres a été réussie (sinon erreur détectée)
         """
         # Récupère la longueur actuelle
         current_length = len(self)
 
         try:
-            # Because windows suck, Excel files (csv and txt files) are saved using ANSI encoding and not UTF-8
-            # If the file isn't encoded in utf-8 (if not saved from Excel) converts it to utf-_
+            # Parceque windows pue du cul, les fichiers Excel (csv et txt) sont sauvegardés en ANSI et non en UTF-8
+            # Si le fichier n'est pas encodé en UTF-8 (et donc surement sauvegardé sous Excel), le convertit en UTF-8
             try:
                 with open(file_path, "r", encoding="utf-8-sig") as file:
                     file.readline()
@@ -175,7 +187,7 @@ class SettingsDictionary(dict):
                 with open(file_path, "r", encoding="ANSI") as file:
                     contents = file.readlines()
 
-                #L'enregistre dans le même fichier avec l'encoding utf-8-sig en décodant les lignes
+                # L'enregistre dans le même fichier avec l'encoding utf-8-sig en décodant les lignes
                 with open(file_path, "w", encoding="utf-8-sig") as file:
                     for line in contents:
                         file.write(line.replace("\t", ";").replace("\"", ""))
@@ -212,10 +224,12 @@ class SettingsDictionary(dict):
             # Cas où le fichier ouvert n'existe pas ou qu'il n'est pas accessible
             log.warning(f"Impossible d'ouvrir le fichier, action non prise en comtpe. \n\t{file_path}",
                         exception=error, prefix="Lecture des données")
+            return False
         else:
             # Indique en debug le nombre d'éléments récupérés
             log.debug(f"{len(self) - current_length} nouveaux paramètres récupérés dans le fichier :\n\t{file_path}",
                       prefix="dictionaire de paramètres")
+            return True
 
     @staticmethod
     def convert_type(data):
