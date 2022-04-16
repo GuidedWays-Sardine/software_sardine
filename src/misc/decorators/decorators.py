@@ -1,3 +1,4 @@
+# ENHANCE : Une fois le décorateur ajouté, ne pas oublié de l'importer dans le fichier __init__.py, sinon inappelable
 # Librairies par défaut
 import os
 import sys
@@ -15,7 +16,7 @@ from PyQt5 import QtCore
 # Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
-import src.misc.log.log as log
+import src.misc.log as log
 
 
 # Appel : @decorators.CommandBoardComponent
