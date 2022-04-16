@@ -19,18 +19,18 @@ import src.misc.decorators.decorators as decorators
 
 @decorators.UIupdate
 @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
-def set_window_position(window, key, settings, minimum_size=(0, 0)):
+def set_window_position(window, settings, key, minimum_size=(124, 48)) -> None:
     """Fonction permettant de redimenssioner une fenêtre en toute sécurité
 
     Parameters
     ----------
     window: `QMainWindow | QObject`
         Fenêtre à redimensionnée, peut provenir d'un QMainWindow (python) ou d'un Window (QML)
-    key: `str`
-        Clé à partir de laquelle, les paramètres écrans seront lus.
-    settings: `sd.SettingsDictionary`
+    settings: `sd.SettingsDictionary | dict[str, Any]`
         Dictionaire de paramètres contenant les informations sur la fenêtre. Les paramètres suivant doivent apparaitre :
         key.screen_index, key.x, key.y, key.w, key.h -> avec key le paramètre key envoyé
+    key: `str`
+        Clé à partir de laquelle, les paramètres écrans seront lus.
     minimum_size: `tuple[int, int] | list[int, int]`
         Liste des dimensions minimales de la fenêtre. format : (min_w, min_h)
     """
@@ -97,18 +97,18 @@ def set_window_position(window, key, settings, minimum_size=(0, 0)):
 
 @decorators.UIupdate
 @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
-def get_window_position(window, key, settings):
+def get_window_position(window, settings, key):
     """Fonction permettant de redimenssioner une fenêtre en toute sécurité
 
     Parameters
     ----------
     window: `QMainWindow | QObject`
         Fenêtre dont les dimensions doivent être récupérés, peut provenir d'un QMainWindow (python) ou d'un Window (QML)
-    key: `str`
-        Clé avec laquelle les dimensions seront enregistrées.
-    settings: `sd.SettingsDictionary`
+    settings: `sd.SettingsDictionary | dict`
         Dictionaire de paramètres où les informations seront stockées. Les paramètres seront sous la forme :
         key.screen_index, key.x, key.y, key.w, key.h -> avec key le paramètre key envoyé
+    key: `str`
+        Clé avec laquelle les dimensions seront enregistrées.
     """
     # Parce que windows pue du cul, voici quelques éléments à prendre en compte :
     # - Quand la fenêtre est maximisée, la "titlebar" dépasse légèrement de la partie supérieur de l'écran
