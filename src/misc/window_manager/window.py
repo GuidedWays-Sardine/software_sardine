@@ -152,35 +152,3 @@ def get_window_position(window, settings, key):
         # Indique si la recherche de l'écran  n'a pas été concluant (coin supérieur droit hors de tout écran)
         log.debug(f"Impossible de localiser la fenêtre \"{key[:-1]}\".")
 
-
-def main():
-    import threading
-    from PyQt5.QtWidgets import QMainWindow
-
-    app = QApplication(sys.argv)
-    win = QMainWindow()
-    thread = threading.Thread(target=worker, daemon=True, args=(win,))
-    thread.start()
-
-    win.show()
-    app.exec()
-
-
-def worker(win):
-    import time
-    settings = sd.SettingsDictionary()
-    for i in range(5):
-        # Do some random tests
-        get_window_position(win, f"test{i}", settings)
-        time.sleep(0.5)
-        set_window_position(window=win, key=f"test", settings={"test.screen_index": 1,
-                                           "test.x": 35 * i,
-                                           "test.y": 35 * i,
-                                           "test.w": 300,
-                                           "test.h": 210})
-        time.sleep(0.5)
-    log.info(str(settings))
-
-
-if __name__ == "__main__":
-    main()
