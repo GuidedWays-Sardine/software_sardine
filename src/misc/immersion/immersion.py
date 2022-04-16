@@ -59,10 +59,9 @@ def change_mode(new_mode):
         # FIXME : trouver un moyen de changer le plugin de lecture pour windows media fountation
         # os.environ["QT_MULTIMEDIA_PREFERRED_PLUGINS"] = "windowsmediafoundation"      # Not working
         initial_time = time.perf_counter()
-        for screen_index in range(QDesktopWidget().screenCount()):
-            sg = QDesktopWidget().screenGeometry(screen_index).getCoords()
-            IMMERSION.append(ImmersionWindow(position=(sg[0], sg[1]),
-                                             size=(sg[2] - sg[0] + 1, sg[3] - sg[1] + 1)))
+        for screen_index in range(1, wm.screens_count() + 1):
+            IMMERSION.append(ImmersionWindow(position=wm.get_screen(screen_index)[0],
+                                             size=wm.get_screen(screen_index)[1]))
 
         # Indique le temps de chargement des fenêtre d'immersions
         log.info(f"Initialisation de {len(IMMERSION)} fenêtres d'immersions en " +
