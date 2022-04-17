@@ -44,7 +44,7 @@ def set_window_position(window, settings, key, minimum_size=(124, 48)) -> None:
     minimum_size = (max(minimum_size[0], 124), max(minimum_size[1], 48))
 
     # Si la fenêtre est cachée, il est impossible de récupérer ses informations. Montre la temporairement
-    if isinstance(window, QMainWindow):
+    if "isVisible" in dir(window):
         is_visible = window.isVisible()
     else:
         is_visible = window.property("visible")
@@ -52,7 +52,7 @@ def set_window_position(window, settings, key, minimum_size=(124, 48)) -> None:
         window.show()
 
     # Calcule la hauteur de la titlebar
-    if isinstance(window, QMainWindow):
+    if "framePosition" not in dir(window):
         titlebar_height = window.geometry().y() - window.pos().y()
     else:
         titlebar_height = window.geometry().y() - window.framePosition().y()
@@ -86,7 +86,7 @@ def set_window_position(window, settings, key, minimum_size=(124, 48)) -> None:
             # S'assure que la nouvelle taille de la fenêtre est suffisante (si la fenêtre a une taille minimale=
             if window_size[0] >= minimum_size[0] and (window_size[1] - titlebar_height) >= minimum_size[1]:
                 # Repositione et redimensionne la fenêtre (fonctions différentes pour QMainWindow et QObject)
-                if isinstance(window, QMainWindow):
+                if "setPosition" not in dir(window):
                     window.move(screens[screen_index - 1][0][0] + settings[f"{key}x"],
                                 screens[screen_index - 1][0][1] + settings[f"{key}y"])
                 else:
@@ -139,7 +139,7 @@ def get_window_position(window, settings, key):
     key += "." if not key.endswith(".") else ""
 
     # Si la fenêtre est cachée, il est impossible de récupérer ses informations. Montre la temporairement
-    if isinstance(window, QMainWindow):
+    if "isVisible" in dir(window):
         is_visible = window.isVisible()
     else:
         is_visible = window.property("visible")
@@ -147,7 +147,7 @@ def get_window_position(window, settings, key):
         window.show()
 
     # Calcule la hauteur de la titlebar
-    if isinstance(window, QMainWindow):
+    if "framePosition" not in dir(window):
         titlebar_height = window.geometry().y() - window.pos().y()
     else:
         titlebar_height = window.geometry().y() - window.framePosition().y()
@@ -166,8 +166,8 @@ def get_window_position(window, settings, key):
     if screen_index:
         sg = screens[screen_index[0]]
         settings[f"{key}screen_index"] = screen_index[0] + 1
-        settings[f"{key}x"] = max(window.x() - sg[0][0] - (not isinstance(window, QMainWindow)), 0)
-        settings[f"{key}y"] = max(window.y() - sg[0][1] - titlebar_height * (not isinstance(window, QMainWindow)), 0)
+        settings[f"{key}x"] = max(window.x() - sg[0][0] - ("framePosition" in dir(window)), 0)
+        settings[f"{key}y"] = max(window.y() - sg[0][1] - titlebar_height * ("framePosition" in dir(window)), 0)
         settings[f"{key}w"] = min(window.width(), sg[1][0])
         settings[f"{key}h"] = min(window.height() + titlebar_height, sg[1][1])
 
