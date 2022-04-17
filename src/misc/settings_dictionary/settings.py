@@ -191,6 +191,7 @@ class SettingsDictionary(dict):
                 with open(file_path, "w", encoding="utf-8-sig") as file:
                     for line in contents:
                         file.write(line.replace("\t", ";").replace("\"", ""))
+                        delimiter = ";"
 
             # Essaye d'ouvrir le fichier avec les paramètres
             with open(file_path, "r", encoding="utf-8-sig") as file:
