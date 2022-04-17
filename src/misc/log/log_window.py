@@ -59,7 +59,7 @@ class LogWindow(QTextEdit):
         # Change la taille et la police d'écriture
         self.__font = QFont()
         self.__font.setPixelSize(16)
-        self.__font.setFamily("Verdana")
+        self.__font.setFamily("Courier")
         self.setFont(self.__font)
 
         # Indique la fonction a appeler lorsqu'une fonction est initialisée
