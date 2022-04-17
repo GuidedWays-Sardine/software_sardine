@@ -60,7 +60,7 @@ class SettingsDictionary(dict):
         return super(SettingsDictionary, self).__getitem__(re.sub("[;\t]", "", str(key).lower()))
 
     def get_value(self, key, default=None):
-        """Méthode pour récupérer une valeur à partir de sa clé, et de mettre un message dans le registre s'il n'existe pas
+        """Méthode pour récupérer une valeur à partir de sa clé, et mettre un message dans le registre s'il n'existe pas
 
         Parameters
         ----------
