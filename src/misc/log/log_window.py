@@ -24,7 +24,6 @@ WARNING_COLOR = "#cb772f"
 INFO_COLOR = "#a9b7c6"
 DEBUG_COLOR = "#808080"
 BACKGROUND_COLOR = "#2b2b2b"
-SLIDER_COLOR = "#323232"
 
 
 COLORS = {Level.CRITICAL: QColor(CRITICAL_COLOR),
@@ -53,9 +52,8 @@ class LogWindow(QTextEdit):
         self.setFrameStyle(QFrame.NoFrame)
 
         # Change the scrollbar to be slimmer and with correct colors
-        # FIXME : rendre la scrollbar moins visible (fond blanc oof)
         self.__scrollbar = QScrollBar()
-        self.__scrollbar.setStyleSheet(f"background: {SLIDER_COLOR}; width: 8;")
+        self.__scrollbar.setStyleSheet("width: 8;")
         self.setVerticalScrollBar(self.__scrollbar)
 
         # Change la taille et la police d'écriture
