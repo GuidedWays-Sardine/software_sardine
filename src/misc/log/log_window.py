@@ -146,26 +146,18 @@ def __initialise_log_window():
     if QApplication.instance() is not None and not len(INSTANCE):
         INSTANCE.append(LogWindow())
     else:
-        from src.misc.log.log import warning
-        warning("Une QApplication doit être initialisé afin de pouvoir générer la fenêtre de logging." +
-                "Fenêtre de registre désactivée pour la simulation")
+        from src.misc.log.log import error
+        error("Une QApplication doit être initialisé afin de pouvoir générer la fenêtre de logging." +
+              "Fenêtre de registre désactivée pour la simulation")
 
 
 def add_log_window_message(message, log_level):
-    # Si la fenêtre de registre n'a pas été initialisée, tente de l'initialiser
-    if not INSTANCE:
-        __initialise_log_window()
-
     # Si le fichier de registre a été initialisé et que la fenêtre est initialisée et activée
     if INSTANCE and logging.getLogger().hasHandlers():
         INSTANCE[0].append_log_message(message, log_level)
 
 
 def set_log_window_frameless(visible=None):
-    # Si la fenêtre de registre n'a pas été initialisée, tente de l'initialiser
-    if not INSTANCE:
-        __initialise_log_window()
-
     # Si le fichier registre a été initialisé et que la fenêtre est initialisée et activée
     if INSTANCE and logging.getLogger().hasHandlers():
         INSTANCE[0].set_frameless()
@@ -176,13 +168,9 @@ def set_log_window_frameless(visible=None):
 
 
 def set_log_window_windowed(visible=None):
-    # Si la fenêtre de registre n'a pas été initialisée, tente de l'initialiser
-    if not INSTANCE:
-        __initialise_log_window()
-
     # Si le fichier registre a été initialisé et que la fenêtre est initialisée et activée
     if INSTANCE and logging.getLogger().hasHandlers():
-        INSTANCE[0].set_frameless()
+        INSTANCE[0].set_windowed()
 
         # Si le mode de visibilité doit être changé, le change
         if visible is not None:
@@ -192,10 +180,6 @@ def set_log_window_windowed(visible=None):
 @decorators.UIupdate
 @decorators.QtSignal(log_level=Level.WARNING, end_process=False)
 def change_log_window_visibility(visible=True):
-    # Si la fenêtre de registre n'a pas été initialisée, tente de l'initialiser
-    if not INSTANCE:
-        __initialise_log_window()
-
     # Si la fenêtre de registres est initialisée, cache ou montre la fenêtre
     if INSTANCE and visible:
         INSTANCE[0].show()
@@ -204,10 +188,6 @@ def change_log_window_visibility(visible=True):
 
 
 def resize_log_window(settings, key, visible=None):
-    # Si la fenêtre de registre n'a pas été initialisée, tente de l'initialiser
-    if not INSTANCE:
-        __initialise_log_window()
-
     # redimensionne la fenêtre
     if INSTANCE:
         wm.set_window_position(INSTANCE[0], settings, key, (640, 128))
@@ -217,10 +197,6 @@ def resize_log_window(settings, key, visible=None):
 
 
 def get_log_window_settings(settings, key):
-    # Si la fenêtre de registre n'a pas été initialisée, tente de l'initialiser
-    if not INSTANCE:
-        __initialise_log_window()
-
     # Récupère la position de la fenêtre
     if INSTANCE:
         wm.get_window_position(INSTANCE[0], settings, key)
