@@ -1,8 +1,8 @@
 # librairies par défaut
 import os
+import sys
 import logging
 import traceback
-from enum import Enum
 from datetime import datetime
 import re
 
@@ -13,22 +13,14 @@ from PyQt5 import QtCore
 
 VERSION = "1.1.0"
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
+sys.path.append(os.path.dirname(PROJECT_DIR))
+from src.misc.log.log_levels import Level
 QT_IGNORE = ("Found metadata in lib",
              "Got keys from plugin meta data",
              "loaded library",
              "loaded plugins",
              "QFactoryLoader::QFactoryLoader() looking at",
              "QFactoryLoader::QFactoryLoader() checking directory path")   # List of all spammy debug messages to ignore
-
-
-class Level(Enum):
-    """Classe contenant les différents niveaux de logs (permet une indépendance du module)"""
-    NOTSET = logging.NOTSET
-    DEBUG = logging.DEBUG
-    INFO = logging.INFO
-    WARNING = logging.WARNING
-    ERROR = logging.ERROR
-    CRITICAL = logging.CRITICAL
 
 
 def initialise(path=f"{PROJECT_DIR}log\\", version=VERSION, log_level=Level.DEBUG, save=True):
@@ -52,12 +44,8 @@ def initialise(path=f"{PROJECT_DIR}log\\", version=VERSION, log_level=Level.DEBU
     # Vérifie si un fichier log a déjà été créé, si oui, change le niveau de logging sinon le crée
     if logging.getLogger().hasHandlers():
         logging.getLogger().setLevel(log_level.value)
-        logging.warning("Fichier de registre pour cette simulation déjà existant. Aucun besoin d'en créer un nouveau.\n")
+        logging.warning("Fichier de registre pour cette simulation déjà existant. Aucun besoin d'en créer un nouveau.")
         return
-
-    # Indique la fonction a appeler lorsqu'une fonction est initialisée
-    os.environ["QT_DEBUG_PLUGINS"] = "1"
-    QtCore.qInstallMessageHandler(__qt_message_handler)
 
     # Dans le cas où les logs doivent être enregistrées et que le niveau n'est pas mis à log.NOTSET
     if save and log_level is not Level.NOTSET:
@@ -79,6 +67,10 @@ def initialise(path=f"{PROJECT_DIR}log\\", version=VERSION, log_level=Level.DEBU
         logging.basicConfig(level=log_level.value,
                             datefmt="%H:%M:%S",
                             format="%(asctime)s - %(levelname)s - %(message)s")
+        
+    # Initialise la fenêtr de registre
+    from src.misc.log.log_window import __initialise_log_window
+    __initialise_log_window()
 
 
 def stop():
@@ -116,7 +108,7 @@ def change_log_prefix(prefix=""):
         logging.basicConfig(level=Level.DEBUG.value,
                             datefmt="%H:%M:%S",
                             format="%(asctime)s - %(levelname)s - %(message)s")
-        logging.warning("préfix changé sans registre initialisé (log.initialise). Configuration par défaut utilisée.")
+        logging.warning("Préfix changé sans registre initialisé (log.initialise). Configuration par défaut utilisée.")
 
     # Si un préfix non vide a été envoyé, l'ajoute au format du registre, sinon remet celui par défaut
     handler = logging.getLogger().handlers[0]
@@ -148,7 +140,7 @@ def log(log_level, message, exception=None, prefix=None):
         logging.basicConfig(level=Level.DEBUG.value,
                             datefmt="%H:%M:%S",
                             format="%(asctime)s - %(levelname)s - %(message)s")
-        logging.warning("message laissé sans registre initialisé (log.initialise). Configuration par défaut utilisée.")
+        logging.warning("Message laissé sans registre initialisé (log.initialise). Configuration par défaut utilisée.")
 
     # Vérifie si un préfix temporaire a été envoyé, si oui, enregistre le format actuel et change le préfix
     previous_format = logging.getLogger().handlers[0].formatter._fmt
@@ -159,7 +151,7 @@ def log(log_level, message, exception=None, prefix=None):
     if isinstance(exception, Exception):
         message += (("\n" if not message.endswith("\n") else "") + f"\tErreur de type : {type(exception)}\n" +
                     f"\tAvec comme message d'erreur : {exception.args}\n\t" + "Traceback : \n\t" +
-                    "".join(traceback.format_tb(exception.__traceback__)).replace("\n", "\n\t") + "\n")
+                    "".join(traceback.format_tb(exception.__traceback__)).replace("\n", "\n\t"))
 
     # Remplace les "\n\t..." par autant d'espaces que nécessaire pour bien aligner le texte avec le message
     prefix_length = len(logging.getLogger().handlers[0].formatter._fmt) - 3 - 19 + len(str(log_level)) - 11
@@ -167,6 +159,8 @@ def log(log_level, message, exception=None, prefix=None):
 
     # Laisse le message fraichement créé dans le registre avec le niveau de registre demandé
     logging.log(log_level.value, message)
+    from src.misc.log.log_window import add_log_window_message
+    add_log_window_message(message, log_level)
 
     # Si le préfix a été changé temporairement, remet celui d'origine
     if prefix is not None:
@@ -278,7 +272,7 @@ def add_empty_lines(lines_count=1, log_level=Level.INFO):
     handler.setFormatter(logging.Formatter(datefmt="%H:%M:%S", fmt=current_format))
 
 
-def __qt_message_handler(mode, context, message):
+def _qt_message_handler(mode, context, message):
     """Fonction (non appelable) permettant de récupérer et d'afficher les messages d'erreurs des fichiers qml
 
     Parameters
