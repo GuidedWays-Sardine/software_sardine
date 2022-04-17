@@ -1,4 +1,4 @@
-# ENHANCE : Une fois le décorateur ajouté, ne pas oublié de l'importer dans le fichier __init__.py, sinon inappelable
+# ENHANCE : Une fois le décorateur ajouté, ne pas oublié de l'importer dans le fichier __init__.py, sinon indétectable
 # Librairies par défaut
 import os
 import sys
@@ -169,13 +169,17 @@ class UIupdate:
                 raise TypeError(f"{self.__function} takes {len(self.__args_list)} " +
                                 f"positional arguments but {len(args)} was given")
 
+        def clear_arguments(self):
+            """Fonction permettant de réinitialiser les arguments"""
+            self.__args = ()
+
         def run(self):
             """Fonction permettant d'émettre le signal et donc d'appeler la fonction avec les paramètres sauvegardés"""
             # Emet le signal, l'executant et attend qu'il se finisse
             exec(self.__signal)
 
             # réinitialise les arguments pour éviter de rappeler la fonction avec les mêmes arguments
-            self.__args = ()
+            self.clear_arguments()
 
         def get_func(self):
             return self.__function
@@ -199,10 +203,20 @@ class UIupdate:
 
     def __call__(self, *args, **kwargs):
         """fonction appelée lors de l'appel de la fonction ciblée par le décorateur"""
-        # Démarre le QThread (appelant sa fonction run() et donc la fonction envoyée) et attend que l'appel se finisse
+        # Génère la liste des arguments (fusion des *args, **kwargs et des arguments par défaut
         self.__ui_thread.set_arguments(*args, **kwargs)
+
+        # Si on se trouve dans le thread principal, appel directement la fonction (optimisation)
+        # Sinon, démarre le QThread (appelant sa fonction run() -> la fonction envoyée) et attend que l'appel se finisse
         if threading.current_thread().__class__.__name__ == '_MainThread':
-            self.__ui_thread.get_func()(*self.__ui_thread.get_args())
+            # QtSignal récupère une exception que si la fonction est appelée dans un thread secondaire
+            try:
+                self.__ui_thread.get_func()(*self.__ui_thread.get_args())
+            except Exception as error:
+                function_name = str(self.__ui_thread)[10:].split(" at ")[0]
+                log.warning(message=f"Exception jetée dans le signal : {function_name}().",
+                            exception=error)
+            self.__ui_thread.clear_arguments()
         else:
             self.__ui_thread.start()
             self.__ui_thread.wait()
