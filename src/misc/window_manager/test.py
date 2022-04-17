@@ -27,7 +27,7 @@ def main():
     app = QApplication(sys.argv)
     win_python = QMainWindow()
     engine = QQmlApplicationEngine()
-    engine.load(f"{PROJECT_DIR}src/misc/visual_position/test.qml")
+    engine.load(f"{PROJECT_DIR}src/misc/window_manager/test.qml")
     win_qml = engine.rootObjects()[0]
 
     wm.get_window_position(win_qml, settings, "win_qml")
@@ -42,9 +42,6 @@ def main():
     win_python.show()
     win_qml.show()
     app.exec()
-
-    # Arrête le registre pour éviter l'erreur de segmentation
-    log.stop()
 
 
 def worker(win_python, win_qml):
