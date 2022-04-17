@@ -46,10 +46,12 @@ class LogWindow(QTextEdit):
 
         # Defines default tags and hides the window
         self.setMinimumSize(640, 128)
+        self.setWindowTitle("Fenêtre de registre")
         self.setStyleSheet(f"background: {BACKGROUND_COLOR}; ")
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint | Qt.CustomizeWindowHint |
-                            Qt.Dialog | Qt.WindowTitleHint) # Par défaut : en fenêtré
+                            Qt.Dialog | Qt.WindowTitleHint)     # Par défaut : en fenêtré
         self.setFrameStyle(QFrame.NoFrame)
+        self.setTextInteractionFlags(Qt.NoTextInteraction)
 
         # Change the scrollbar to be slimmer and with correct colors
         self.__scrollbar = QScrollBar()
