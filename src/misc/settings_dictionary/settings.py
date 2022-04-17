@@ -181,7 +181,7 @@ class SettingsDictionary(dict):
                     file.readline()
             except (UnicodeDecodeError, UnicodeError):
                 log.debug("Les fichiers enregistrés sous Excel ne sont pas en UTF-8 (ANSI - Windows-1252). " +
-                          "Merci d'éviter la modification et la sauvegarde de fichiers paramètres sous Excel.")
+                          f"Éviter la modification et sauvegarde de fichiers paramètres sous Excel.\n\t{file_path}")
 
                 # Ouvre le fichier avec l'encoding ANSI (utilisé par Excel)
                 with open(file_path, "r", encoding="ANSI") as file:
