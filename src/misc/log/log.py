@@ -292,14 +292,13 @@ def __qt_message_handler(mode, context, message):
     """
     # Vérifie que l'erreur ne fait pas partie des erreurs à sauter (pour éviter le spam en niveau debug)
     if not any(ignore in message for ignore in QT_IGNORE):
+        message = f"message : {message.split(': ', maxsplit=1)[-1]}" + \
+                  (f"\n\tline: {context.line} ; file: {context.file}" if context.file is not None else "")
+
         # Pour chaque mode, met le message d'erreur sous le bon format et l'indique dans le registre
         if mode == QtCore.QtFatalMsg or mode == QtCore.QtFatalMsg:
-            critical(f"Erreur Critique dans un fichier graphique QML : \n\t{message}" +
-                     f"{(f'line:{context.line} ; file:{context.file} -> ' if context.file is not None else '')}{message}",
-                     prefix="QML")
+            critical(f"Erreur Critique dans un fichier graphique QML : \n\t{message}", prefix="QML")
         elif mode == QtCore.QtWarningMsg:
-            warning(f"{(f'line:{context.line} ; file:{context.file} -> ' if context.file is not None else '')}{message}",
-                    prefix="QML")
+            warning(message, prefix="QML")
         else:
-            debug(f"{(f'line:{context.line} ; file:{context.file} -> ' if context.file is not None else '')}{message}",
-                  prefix="QML")
+            debug(message, prefix="QML")
