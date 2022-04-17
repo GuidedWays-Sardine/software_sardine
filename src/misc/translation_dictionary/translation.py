@@ -125,3 +125,46 @@ class TranslationDictionary(dict):
             log.debug(f"{len(self) - current_length} nouvelles traductions récupérées dans le fichier :\n\t {file_path}",
                       prefix="dictionaire de traduction")
             return True
+
+
+def get_language_list(file_path):
+    """Fonction permettant de récupérer la liste des langues dans un fichier de traduction
+
+    Parameters
+    ----------
+    file_path: `str`
+        chemin d'accès vers le fichier de traduction
+
+    Returns
+    -------
+    language_list: `tuple[str]`
+    """
+    try:
+        # Parceque windows pue du cul, les fichiers Excel (csv et txt) sont sauvegardés en ANSI et non en UTF-8
+        # Si le fichier n'est pas encodé en UTF-8 (et donc surement sauvegardé sous Excel), le convertit en UTF-8
+        try:
+            with open(file_path, "r", encoding="utf-8-sig") as file:
+                # Pour l'optimisation (et éviter la double ouverture du fichier) esssaye de retourner la liste de suite
+                return tuple(file.readline().rstrip('\n').split(";"))
+        except (UnicodeDecodeError, UnicodeError):
+            log.debug("Les fichiers enregistrés sous Excel ne sont pas en UTF-8 (ANSI - Windows-1252). " +
+                      f"Éviter la modification et sauvegarde de fichiers paramètres sous Excel.\n\t{file_path}")
+
+            # Ouvre le fichier avec l'encoding ANSI (utilisé par Excel)
+            with open(file_path, "r", encoding="ANSI") as file:
+                contents = file.readlines()
+
+            # L'enregistre dans le même fichier avec l'encoding utf-8-sig en décodant les lignes
+            with open(file_path, "w", encoding="utf-8-sig") as file:
+                for line in contents:
+                    file.write(line.replace("\t", ";").replace("\"", ""))
+
+        # Ouvre le fichier de nouveau et retourne la liste des langues détectées
+        with open(file_path, "r", encoding="utf-8-sig") as file:
+            return tuple(file.readline().rstrip('\n').split(";"))
+    # Si une erreur a été récupérée (fichier ouvert dans un autre logiciel, ...
+    except Exception as error:
+        # Cas où le fichier ouvert n'est pas accessible, indique la raison et retourne false
+        log.warning(f"Impossible d'ouvrir le fichier de traduction : {file_path}",
+                    exception=error, prefix="dictionaire de traduction")
+        return ()
