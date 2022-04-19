@@ -26,38 +26,36 @@ def main():
     application = QApplication(sys.argv)        # Une seule QApplication peut être créée durant toute la simulation
 
     # Application d'initialisation : Permet de rentrer tous les paramètres de simulation de façon simple
-    parameters = {}
+    settings = {}
     try:
         # Initialise et lance l'application d'initialisation.
         initialisation = ini.InitialisationWindow()
 
         # Si le bouton lancer a été cliqué, récupère les informations, sinon sort
         if initialisation.launch_simulator:
-            parameters = initialisation.get_settings()
+            settings = initialisation.get_settings()
             del initialisation
         else:
             log.add_empty_lines()
             log.info(f"l'application d'initialisation a été fermée sans donner suite.",
                      prefix="Application d'initialisation")
-            log.stop()
             exit(0)
     except Exception as error:
         # Récupère une potentielle erreur ratée, la laisse dans le registre et arrête l'application
         log.critical(f"Erreur fatale lors du chargement de l'application d'initialisation simulateur.",
                      exception=error, prefix="Application d'initialisation")
-        log.stop()
         exit(-1)
 
     # Change le niveau de log à celui précisé par l'utilisateur et enlève tout préfixe
     log.change_log_prefix()
     log.add_empty_lines()
     log.info(f"Lancement du simulateur.\n\n\n")
-    log.change_log_level(parameters.get_value("log_level", INITIAL_LOG_LEVEL))
+    log.change_log_level(settings.get_value("log_level", INITIAL_LOG_LEVEL))
 
     # Application de simulation : gère les différents modules de simulation
     try:
         # Initialise la simulation
-        simulation = sim.Simulation(parameters)
+        simulation = sim.Simulation(settings)
     except Exception as error:
         # Récupère une potentielle erreur lors de l'initialisation, la laisse dans le registre et arrête l'application
         log.critical(f"Erreur fatale lors de l'initialisation du simulateur.\n",
