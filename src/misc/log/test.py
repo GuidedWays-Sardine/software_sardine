@@ -23,7 +23,7 @@ def main():
     log.initialise(save=False, log_level=Level.DEBUG)
 
     # rend la fenêtre frameless
-    lw.set_log_window_frameless(visible=True)
+    lw.log_window_frameless(visible=True)
 
     # génère et lance le thread
     worker_thread = threading.Thread(target=worker, daemon=True)
@@ -45,7 +45,7 @@ def worker():
     time.sleep(1)
     log.debug("Luckily, i'm still running fine")
     time.sleep(1)
-    lw.set_log_window_windowed()
+    lw.log_window_windowed()
     log.error("Oh wait no my bad I'm not :\n\tError of type : AHHHHHHHHH\n\tWith message : \"I don't feel so good\"")
     time.sleep(1)
     log.debug("Really not running well")

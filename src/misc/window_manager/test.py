@@ -30,8 +30,8 @@ def main():
     engine.load(f"{PROJECT_DIR}src/misc/window_manager/test.qml")
     win_qml = engine.rootObjects()[0]
 
-    wm.get_window_position(win_qml, settings, "win_qml")
-    wm.get_window_position(win_python, settings, "win_py")
+    wm.get_window_geometry(win_qml, settings, "win_qml")
+    wm.get_window_geometry(win_python, settings, "win_py")
     log.info(str(settings))
 
     # Génère deux thread pour positioner et placer les différentes fenêtres et les lancent
@@ -51,9 +51,9 @@ def worker(win_python, win_qml):
     log.info("Essais sur la fenêtre python (QMainWindow).")
     for i in range(5):
         # Do some random tests
-        wm.get_window_position(win_python, settings, f"test{i}")
+        wm.get_window_geometry(win_python, settings, f"test{i}")
         time.sleep(0.5)
-        wm.set_window_position(window=win_python,
+        wm.set_window_geometry(window=win_python,
                                settings={"test.screen_index": 1,
                                          "test.x": 35 * i,
                                          "test.y": 35 * i,
@@ -67,9 +67,9 @@ def worker(win_python, win_qml):
     log.info("Essais sur la fenêtre qml (QWindow).")
     for i in range(5):
         # Do some random tests
-        wm.get_window_position(win_qml, settings, f"test{i}")
+        wm.get_window_geometry(win_qml, settings, f"test{i}")
         time.sleep(0.5)
-        wm.set_window_position(window=win_qml,
+        wm.set_window_geometry(window=win_qml,
                                settings={"test.screen_index": 1,
                                          "test.x": 35 * i,
                                          "test.y": 35 * i,
