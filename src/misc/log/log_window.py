@@ -3,6 +3,7 @@ import sys
 import os
 import logging
 import time
+import re
 
 
 # Librairies graphiques
@@ -88,6 +89,9 @@ class LogWindow(QTextEdit):
         message = "\n" + logging.getLogger().handlers[0].formatter._fmt.replace("%(message)s", message)
         message = message.replace("%(asctime)s", time.strftime("%H:%M:%S")).replace("%(levelname)s", str(log_level)[6:])
 
+        # Vérifie si la scrollbar est en bas (dernier message visible)
+        is_scrolled_down = self.verticalScrollBar().value() == self.verticalScrollBar().maximum()
+
         # S'assure que le niveau de registre envoyé est valide et suffisant pour être indiqué dans la fenêtre de logging
         if isinstance(log_level, Level) and log_level in COLORS and log_level.value >= logging.root.level:
             # Change la couleur selon le niveau de registre et le met en gros si : Level.ERROR ou Level.CRITICAL
@@ -96,6 +100,10 @@ class LogWindow(QTextEdit):
 
             # AJoute le message en fin de registre
             self.insertPlainText(message)
+
+            # Si la scrollbar était tout en bas, la redéplace en bas
+            if is_scrolled_down:
+                self.verticalScrollBar().setValue(self.verticalScrollBar().maximum())
 
     @decorators.UIupdate
     @decorators.QtSignal(log_level=Level.WARNING, end_process=False)
