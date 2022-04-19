@@ -162,8 +162,8 @@ def log(log_level, message, exception=None, prefix=None):
 
     # Laisse le message fraichement créé dans le registre avec le niveau de registre demandé
     logging.log(log_level.value, message)
-    from src.misc.log.log_window import add_log_window_message
-    add_log_window_message(message, log_level)
+    from src.misc.log.log_window import __add_log_window_message
+    __add_log_window_message(message, log_level)
 
     # Si le préfix a été changé temporairement, remet celui d'origine
     if prefix is not None:
@@ -266,6 +266,8 @@ def add_empty_lines(lines_count=1, log_level=Level.INFO):
 
     # Ajoute autant de lignes que demandés (si la valeur est négative, une seule ligne sera sautée)
     log(log_level, "\n" * (lines_count - 1))
+    from src.misc.log.log_window import __add_log_window_message
+    __add_log_window_message("\n" * lines_count, log_level)
 
     # Remet de nouveau le format actuel
     handler.setFormatter(logging.Formatter(datefmt="%H:%M:%S", fmt=current_format))

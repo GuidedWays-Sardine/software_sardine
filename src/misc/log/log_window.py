@@ -164,7 +164,7 @@ def __initialise_log_window():
               "Fenêtre de registre désactivée pour la simulation")
 
 
-def add_log_window_message(message, log_level):
+def __add_log_window_message(message, log_level):
     # Si le fichier de registre a été initialisé et que la fenêtre est initialisée et activée
     if INSTANCE and logging.getLogger().hasHandlers():
         INSTANCE[0].append_log_message(message, log_level)
