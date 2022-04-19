@@ -128,6 +128,9 @@ class LogWindow(QTextEdit):
             # Détecte si la fenêtre est visible ou non (enlever ou rajouter la barre des titres cachera la fenêtre)
             is_visible = self.isVisible()
 
+            # Vérifie si la scrollbar est en bas (dernier message visible)
+            is_scrolled_down = self.verticalScrollBar().value() == self.verticalScrollBar().maximum()
+
             # Récupère la position et taillede la fenêtre (enlever ou rajouter la barre des titres déplacera la fenêtre)
             log_window_settings = {}
             wm.get_window_geometry(self, log_window_settings, "log window")
@@ -145,6 +148,10 @@ class LogWindow(QTextEdit):
             else:
                 self.hide()
 
+            # Si la scrollbar était tout en bas, la redéplace en bas
+            if is_scrolled_down:
+                self.verticalScrollBar().setValue(self.verticalScrollBar().maximum())
+
     @decorators.UIupdate
     @decorators.QtSignal(log_level=Level.WARNING, end_process=False)
     def set_frameless(self):
@@ -153,6 +160,9 @@ class LogWindow(QTextEdit):
         if not (self.windowFlags() & Qt.FramelessWindowHint):
             # Détecte si la fenêtre est visible ou non (enlever ou rajouter la barre des titres cachera la fenêtre)
             is_visible = self.isVisible()
+
+            # Vérifie si la scrollbar est en bas (dernier message visible)
+            is_scrolled_down = self.verticalScrollBar().value() == self.verticalScrollBar().maximum()
 
             # Récupère la position et taillede la fenêtre (enlever ou rajouter la barre des titres déplacera la fenêtre)
             log_window_settings = {}
@@ -170,6 +180,9 @@ class LogWindow(QTextEdit):
             else:
                 self.hide()
 
+            # Si la scrollbar était tout en bas, la redéplace en bas
+            if is_scrolled_down:
+                self.verticalScrollBar().setValue(self.verticalScrollBar().maximum())
 
 def __initialise_log_window():
     """Fonction (privée) permettant d'initialiser une instance de LogWindow si aucune n'a été initialisée."""
