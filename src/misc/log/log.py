@@ -68,7 +68,7 @@ def initialise(path=f"{PROJECT_DIR}log\\", version=VERSION, log_level=Level.DEBU
                             datefmt="%H:%M:%S",
                             format="%(asctime)s - %(levelname)s - %(message)s")
         
-    # Initialise la fenêtr de registre
+    # Initialise la fenêtre de registre
     from src.misc.log.log_window import __initialise_log_window
     __initialise_log_window()
 
@@ -99,7 +99,13 @@ def change_log_prefix(prefix=""):
         logging.basicConfig(level=Level.DEBUG.value,
                             datefmt="%H:%M:%S",
                             format="%(asctime)s - %(levelname)s - %(message)s")
-        logging.warning("Préfix changé sans registre initialisé (log.initialise). Configuration par défaut utilisée.")
+        logging.warning("Préfix changé sans registre initialisé. Configuration par défaut utilisée.")
+
+        # Initialise la fenêtre de registre
+        from src.misc.log.log_window import __initialise_log_window, __add_log_window_message
+        __initialise_log_window()
+        __add_log_window_message("Préfix changé sans registre initialisé. Configuration par défaut utilisée.",
+                               Level.WARNING)
 
     # Si un préfix non vide a été envoyé, l'ajoute au format du registre, sinon remet celui par défaut
     handler = logging.getLogger().handlers[0]
@@ -131,7 +137,13 @@ def log(log_level, message, exception=None, prefix=None):
         logging.basicConfig(level=Level.DEBUG.value,
                             datefmt="%H:%M:%S",
                             format="%(asctime)s - %(levelname)s - %(message)s")
-        logging.warning("Message laissé sans registre initialisé (log.initialise). Configuration par défaut utilisée.")
+        logging.warning("Message laissé sans registre initialisé. Configuration par défaut utilisée.")
+
+        # Initialise la fenêtre de registre
+        from src.misc.log.log_window import __initialise_log_window, __add_log_window_message
+        __initialise_log_window()
+        __add_log_window_message("Message laissé sans registre initialisé. Configuration par défaut utilisée.",
+                               Level.WARNING)
 
     # Vérifie si un préfix temporaire a été envoyé, si oui, enregistre le format actuel et change le préfix
     previous_format = logging.getLogger().handlers[0].formatter._fmt
