@@ -72,6 +72,10 @@ class LogWindow(QTextEdit):
         # Cache la fenêtre
         self.hide()
 
+    def __del__(self):
+        qInstallMessageHandler(None)
+        del self
+
     @decorators.UIupdate
     @decorators.QtSignal(log_level=Level.WARNING, end_process=False)
     def append_log_message(self, message, log_level):
@@ -136,10 +140,6 @@ class LogWindow(QTextEdit):
                 self.show()
             else:
                 self.hide()
-
-    def __del__(self):
-        qInstallMessageHandler(None)
-        del self
 
 
 def __initialise_log_window():
