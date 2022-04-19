@@ -48,10 +48,10 @@ def worker():
     lw.log_window_windowed()
     log.error("Oh wait no my bad I'm not :\n\tError of type : AHHHHHHHHH\n\tWith message : \"I don't feel so good\"")
     time.sleep(1)
+    log.add_empty_lines(3)
     log.debug("Really not running well")
     time.sleep(1)
     log.critical('Looks like a critical error! Time to crash')
-
 
 if __name__ == "__main__":
     main()

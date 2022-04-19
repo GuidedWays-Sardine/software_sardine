@@ -33,31 +33,29 @@ class Mode(Enum):
     UNLOADING = 4
 
 
-def change_mode(new_mode):
+def change_mode(new_mode) -> None:
     """Fonction permettant de changer le mode du mode immersion.
 
     Parameters
     ----------
     new_mode: `Mode`
-        DEACTIVATED -> Toutes les fenêtres d'immersion sont cachées. Le mode immersion est désactivé
-        EMPTY -> Les fenêtres sont visibles (sauf celles à sauter) avec un fond uni
-        LOADING -> Les fenêtres sont visibles (sauf celles à sauter) avec l'animation de chargement -> mode STILL
-        STILL -> Les fenêtres sont visibles (sauf celles à sauter) avec le logo du simulateur au centre
-        UNLOADING -> Les fenêtres sont visibles (sauf celles à sauter) avec l'animation de déchargement -> mode EMPTY
+        DEACTIVATED -> Toutes les fenêtres d'immersion sont cachées. Le mode immersion est désactivé ;
+        EMPTY -> Les fenêtres sont visibles (sauf celles à sauter) avec un fond uni ;
+        LOADING -> Les fenêtres sont visibles (sauf celles à sauter) avec l'animation de chargement -> mode STILL ;
+        STILL -> Les fenêtres sont visibles (sauf celles à sauter) avec le logo du simulateur au centre ;
+        UNLOADING -> Les fenêtres sont visibles (sauf celles à sauter) avec l'animation de déchargement -> mode EMPTY.
 
     Raises
     ------
     RuntimeError
-        Jetée lorsqu'aucune instance de QApplication n'a été initialisée
+        Jetée lorsqu'aucune instance de QApplication n'a été initialisée.
     """
     # First verify if an instance of QApplication has been initialised
     if QApplication.instance() is None:
-        raise RuntimeError("Aucune instance de <PyQt5.QtWidgets.QApplication> n'a été initialisée")
+        raise RuntimeError("Aucune instance de <PyQt5.QtWidgets.QApplication> n'a été initialisée.")
 
     # First generate the windows if they aren't generated
     if not IMMERSION:
-        # FIXME : trouver un moyen de changer le plugin de lecture pour windows media fountation
-        # os.environ["QT_MULTIMEDIA_PREFERRED_PLUGINS"] = "windowsmediafoundation"      # Not working
         initial_time = time.perf_counter()
         for screen_index in range(1, wm.screens_count() + 1):
             IMMERSION.append(ImmersionWindow(position=wm.get_screen(screen_index)[0],
@@ -118,19 +116,19 @@ def change_mode(new_mode):
             log.info("Changement du mode immersion : mode désactivé.\n")
 
 
-def change_skip_list(skip_list=(), new_mode=Mode.EMPTY):
-    """Fonction permettant de rajouter des écrans à désactiver (et donc à sauter)
+def change_skip_list(skip_list=(), new_mode=Mode.EMPTY) -> None:
+    """Fonction permettant de rajouter des écrans à désactiver (et donc à sauter).
 
     Parameters
     ----------
     skip_list: `tuple[int] | list[int]`
-        Liste des écrans à sauter (de 1 à Nécrans). Par défaut aucun
+        Liste des écrans à sauter (de 1 à Nécrans). Par défaut aucun.
     new_mode: `Mode`
-        DEACTIVATED -> Toutes les fenêtres d'immersion sont cachées. Le mode immersion est désactivé
-        EMPTY -> Les fenêtres sont visibles (sauf celles à sauter) avec un fond uni
-        LOADING -> Les fenêtres sont visibles (sauf celles à sauter) avec l'animation de chargement -> mode STILL
-        STILL -> Les fenêtres sont visibles (sauf celles à sauter) avec le logo du simulateur au centre
-        UNLOADING -> Les fenêtres sont visibles (sauf celles à sauter) avec l'animation de déchargement -> mode EMPTY
+        DEACTIVATED -> Toutes les fenêtres d'immersion sont cachées. Le mode immersion est désactivé ;
+        EMPTY -> Les fenêtres sont visibles (sauf celles à sauter) avec un fond uni ;
+        LOADING -> Les fenêtres sont visibles (sauf celles à sauter) avec l'animation de chargement -> mode STILL ;
+        STILL -> Les fenêtres sont visibles (sauf celles à sauter) avec le logo du simulateur au centre ;
+        UNLOADING -> Les fenêtres sont visibles (sauf celles à sauter) avec l'animation de déchargement -> mode EMPTY.
     """
     # Réinitialise la liste des SKIP_LIST et rajoute chacun des index écrans
     SKIP_LIST.clear()
@@ -144,12 +142,12 @@ def change_skip_list(skip_list=(), new_mode=Mode.EMPTY):
 
 @lru_cache(maxsize=1)
 def loading_duration():
-    """Fonction permettant de connaitre la durée de la vidéo de chargement
+    """Retourne la durée de la vidéo de chargement.
 
     Returns
     -------
     loading_duration: `float`
-        Durée de la vidéo (0 if video is not found)
+        Durée de la vidéo (0 si la vidéo n'existe pas).
     """
     if os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{LOADING_PATH}"):
         cap = cv.VideoCapture(f"{PROJECT_DIR}src\\misc\\immersion\\{LOADING_PATH}")
@@ -160,12 +158,12 @@ def loading_duration():
 
 @lru_cache(maxsize=1)
 def unloading_duration():
-    """Fonction permettant de connaitre la durée de la vidéo de chargement
+    """Retourne la durée de la vidéo de déchargement.
 
     Returns
     -------
     loading_duration: `float`
-        Durée de la vidéo (0 if video is not found)
+        Durée de la vidéo (0 si la vidéo n'existe pas).
     """
     if os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{UNLOADING_PATH}"):
         cap = cv.VideoCapture(f"{PROJECT_DIR}src\\misc\\immersion\\{UNLOADING_PATH}")

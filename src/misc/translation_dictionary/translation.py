@@ -10,17 +10,17 @@ import src.misc.log as log
 
 
 class TranslationDictionary(dict):
-    """Classe permettant de convertir un fichier de paramètres en un dictionnaire fonctionnel"""
+    """Classe permettant de convertir un fichier de paramètres en un dictionnaire fonctionnel."""
 
     def __setitem__(self, key, value):
-        """Opérateur self["key"] = value permettant de rajouter des valeurs dans le dictionnaire de traduction
+        """Opérateur self["key"] = value permettant de rajouter des valeurs dans le dictionnaire de traduction.
 
         Parameters
         ----------
         key: `str`
-            Mot à traduire (non sensible aux minuscules et aux majuscules)
+            Mot à traduire (non sensible aux minuscules et aux majuscules) ;
         value: `str`
-            Sa traduction
+            Sa traduction.
         """
         if isinstance(key, str):
             super(TranslationDictionary, self).__setitem__(key.lower(), value)
@@ -28,17 +28,17 @@ class TranslationDictionary(dict):
             log.debug(f"la clé : {key}, n'est pas de type string : {type(key)}")
 
     def __getitem__(self, key):
-        """Opérateur value = self["key"] permettant de lire des valeurs du dictionnaire de traduction
+        """Opérateur value = self["key"] permettant de lire des valeurs du dictionnaire de traduction.
 
         Parameters
         ----------
         key : `str`
-            Mot à traduire (non sensible aux minuscules et aux majuscules)
+            Mot à traduire (non sensible aux minuscules et aux majuscules).
 
         Returns
         -------
         value: `str`
-            Sa traduction si elle existe sinon le mot non traduit
+            Sa traduction si elle existe sinon le mot non traduit.
         """
         try:
             return super(TranslationDictionary, self).__getitem__(key.lower())
@@ -47,23 +47,23 @@ class TranslationDictionary(dict):
             return key
 
     def create_translation(self, file_path, current_language, new_language, delimiter=";"):
-        """Méthode permettant d'ouvrir un fichier de traduction et de rajouter les traductions
+        """Ouvre un fichier de traduction et de récupèré toute les traductions.
 
         Parameters
         ----------
         file_path: `str`
-            chemin d'accès vers le fichier de traductions à ouvrir et lire
+            chemin d'accès vers le fichier de traductions à ouvrir et lire ;
         current_language: `str`
-            la langue actuelle de ce qui doit être tradui
+            la langue actuelle de ce qui doit être traduit ;
         new_language: `str`
-            la langue dans laquelle il faut récupérer les traductions
+            la langue dans laquelle il faut récupérer les traductions ;
         delimiter: `str`
-            délimteur séparant les différentes traductions ";" par défaut
+            délimteur séparant les différentes traductions ";" par défaut.
 
         Returns
         -------
         successful: `bool`
-            Retourne si la lecture du fichier de traductions a été réussie (sinon erreur détectée)
+            Retourne si la lecture du fichier de traductions a été réussie (sinon erreur détectée).
         """
         try:
             # Parceque windows pue du cul, les fichiers Excel (csv et txt) sont sauvegardés en ANSI et non en UTF-8
@@ -128,12 +128,12 @@ class TranslationDictionary(dict):
 
 
 def get_language_list(file_path):
-    """Fonction permettant de récupérer la liste des langues dans un fichier de traduction
+    """Récupère et retourne la liste des langues dans un fichier de traduction.
 
     Parameters
     ----------
     file_path: `str`
-        chemin d'accès vers le fichier de traduction
+        chemin d'accès vers le fichier de traduction.
 
     Returns
     -------

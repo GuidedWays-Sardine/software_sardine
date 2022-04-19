@@ -24,9 +24,9 @@ VOLUME = 0      # Intensité du volume sur une base 100
 RATIO = 0.8     # Ratio entre la taille de des images/vidéos et de la fenêtre d'immersion
 #                 Préférer garder < 0.75 pour ne pas que ça dépasse pour les fenêtre en 4:3 (DMI)
 
-LOADING_PATH = "media\\loading.wmv"  # Taille identique à image STILL ; image de fin identique à image STILL
-STILL_PATH = "media\\logo.png"
-UNLOADING_PATH = "media\\unloading.wmv"  # Taille identique à image STILL ; image de début identique à image STILL
+LOADING_PATH = "medias\\loading.wmv"  # Taille identique à image STILL ; image de fin identique à image STILL
+STILL_PATH = "medias\\logo.png"
+UNLOADING_PATH = "medias\\unloading.wmv"  # Taille identique à image STILL ; image de début identique à image STILL
 
 BACKGROUND_COLOR = "#000000"        # Il est conseillé de mettre du noir pour simuler un écran éteint
 TEXT_COLOR = "#2b2b2b"              # Couleur du texte (version du code principalement), gris foncé de préférence
@@ -47,14 +47,14 @@ class ImmersionWindow(QMainWindow):
     __image = None
 
     def __init__(self, position, size):
-        """Fonction permettant d'initialiser une fenêtre d'immersion
+        """Fonction permettant d'initialiser une fenêtre d'immersion.
 
         Parameters
         ----------
-        position: `tuple`
-            Liste des positions de la fenêtre (x, y)
-        size: `tuple`
-            Liste des dimensions de la fenêtre (w, h)
+        position: `tuple[int, int] | list[int, int]`
+            Liste des positions de la fenêtre (x, y) ;
+        size: `tuple[int, int] | list[int, int]`
+            Liste des dimensions de la fenêtre (w, h).
             """
         # Initialise la fenêtre
         super().__init__()
@@ -136,8 +136,8 @@ class ImmersionWindow(QMainWindow):
 
     @decorators.UIupdate
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
-    def set_loading(self):
-        """Fonction permettant de lancer la vidéo de chargement, puis de se mettre en mode Mode.STILL"""
+    def set_loading(self) -> None:
+        """Fonction permettant de lancer la vidéo de chargement, puis de se mettre en mode Mode.STILL."""
         # Si la vidéo de chargement n'existe pas, passe directement en mode still
         if not os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{LOADING_PATH}"):
             self.set_still()
@@ -157,8 +157,8 @@ class ImmersionWindow(QMainWindow):
 
     @decorators.UIupdate
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
-    def set_unloading(self):
-        """Fonction permettant de lancer la vidéo de chargement, puis de se mettre en mode Mode.STILL"""
+    def set_unloading(self) -> None:
+        """Fonction permettant de lancer la vidéo de chargement, puis de se mettre en mode Mode.STILL."""
         # Si la vidéo de déchargement n'existe pas, passe directement en mode empty
         if not os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{UNLOADING_PATH}"):
             self.set_empty()
@@ -178,8 +178,8 @@ class ImmersionWindow(QMainWindow):
 
     @decorators.UIupdate
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
-    def set_still(self):
-        """Fonction permettant de vider la fenêtre d'immersion"""
+    def set_still(self) -> None:
+        """Fonction permettant de vider la fenêtre d'immersion."""
         # Si le logo n'existe pas, passe en mode empty
         if not os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{STILL_PATH}"):
             self.set_empty()
@@ -198,8 +198,8 @@ class ImmersionWindow(QMainWindow):
 
     @decorators.UIupdate
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
-    def set_empty(self):
-        """Fonction permettant de vider la fenêtre d'immersion"""
+    def set_empty(self) -> None:
+        """Fonction permettant de vider la fenêtre d'immersion."""
         # Arrête la vidéo si elle tourne, cache la vidéo et l'image et montre la fenêtre
         if self.__load_mediaplayer is not None:
             self.__load_video.hide()
@@ -213,8 +213,8 @@ class ImmersionWindow(QMainWindow):
 
     @decorators.UIupdate
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
-    def set_deactivated(self):
-        """Fonction permettant de vider la fenêtre d'immersion"""
+    def set_deactivated(self) -> None:
+        """Fonction permettant de vider la fenêtre d'immersion."""
         # Arrête la vidéo si elle tourne et cache la fenêtre, la vidéo et l'image
         if self.__load_mediaplayer is not None:
             self.__load_video.hide()

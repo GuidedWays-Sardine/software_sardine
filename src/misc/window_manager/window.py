@@ -19,20 +19,20 @@ import src.misc.decorators as decorators
 
 @decorators.UIupdate
 @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
-def set_window_position(window, settings, key, minimum_size=(124, 48)) -> None:
-    """Fonction permettant de redimenssioner une fenêtre en toute sécurité
+def set_window_geometry(window, settings, key, minimum_size=(124, 48)) -> None:
+    """repositionne et redimensionne la fenêtre.
 
     Parameters
     ----------
     window: `QMainWindow | QObject`
-        Fenêtre à redimensionnée, peut provenir d'un QMainWindow (python) ou d'un Window (QML)
+        Fenêtre à redimensionnée, peut provenir d'un QMainWindow (python) ou d'un Window (QML) ;
     settings: `sd.SettingsDictionary | dict[str, Any]`
         Dictionaire de paramètres contenant les informations sur la fenêtre. Les paramètres suivant doivent apparaitre :
-        key.screen_index, key.x, key.y, key.w, key.h -> avec key le paramètre key envoyé
+        key.screen_index, key.x, key.y, key.w, key.h -> avec key le paramètre key envoyé ;
     key: `str`
-        Clé à partir de laquelle, les paramètres écrans seront lus.
+        Clé à partir de laquelle, les paramètres écrans seront lus ;
     minimum_size: `tuple[int, int] | list[int, int]`
-        Liste des dimensions minimales de la fenêtre. format : (min_w, min_h)
+        Liste des dimensions minimales de la fenêtre. format : (min_w, min_h).
     """
     # récupère la liste de la position et de la taille de chacun des écrans
     screens = wms.screens_list()
@@ -113,16 +113,16 @@ def set_window_position(window, settings, key, minimum_size=(124, 48)) -> None:
 
 @decorators.UIupdate
 @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
-def get_window_position(window, settings, key):
-    """Fonction permettant de redimenssioner une fenêtre en toute sécurité
+def get_window_geometry(window, settings, key) -> None:
+    """Récupère st stocke dans settings la position et la dimension de la fenêtre
 
     Parameters
     ----------
     window: `QMainWindow | QObject`
-        Fenêtre dont les dimensions doivent être récupérés, peut provenir d'un QMainWindow (python) ou d'un Window (QML)
+        Fenêtre dont la géométrie doit être récupérée, peut provenir d'un QMainWindow (python) ou d'un Window (QML) ;
     settings: `sd.SettingsDictionary | dict`
         Dictionaire de paramètres où les informations seront stockées. Les paramètres seront sous la forme :
-        key.screen_index, key.x, key.y, key.w, key.h -> avec key le paramètre key envoyé
+        key.screen_index, key.x, key.y, key.w, key.h -> avec key le paramètre key envoyé ;
     key: `str`
         Clé avec laquelle les dimensions seront enregistrées.
     """

@@ -16,13 +16,12 @@ import src.misc.log as log
 
 @functools.lru_cache(maxsize=1)
 def screens_list():
-    """fonction permettant de récupérer les informations sur tous les écrans détectés (position et taille)
+    """Récupère et retourne les informations sur tous les écrans détectés (position et taille).
 
     Returns
     -------
     screens_informations: `tuple[tuple[tuple[int, int], tuple[int, int]]]`
-        information sur les écrans, indiquant leur position et taille
-        format : (((x, y), (w, h)), ...)
+        Information sur les écrans, indiquant leur position et taille : format : (((x, y), (w, h)), ...).
 
     Raises
     ------
@@ -48,12 +47,12 @@ def screens_list():
 
 @functools.lru_cache(maxsize=1)
 def screens_count():
-    """Fonction permettant de connaitre le nombre d'écrans connectés à l'ordinateur
+    """Récupère et retourne le nombre d'écrans connectés à l'ordinateur.
 
     Returns
     -------
     screens_count: `int`
-        Le nombre d'écrans connectés à l'ordinateur
+        Nombre d'écrans connectés à l'ordinateur
 
     Raises
     ------
@@ -65,7 +64,7 @@ def screens_count():
 
 @functools.lru_cache(maxsize=8)     # 8 car nombre d'écrans connectables au maximum sur un ordinateur
 def get_screen(screen_index):
-    """fonction permettant de récupérer les informations d'un écran en particulier (position et taille)
+    """fonction permettant de récupérer les informations d'un écran en particulier (position et taille).
 
     Parameters
     ----------
@@ -81,9 +80,9 @@ def get_screen(screen_index):
     Raises
     ------
     RuntimeError:
-        Jetée si lappel de la fonction se fait avant l'initialisation du QApplication (nécessaire).
+        Jetée si lappel de la fonction se fait avant l'initialisation du QApplication (nécessaire) ;
     IndexError:
-        Jetée si l'index demandé ne correspond a aucun écran connecté
+        Jetée si l'index demandé ne correspond a aucun écran connecté.
     """
     # Vérifie que l'index envoyé correspond bien à un écran visible
     if 1 < screen_index < screens_count():

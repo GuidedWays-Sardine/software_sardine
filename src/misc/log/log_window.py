@@ -42,8 +42,7 @@ class LogWindow(QTextEdit):
     __font = None
 
     def __init__(self):
-        """Fonction permettant d'initialiser la partie graphique du module de registre.
-        Ouvre en parallèle la connexion avec les fichiers QML pour recevoir leurs messages"""
+        """Initialise la partie graphique du module de registre. Ouvre la connexion avec les fichiers QML."""
         # Initialiser le QTextEdit (qui apparaitra dans une fenêtre)
         super().__init__()
 
@@ -76,23 +75,22 @@ class LogWindow(QTextEdit):
         self.hide()
 
     def __del__(self):
-        """Fonction permettant de supprimer la partie graphique du module de registre.
-        S'occupe aussi de fermer la connexion avec les fichiers QML pour éviter toute erreur de segmentation"""
+        """Déconnecte la réception des messages de registre des fichiers QML et supprime l'instance du LowWindow."""
         qInstallMessageHandler(None)
         del self
 
     @decorators.UIupdate
     @decorators.QtSignal(log_level=Level.WARNING, end_process=False)
     def append_log_message(self, message, log_level) -> None:
-        """Fonction permettant d'ajouter un message dans le registre. Le message aura le même format que ceux du fichier
-        de registres. Si seul des caractères de nouvelles lignes sont envoyés, des lignes vides seront ajoutées
+        """Ajoute un message dans le registre. Le message aura le même format que ceux du fichier.
+        de registres. Si seul des caractères de nouvelles lignes sont envoyés, des lignes vides seront ajoutées.
 
         Parameters
         ----------
         message: `str`
-            message à rajouter sur la fenêtre de registre (le format/préfix de registre y sera ajouté)
+            message à rajouter sur la fenêtre de registre (le format/préfix de registre y sera ajouté) ;
         log_level: `Level`
-            niveau de registre du message (sera affiché que si le niveau de registre est suffisant)
+            niveau de registre du message (sera affiché que si le niveau de registre est suffisant).
         """
         # Dans le cas où seul des charactères de retour à la ligne ont été envoyés, laisse des lignes vides
         if re.match("/^(\n)\1*$/", message):
@@ -121,8 +119,8 @@ class LogWindow(QTextEdit):
 
     @decorators.UIupdate
     @decorators.QtSignal(log_level=Level.WARNING, end_process=False)
-    def set_windowed(self):
-        """Fonction permettant de rendre la fenêtre de registre fenêtré avec la barre des titres et déplaçable"""
+    def set_windowed(self) -> None:
+        """Fonction permettant de rendre la fenêtre de registre fenêtré avec la barre des titres et déplaçable."""
         # Dans le cas où la fenêtre n'est pas déjà en mode fenêtré
         if not (self.windowFlags() & Qt.WindowTitleHint):
             # Détecte si la fenêtre est visible ou non (enlever ou rajouter la barre des titres cachera la fenêtre)
@@ -154,8 +152,8 @@ class LogWindow(QTextEdit):
 
     @decorators.UIupdate
     @decorators.QtSignal(log_level=Level.WARNING, end_process=False)
-    def set_frameless(self):
-        """Fonction permettant de rendre la fenêtre de registre sans cadre sans la barre des titres et indéplaçable"""
+    def set_frameless(self) -> None:
+        """Fonction permettant de rendre la fenêtre de registre sans cadre sans la barre des titres et indéplaçable."""
         # Dans le cas où la fenêtre n'est pas déjà en mode fenêtré
         if not (self.windowFlags() & Qt.FramelessWindowHint):
             # Détecte si la fenêtre est visible ou non (enlever ou rajouter la barre des titres cachera la fenêtre)
@@ -184,8 +182,10 @@ class LogWindow(QTextEdit):
             if is_scrolled_down:
                 self.verticalScrollBar().setValue(self.verticalScrollBar().maximum())
 
-def __initialise_log_window():
-    """Fonction (privée) permettant d'initialiser une instance de LogWindow si aucune n'a été initialisée."""
+
+def __initialise_log_window() -> None:
+    """Fonction (privée) permettant d'initialiser une instance de LogWindow si aucune n'a été initialisée.
+    La fenêtre est automatiquement initialisée lors de l'initialisation du registre"""
     if QApplication.instance() is not None and not len(INSTANCE):
         INSTANCE.append(LogWindow())
     else:
@@ -201,22 +201,22 @@ def __add_log_window_message(message, log_level):
     Parameters
     ----------
     message: `str`
-        message à rajouter sur la fenêtre de registre (le format/préfix de registre y sera ajouté)
+        message à rajouter sur la fenêtre de registre (le format/préfix de registre y sera ajouté) ;
     log_level: `Level`
-        niveau de registre du message (sera affiché que si le niveau de registre est suffisant)
+        niveau de registre du message (sera affiché que si le niveau de registre est suffisant).
     """
     # Si le fichier de registre a été initialisé et que la fenêtre est initialisée et activée
     if INSTANCE and logging.getLogger().hasHandlers():
         INSTANCE[0].append_log_message(message, log_level)
 
 
-def log_window_frameless(visible=None):
+def log_window_frameless(visible=None) -> None:
     """Fonction permettant de rendre la fenêtre de registre fenêtré avec la barre des titres et déplaçable.
 
     Parameters
     ----------
     visible: `bool | None`
-        Est ce que la visibilité de la fenêtre doit être changée ? (None pour aucune modification sinon changé)
+        Est ce que la visibilité de la fenêtre doit être changée ? (None pour aucune modification sinon changé).
     """
     # Si le fichier registre a été initialisé et que la fenêtre est initialisée et activée
     if INSTANCE and logging.getLogger().hasHandlers():
@@ -227,14 +227,13 @@ def log_window_frameless(visible=None):
             log_window_visibility(visible)
 
 
-def log_window_windowed(visible=None):
-    """Fonction permettant de rendre la fenêtre de registre sans cadre sans la barre des titres et indéplaçable"
-    Si seul des caractères de nouvelles lignes sont envoyés, des lignes vides seront ajoutées.
+def log_window_windowed(visible=None) -> None:
+    """Fonction permettant de rendre la fenêtre de registre sans cadre sans la barre des titres et indéplaçable.
 
     Parameters
     ----------
     visible: `bool | None`
-        Est ce que la visibilité de la fenêtre doit être changée ? (None pour aucune modification sinon changé)
+        Est ce que la visibilité de la fenêtre doit être changée ? (None pour aucune modification sinon changé).
     """
     # Si le fichier registre a été initialisé et que la fenêtre est initialisée et activée
     if INSTANCE and logging.getLogger().hasHandlers():
@@ -262,21 +261,20 @@ def log_window_visibility(visible=True) -> None:
         INSTANCE[0].hide()
 
 
-def set_log_window_geometry(settings, key, visible=None):
-    """Fonction permettant de redimenssioner la fenêtre de registre.
+def set_log_window_geometry(settings, key, visible=None) -> None:
+    """Repositionne et redimenssione la fenêtre de registre.
 
     Parameters
     ----------
     settings: `sd.SettingsDictionary | dict[str, Any]`
         Dictionaire de paramètres contenant les informations sur la fenêtre. Les paramètres suivant doivent apparaitre :
-        key.screen_index, key.x, key.y, key.w, key.h -> avec key le paramètre key envoyé
+        key.screen_index, key.x, key.y, key.w, key.h -> avec key le paramètre key envoyé ;
     key: `str`
-        Clé à partir de laquelle, les paramètres écrans seront lus.
+        Clé à partir de laquelle, les paramètres écrans seront lus ;
     visible: `bool | None`
-        Est ce que la visibilité de la fenêtre doit être changée ? (None pour aucune modification sinon changé)
-
+        Est ce que la visibilité de la fenêtre doit être changée ? (None pour aucune modification sinon changé).
     """
-    # redimensionne la fenêtre
+    # appelle la fonction du module window_manager pour changer la géométrie de la fenêtre
     if INSTANCE:
         wm.set_window_geometry(INSTANCE[0], settings, key, (640, 128))
 
@@ -284,17 +282,17 @@ def set_log_window_geometry(settings, key, visible=None):
             log_window_visibility(visible)
 
 
-def get_log_window_geometry(settings, key):
-    """Fonction permettant de redimenssioner la fenêtre de registre
+def get_log_window_geometry(settings, key) -> None:
+    """Récupère la position et la dimension de la fenêtre (stocké directement dans settings)
 
     Parameters
     ----------
-    settings: `sd.SettingsDictionary | dict`
+    settings: `sd.SettingsDictionary | dict[str, int]`
         Dictionaire de paramètres où les informations seront stockées. Les paramètres seront sous la forme :
-        key.screen_index, key.x, key.y, key.w, key.h -> avec key le paramètre key envoyé
+        key.screen_index, key.x, key.y, key.w, key.h -> avec key le paramètre key envoyé ;
     key: `str`
         Clé avec laquelle les dimensions seront enregistrées.
     """
-    # Récupère la position de la fenêtre
+    # Appelle la fonction du module window_manager pour changer la géométrie de la fenêtre
     if INSTANCE:
         wm.get_window_geometry(INSTANCE[0], settings, key)
