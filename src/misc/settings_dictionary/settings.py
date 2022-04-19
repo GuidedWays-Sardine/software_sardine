@@ -263,11 +263,16 @@ class SettingsDictionary(dict):
         if data.lower() == "none":
             return None
 
+        # Regarde s'il contient un tuple ou une liste (appelle la fonction récursivement pour chacune des valeurs
         if data[0] == "(" and data[-1] == ")":
             return tuple(SettingsDictionary.convert_type(ele.strip()) for ele in data[1:-1].split(",") if ele)
-
         if data[0] == "[" and data[-1] == "]":
             return list(SettingsDictionary.convert_type(ele.strip()) for ele in data[1:-1].split(",") if ele)
+
+        # Regarde s'il contienr un dictionnaire (appelle la fonction récursivement pour chacune des valeurs)
+        if data[0] == "}" and data[-1] == "}":
+            return {re.sub("[\"\']", "", couple.split(":", maxsplit=1)[0]): int(couple.split(":", maxsplit=1)[-1])
+                    for couple in data[1:-1].replace(" ", "").split(",") if ":" in couple}
 
         # Dans tous les cas (si aucun des autres cas n'a été intercepté) retourne le string
         return data
