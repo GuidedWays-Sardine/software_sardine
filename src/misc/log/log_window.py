@@ -79,8 +79,13 @@ class LogWindow(QTextEdit):
     @decorators.UIupdate
     @decorators.QtSignal(log_level=Level.WARNING, end_process=False)
     def append_log_message(self, message, log_level):
-        # combine le messafe au format de logging et change la date, le niveau et ajoute un caractère de nouvelle ligne:
-        message = logging.getLogger().handlers[0].formatter._fmt.replace("%(message)s", message) + "\n"
+        # Dans le cas où seul des charactères de retour à la ligne ont été envoyés, laisse des lignes vides
+        if re.match("/^(\n)\1*$/", message):
+            self.insertPlainText(message)
+            return
+
+        # combine le message au format de logging et change la date, le niveau et ajoute un caractère de nouvelle ligne:
+        message = "\n" + logging.getLogger().handlers[0].formatter._fmt.replace("%(message)s", message)
         message = message.replace("%(asctime)s", time.strftime("%H:%M:%S")).replace("%(levelname)s", str(log_level)[6:])
 
         # S'assure que le niveau de registre envoyé est valide et suffisant pour être indiqué dans la fenêtre de logging
