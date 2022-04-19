@@ -255,13 +255,9 @@ def add_empty_lines(lines_count=1, log_level=Level.INFO):
     log_level: `Level`
         Le niveau de registre à partir duquel le message doit apparaitre
     """
-    # Dans le cas où aucun registre n'a été initialisé
+    # Dans le cas où aucun registre n'a été initialisé, retourne (inutile de commencer le registre par une ligne vide
     if not logging.getLogger().hasHandlers():
-        # initialise un simple registre console et affiche un message de warning pour avertir de l'oubli
-        logging.basicConfig(level=Level.DEBUG.value,
-                            datefmt="%H:%M:%S",
-                            format="%(asctime)s - %(levelname)s - %(message)s")
-        logging.warning("lignes sautées sans registre initialisé (log.initialise). Configuration par défaut utilisée.")
+        return
 
     # Récupère le format de registe actuel et le change pour un format vide (pour écrire des lignes vides)
     handler = logging.getLogger().handlers[0]
