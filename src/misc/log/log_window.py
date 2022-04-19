@@ -115,14 +115,14 @@ class LogWindow(QTextEdit):
 
             # Récupère la position et taillede la fenêtre (enlever ou rajouter la barre des titres déplacera la fenêtre)
             log_window_settings = {}
-            wm.get_window_position(self, log_window_settings, "log window")
+            wm.get_window_geometry(self, log_window_settings, "log window")
 
             # Change les flags
             self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint | Qt.CustomizeWindowHint |
                                 Qt.Dialog | Qt.WindowTitleHint)
 
             # Redimensionne la fenêtre (elle prendra la même taille et position que précédemment)
-            wm.set_window_position(self, log_window_settings, "log window", (640, 128))
+            wm.set_window_geometry(self, log_window_settings, "log window", (640, 128))
 
             # Si la fenêtre était visible la remontre sinon la cache
             if is_visible:
@@ -140,13 +140,13 @@ class LogWindow(QTextEdit):
 
             # Récupère la position et taillede la fenêtre (enlever ou rajouter la barre des titres déplacera la fenêtre)
             log_window_settings = {}
-            wm.get_window_position(self, log_window_settings, "log window")
+            wm.get_window_geometry(self, log_window_settings, "log window")
 
             # Change les flags
             self.setWindowFlags(Qt.FramelessWindowHint | Qt.Window | Qt.WindowStaysOnTopHint)
 
             # Redimensionne la fenêtre (elle prendra la même taille et position que précédemment)
-            wm.set_window_position(self, log_window_settings, "log window", (640, 128))
+            wm.set_window_geometry(self, log_window_settings, "log window", (640, 128))
 
             # Si la fenêtre était visible la remontre sinon la cache
             if is_visible:
@@ -170,29 +170,29 @@ def add_log_window_message(message, log_level):
         INSTANCE[0].append_log_message(message, log_level)
 
 
-def set_log_window_frameless(visible=None):
+def log_window_frameless(visible=None):
     # Si le fichier registre a été initialisé et que la fenêtre est initialisée et activée
     if INSTANCE and logging.getLogger().hasHandlers():
         INSTANCE[0].set_frameless()
 
         # Si le mode de visibilité doit être changé, le change
         if visible is not None:
-            change_log_window_visibility(visible)
+            log_window_visibility(visible)
 
 
-def set_log_window_windowed(visible=None):
+def log_window_windowed(visible=None):
     # Si le fichier registre a été initialisé et que la fenêtre est initialisée et activée
     if INSTANCE and logging.getLogger().hasHandlers():
         INSTANCE[0].set_windowed()
 
         # Si le mode de visibilité doit être changé, le change
         if visible is not None:
-            change_log_window_visibility(visible)
+            log_window_visibility(visible)
 
 
 @decorators.UIupdate
 @decorators.QtSignal(log_level=Level.WARNING, end_process=False)
-def change_log_window_visibility(visible=True):
+def log_window_visibility(visible=True):
     # Si la fenêtre de registres est initialisée, cache ou montre la fenêtre
     if INSTANCE and visible:
         INSTANCE[0].show()
@@ -200,16 +200,16 @@ def change_log_window_visibility(visible=True):
         INSTANCE[0].hide()
 
 
-def resize_log_window(settings, key, visible=None):
+def set_log_window_geometry(settings, key, visible=None):
     # redimensionne la fenêtre
     if INSTANCE:
-        wm.set_window_position(INSTANCE[0], settings, key, (640, 128))
+        wm.set_window_geometry(INSTANCE[0], settings, key, (640, 128))
 
         if visible is not None:
-            change_log_window_visibility(visible)
+            log_window_visibility(visible)
 
 
-def get_log_window_settings(settings, key):
+def get_log_window_geometry(settings, key):
     # Récupère la position de la fenêtre
     if INSTANCE:
-        wm.get_window_position(INSTANCE[0], settings, key)
+        wm.get_window_geometry(INSTANCE[0], settings, key)
