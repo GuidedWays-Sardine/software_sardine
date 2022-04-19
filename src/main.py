@@ -21,9 +21,9 @@ SAVE = True
 
 def main():
     # Lance le registre selon les constantes définit en amont
+    application = QApplication(sys.argv)        # Une seule QApplication peut être créée durant toute la simulation
     log.initialise(log_level=INITIAL_LOG_LEVEL, save=SAVE)
     log.info(f"Lancement de l'application d'initialisation du simulateur.\n\n\n")
-    application = QApplication(sys.argv)        # Une seule QApplication peut être créée durant toute la simulation
 
     # Application d'initialisation : Permet de rentrer tous les paramètres de simulation de façon simple
     settings = {}
@@ -78,7 +78,6 @@ def main():
                 log.critical(f"Erreur fatale lors de la fermeture du simulateur.",
                              exception=error, prefix="Fermeture simulation")
                 crash = True
-            log.stop()
             exit(0 if not crash else -1)
 
 
