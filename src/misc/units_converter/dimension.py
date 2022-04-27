@@ -336,3 +336,28 @@ class Dimension:
             Version lisible de la classe.
         """
         return str(self)
+
+    def si_to_unit(self):
+        """Retourne les coefficients de conversions pour passer de l'équivalent SI à cette unité.
+
+        Returns
+        -------
+        factor: `float`
+            Facteur de multiplication ;
+        offset: `float`
+            Décallage à rajouter.
+        """
+        return 1/self.factor, - self.offset / self.factor
+
+    def unit_to_si(self):
+        """Retourne les coefficients de conversions pour passer de cette unité à l'équivalent SI.
+
+        Returns
+        -------
+        factor: `float`
+            Facteur de multiplication ;
+        offset: `float`
+            Décallage à rajouter.
+        """
+        return self.factor, self.offset
+
