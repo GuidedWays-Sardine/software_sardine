@@ -19,6 +19,22 @@ import src.misc.translation_dictionary as td
 class SettingsDictionary(dict):
     """Classe permettant de convertir un fichier de paramètres en un dictionnaire fonctionnel"""
 
+    def __init__(self, settings=None):
+        """Initialise le dictionaire de paramètres.
+
+        Parameters
+        ----------
+        settings: `dict[str, Any] | SettingsDictionary | None`
+            paramètres à insérer lors de l'initialisation du paramètres (non obligatoire).
+        """
+        # Initialise la base du dictionnaire de paramètres
+        super().__init__()
+
+        # Si un dictionaire de paramètres a été envoyé ajoute chacun de ses arguments
+        if isinstance(settings, dict):
+            for key, value in settings.items():
+                self.__setitem__(key, value)
+
     def __setitem__(self, key, value):
         """Opérateur self["key"] = value permettant de rajouter des valeurs dans le dictionnaire de paramètres.
 
