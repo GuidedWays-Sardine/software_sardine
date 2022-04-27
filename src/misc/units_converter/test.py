@@ -22,6 +22,9 @@ if __name__ == "__main__":
 
     # Essaye de charger la même unité gourmande pleins de fois pour voir l'impact sur les performances
     initial_time = time.perf_counter()
-    for _ in range(10000):
+    for _ in range(1000000):
         uc.get_unit("kN/t/(km/h*(floz*gal)^3.0)^2")
-    print((time.perf_counter() - initial_time) / 10000)
+    print((time.perf_counter() - initial_time) / 1000000)
+
+    print(uc.get_unit("C") / uc.get_unit("F"))
+    print(uc.get_conversion_list(("K", "C", "F")))
