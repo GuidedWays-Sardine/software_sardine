@@ -114,6 +114,38 @@ def change_log_prefix(prefix="") -> None:
                                                fmt="%(asctime)s - %(levelname)s - %(message)s"))
 
 
+def get_log_level():
+    """Récupère le niveau de registre
+
+    Returns
+    -------
+    log_level: `Level`
+        Niveau de registre actuel.
+    """
+    # Retourne le niveau (convertit de niveau logging au niveau Level). retourne Level.NOTSET si niveau inconnu
+    try:
+        return {50: Level.CRITICAL,
+                40: Level.ERROR,
+                30: Level.WARNING,
+                20: Level.INFO,
+                10: Level.DEBUG,
+                00: Level.NOTSET}[logging.root.level]
+    except KeyError:
+        return Level.NOTSET
+
+
+def get_log_prefix():
+    """Récupère le préfix actuel
+    
+    Returns 
+    -------
+    log_prefix: `str`
+        Préfixe actuel du registre.
+    """
+    log_format = logging.getLogger().handlers[0].formatter._fmt
+    return log_format.split("[")[-1].split("]")[0] if "[" in log_format else ""
+
+
 def log(log_level, message, exception=None, prefix=None) -> None:
     """Permet de laisser un message de registre de niveau log_level.
 
