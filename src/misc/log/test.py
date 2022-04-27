@@ -12,25 +12,7 @@ from PyQt5.QtWidgets import QApplication
 # Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
-from src.misc.log.log_levels import Level
 import src.misc.log as log
-import src.misc.log.log_window as lw
-
-
-def main():
-    # Initialise le QApplication et le registre
-    app = QApplication(sys.argv)
-    log.initialise(save=False, log_level=Level.DEBUG)
-
-    # rend la fenêtre frameless
-    lw.log_window_frameless(visible=True)
-
-    # génère et lance le thread
-    worker_thread = threading.Thread(target=worker, daemon=True)
-    worker_thread.start()
-
-    # Execute l'application
-    app.exec()
 
 
 def worker():
@@ -45,7 +27,7 @@ def worker():
     time.sleep(1)
     log.debug("Luckily, i'm still running fine")
     time.sleep(1)
-    lw.log_window_windowed()
+    log.log_window_windowed()
     log.error("Oh wait no my bad I'm not :\n\tError of type : AHHHHHHHHH\n\tWith message : \"I don't feel so good\"")
     time.sleep(1)
     log.add_empty_lines(3)
@@ -53,5 +35,18 @@ def worker():
     time.sleep(1)
     log.critical('Looks like a critical error! Time to crash')
 
+
 if __name__ == "__main__":
-    main()
+    # Initialise le QApplication et le registre
+    app = QApplication(sys.argv)
+    log.initialise(save=False, log_level=log.Level.DEBUG)
+
+    # rend la fenêtre frameless
+    log.log_window_frameless(visible=True)
+
+    # génère et lance le thread
+    worker_thread = threading.Thread(target=worker, daemon=True)
+    worker_thread.start()
+
+    # Execute l'application
+    app.exec()

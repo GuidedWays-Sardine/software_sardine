@@ -16,18 +16,6 @@ import src.misc.log as log
 import src.misc.immersion as immersion
 
 
-def main():
-    # Create the application, a thread to do the actions and starts the application
-    log.initialise(save=False)
-    app = QApplication(sys.argv)
-    immersion.change_mode(immersion.Mode.EMPTY)
-
-    worker_thread = threading.Thread(target=worker)
-    worker_thread.start()
-
-    app.exec()
-
-
 def worker():
     # Fais des essais pour différents skip list
     for s_l in [(), (2,)]:
@@ -45,4 +33,12 @@ def worker():
 
 
 if __name__ == "__main__":
-    main()
+    # Create the application, a thread to do the actions and starts the application
+    log.initialise(save=False)
+    app = QApplication(sys.argv)
+    immersion.change_mode(immersion.Mode.EMPTY)
+
+    worker_thread = threading.Thread(target=worker)
+    worker_thread.start()
+
+    app.exec()
