@@ -10,7 +10,23 @@ import src.misc.log as log
 
 
 class TranslationDictionary(dict):
-    """Classe permettant de convertir un fichier de paramètres en un dictionnaire fonctionnel."""
+    """Classe permettant de convertir un fichier de traduction en un dictionnaire de traductions fonctionnel."""
+
+    def __init__(self, translations=None):
+        """Initialise le dictionaire de traductions.
+
+        Parameters
+        ----------
+        translations: `dict[str, str] | TranslationDictionary | None`
+            traductions à insérer lors de l'initialisation du paramètres (non obligatoire).
+        """
+        # Initialise la base du dictionnaire de paramètres
+        super().__init__()
+
+        # Si un dictionaire de paramètres a été envoyé ajoute chacun de ses arguments
+        if isinstance(translations, dict):
+            for key, value in translations.items():
+                self.__setitem__(key, value)
 
     def __setitem__(self, key, value):
         """Opérateur self["key"] = value permettant de rajouter des valeurs dans le dictionnaire de traduction.
