@@ -59,13 +59,19 @@ class Dimension:
         light_intensity: `float | int`
             Dimension pour l'unité d'intensité lumineuse (SI : cd) ;
         length: `float | int`
-            Dimension pour l'unité de quantité de matière (SI : mol) ;
+            Dimension pour l'unité de quantité de matière (SI : mol).
 
         Raises
         ------
-        ValueError
-            Jetée si les dimensions de l'unité envoyé sont invalides (K^2, ...).
+        ValueError:
+            Jetée si les dimensions de l'unité envoyé sont invalides (K^2, ...) ;
+        ZeroDivisionError:
+            Jetée si le facteur envoyé vaut 0 (impossible).
         """
+        # S'assure que le facteur ne vaut pas 0 (sinon risque de division par défaut
+        if factor == 0:
+            raise ZeroDivisionError("Le facteur entre une unité et son équivalent ne peut pas valoir 0.")
+
         # S'assure que la température n'a pas une dimension différent de 1, 0, -1
         if temperature not in (-1, 0, 1):
             raise ValueError("La dimensions de température ne peut pas être différente de -1 ; 0 ; 1. " +
