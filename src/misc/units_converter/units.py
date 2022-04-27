@@ -118,3 +118,38 @@ def get_unit(name):
     else:
         from src.misc.units_converter.converter import __get_unit
         return __get_unit(name)
+
+
+def get_conversion_list(unit_list):
+    """Récupère pour chacune des unités, leur nom, facteur et décalage.
+
+    Parameters
+    ----------
+    unit_list: `list[str] | tuple[str]`
+        Liste des unités de conversion (doivent avoir la même dimension).
+
+    Returns
+    -------
+    conversion_list: `list[list[str, float, float]]`
+        Liste des conversions d'unités.
+    """
+    conversion_list = []
+
+    # Pour chacune des unités de la liste
+    for unit_name in unit_list:
+        # Récupère l'unité et laisse un message de warning si une erreur a été détectée
+        try:
+            unit = get_unit(unit_name)
+        except Exception as error:
+            log.warning(f"Erreur avec l'unité \"{unit_name}\" lors de la création d'une liste de conversion",
+                        exception=error)
+        else:
+            # Si c'est la première unité ou que les dimensions sont cohérentes avec les autres, l'ajoute
+            if conversion_list and unit == get_unit(conversion_list[0][0]) or not conversion_list:
+                conversion_list.append([unit_name, *unit.si_to_unit()])
+            else:
+                log.warning(f"Les dimensions d'une des unités de la liste de conversion n'est pas cohérente.\n\t" +
+                            f"{unit} au lieu de {conversion_list[0]}")
+
+    # Retourne la liste de conversion
+    return conversion_list
