@@ -98,7 +98,7 @@ class LogWindow(QTextEdit):
             message à rajouter sur la fenêtre de registre (le format/préfix de registre y sera ajouté) ;
         """
         # Dans le cas où seul des charactères de retour à la ligne ont été envoyés, laisse des lignes vides
-        if re.match("^(\n)\1*$", message):
+        if re.match(r"^(\n)\1*$", message):
             self.insertPlainText(message)
             return
 

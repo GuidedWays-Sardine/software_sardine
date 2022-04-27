@@ -236,7 +236,7 @@ class Dimension:
                              f"[Θ1] / [Θ2] = {self.dimensions['temperature'] - other.dimensions['temperature']}")
         # Sinon, les unités sont bonnes, retourne la division des deux unités
         elif isinstance(other, Dimension):
-            is_complex = (len(re.findall("[/*]", other.name)) > 0)      # Pour savoir si l'unité doit être encadrée
+            is_complex = (len(re.findall(r"[/*]", other.name)) > 0)      # Pour savoir si l'unité doit être encadrée
             return Dimension(name=f"{self.name}/{f'({other.name})' if is_complex else other.name}",
                              factor=other.factor / self.factor,
                              offset=(other.offset - self.offset) / self.factor * (not isclose(self.offset, 0)),
@@ -284,7 +284,7 @@ class Dimension:
                                  f"[Θ1]^power = {self.dimensions['temperature'] * power}")
             else:
                 # Sinon retourne la dimension mis à la puissance envoyée
-                is_complex = (len(re.findall("[/*]", self.name)) > 0)
+                is_complex = (len(re.findall(r"[/*]", self.name)) > 0)
                 return Dimension(name=f"{f'({self.name})' if is_complex else self.name}^{power}",
                                  factor=self.factor**power,
                                  offset=self.offset * (power == 1),

@@ -48,7 +48,7 @@ def __get_unit(unit_name):
         log.debug(f"Utilisation de charactères déconseillés (\"{unit_name}\" -> \"{__unit}\").")
 
     # Si des characètres inconnus sont restants, jette une erreur
-    if not re.match("^[a-zA-Z0-9.*/()^]*$", unit_name):
+    if not re.match(r"^[a-zA-Z0-9.*/()^]*$", unit_name):
         raise ValueError(f"Certains charactères de l'unité \"{__unit}\" ne sont pas supportés. " +
                          f"Charactères supportés : a-z ; A-Z ; 0-9 ; . ; * ; / ; ^ ; ( ; )")
 

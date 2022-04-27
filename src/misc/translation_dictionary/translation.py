@@ -114,7 +114,7 @@ class TranslationDictionary(dict):
                 except ValueError:
                     # Si l'une des langues n'existe envoyée n'existe pas
                     log.warning(f"La langue : {current_language} ou {new_language} n'existe pas : \n\t{language_list}",
-                                prefix=f"Chargement traductions \"" + re.split("[\\/\\\\]+", file_path)[-1] + "\"")
+                                prefix=f"Chargement traductions \"" + re.split(r"[/\\]+", file_path)[-1] + "\"")
                     return False
 
                 # Récupère la longueur actuelle
@@ -135,21 +135,21 @@ class TranslationDictionary(dict):
                         # S'il n'y a pas autant de traductions que de langue, cela signifie que la ligne est incomplète
                         log.debug(f"Certaines traductions manquantes ({len(translations)}/{len(language_list)}) " +
                                   f"sur la ligne : \n\t{line}",
-                                  prefix=f"Chargement traductions \"" + re.split("[\\/\\\\]+", file_path)[-1] + "\"")
+                                  prefix=f"Chargement traductions \"" + re.split(r"[/\\]+", file_path)[-1] + "\"")
         except Exception as error:
             # Cas où le fichier ouvert n'est pas accessible, indique la raison et retourne false
             log.warning(f"Impossible d'ouvrir le fichier de traductions : \n\t{file_path}", exception=error,
-                        prefix=f"Chargement traductions \"" + re.split("[\\/\\\\]+", file_path)[-1] + "\"")
+                        prefix=f"Chargement traductions \"" + re.split(r"[/\\]+", file_path)[-1] + "\"")
             return False
         else:
             # Indique le nombre d'éléments récupérées dans le registre et retourne vrai
             if (len(self) - current_length) == 0:
                 log.debug(f"Aucune nouvelle traduction dans le fichier : \n\t{file_path}",
-                          prefix=f"Chargement traductions \"" + re.split("[\\/\\\\]+", file_path)[-1] + "\"")
+                          prefix=f"Chargement traductions \"" + re.split(r"[/\\]+", file_path)[-1] + "\"")
             else:
                 log.debug(f"{len(self) - current_length} nouvelle{'s' if (len(self) - current_length) > 1 else ''} " +
                           f"traduction{'s' if (len(self) - current_length) > 1 else ''} dans le fichier :\n\t{file_path}",
-                          prefix=f"Chargement traductions \"" + re.split("[\\/\\\\]+", file_path)[-1] + "\"")
+                          prefix=f"Chargement traductions \"" + re.split(r"[/\\]+", file_path)[-1] + "\"")
             return True
 
 

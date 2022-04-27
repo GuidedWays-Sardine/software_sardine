@@ -46,7 +46,7 @@ class SettingsDictionary(dict):
             Sa valeur.
         """
         # Enlève les charactères problématiques de la clé (ici ";" et "\t")
-        key = re.sub("[;\t]", "", str(key).lower())
+        key = re.sub(r"[;\t]", "", str(key).lower())
 
         # Vérifie si la clé a déjà une valeur et si c'est le cas, laisse un message de debug l'indiquant
         if key in self:
@@ -73,7 +73,7 @@ class SettingsDictionary(dict):
             Jetée si la clé n'a pas de valeur associée.
         """
         # Retourne la valeur avec la clé envoyée et nétoyée
-        return super(SettingsDictionary, self).__getitem__(re.sub("[;\t]", "", str(key).lower()))
+        return super(SettingsDictionary, self).__getitem__(re.sub(r"[;\t]", "", str(key).lower()))
 
     def get_value(self, key, default=None):
         """Récupère une valeur à partir de sa clé, et mettre un message dans le registre si inexistant.
@@ -199,7 +199,7 @@ class SettingsDictionary(dict):
             except (UnicodeDecodeError, UnicodeError):
                 log.debug("Les fichiers enregistrés sous Excel ne sont pas en UTF-8 (ANSI - Windows-1252). " +
                           f"Éviter la modification et sauvegarde de fichiers paramètres sous Excel.\n\t{file_path}",
-                          prefix="Chargement paramètres \"" + re.split("[\\/\\\\]+", file_path)[-1] + "\"")
+                          prefix="Chargement paramètres \"" + re.split(r"[/\\]+", file_path)[-1] + "\"")
 
                 # Ouvre le fichier avec l'encoding ANSI (utilisé par Excel)
                 with open(file_path, "r", encoding="ANSI") as file:
@@ -238,21 +238,21 @@ class SettingsDictionary(dict):
                         valid_settings += 1
                     else:
                         log.debug(f"Ligne sautée. Délimiteur \"{delimiter}\" manquant dans la ligne : \n\t{line}",
-                                  prefix="Chargement paramètres \"" + re.split("[\\/\\\\]+", file_path)[-1] + "\"")
+                                  prefix="Chargement paramètres \"" + re.split(r"[/\\]+", file_path)[-1] + "\"")
 
         except Exception as error:
             # Cas où le fichier ouvert n'existe pas ou qu'il n'est pas accessible
             log.warning(f"Impossible d'ouvrir le fichier de paramètres : \n\t{file_path}", exception=error,
-                        prefix="Chargement paramètres \"" + re.split("[\\/\\\\]+", file_path)[-1] + "\"")
+                        prefix="Chargement paramètres \"" + re.split(r"[/\\]+", file_path)[-1] + "\"")
             return False
         else:
             # Indique en debug le nombre d'éléments récupérés
             if valid_settings == 0:
                 log.debug(f"Aucun paramètre dans le fichier : \n\t{file_path}",
-                          prefix="Chargement paramètres \"" + re.split("[\\/\\\\]+", file_path)[-1] + "\"")
+                          prefix="Chargement paramètres \"" + re.split(r"[/\\]+", file_path)[-1] + "\"")
             else:
                 log.debug(f"{valid_settings} paramètre{'s' if valid_settings > 1 else ''} dans le fichier :\n\t{file_path}",
-                          prefix="Chargement paramètres \"" + re.split("[\\/\\\\]+", file_path)[-1] + "\"")
+                          prefix="Chargement paramètres \"" + re.split(r"[/\\]+", file_path)[-1] + "\"")
             return True
 
     @staticmethod
@@ -293,7 +293,7 @@ class SettingsDictionary(dict):
 
         # Regarde s'il contienr un dictionnaire (appelle la fonction récursivement pour chacune des valeurs)
         if data[0] == "}" and data[-1] == "}":
-            return {re.sub("[\"\']", "", couple.split(":", maxsplit=1)[0]): int(couple.split(":", maxsplit=1)[-1])
+            return {re.sub(r"[\"\']", "", couple.split(":", maxsplit=1)[0]): int(couple.split(":", maxsplit=1)[-1])
                     for couple in data[1:-1].replace(" ", "").split(",") if ":" in couple}
 
         # Dans tous les cas (si aucun des autres cas n'a été intercepté) retourne le string

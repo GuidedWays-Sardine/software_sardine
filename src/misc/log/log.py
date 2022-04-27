@@ -192,7 +192,7 @@ def log(log_level, message, exception=None, prefix=None) -> None:
     # heure ; - ; [prefix] ; - ; len(level) ; - ; ...
     format_length = 8 + (3 + 2) * bool(get_log_prefix()) + len(get_log_prefix()) + 3 + len(str(log_level)[6:]) + 3
     if message.count("\n") != len(message):
-        message = re.sub("\\n[\\t]*", "\n" + " " * format_length, message)
+        message = re.sub(r"\n[\t]*", "\n" + " " * format_length, message)
 
     # Laisse le message fraichement créé dans le registre avec le niveau de registre demandé
     logging.log(log_level.value, message)
