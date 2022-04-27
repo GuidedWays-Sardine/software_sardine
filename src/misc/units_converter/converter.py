@@ -55,22 +55,24 @@ def __get_unit(unit_name):
     # Convertir la chaine de charactère de l'unité en liste d'opérateurs et de valeurs
     try:
         __unit_list = __divide_unit_string(__unit)
-    except RecursionError:
-        raise RecursionError(f"Certaines parenthèses ne sont pas correctement fermées dans \"{__unit}\".")
-    except ValueError:
-        raise ValueError(f"Une unité ne peut pas se finir par un opérateur (* ; / ; ^) \"{__unit}\".")
+    except RecursionError as error:
+        raise RecursionError(f"Certaines parenthèses ne sont pas correctement fermées dans \"{__unit}\".") from error
+    except ValueError as error:
+        raise ValueError(f"Une unité ne peut pas se finir par un opérateur (* ; / ; ^) \"{__unit}\".") from error
 
     try:
         return __convert_unit_list(__unit_list[0])
     except ValueError as error:
         if not error.args:
-            raise ValueError(f"Suite d'opérateurs incohérents. Deux puissances ne peuvent pas se succéder ({__unit}).")
+            raise ValueError(f"Suite d'opérateurs incohérents. Deux puissances ne peuvent pas se succéder ({__unit}).") \
+                from error
         else:
-            raise ValueError(f"Suite d'opérateurs incohérents. {error.args[0]} trouvé au lieu de * ou / ({__unit}).")
+            raise ValueError(f"Suite d'opérateurs incohérents. {error.args[0]} trouvé au lieu de * ou / ({__unit}).") \
+                from error
     except KeyError as error:
-        raise KeyError(f"La sous-unité \"{error.args[0]}\" de l'unité \"{__unit}\" n'a pas été définie.")
+        raise KeyError(f"La sous-unité \"{error.args[0]}\" de l'unité \"{__unit}\" n'a pas été définie.") from error
     except TypeError as error:
-        raise TypeError(f"Puissance \"{error.args[0]}\" incohérente dans l'unité \"{__unit}\".")
+        raise TypeError(f"Puissance \"{error.args[0]}\" incohérente dans l'unité \"{__unit}\".") from error
 
 
 def __divide_unit_string(unit_string):
