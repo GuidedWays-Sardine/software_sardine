@@ -35,7 +35,9 @@ def initialise(path=f"{PROJECT_DIR}log\\", version=VERSION, log_level=Level.DEBU
     log_level : `Level`
         Niveau de registre. (Par défaut Level.DEBUG pour inscrire tous les messages de registre).
     save : `bool`
-        Indique si les messages doivent être sauvegardés dans un fichier (sinon elles apparaitront dans le terminal).
+        Indique si les messages doivent être sauvegardés dans un fichier ;
+    terminal: `bool`
+        Indique si le terminal sera utilisé (sinon il ne sera pas initialisé).
     """
     # Vérifie si un fichier log a déjà été créé, si oui, change le niveau de logging sinon le crée
     if logging.getLogger().hasHandlers():
@@ -64,9 +66,10 @@ def initialise(path=f"{PROJECT_DIR}log\\", version=VERSION, log_level=Level.DEBU
                             datefmt="%H:%M:%S",
                             format="%(asctime)s - %(levelname)s - %(message)s")
         
-    # Initialise la fenêtre de registre
-    from src.misc.log.log_window import __initialise_log_window
-    __initialise_log_window()
+    # si le terminal a été demandé, l'initialise
+    if terminal:
+        from src.misc.log.log_window import __initialise_log_window
+        __initialise_log_window()
 
 
 def change_log_level(log_level) -> None:
