@@ -47,7 +47,7 @@ class ImmersionWindow(QMainWindow):
     __image = None
 
     def __init__(self, position, size):
-        """Fonction permettant d'initialiser une fenêtre d'immersion.
+        """Initialise une fenêtre d'immersion.
 
         Parameters
         ----------
@@ -55,7 +55,7 @@ class ImmersionWindow(QMainWindow):
             Liste des positions de la fenêtre (x, y) ;
         size: `tuple[int, int] | list[int, int]`
             Liste des dimensions de la fenêtre (w, h).
-            """
+        """
         # Initialise la fenêtre
         super().__init__()
         self.hide()
@@ -137,7 +137,7 @@ class ImmersionWindow(QMainWindow):
     @decorators.UIupdate
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def set_loading(self) -> None:
-        """Fonction permettant de lancer la vidéo de chargement, puis de se mettre en mode Mode.STILL."""
+        """Lance la vidéo de chargement, puis se met en mode : Mode.STILL."""
         # Si la vidéo de chargement n'existe pas, passe directement en mode still
         if not os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{LOADING_PATH}"):
             self.set_still()
@@ -158,7 +158,7 @@ class ImmersionWindow(QMainWindow):
     @decorators.UIupdate
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def set_unloading(self) -> None:
-        """Fonction permettant de lancer la vidéo de chargement, puis de se mettre en mode Mode.STILL."""
+        """Lance la vidéo de chargement, puis se met en mode : Mode.STILL."""
         # Si la vidéo de déchargement n'existe pas, passe directement en mode empty
         if not os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{UNLOADING_PATH}"):
             self.set_empty()
@@ -179,7 +179,7 @@ class ImmersionWindow(QMainWindow):
     @decorators.UIupdate
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def set_still(self) -> None:
-        """Fonction permettant de vider la fenêtre d'immersion."""
+        """Montre la fenêtre d'initialisation avec le logo du simulateur au centre."""
         # Si le logo n'existe pas, passe en mode empty
         if not os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{STILL_PATH}"):
             self.set_empty()
@@ -199,7 +199,7 @@ class ImmersionWindow(QMainWindow):
     @decorators.UIupdate
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def set_empty(self) -> None:
-        """Fonction permettant de vider la fenêtre d'immersion."""
+        """Montre la fenêtre d'immersion vide (version uniquement)."""
         # Arrête la vidéo si elle tourne, cache la vidéo et l'image et montre la fenêtre
         if self.__load_mediaplayer is not None:
             self.__load_video.hide()
@@ -214,7 +214,7 @@ class ImmersionWindow(QMainWindow):
     @decorators.UIupdate
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def set_deactivated(self) -> None:
-        """Fonction permettant de vider la fenêtre d'immersion."""
+        """Cache la fenêtre d'immersion."""
         # Arrête la vidéo si elle tourne et cache la fenêtre, la vidéo et l'image
         if self.__load_mediaplayer is not None:
             self.__load_video.hide()

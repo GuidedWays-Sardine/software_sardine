@@ -4,7 +4,7 @@ import logging
 
 
 class Level(Enum):
-    """Classe contenant les différents niveaux de logs (permet une indépendance du module)"""
+    """Enum contenant les différents niveaux de logs."""
     NOTSET = logging.NOTSET
     DEBUG = logging.DEBUG
     INFO = logging.INFO

@@ -1,6 +1,8 @@
 #Librairies par défaut
 import sys
 import os
+import re
+import functools
 
 
 # Librairies SARDINE
@@ -38,17 +40,17 @@ class TranslationDictionary(dict):
         value: `str`
             Sa traduction.
         """
-        if isinstance(key, str):
+        if isinstance(key, str) and isinstance(value, str):
             super(TranslationDictionary, self).__setitem__(key.lower(), value)
         else:
-            log.debug(f"la clé : {key}, n'est pas de type string : {type(key)}")
+            log.debug(f"La traduction {{{key}: {value}}}, n'est pas du texte ({{{type(key)} : {type(value)}}}).")
 
     def __getitem__(self, key):
         """Opérateur value = self["key"] permettant de lire des valeurs du dictionnaire de traduction.
 
         Parameters
         ----------
-        key : `str`
+        key: `str`
             Mot à traduire (non sensible aux minuscules et aux majuscules).
 
         Returns
@@ -59,27 +61,27 @@ class TranslationDictionary(dict):
         try:
             return super(TranslationDictionary, self).__getitem__(key.lower())
         except KeyError:
-            log.debug(f"Aucune traduction pour : \"{key}\".")
+            log.debug(f"Aucune traduction correspondant à la clé : \"{key}\".")
             return key
 
     def create_translation(self, file_path, current_language, new_language, delimiter=";"):
-        """Ouvre un fichier de traduction et de récupèré toute les traductions.
+        """Ouvre un fichier de traduction et récupèré toute les traductions.
 
         Parameters
         ----------
         file_path: `str`
             chemin d'accès vers le fichier de traductions à ouvrir et lire ;
         current_language: `str`
-            la langue actuelle de ce qui doit être traduit ;
+            Langue de ce qui doit être traduit ;
         new_language: `str`
-            la langue dans laquelle il faut récupérer les traductions ;
+            Langue des traductions ;
         delimiter: `str`
-            délimteur séparant les différentes traductions ";" par défaut.
+            Délimiteur séparant les différentes traductions ";" par défaut.
 
         Returns
         -------
         successful: `bool`
-            Retourne si la lecture du fichier de traductions a été réussie (sinon erreur détectée).
+            Indique si la lecture du fichier de traductions a été réussie.
         """
         try:
             # Parceque windows pue du cul, les fichiers Excel (csv et txt) sont sauvegardés en ANSI et non en UTF-8
@@ -89,7 +91,8 @@ class TranslationDictionary(dict):
                     file.readline()
             except (UnicodeDecodeError, UnicodeError):
                 log.debug("Les fichiers enregistrés sous Excel ne sont pas en UTF-8 (ANSI - Windows-1252). " +
-                          f"Éviter la modification et sauvegarde de fichiers paramètres sous Excel.\n\t{file_path}")
+                          f"Éviter la modification et sauvegarde de fichiers paramètres sous Excel.\n\t{file_path}",
+                          prefix=f"Module traductions")
 
                 # Ouvre le fichier avec l'encoding ANSI (utilisé par Excel)
                 with open(file_path, "r", encoding="ANSI") as file:
@@ -110,7 +113,8 @@ class TranslationDictionary(dict):
                     new_index = language_list.index(new_language.lower())
                 except ValueError:
                     # Si l'une des langues n'existe envoyée n'existe pas
-                    log.warning(f"La langue : {current_language} ou {new_language} n'existe pas : \n\t{language_list}")
+                    log.warning(f"La langue : {current_language} ou {new_language} n'existe pas : \n\t{language_list}",
+                                prefix=f"Chargement traductions \"" + re.split("[\\/\\\\]+", file_path)[-1] + "\"")
                     return False
 
                 # Récupère la longueur actuelle
@@ -130,30 +134,38 @@ class TranslationDictionary(dict):
                     else:
                         # S'il n'y a pas autant de traductions que de langue, cela signifie que la ligne est incomplète
                         log.debug(f"Certaines traductions manquantes ({len(translations)}/{len(language_list)}) " +
-                                  f"sur la ligne : \n\t{line}")
+                                  f"sur la ligne : \n\t{line}",
+                                  prefix=f"Chargement traductions \"" + re.split("[\\/\\\\]+", file_path)[-1] + "\"")
         except Exception as error:
             # Cas où le fichier ouvert n'est pas accessible, indique la raison et retourne false
-            log.warning(f"Impossible d'ouvrir le fichier de traduction : {file_path}",
-                        exception=error,  prefix="dictionaire de traduction")
+            log.warning(f"Impossible d'ouvrir le fichier de traductions : \n\t{file_path}", exception=error,
+                        prefix=f"Chargement traductions \"" + re.split("[\\/\\\\]+", file_path)[-1] + "\"")
             return False
         else:
             # Indique le nombre d'éléments récupérées dans le registre et retourne vrai
-            log.debug(f"{len(self) - current_length} nouvelles traductions récupérées dans le fichier :\n\t {file_path}",
-                      prefix="dictionaire de traduction")
+            if (len(self) - current_length) == 0:
+                log.debug(f"Aucune nouvelle traduction dans le fichier : \n\t{file_path}",
+                          prefix=f"Chargement traductions \"" + re.split("[\\/\\\\]+", file_path)[-1] + "\"")
+            else:
+                log.debug(f"{len(self) - current_length} nouvelle{'s' if (len(self) - current_length) > 1 else ''} " +
+                          f"traduction{'s' if (len(self) - current_length) > 1 else ''} dans le fichier :\n\t{file_path}",
+                          prefix=f"Chargement traductions \"" + re.split("[\\/\\\\]+", file_path)[-1] + "\"")
             return True
 
 
+@functools.lru_cache(maxsize=len(os.listdir(f"{PROJECT_DIR}/settings/language_settings/")))
 def get_language_list(file_path):
-    """Récupère et retourne la liste des langues dans un fichier de traduction.
+    """Récupère la liste des langues dans un fichier de traduction.
 
     Parameters
     ----------
     file_path: `str`
-        chemin d'accès vers le fichier de traduction.
+        Chemin d'accès vers le fichier de traduction.
 
     Returns
     -------
     language_list: `tuple[str]`
+        Liste des langues détectées dans le fichier de traduction.
     """
     try:
         # Parceque windows pue du cul, les fichiers Excel (csv et txt) sont sauvegardés en ANSI et non en UTF-8
@@ -164,7 +176,8 @@ def get_language_list(file_path):
                 return tuple(file.readline().rstrip('\n').split(";"))
         except (UnicodeDecodeError, UnicodeError):
             log.debug("Les fichiers enregistrés sous Excel ne sont pas en UTF-8 (ANSI - Windows-1252). " +
-                      f"Éviter la modification et sauvegarde de fichiers paramètres sous Excel.\n\t{file_path}")
+                      f"Éviter la modification et sauvegarde de fichiers paramètres sous Excel.\n\t{file_path}",
+                      prefix="Module traductions")
 
             # Ouvre le fichier avec l'encoding ANSI (utilisé par Excel)
             with open(file_path, "r", encoding="ANSI") as file:
@@ -177,10 +190,16 @@ def get_language_list(file_path):
 
         # Ouvre le fichier de nouveau et retourne la liste des langues détectées
         with open(file_path, "r", encoding="utf-8-sig") as file:
-            return tuple(file.readline().rstrip('\n').split(";"))
+            languages = tuple(file.readline().rstrip('\n').split(";"))
+            if not languages:
+                log.warning(f"Aucune langue détectée dans le fichier : \n\t{file_path}", prefix="Module traductions")
+            else:
+                log.info(f"{len(languages)} langue{'s' if len(languages) > 1 else ''} dans le fichier : \n\t{file_path}",
+                         prefix="Module traductions")
+            return languages
     # Si une erreur a été récupérée (fichier ouvert dans un autre logiciel, ...
     except Exception as error:
         # Cas où le fichier ouvert n'est pas accessible, indique la raison et retourne false
         log.warning(f"Impossible d'ouvrir le fichier de traduction : {file_path}",
-                    exception=error, prefix="dictionaire de traduction")
+                    exception=error, prefix="Module de traductions")
         return ()

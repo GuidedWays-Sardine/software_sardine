@@ -38,6 +38,11 @@ INSTANCE = []
 
 
 class LogWindow(QTextEdit):
+    """Fenêtre de registre (unique à chaque simulation) pour visualiser les erreurs et messages d'informations."""
+    # Indique si un message a déjà été inséré dans le registre
+    __any = False
+
+    # Stocke la scrollbar et la police d'écriture pour le fonctionnement de la fenêtre
     __scrollbar = None
     __font = None
 
@@ -81,31 +86,34 @@ class LogWindow(QTextEdit):
 
     @decorators.UIupdate
     @decorators.QtSignal(log_level=Level.WARNING, end_process=False)
-    def append_log_message(self, message, log_level) -> None:
-        """Ajoute un message dans le registre. Le message aura le même format que ceux du fichier.
-        de registres. Si seul des caractères de nouvelles lignes sont envoyés, des lignes vides seront ajoutées.
+    def append_log_message(self, log_level, message) -> None:
+        """Ajoute un message dans la fenêtre de registre.
+        Si seul des caractères de nouvelles lignes sont envoyés, des lignes vides seront ajoutées.
 
         Parameters
         ----------
-        message: `str`
-            message à rajouter sur la fenêtre de registre (le format/préfix de registre y sera ajouté) ;
         log_level: `Level`
             niveau de registre du message (sera affiché que si le niveau de registre est suffisant).
+        message: `str`
+            message à rajouter sur la fenêtre de registre (le format/préfix de registre y sera ajouté) ;
         """
         # Dans le cas où seul des charactères de retour à la ligne ont été envoyés, laisse des lignes vides
-        if re.match("/^(\n)\1*$/", message):
+        if re.match("^(\n)\1*$", message):
             self.insertPlainText(message)
             return
 
         # combine le message au format de logging et change la date, le niveau et ajoute un caractère de nouvelle ligne:
-        message = "\n" + logging.getLogger().handlers[0].formatter._fmt.replace("%(message)s", message)
-        message = message.replace("%(asctime)s", time.strftime("%H:%M:%S")).replace("%(levelname)s", str(log_level)[6:])
+        from src.misc.log.log import get_log_prefix
+        message = "\n" * self.__any + time.strftime("%H:%M:%S") + " - "  +(f"[{get_log_prefix()}] - " if get_log_prefix() else "") + str(log_level)[6:] + " - " + message
+
+        self.__any = True
 
         # Vérifie si la scrollbar est en bas (dernier message visible)
         is_scrolled_down = self.verticalScrollBar().value() == self.verticalScrollBar().maximum()
 
         # S'assure que le niveau de registre envoyé est valide et suffisant pour être indiqué dans la fenêtre de logging
-        if isinstance(log_level, Level) and log_level in COLORS and log_level.value >= logging.root.level:
+        from src.misc.log.log import get_log_level
+        if isinstance(log_level, Level) and log_level in COLORS and log_level.value >= get_log_level().value:
             # Change la couleur selon le niveau de registre et le met en gros si : Level.ERROR ou Level.CRITICAL
             self.setTextColor(COLORS[log_level])
             self.setFontWeight(QFont.Bold if log_level.value >= Level.WARNING.value else QFont.Normal)
@@ -120,7 +128,7 @@ class LogWindow(QTextEdit):
     @decorators.UIupdate
     @decorators.QtSignal(log_level=Level.WARNING, end_process=False)
     def set_windowed(self) -> None:
-        """Fonction permettant de rendre la fenêtre de registre fenêtré avec la barre des titres et déplaçable."""
+        """Change la fenêtre de registre en mode fenêtré (bare des titre visible)."""
         # Dans le cas où la fenêtre n'est pas déjà en mode fenêtré
         if not (self.windowFlags() & Qt.WindowTitleHint):
             # Détecte si la fenêtre est visible ou non (enlever ou rajouter la barre des titres cachera la fenêtre)
@@ -153,7 +161,7 @@ class LogWindow(QTextEdit):
     @decorators.UIupdate
     @decorators.QtSignal(log_level=Level.WARNING, end_process=False)
     def set_frameless(self) -> None:
-        """Fonction permettant de rendre la fenêtre de registre sans cadre sans la barre des titres et indéplaçable."""
+        """Change la fenêtre de registre en mode sans bordure (bare des titre cachée)."""
         # Dans le cas où la fenêtre n'est pas déjà en mode fenêtré
         if not (self.windowFlags() & Qt.FramelessWindowHint):
             # Détecte si la fenêtre est visible ou non (enlever ou rajouter la barre des titres cachera la fenêtre)
@@ -184,8 +192,7 @@ class LogWindow(QTextEdit):
 
 
 def __initialise_log_window() -> None:
-    """Fonction (privée) permettant d'initialiser une instance de LogWindow si aucune n'a été initialisée.
-    La fenêtre est automatiquement initialisée lors de l'initialisation du registre"""
+    """[Fonction privée] Initialise l'instance de la fenêtre de registre (Initialisée en même temps que le registre)."""
     if QApplication.instance() is not None and not len(INSTANCE):
         INSTANCE.append(LogWindow())
     else:
@@ -194,29 +201,29 @@ def __initialise_log_window() -> None:
               "Fenêtre de registre désactivée pour la simulation")
 
 
-def __add_log_window_message(message, log_level):
-    """Fonction (privée) permettant d'ajouter un message de registre sur la fenêtre LogWindow active.
+def __add_log_window_message(log_level, message) -> None:
+    """[Fonction privée] Ajoute un message dans la fenêtre de registre.
     Si seul des caractères de nouvelles lignes sont envoyés, des lignes vides seront ajoutées.
 
     Parameters
     ----------
-    message: `str`
-        message à rajouter sur la fenêtre de registre (le format/préfix de registre y sera ajouté) ;
     log_level: `Level`
-        niveau de registre du message (sera affiché que si le niveau de registre est suffisant).
+        Niveau de registre du message (sera affiché que si le niveau de registre est suffisant) ;
+    message: `str`
+        Message à rajouter sur la fenêtre de registre (sans formatage) ;
     """
     # Si le fichier de registre a été initialisé et que la fenêtre est initialisée et activée
     if INSTANCE and logging.getLogger().hasHandlers():
-        INSTANCE[0].append_log_message(message, log_level)
+        INSTANCE[0].append_log_message(log_level, message)
 
 
 def log_window_frameless(visible=None) -> None:
-    """Fonction permettant de rendre la fenêtre de registre fenêtré avec la barre des titres et déplaçable.
+    """Change la fenêtre de registre en mode sans bordure (bare des titre cachée).
 
     Parameters
     ----------
     visible: `bool | None`
-        Est ce que la visibilité de la fenêtre doit être changée ? (None pour aucune modification sinon changé).
+        Indique si la visibilité doit changer (None pour aucune modification sinon changé).
     """
     # Si le fichier registre a été initialisé et que la fenêtre est initialisée et activée
     if INSTANCE and logging.getLogger().hasHandlers():
@@ -228,12 +235,12 @@ def log_window_frameless(visible=None) -> None:
 
 
 def log_window_windowed(visible=None) -> None:
-    """Fonction permettant de rendre la fenêtre de registre sans cadre sans la barre des titres et indéplaçable.
+    """Change la fenêtre de registre en mode fenêtré (bare des titre visible).
 
     Parameters
     ----------
     visible: `bool | None`
-        Est ce que la visibilité de la fenêtre doit être changée ? (None pour aucune modification sinon changé).
+        Indique si la visibilité doit changer (None pour aucune modification sinon changé).
     """
     # Si le fichier registre a été initialisé et que la fenêtre est initialisée et activée
     if INSTANCE and logging.getLogger().hasHandlers():
@@ -247,7 +254,7 @@ def log_window_windowed(visible=None) -> None:
 @decorators.UIupdate
 @decorators.QtSignal(log_level=Level.WARNING, end_process=False)
 def log_window_visibility(visible=True) -> None:
-    """Fonction permettant de changer la visibilité de la fenêtre.
+    """Change la visibilité de la fenêtre.
 
     Parameters
     ----------
@@ -266,9 +273,9 @@ def set_log_window_geometry(settings, key, visible=None) -> None:
 
     Parameters
     ----------
-    settings: `sd.SettingsDictionary | dict[str, Any]`
-        Dictionaire de paramètres contenant les informations sur la fenêtre. Les paramètres suivant doivent apparaitre :
-        key.screen_index, key.x, key.y, key.w, key.h -> avec key le paramètre key envoyé ;
+    settings: `sd.SettingsDictionary | dict[str, int]`
+        Dictionaire de paramètres contenant les informations sur la fenêtre.
+        Données requises : {key}.screen_index, {key}.x, {key}.y, {key}.w, {key}.h ;
     key: `str`
         Clé à partir de laquelle, les paramètres écrans seront lus ;
     visible: `bool | None`
@@ -283,13 +290,13 @@ def set_log_window_geometry(settings, key, visible=None) -> None:
 
 
 def get_log_window_geometry(settings, key) -> None:
-    """Récupère la position et la dimension de la fenêtre (stocké directement dans settings)
+    """Récupère la position et la dimension de la fenêtre (stocké directement dans settings).
 
     Parameters
     ----------
     settings: `sd.SettingsDictionary | dict[str, int]`
-        Dictionaire de paramètres où les informations seront stockées. Les paramètres seront sous la forme :
-        key.screen_index, key.x, key.y, key.w, key.h -> avec key le paramètre key envoyé ;
+        Dictionaire de paramètres où les informations seront stockées.
+        Données requises : {key}.screen_index, {key}.x, {key}.y, {key}.w, {key}.h ;
     key: `str`
         Clé avec laquelle les dimensions seront enregistrées.
     """

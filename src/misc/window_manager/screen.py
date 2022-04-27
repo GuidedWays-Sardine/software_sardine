@@ -16,7 +16,7 @@ import src.misc.log as log
 
 @functools.lru_cache(maxsize=1)
 def screens_list():
-    """Récupère et retourne les informations sur tous les écrans détectés (position et taille).
+    """Récupère les informations sur tous les écrans détectés (position et taille).
 
     Returns
     -------
@@ -32,27 +32,27 @@ def screens_list():
     if QApplication.instance() is None:
         raise RuntimeError("Le QApplication doit être initialisé pour permettre la récupération de la liste des écrans")
 
-    window_size = []
+    screens_geometry = []
     # Charge tous les écrans connectés à l'ordinateur (utile pour la positionnement de certaines popup)
     for screen_index in range(0, QDesktopWidget().screenCount()):
         # Charge les informations de l'écran (au format [x_min, y_min, x_max, y_max]
         sg = QDesktopWidget().screenGeometry(screen_index).getCoords()
 
         # Les stockes au bon format ((x, y), (w, h))
-        window_size.append(((sg[0], sg[1]), (sg[2] - sg[0] + 1, sg[3] - sg[1] + 1)))
+        screens_geometry.append(((sg[0], sg[1]), (sg[2] - sg[0] + 1, sg[3] - sg[1] + 1)))
 
-    log.info(f"Détection de {len(window_size)} écrans connectés à l'ordinateur.")
-    return tuple(window_size)
+    log.info(f"Détection de {len(screens_geometry)} écran{'s' * (len(screens_geometry) > 1)} sur l'ordinateur.")
+    return tuple(screens_geometry)
 
 
 @functools.lru_cache(maxsize=1)
 def screens_count():
-    """Récupère et retourne le nombre d'écrans connectés à l'ordinateur.
+    """Récupère le nombre d'écrans connectés à l'ordinateur.
 
     Returns
     -------
     screens_count: `int`
-        Nombre d'écrans connectés à l'ordinateur
+        Nombre d'écrans connectés à l'ordinateur.
 
     Raises
     ------
@@ -62,7 +62,7 @@ def screens_count():
     return len(screens_list())
 
 
-@functools.lru_cache(maxsize=8)     # 8 car nombre d'écrans connectables au maximum sur un ordinateur
+@functools.lru_cache(maxsize=8)     # 8 car nombre d'écrans connectables au maximum sur un ordinateur avec 2 CG/GPU
 def get_screen(screen_index):
     """fonction permettant de récupérer les informations d'un écran en particulier (position et taille).
 
@@ -74,8 +74,7 @@ def get_screen(screen_index):
     Returns
     -------
     screen_informations: `tuple[tuple[int, int], tuple[int, int]]`
-        Informations sur l'écran, leur position et taille ; format : ((x, y), (w, h)).
-
+        Informations sur l'écran, leur position et taille. Format : ((x, y), (w, h)).
 
     Raises
     ------

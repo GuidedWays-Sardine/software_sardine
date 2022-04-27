@@ -118,7 +118,7 @@ class SettingsDictionary(dict):
             # Cas des valueinput, dont la valeur doit être changée avec la fonction change_value
             if property_name == "value":
                 component.change_value(self[key])
-            # Cas du changement de sélection de la combobox (obligatoirement avec la fonction change_selection)
+            # Cas du changement de sélection du combobox (obligatoirement avec la fonction change_selection)
             elif "selection" in property_name:
                 # Récupère la valeur en tant qu'entier ou string selon si selection_index ou selection_
                 value = int(self["key"]) if property_name == "selection_index" else str(self["key"])
@@ -127,7 +127,7 @@ class SettingsDictionary(dict):
                     component.change_selection(translations[value])
                 else:
                     # Cas où l'utilisateur a oublié d'envoyer un dictionaire de paramètres
-                    log.debug(f"Changement de sélection avec la clé \"{key}\", sans dictionaire de paramètres.")
+                    log.debug(f"Changement de sélection avec la clé \"{key}\", sans dictionaire de traductions.")
                     component.change_selection(value)
             # Cas général où la propriété peut être changée sans fonction
             else:
@@ -165,10 +165,11 @@ class SettingsDictionary(dict):
         except Exception as error:
             # Cas où le fichier ouvert n'est pas accessible
             log.warning(f"Impossible d'enregistrer le fichier, l'action ne sera pas prise en compte.\n\t{file_path}",
-                        exception=error, prefix="Sauvegarde des données")
+                        exception=error, prefix="Sauvegarde des paramètres")
             return False
         else:
-            log.info(f"Enregistrement de {len(self)} données dans : {file_path}")
+            log.debug(f"Enregistrement de {len(self)} donnée{'s' if len(self) > 1 else ''} dans : \n\t{file_path}",
+                      prefix="Sauvegarde des paramètres")
             return True
 
     def open(self, file_path, delimiter=(";", "\t")):
@@ -187,7 +188,7 @@ class SettingsDictionary(dict):
             Retourne si l'ouverture du fichier paramètres a été réussie (sinon erreur détectée).
         """
         # Récupère la longueur actuelle
-        current_length = len(self)
+        valid_settings = 0
 
         try:
             # Parceque windows pue du cul, les fichiers Excel (csv et txt) sont sauvegardés en ANSI et non en UTF-8
@@ -197,7 +198,8 @@ class SettingsDictionary(dict):
                     file.readline()
             except (UnicodeDecodeError, UnicodeError):
                 log.debug("Les fichiers enregistrés sous Excel ne sont pas en UTF-8 (ANSI - Windows-1252). " +
-                          f"Éviter la modification et sauvegarde de fichiers paramètres sous Excel.\n\t{file_path}")
+                          f"Éviter la modification et sauvegarde de fichiers paramètres sous Excel.\n\t{file_path}",
+                          prefix="Chargement paramètres \"" + re.split("[\\/\\\\]+", file_path)[-1] + "\"")
 
                 # Ouvre le fichier avec l'encoding ANSI (utilisé par Excel)
                 with open(file_path, "r", encoding="ANSI") as file:
@@ -233,19 +235,24 @@ class SettingsDictionary(dict):
                         # Récupère les deux éléments de la ligne et les ajoutent comme clé et valeur
                         line = list(map(str.strip, line.rstrip('\n').split(delimiter, maxsplit=1)))
                         self[line[0]] = SettingsDictionary.convert_type(line[1])
+                        valid_settings += 1
                     else:
-                        log.debug(f"Ligne sautée. Délimiteur \"{delimiter}\" manquant dans la ligne : {line}",
-                                  prefix="Lecture des données")
+                        log.debug(f"Ligne sautée. Délimiteur \"{delimiter}\" manquant dans la ligne : \n\t{line}",
+                                  prefix="Chargement paramètres \"" + re.split("[\\/\\\\]+", file_path)[-1] + "\"")
 
         except Exception as error:
             # Cas où le fichier ouvert n'existe pas ou qu'il n'est pas accessible
-            log.warning(f"Impossible d'ouvrir le fichier, action non prise en comtpe. \n\t{file_path}",
-                        exception=error, prefix="Lecture des données")
+            log.warning(f"Impossible d'ouvrir le fichier de paramètres : \n\t{file_path}", exception=error,
+                        prefix="Chargement paramètres \"" + re.split("[\\/\\\\]+", file_path)[-1] + "\"")
             return False
         else:
             # Indique en debug le nombre d'éléments récupérés
-            log.debug(f"{len(self) - current_length} nouveaux paramètres récupérés dans le fichier :\n\t{file_path}",
-                      prefix="dictionaire de paramètres")
+            if valid_settings == 0:
+                log.debug(f"Aucun paramètre dans le fichier : \n\t{file_path}",
+                          prefix="Chargement paramètres \"" + re.split("[\\/\\\\]+", file_path)[-1] + "\"")
+            else:
+                log.debug(f"{valid_settings} paramètre{'s' if valid_settings > 1 else ''} dans le fichier :\n\t{file_path}",
+                          prefix="Chargement paramètres \"" + re.split("[\\/\\\\]+", file_path)[-1] + "\"")
             return True
 
     @staticmethod

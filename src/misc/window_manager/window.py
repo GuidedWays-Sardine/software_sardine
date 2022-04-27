@@ -12,7 +12,7 @@ from PyQt5.QtCore import QObject
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log as log
-import src.misc.window_manager.screen as wms
+import src.misc.window_manager.screen as wm
 import src.misc.settings_dictionary as sd
 import src.misc.decorators as decorators
 
@@ -20,22 +20,22 @@ import src.misc.decorators as decorators
 @decorators.UIupdate
 @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
 def set_window_geometry(window, settings, key, minimum_size=(124, 48)) -> None:
-    """repositionne et redimensionne la fenêtre.
+    """Repositionne et redimensionne la fenêtre.
 
     Parameters
     ----------
     window: `QMainWindow | QObject`
         Fenêtre à redimensionnée, peut provenir d'un QMainWindow (python) ou d'un Window (QML) ;
-    settings: `sd.SettingsDictionary | dict[str, Any]`
-        Dictionaire de paramètres contenant les informations sur la fenêtre. Les paramètres suivant doivent apparaitre :
-        key.screen_index, key.x, key.y, key.w, key.h -> avec key le paramètre key envoyé ;
+    settings: `sd.SettingsDictionary | dict[str, int]`
+        Dictionaire de paramètres contenant les informations sur la fenêtre.
+        Données requises : {key}.screen_index, {key}.x, {key}.y, {key}.w, {key}.h ;
     key: `str`
         Clé à partir de laquelle, les paramètres écrans seront lus ;
     minimum_size: `tuple[int, int] | list[int, int]`
         Liste des dimensions minimales de la fenêtre. format : (min_w, min_h).
     """
     # récupère la liste de la position et de la taille de chacun des écrans
-    screens = wms.screens_list()
+    screens = wm.screens_list()
 
     # Dans le cas où la clé ne se finit pas par un point, l'ajoute
     key += "." if not key.endswith(".") else ""
@@ -63,12 +63,13 @@ def set_window_geometry(window, settings, key, minimum_size=(124, 48)) -> None:
             # Récupère l'index de l'écran, cache la fenêtre s'il vaut 0, le met à 1 si trop peu d'écrans sont connectés.
             screen_index = settings[f"{key}screen_index"]
             if screen_index <= 0:
-                log.debug(f"La fenêtre \"{key[:-1]}\" n'est pas activée (screen_index à 0), dimensionnement annulé.")
+                log.debug(f"La fenêtre \"{key[:-1]}\" est désactivée (screen_index à 0).")
                 window.hide()
                 return
 
             if not (1 <= settings[f"{key}screen_index"] <= len(screens)):
-                log.debug(f"L'écran {screen_index} n'existe pas ({len(screens)} écrans).")
+                log.debug(f"L'écran {screen_index} n'existe pas ({len(screens)} écran{'s' * (len(screens) > 1)})." +
+                          f"Fenêtre positionnée par défaut sur l'écran 1.")
                 screen_index = 1
 
             # Commence par calculer la taille théorique maximale selon la position de la fenêtre et la taille écran
@@ -79,7 +80,7 @@ def set_window_geometry(window, settings, key, minimum_size=(124, 48)) -> None:
             if max_window_size[0] < settings[f"{key}w"] or max_window_size[1] < settings[f"{key}h"]:
                 log.debug(f"Les dimensions pour l'écran \"{key[:-1]}\" ({settings[f'{key}w']}, {settings[f'{key}h']})" +
                           f"sont trop grandes pour l'écran (maximum : {max_window_size[0]}, {max_window_size[1]})." +
-                          f"Les dimensions maximales seront utilisées")
+                          f"Les dimensions maximales ({max_window_size[0]}, {max_window_size[1]}) seront utilisées")
             window_size = [min(max_window_size[0], settings[f"{key}w"]),
                            min(max_window_size[1], settings[f"{key}h"])]
 
@@ -87,24 +88,24 @@ def set_window_geometry(window, settings, key, minimum_size=(124, 48)) -> None:
             if window_size[0] >= minimum_size[0] and (window_size[1] - titlebar_height) >= minimum_size[1]:
                 # Repositione et redimensionne la fenêtre (fonctions différentes pour QMainWindow et QObject)
                 if "setPosition" not in dir(window):
-                    window.move(screens[screen_index - 1][0][0] + settings[f"{key}x"],
+                    window.move(screens[screen_index - 1][0][0] + settings[f"{key}x"] - 1,
                                 screens[screen_index - 1][0][1] + settings[f"{key}y"])
                 else:
                     window.setPosition(screens[screen_index - 1][0][0] + settings[f"{key}x"] + 1,
                                        screens[screen_index - 1][0][1] + settings[f"{key}y"] + titlebar_height)
                 window.resize(window_size[0], window_size[1] - titlebar_height)
-                log.debug(f"fenêtre \"{key[:-1]}\" placée avec succès.")
+                log.debug(f"fenêtre \"{key[:-1]}\" placée et redimensionnée.")
             else:
                 # indique dans le cas où les positions sur l'écran rendent impossible le positionnement de la fenêtre
-                log.debug(f"La fenêtre \"{key[:-1]}\" ne rentre pas à l'écran." +
-                          f" ({window_size} -> [{minimum_size[0]}, {minimum_size[1]}] minimum).")
+                log.debug(f"La fenêtre \"{key[:-1]}\" ne rentre pas à l'écran" +
+                          f" (dimensions : {window_size} -> minimum : [{minimum_size[0]}, {minimum_size[1]}]).")
         except Exception as error:
             # Récupère une exception si l'une des données n'est pas au bon format
-            log.warning(f"Erreur lors du redimensionement de la fenêtre \"{key[:-1]}\".",
-                        exception=error)
+            log.warning(f"Erreur lors du redimensionement de la fenêtre \"{key[:-1]}\".", exception=error)
     else:
         # Sinon laisse un message de debug indiquant que certaines données sont manquantes
-        log.debug(f"Paramètres manquants pour la position et la taille de la fenêtre \"{key[:-1]}\".")
+        log.debug(f"Paramètres manquants {[s for s in ['screen_index', 'x', 'y', 'w', 'h'] if (key + s) not in settings]}" +
+                  f"pour la position et la taille de la fenêtre \"{key[:-1]}\".")
 
     # Si la fenêtre était cachée (motrée temporairement), la recache
     if not is_visible:
@@ -114,15 +115,15 @@ def set_window_geometry(window, settings, key, minimum_size=(124, 48)) -> None:
 @decorators.UIupdate
 @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
 def get_window_geometry(window, settings, key) -> None:
-    """Récupère st stocke dans settings la position et la dimension de la fenêtre
+    """Récupère (et stocke dans settings) la position et la dimension de la fenêtre
 
     Parameters
     ----------
     window: `QMainWindow | QObject`
         Fenêtre dont la géométrie doit être récupérée, peut provenir d'un QMainWindow (python) ou d'un Window (QML) ;
-    settings: `sd.SettingsDictionary | dict`
-        Dictionaire de paramètres où les informations seront stockées. Les paramètres seront sous la forme :
-        key.screen_index, key.x, key.y, key.w, key.h -> avec key le paramètre key envoyé ;
+    settings: `sd.SettingsDictionary | dict[str, int]`
+        Dictionaire de paramètres où les informations seront stockées.
+        Données requises : {key}.screen_index, {key}.x, {key}.y, {key}.w, {key}.h ;
     key: `str`
         Clé avec laquelle les dimensions seront enregistrées.
     """
@@ -133,7 +134,7 @@ def get_window_geometry(window, settings, key) -> None:
     # - La taille d'une fenêtre ne prend pas en compte la titlebar, contrairement à sa position
 
     # récupère la liste de la position et de la taille de chacun des écrans
-    screens = wms.screens_list()
+    screens = wm.screens_list()
 
     # Dans le cas où la clé ne se finit pas par un point, l'ajoute
     key += "." if not key.endswith(".") else ""
@@ -166,14 +167,14 @@ def get_window_geometry(window, settings, key) -> None:
     if screen_index:
         sg = screens[screen_index[0]]
         settings[f"{key}screen_index"] = screen_index[0] + 1
-        settings[f"{key}x"] = max(window.x() - sg[0][0] - ("framePosition" in dir(window)), 0)
+        settings[f"{key}x"] = max(window.x() - sg[0][0] - ("framePosition" in dir(window)) + ("setPosition" not in dir(window)), 0)
         settings[f"{key}y"] = max(window.y() - sg[0][1] - titlebar_height * ("framePosition" in dir(window)), 0)
         settings[f"{key}w"] = min(window.width(), sg[1][0])
         settings[f"{key}h"] = min(window.height() + titlebar_height, sg[1][1])
 
         # Donne des indications sur la position et la taille de l'écran récupéré
         log.debug(f"Emplacement de la fenêtre \"{key[:-1]}\" récupéré avec succès :\n\t" +
-                  " ; ".join((f"{p}: {settings[key + p]}" for p in ["screen_index", "x", "y", "w", "h"])))
+                  str({p: settings[key + p] for p in ["screen_index", "x", "y", "w", "h"]}) + ".")
     else:
         # Indique si la recherche de l'écran  n'a pas été concluant (coin supérieur droit hors de tout écran)
         log.debug(f"Impossible de localiser la fenêtre \"{key[:-1]}\".")

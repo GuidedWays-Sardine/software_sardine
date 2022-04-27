@@ -31,7 +31,8 @@ def CommandBoardComponent():
             except Exception as error:
                 # Laisse un message en niveau log.WARNING pour indiquer que le composant n'a pas su être chargé
                 log.warning("Un des composant pour le pupitre n'a pas pu être chargé correctement : \n" +
-                            f"\tErreur de type : {type(error)}\n\tAvec comme message d'erreur : {error.args}\n\t")
+                            f"\tErreur de type : {type(error)}\n\tAvec comme message d'erreur : {error.args}\n\t",
+                            prefix="Chargement pupitre")
 
         return signal_wraper
     return signal_decorator
@@ -39,14 +40,14 @@ def CommandBoardComponent():
 
 # Appel : @decorators.QtSignal(log_level=log.Level.DEBUG, end_process=False)
 def QtSignal(log_level=log.Level.ERROR, end_process=False):
-    """décorateur permettant de récupérer les exceptions dans les signaux (ne pouvant pas être récupéré par le main)
+    """décorateur permettant de récupérer les exceptions dans les signaux (ne pouvant pas être récupéré par le main).
 
     Parameters
     ----------
     log_level: `log.Level`
-        Le niveau du message de registre dans le cas où le signal jette une exception
+        Niveau du message de registre si le signal jette une exception (Level.ERROR par défaut) ;
     end_process: `bool`
-        Est ce que l'erreur doit générer une sortie de l'application
+        Indique si une exception récupérée doit entrainer une sortie de l'application.
     """
     def signal_decorator(signal):
         @wraps(signal)
@@ -59,7 +60,8 @@ def QtSignal(log_level=log.Level.ERROR, end_process=False):
                 function_name = str(signal)[10:].split(" at ")[0]
                 log.log(log_level=log_level,
                         message=f"Exception jetée dans le signal : {function_name}().",
-                        exception=error)
+                        exception=error,
+                        prefix=f"Signal : \"{function_name}\"")
                 if end_process:
                     exit(-1)
 
@@ -88,19 +90,19 @@ class UIupdate:
         __args = None
 
         def __init__(self, function):
-            """Fonction permettant d'initialiser le QThread et le décorateur UI.
-            Il connecte la fonction au thread principal à l'aide d'un pyqtSignal.
+            """Initialise le UIThread. Connecte la fonction au thread principal à l'aide d'un pyqtSignal.
 
             Parameters
             ----------
             function: `function`
-                Fonction influençant un module graphique à connecter avec le thread principal
+                Fonction influençant un module graphique à connecter avec le thread principal.
 
             Raises
             ------
-            RuntimeError
+            RuntimeError:
                 Jetée lorsque le thread dans lequel l'initialisation se fait n'est pas le thread principal
-                ou que la limite d'argument configurée (__MAX_PARAMETERS) n'est pas suffisant"""
+                ou que la limite d'argument configurée (__MAX_PARAMETERS) n'est pas suffisant.
+            """
             # Initialise le QThread
             super().__init__()
             self.__function = function
@@ -109,7 +111,7 @@ class UIupdate:
             # Il est donc vital que le QThread et le pyqtSignal soit initialisé sur le thread principal
             # On vérifie donc le "nom" du thread, qui s'appelle "_MainThread" pour le thread principal
             if threading.current_thread().__class__.__name__ != '_MainThread':
-                raise RuntimeError("Les composants pyQt doivent obligatoirement être initialisés sur thread principal")
+                raise RuntimeError("Les composants pyQt doivent obligatoirement être initialisés sur thread principal.")
 
             # Récupère les arguments par défaut)
             signature = inspect.signature(self.__function)
@@ -119,7 +121,7 @@ class UIupdate:
             # Si le nombre d'arguments est supérieur au nombre maximum d'arguments, alors jette une erreur
             if len(self.__args_list) > self.__MAX_PARAMETERS:
                 raise RuntimeError(f"La fonction envoyée a trop de paramètres. {len(self.__args_list)} nécessaires " +
-                                   f"pour {self.__MAX_PARAMETERS} maximums. Changer la valeur de __MAX_PARAMETERS")
+                                   f"pour {self.__MAX_PARAMETERS} maximums. Changer la valeur de __MAX_PARAMETERS.")
 
             # Sinon connecte la fonction au bon pyqtSignal (index = nombre d'arguments permis)
             # tag : QtCore.Qt.BlockingQueuedConnection ; pour attendre la fin du signal pour continuer
@@ -132,20 +134,22 @@ class UIupdate:
                                     filename=f"signal{len(self.__args_list)}",
                                     mode="eval")
 
-        def set_arguments(self, *args, **kwargs):
-            """Fonction pour changer les arguments pour le prochain appel de la fonction
-            (impossible à envoyer dans la fonction run(), définit par défaut par QThread et appelé avec QThread.start())
+        def set_arguments(self, *args, **kwargs) -> None:
+            """Prépare les arguments pour l'émission du signal (et donc l'appel de la fonction),
+            impossible à envoyer dans la fonction run(), définit par défaut par QThread et appelé avec UIThread.start().
 
             Parameters
             ----------
-            *args, **kwargs: Any
-                les différents arguments à envoyer lors de l'appel de la fonction
+            *args, **kwargs: `Any`
+                les différents arguments à envoyer lors de l'appel de la fonction.
 
             Raises
             ------
             TypeError:
-                Jetée lorsque le nombre d'arguments ne correspond pas au nombre d'arguments de la fonction
+                Jetée lorsque le nombre d'arguments ne correspond pas au nombre d'arguments de la fonction.
             """
+            function_name = str(self.__function)[10:].split(" at ")[0]
+
             # Transforme le tuple d'argument en une liste
             arguments = list(args)
 
@@ -159,22 +163,21 @@ class UIupdate:
                     arguments.append(copy.deepcopy(self.__args_list[i][1]))
                 # Sinon la valeur n'a pas été envoyée, laisse un message d'erreur (un crash se produira dans le signal)
                 else:
-                    log.warning(f"Argument \"{self.__args_list[i][0]}\" manquant dans appel fonction {self.__function}")
+                    log.debug(f"Argument \"{self.__args_list[i][0]}\" manquant dans l'appel fonction {function_name}.")
 
             # Reconvertit la liste d'arguments en tuple et le stocke dans la classe
             self.__args = tuple(arguments)
 
             # # S'assure que le nombre d'argument qui sera envoyé sera le bon
             if len(self.__args_list) != len(self.__args):
-                raise TypeError(f"{self.__function} takes {len(self.__args_list)} " +
-                                f"positional arguments but {len(args)} was given")
+                raise TypeError(f"{function_name} takes {len(self.__args_list)} positional arguments but {len(args)} was given.")
 
-        def clear_arguments(self):
-            """Fonction permettant de réinitialiser les arguments"""
+        def clear_arguments(self) -> None:
+            """Réinitialise les arguments."""
             self.__args = ()
 
-        def run(self):
-            """Fonction permettant d'émettre le signal et donc d'appeler la fonction avec les paramètres sauvegardés"""
+        def run(self) -> None:
+            """Emet le signal donc appelle la fonction avec les paramètres sauvegardés"""
             # Emet le signal, l'executant et attend qu'il se finisse
             exec(self.__signal)
 
@@ -191,18 +194,18 @@ class UIupdate:
     __ui_thread = None
 
     def __init__(self, function):
-        """fonction appelée lors de l'initialisation de la fonction ciblée par le décorateur
+        """Fonction appelée lors de l'initialisation de la fonction ciblée par le décorateur.
 
         Parameters
         ----------
         function: `function`
-            fonction à appeler de façon sécurisé
+            fonction à appeler de façon sécurisée.
         """
         # Initialise le QThread
         self.__ui_thread = self.UIThread(function)
 
     def __call__(self, *args, **kwargs):
-        """fonction appelée lors de l'appel de la fonction ciblée par le décorateur"""
+        """Fonction appelée lors de l'appel de la fonction ciblée par le décorateur."""
         # Génère la liste des arguments (fusion des *args, **kwargs et des arguments par défaut
         self.__ui_thread.set_arguments(*args, **kwargs)
 
@@ -213,9 +216,9 @@ class UIupdate:
             try:
                 self.__ui_thread.get_func()(*self.__ui_thread.get_args())
             except Exception as error:
-                function_name = str(self.__ui_thread)[10:].split(" at ")[0]
-                log.warning(message=f"Exception jetée dans le signal : {function_name}().",
-                            exception=error)
+                function_name = str(self.__ui_thread.get_func())[10:].split(" at ")[0]
+                log.warning(message=f"Exception jetée dans le signal : {function_name}().", exception=error,
+                            prefix=f"Signal : \"{function_name}\"")
             self.__ui_thread.clear_arguments()
         else:
             self.__ui_thread.start()
