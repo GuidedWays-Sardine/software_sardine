@@ -238,8 +238,8 @@ class Dimension:
         elif isinstance(other, Dimension):
             is_complex = (len(re.findall(r"[/*]", other.name)) > 0)      # Pour savoir si l'unité doit être encadrée
             return Dimension(name=f"{self.name}/{f'({other.name})' if is_complex else other.name}",
-                             factor=other.factor / self.factor,
-                             offset=(other.offset - self.offset) / self.factor * (not isclose(self.offset, 0)),
+                             factor=self.factor / other.factor,
+                             offset=(self.offset - other.offset) / other.factor * (not isclose(other.offset, 0)),
                              length=self.dimensions["length"] - other.dimensions["length"],
                              mass=self.dimensions["mass"] - other.dimensions["mass"],
                              time=self.dimensions["time"] - other.dimensions["time"],
