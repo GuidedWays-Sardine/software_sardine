@@ -64,11 +64,14 @@ class Dimension:
         Raises
         ------
         ValueError:
+            Jetée si le facteur est négatif
             Jetée si les dimensions de l'unité envoyé sont invalides (K^2, ...) ;
         ZeroDivisionError:
             Jetée si le facteur envoyé vaut 0 (impossible).
         """
         # S'assure que le facteur ne vaut pas 0 (sinon risque de division par défaut
+        if factor < 0:
+            raise ValueError("Le facteur de conversion ne peut pas être négatif.")
         if factor == 0:
             raise ZeroDivisionError("Le facteur entre une unité et son équivalent ne peut pas valoir 0.")
 
