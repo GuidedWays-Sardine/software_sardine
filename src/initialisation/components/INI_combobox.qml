@@ -13,9 +13,9 @@ Item {
     id:root
 
     //Propriétés liés à la position et à la taille de l'objet
-    property double default_x: 0               //position de la combobox pour les dimensions minimales de la fenêtre (w_min*h_min)
+    property double default_x: 0               //position du combobox pour les dimensions minimales de la fenêtre (w_min*h_min)
     property double default_y: 0
-    property double default_width: 100         //dimensions de la combobox pour les dimensions minimales de la fenêtre (w_min*h_min)
+    property double default_width: 100         //dimensions du combobox pour les dimensions minimales de la fenêtre (w_min*h_min)
     property double default_height: 40
 
     //permet à partir des valeurs de positions et dimensions par défauts de calculer le ratio à appliquer aux dimensions
@@ -31,19 +31,19 @@ Item {
     width: root.default_width * root.ratio
     height: root.default_height * root.ratio
 
-    //Propriétés liés aux donnés de la combobox
-    property var elements: ["NaN"]          //définit les éléments sélectionables de la combobox
-    readonly property int elements_count: combo.count //retient le nombre d'éléments sélectionables dans la combobox
-    property int elements_displayed: 4      //définit le nombre d'éléments visibles dans la popup
+    //Propriétés liés aux donnés du combobox
+    property var elements: ["NaN"]          //définit les éléments sélectionables du combobox
+    readonly property int elements_count: combo.count //retient le nombre d'éléments sélectionables dans le combobox
+    property int elements_displayed: 4      //définit le nombre d'éléments visibles dans le popup
     readonly property string selection_text: combo.displayText //retient le texte et l'index de la sélection actuelle et précédente
     readonly property int selection_index: root.elements_count !== 0 ? combo.currentIndex : -1
     property string title: ""        //texte à afficher au dessus du composant
     property int font_size: 12
 
-    //Propriétés liés à l'état de la combobox
-    property bool is_activable: true        //si la combobox peut être activée (Elle le sera que si is_activable est à true et qu'il y a plus d'un élément dans la combobox)
+    //Propriétés liés à l'état du combobox
+    property bool is_activable: true        //si le combobox peut être activée (Elle le sera que si is_activable est à true et qu'il y a plus d'un élément dans le combobox)
     property bool is_dark_grey: !is_activable//est ce que le texte doit-être en gris foncé ?
-    property bool is_positive: false        //si la combobox doit-être visible en couche positive (sinon négative)
+    property bool is_positive: false        //si le combobox doit-être visible en couche positive (sinon négative)
     property bool is_visible: true          //si le bouton est visible
     visible: is_visible
 
@@ -61,12 +61,12 @@ Item {
 
 
     //Différents signal handlers (à écrire en python)
-    signal combobox_opened()                //détecte quand le popup de la combobox s'ouvre
-    signal combobox_closed()                //détecte quand le popup de la combobox se ferme
-    signal selection_changed()              //détecte quand l'utilisateur changed la sélection de la combobox (selection_changed() appelé après combobox_closed())
+    signal combobox_opened()                //détecte quand le popup du combobox s'ouvre
+    signal combobox_closed()                //détecte quand le popup du combobox se ferme
+    signal selection_changed()              //détecte quand l'utilisateur changed la sélection du combobox (selection_changed() appelé après combobox_closed())
 
 
-    //Fonction pour changer l'index de la combobox en fonction de l'index ou du texte de la sélection souhaité
+    //Fonction pour changer l'index du combobox en fonction de l'index ou du texte de la sélection souhaité
     function change_selection(new_selection){
         // Si la nouvelle sélection est un int, change le currentIndex en fonction de l'index envoyé
         if(typeof new_selection === typeof root.font_size && new_selection < combo.count && new_selection >= 0){
@@ -153,7 +153,7 @@ Item {
 
 
 
-    //Inline component : combobox (crée une templace de la combobox)
+    //Inline component : combobox (crée une templace du combobox)
     component DMI_combo: ComboBox {
         id: body
 
@@ -163,7 +163,7 @@ Item {
         font.family: "Verdana"
         flat: true
 
-        //Flèche visible lorsque la combobox est fermée
+        //Flèche visible lorsque le combobox est fermée
         indicator: Canvas {
             id: canvas
 
@@ -173,11 +173,11 @@ Item {
             height: 8 * root.ratio
 
 
-            //Permet d'ouvrir le popup quand la combobox est sélectionné et appelle le signal handler
+            //Permet d'ouvrir le popup quand le combobox est sélectionné et appelle le signal handler
             Connections {
                 target: body
 
-                //Fonction détectant quand quand la combobox fermé a été cliquée
+                //Fonction détectant quand quand le combobox fermé a été cliquée
                 function onPressedChanged() {
                     forceActiveFocus()
                     canvas.requestPaint()
@@ -202,7 +202,7 @@ Item {
             }
         }
 
-        //Texte visible quand la combobox est fermée
+        //Texte visible quand le combobox est fermée
         contentItem: Text {
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
@@ -218,7 +218,7 @@ Item {
             }
         }
 
-        //Rectangle visible lorsque la combobox est fermée
+        //Rectangle visible lorsque le combobox est fermée
         background: Rectangle {
             id: text_zone
 
@@ -227,7 +227,7 @@ Item {
             color: root.dark_blue
         }
 
-        //Menu de popup quand la combobox est ouverte
+        //Menu de popup quand le combobox est ouverte
         popup: Popup {
             id: popup
 
@@ -258,7 +258,7 @@ Item {
                 ScrollIndicator.vertical: ScrollIndicator { }
             }
 
-            //Rectangle de fond (cache les widgets lorsque la combobox est ouverte
+            //Rectangle de fond (cache les widgets lorsque le combobox est ouverte
             background: Rectangle {
                 color: root.dark_blue
             }
@@ -266,7 +266,7 @@ Item {
     }
 
 
-    //Crée une instance de la combobox
+    //Crée une instance du combobox
     DMI_combo {
         id:combo
 
@@ -274,7 +274,7 @@ Item {
 
         model: root.elements
 
-        //Le delegate permete de définir la composition et la forme des éléments de la combobox
+        //Le delegate permete de définir la composition et la forme des éléments du combobox
         delegate: ItemDelegate {
             width: combo.width
             height: combo.height
@@ -299,11 +299,11 @@ Item {
     INI_text {
         id: title_text
 
+        default_x: 0
+        default_y: - (root.font_size + 4) * root.ratio
+
         text: root.title
         font_size: root.font_size * root.ratio
-
-        default_x: 2 * root.ratio
-        default_y: - (root.font_size + 4) * root.ratio
 
         is_dark_grey: root.is_dark_grey || root.elements.length <= 1
     }

@@ -27,7 +27,7 @@ Item {
     property string title: ""                //texte à afficher à côté du corp du checkbutton
     property int font_size: 12               //police du texte
 
-    //Propriétés liés à l'état de la combobox
+    //Propriétés liés à l'état du combobox
     property bool is_checked: false          //si le bouton est activé
     onIs_checkedChanged : value_changed()
     property bool is_activable: true         //si le bouton peut être activée

@@ -153,11 +153,11 @@ Item {
     INI_text {
         id: title_text
 
+        default_x: root.default_x
+        default_y: root.default_y - 4 - font_size
+
         text: root.title
         font_size: root.font_size
-
-        default_x: root.default_x + 2
-        default_y: root.default_y - 4 - font_size
 
         is_dark_grey: root.is_dark_grey || root.elements.length <= 1
     }
