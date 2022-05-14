@@ -117,8 +117,8 @@ def change_mode(new_mode) -> None:
         # Cache toutes les fenêtres
         for window in IMMERSION:
             window.set_deactivated()
-            log.info("Changement du mode immersion : mode désactivé.",
-                     prefix="Module immersion")
+        log.info("Changement du mode immersion : mode désactivé.",
+                 prefix="Module immersion")
 
 
 def change_skip_list(skip_list=(), new_mode=Mode.EMPTY) -> None:
