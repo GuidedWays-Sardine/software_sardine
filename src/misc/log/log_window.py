@@ -8,7 +8,7 @@ import re
 
 # Librairies graphiques
 from PyQt5.QtWidgets import QTextEdit, QScrollBar, QApplication, QFrame
-from PyQt5.QtGui import QColor, QFont
+from PyQt5.QtGui import QColor, QFont, QCloseEvent
 from PyQt5.QtCore import Qt, qInstallMessageHandler
 
 # Librairies SARDINE
@@ -85,7 +85,7 @@ class LogWindow(QTextEdit):
         del self
 
     @decorators.UIupdate
-    @decorators.QtSignal(log_level=Level.WARNING, end_process=False)
+    @decorators.QtSignal(log_level=Level.CRITICAL, end_process=True)
     def append_log_message(self, log_level, message) -> None:
         """Ajoute un message dans la fenêtre de registre.
         Si seul des caractères de nouvelles lignes sont envoyés, des lignes vides seront ajoutées.
@@ -104,7 +104,7 @@ class LogWindow(QTextEdit):
 
         # combine le message au format de logging et change la date, le niveau et ajoute un caractère de nouvelle ligne:
         from src.misc.log.log import get_log_prefix
-        message = "\n" * self.__any + time.strftime("%H:%M:%S") + " - "  +(f"[{get_log_prefix()}] - " if get_log_prefix() else "") + str(log_level)[6:] + " - " + message
+        message = "\n" * self.__any + time.strftime("%H:%M:%S") + " - " + (f"[{get_log_prefix()}] - " if get_log_prefix() else "") + str(log_level)[6:] + " - " + message
 
         self.__any = True
 
@@ -189,6 +189,10 @@ class LogWindow(QTextEdit):
             # Si la scrollbar était tout en bas, la redéplace en bas
             if is_scrolled_down:
                 self.verticalScrollBar().setValue(self.verticalScrollBar().maximum())
+
+    def closeEvent(self, event: QCloseEvent) -> None:
+        event.ignore()
+        self.hide()
 
 
 def __initialise_log_window() -> None:
