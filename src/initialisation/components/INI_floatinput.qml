@@ -28,14 +28,19 @@ Item{
     readonly property double y_offset: (parent.width/parent.height < w_min/h_min) && (parent.width >= w_min && parent.height >= h_min) ? (parent.height - h_min * root.ratio) / 2 : 0
 
     //Propriétés liés aux valeurs limites et la valeur actuellement sélectionnée
-    property double minimum_value: 0
-    property double maximum_value: 1
+    property double minimum_value: 0.0
+    property double maximum_value: 1.0
     property int decimals: 1000
-    property double value: 0
+    property double visible_value: 0.0
+    readonly property double value: (root.visible_value - root.unit_offset) / root.unit_factor
 
     //propriétés sur les textes d'habillages
     property string title: ""
     property string unit: ""
+    property var conversion_list: []    // format [[name, factor, offset], ...]
+    property string unit_name: unit_text.text
+    property double unit_factor: 1.0
+    property double unit_offset: 0.0
     property int font_size: 12
     property int unit_font_size: root.font_size / 2
 
@@ -66,29 +71,39 @@ Item{
     //Fonction pour remettre la valeur par défaut dans le valueinput (maximum_calue si is_max_default est vrai sinon minimum_value)
     function clear(){
         // Vérifie si la valeur actuellement visible est différente que la valeur quand vidé, change la valeur et appelle le signal value_changed si c'est le cas
-        var changed = root.is_max_default ? root.value !== validator.bottom : root.value !== validator.top
+        var changed = root.is_max_default ? root.visible_value !== validator.bottom : root.visible_value !== validator.top
         body.text = ""
 
         //Si la valeur a changée appelle le signal associé et change la valeur
         if(changed){
-            root.value = root.is_max_default ? validator.top : validator.bottom
+            root.visible_value = root.is_max_default ? validator.top : validator.bottom
             value_changed()
         }
     }
 
     //Fonction permettant de changer la valeur du valueinput (de manière sécurisée)
-    function change_value(new_value){
+    function change_value(new_value){   //L'unité toujours en équivalent SI
+        //convertit la valeur dans la bonne unité
+        new_value = new_value * root.unit_factor + root.unit_offset
+
         //Si la valeur n'est pas valide (trop grand ou trop petite) la change
-        if(new_value < validator.bottom || new_value > validator.top) {
-            new_value = new_value < validator.bottom ? validator.bottom : validator.top
+        if(new_value < Math.floor((root.minimum_value * root.unit_factor + root.unit_offset) * Math.pow(10, root.decimals))/Math.pow(10, root.decimals) ||
+           new_value > Math.floor((root.maximum_value * root.unit_factor + root.unit_offset) * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)) {
+            //console.log(`Nouvelle valeur pour le INI_floatinput : \"${root.objectName}\" invalide (${validator.bottom} < ${new_value} < ${validator.top} non vérifié)`)
+            //new_value = new_value < validator.bottom ? validator.bottom : validator.top
+        }
+        //Sinon change le nombre de décimales au bon nombre
+        else {
+            //new_value = Math.floor(new_value * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
         }
 
         // Si la valeur vaut la valeur min sans is_max_default ou max avec is_max_default, vide la zone de texte, sinon la met à la valeur approchée au bon nombre de décimales
-        body.text = ((new_value === validator.bottom && !root.is_max_default) || (new_value === validator.top && root.is_max_default)) ? "" : new_value
+        body.text = new_value
+        //body.text = ((new_value === validator.bottom && !root.is_max_default) || (new_value === validator.top && root.is_max_default)) ? "" : new_value
 
         //Si la valeur a été changée, appelle le signal value_changed
         if(value !== new_value){
-            root.value = new_value
+            root.visible_value = new_value
             value_changed()
         }
     }
@@ -162,68 +177,124 @@ Item{
             }
         }
     }
-    
-    
+
+
 
     //Signal détectant quand la valeur minimale est changée
     onMinimum_valueChanged: {
-        //Calcule la valeur arrondie minimale (pas encore mise à jour sur le validateur)
-        var bottom = Math.floor(root.minimum_value * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
-
-        //Cas où la valeur minimale est inférieure à 0
-        if(root.minimum_value < 0){
-            root.minimum_value = 0
+        //cas où la valeur minimale est supérieure à la valeur maximale
+        if(validator.bottom > validator.top){
+            // Change la borne maximale pour être identique à la nouvelle borne minimale
+            console.log(`Nouvelle limite inférieure pour le INI_floatinput : \"${root.objectName}\" trop grande (min : ${validator.bottom} > ${validator.top} : max)`)
+            root.maximum_value = root.minimum_value
+            // Change la valeur pour qu'elle reste dans les bornes
+            body.text = root.is_max_default ? validator.bottom : ""
+            root.visible_value = validator.top
+            value_changed()
         }
-
-        //Cas où la valeur minimale est supérieure à la valeur maximale
-        if(root.minimum_value > root.maximum_value){
-            root.minimum_value = root.maximum_value
-        }
-
         //cas où la valeur actuelle rentrée est inférieure à la nouvelle valeur minimale
-        if(body.text != "" && parseFloat(body.text.replace(",", ".")) < root.minimum_value){
-            root.value = bottom
-            body.text = (root.is_max_default && validator.top !== bottom) ? bottom : ""
+        else if(body.text != "" && root.visible_value < validator.bottom){
+            root.visible_value = validator.bottom
+            body.text = (!root.is_max_default || root.maximum_value === root.minimum_value) ? "" : validator.bottom
             value_changed()
         }
-        //cas où aucune valeur n'est entrée et que is_max_default faux
-        else if(body.text === "" && !root.is_max_default){
-            root.value = bottom
+        //Cas où aucune valeur n'est entrée et que is_max_default faux
+        else if(body.text === "" && root.is_max_default) {
+            root.visible_value = validator.bottom
             value_changed()
-            body.text = ""
         }
+        //Sinon la valeur est toujours dans les bornes
     }
 
     //Signal détectant quand la valeur maximale est changée
     onMaximum_valueChanged: {
-        //Calcule la valeur arrondie maximale (pas encore mise à jour dans le validateur)
-        var top = Math.floor(root.maximum_value * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
-
         //cas où la valeur maximale est inférieure à la valeur minimale
-        if(root.maximum_value < root.minimum_value){
-            root.maximum_value = root.minimum_value
+        if(validator.top < validator.bottom){
+            // Change la borne minimale pour être identique à la nouvelle borne maximale
+            console.log(`Nouvelle limite supérieure pour le INI_integerinput : \"${root.objectName}\" trop faible (max : ${validator.top} < ${validator.bottom} : min)`)
+            root.minimum_value = root.maximum_value
+            // Change la valeur pour qu'elle reste dans les bornes
+            body.text = root.is_max_default ? "" : validator.top
+            root.visible_value = validator.top
+            value_changed()
         }
         //cas où la valeur actuelle rentrée est supériere à la nouvelle valeur maximale
-        if(root.value > top){
-            body.text = (root.is_max_default || top === validator.bottom) ? "" : top
-            root.value = top
+        else if(body.text != "" && root.visible_value > validator.top){
+            root.visible_value = validator.top
+            body.text = (root.is_max_default || root.maximum_value === root.minimum_value) ? "" : validator.top
             value_changed()
         }
         //cas où aucune valeur n'est entrée et que is_max_default vrai
         else if(body.text === "" && root.is_max_default) {
-            root.value = top
-            body.text = ""
+            root.visible_value = validator.top
             value_changed()
         }
+        // Sinon la valeur est toujours dans les bornes
     }
 
     //Signal détectact lorsque is_max_default est changé
     onIs_max_defaultChanged: {
         //Dans le cas où aucune valeur n'est entrée et que la valeur min et max diffèrent (la valeur va changer de borne)
-        if(body.text == "" && validator.top > validator.bottom) {
-            root.value = root.is_max_default ? validator.top : validator.bottom
+        if(body.text == "") {
+            root.visible_value = root.is_max_default ? validator.top : validator.bottom
             value_changed()
         }
+    }
+
+    // Signal appelé lorsque l'unité est changée
+    onUnitChanged: {
+        // Dans le cas ou une unité est entrée
+        if (root.unit !== "") {
+            // Crée une liste de conversion contenant l'unité et un facteur 1 et un décallage 0
+            root.conversion_list = [[root.unit, 1.0, 0.0]]
+            // Le signal onConversion_listChanged s'occupera du reste
+        }
+    }
+
+    // Signal appelé lorsque la liste d'unité est change
+    onConversion_listChanged: {
+        // Si la liste n'est pas vide, initialise l'unité à utiliser
+        if (root.conversion_list.length > 0) {
+            // Remet le facteur a 1 et le décallage à 0
+            var converted_value = root.value
+
+            // Regarde si l'unité actuelle se trouve dans la liste
+            var index = 0
+            while(index < root.conversion_list.length && root.conversion_list[index][0] != unit_text.text) {
+                index += 1
+            }
+            //si l'unité n'a pas été trouvée, repasse l'index à 0
+            index = index % root.conversion_list.length
+
+            //Définit la nouvelle unité comme celle trouvée (ou la première si non trouvée)
+            unit_text.text = root.conversion_list[index][0]
+            root.unit_factor = root.conversion_list[index][1]
+            root.unit_offset = root.conversion_list[index][2]
+            change_value(converted_value)
+        }
+        // Si la liste est vide, change le texte pour un texte vide ainsi que le facteur et le décallage à 0
+        else {
+            var converted_value = root.value
+            unit_text.text = ""
+            root.unit_factor = 1.0
+            root.unit_offset = 0.0
+            change_value(converted_value)
+        }
+
+        // Repasse la valeur root.unit comme un string vide
+        root.unit = ""
+    }
+
+    //Sécurité dans le cas où l'utilisateur change la variable visible_value (déconseillé)
+    onVisible_valueChanged: {
+        //Si la valeur visible n'est pas dans le rang correct
+        if (root.visible_value < validator.bottom || root.visible_value > validator.top) {
+            console.log(`Nouvelle valeur pour le INI_floatinput : \"${root.objectName}\" invalide (${validator.bottom} < ${root.visible_value} < ${validator.top} non vérifié)`)
+            root.visible_value < validator.bottom ? (root.is_max_default ? validator.bottom : "") : (root.is_max_default ? "" : validator.top)
+        }
+        // Change le texte et appelle le signal value changed
+        body.text = root.visible_value
+        value_changed()
     }
 
 
@@ -258,8 +329,44 @@ Item{
             locale: "RejectGroupSeparator"
 
             decimals: root.decimals
-            bottom: Math.floor(root.minimum_value * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
-            top: Math.floor(root.maximum_value * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
+            bottom: Math.floor((root.minimum_value * root.unit_factor + root.unit_offset) * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
+            top: Math.floor((root.maximum_value * root.unit_factor + root.unit_offset) * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
+        }
+
+        //Mouse area permettant de détecter le double clic (et de changer d'unité)
+        MouseArea
+        {
+            anchors.fill: parent
+            propagateComposedEvents: true
+
+            //Signal appelé, lorsque le valueinput est cloqué, permet de démarrer l'édition de la valeur
+            onClicked: {
+                if (root.is_activable) {
+                    body.forceActiveFocus()
+                }
+            }
+
+            //Signal appelé lorsque le valueinput est double cliqué (permet de changer l'unité active)
+            onDoubleClicked: {
+                //Cas où la liste de conversion contient plus d'un élément
+                if(root.conversion_list.length > 1 && root.is_activable) {
+                    //trouve l'index de l'élément qui suit l'élément actuel
+                    var index = 0
+                    while(index < root.conversion_list.length && root.conversion_list[index][0] != unit_text.text) {
+                        index += 1
+                    }
+                    index = (index + 1) % root.conversion_list.length
+
+                    //Change l'unité aparente
+                    unit_text.text = root.conversion_list[index][0]
+
+                    //convertit la valeur en unité SI, puis change les facteurs et offset ainsi que la valeur actuelle
+                    var converted_value = (root.visible_value - root.unit_offset) / root.unit_factor
+                    root.unit_factor = root.conversion_list[index][1]
+                    root.unit_offset = root.conversion_list[index][2]
+                    change_value(converted_value)
+                }
+            }
         }
 
         //détecte quand le texte entrée est changé et vérifie si la valeur entrée est valide
@@ -270,21 +377,25 @@ Item{
                 var input_value = parseFloat(body.text.replace(",", "."))
                 
                 //Si la valeur est supérieur à la valeur maximale (s'occupe de remettre la valeur dans les limites
-                if(input_value > validator.top) {
+                if(input_value > 0 && input_value > validator.top) {
                     input_value = validator.top
-                    body.text = is_max_default ? "" : validator.top
+                    body.text = root.is_max_default ? "" : validator.top
                 }
                 // On vérifira que la valeur entrée est supérieur à la valeur minimale dans onCursorVisibleChanged
+                else if (input_value < 0 && input_value < validator.bottom) {
+                    input_value = validator.bottom
+                    body.text = root.is_max_default ? validator.bottom: ""
+                }
 
                 //vérifie si la nouvelle valeur est différente de l'ancienne, si oui appelle le signal value_changed et la change
-                if(root.value !== input_value && input_value >= validator.bottom){
-                    root.value = input_value
+                if(root.visible_value !== input_value && input_value >= validator.bottom && input_value <= validator.top){
+                    root.visible_value = input_value
                     value_changed()
                 }
             }
             //Dans le cas où la case a été vidée
-            else if((root.is_max_default && root.value != validator.top) || (!root.is_max_default && root.value != validator.bottom)) {
-                root.value = root.is_max_default ? validator.top : validator.bottom
+            else if((root.is_max_default && root.visible_value != validator.top) || (!root.is_max_default && root.visible_value != validator.bottom)) {
+                root.visible_value = root.is_max_default ? validator.top : validator.bottom
                 value_changed()
             }
         }
@@ -302,12 +413,18 @@ Item{
                 //S'assure que la valeur actuelle n'est pas trop faible
                 if(input_value < validator.bottom) {
                     input_value = validator.bottom
-                    body.text = root.is_max_default ? validator.bottom : ""
+                    body.text = root.is_max_default ? input_value : ""
+                }
+
+                //S'assure que la valeur actuelle n'est pas trop élevée
+                if(input_value > validator.top) {
+                    input_value = validator.top
+                    body.text = root.is_max_default ? "" : input_value
                 }
 
                 //vérifie si la nouvelle valeur est différente de l'ancienne, si oui appelle le signal value_changed et la change
-                if(root.value !== input_value){
-                    root.value = input_value
+                if(root.visible_value !== input_value){
+                    root.visible_value = input_value
                     value_changed()
                 }
             }
@@ -335,7 +452,7 @@ Item{
         default_x: root.default_x + root.default_width + 2
         default_y: root.default_y + root.default_height - 2 - font_size
 
-        text: root.unit
+        text: ""
         font_size: root.unit_font_size
 
         is_dark_grey: true
