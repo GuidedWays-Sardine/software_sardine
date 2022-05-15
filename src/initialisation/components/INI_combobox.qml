@@ -12,42 +12,44 @@ import QtQuick.Controls 2.15
 Item {
     id:root
 
-    //Propriétés liés à la position et à la taille de l'objet
+    // Propriétés liées à la position et à la taille du comobobox
     property double default_x: 0               //position du combobox pour les dimensions minimales de la fenêtre (w_min*h_min)
     property double default_y: 0
     property double default_width: 100         //dimensions du combobox pour les dimensions minimales de la fenêtre (w_min*h_min)
     property double default_height: 40
+    //anchors.fill: parent
 
-    //permet à partir des valeurs de positions et dimensions par défauts de calculer le ratio à appliquer aux dimensions
+    // Permet à partir des valeurs de positions et dimensions par défauts de calculer le ratio à appliquer aux dimensions
     readonly property int w_min: 640
     readonly property int h_min: 480
     readonly property real ratio:  (parent.width >= w_min && parent.height >= h_min) ? parent.width/w_min * (parent.width/w_min < parent.height/h_min) + parent.height/h_min * (parent.width/w_min >= parent.height/h_min) : 1  //parent.height et parent.width représentent la taille de la fenêtre
-    //permet de centrer la fenêtre lorsque le ratio de la fenêtre n'est pas la même que celui utilisé
+    // Permet de centrer la fenêtre lorsque le ratio de la fenêtre n'est pas la même que celui utilisé
     readonly property double x_offset: (parent.width/parent.height > w_min/h_min) && (parent.width >= w_min && parent.height >= h_min) ? (parent.width - w_min * root.ratio) / 2 : 0
     readonly property double y_offset: (parent.width/parent.height < w_min/h_min) && (parent.width >= w_min && parent.height >= h_min) ? (parent.height - h_min * root.ratio) / 2 : 0
-    
+
+    //OPTIMIZE : passer le composant en mode anchors.fill : parent et passer chacun des composants en coordonées
     x: root.x_offset + root.default_x * root.ratio
     y: root.y_offset + root.default_y * root.ratio
     width: root.default_width * root.ratio
     height: root.default_height * root.ratio
 
-    //Propriétés liés aux donnés du combobox
-    property var elements: ["NaN"]          //définit les éléments sélectionables du combobox
-    readonly property int elements_count: combo.count //retient le nombre d'éléments sélectionables dans le combobox
-    property int elements_displayed: 4      //définit le nombre d'éléments visibles dans le popup
-    readonly property string selection_text: combo.displayText //retient le texte et l'index de la sélection actuelle et précédente
+    // Propriétés liées aux donnés du combobox
+    property var elements: ["NaN"]                              // Définit les éléments sélectionables du combobox
+    readonly property int elements_count: combo.count           // Retient le nombre d'éléments sélectionables dans le combobox
+    property int elements_displayed: 4                          // Définit le nombre d'éléments visibles dans le popup
+    readonly property string selection_text: combo.displayText  // Texte (et index) de la sélection actuelle et précédente
     readonly property int selection_index: root.elements_count !== 0 ? combo.currentIndex : -1
-    property string title: ""        //texte à afficher au dessus du composant
-    property int font_size: 12
+    property string title: ""                                   // Texte à afficher au dessus du composant
+    property int font_size: 12                                  // Police du texte
 
-    //Propriétés liés à l'état du combobox
-    property bool is_activable: true        //si le combobox peut être activée (Elle le sera que si is_activable est à true et qu'il y a plus d'un élément dans le combobox)
-    property bool is_dark_grey: !is_activable//est ce que le texte doit-être en gris foncé ?
-    property bool is_positive: false        //si le combobox doit-être visible en couche positive (sinon négative)
-    property bool is_visible: true          //si le bouton est visible
+    // Propriétés liées à l'état du combobox
+    property bool is_activable: true          // Si le combobox peut être activée (Elle le sera que si is_activable est à true et qu'il y a plus d'un élément dans le combobox)
+    property bool is_dark_grey: !is_activable // Si le texte doit-être en gris foncé ?
+    property bool is_positive: false          // Si le combobox doit-être visible en couche positive (sinon négative)
+    property bool is_visible: true            // Si le combobox est visible
     visible: is_visible
 
-    //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
+    // Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
     readonly property string white: "#FFFFFF"       //partie 5.2.1.3.3  Nr 1
     readonly property string black: "#000000"       //partie 5.2.1.3.3  Nr 2
     readonly property string grey: "#C3C3C3"        //partie 5.2.1.3.3  Nr 3
@@ -60,101 +62,138 @@ Item {
     readonly property string red: "#BF0002"         //partie 5.2.1.3.3  Nr 10
 
 
-    //Différents signal handlers (à écrire en python)
-    signal combobox_opened()                //détecte quand le popup du combobox s'ouvre
-    signal combobox_closed()                //détecte quand le popup du combobox se ferme
-    signal selection_changed()              //détecte quand l'utilisateur changed la sélection du combobox (selection_changed() appelé après combobox_closed())
+    // Signaux à surcharger en QML ou en Python
+    signal combobox_opened()                  // Appelé lorsque le combobox s'ouvre
+    signal combobox_closed()                  // Appelé lorsque le combobox se ferme (même si la sélection ne change pas)
+    signal selection_changed()                // Appelé lorsque la sélection du combobox change (par sélection de l'utilisateur ou par fonction)
 
 
     //Fonction pour changer l'index du combobox en fonction de l'index ou du texte de la sélection souhaité
     function change_selection(new_selection){
-        // Si la nouvelle sélection est un int, change le currentIndex en fonction de l'index envoyé
-        if(typeof new_selection === typeof root.font_size && new_selection < combo.count && new_selection >= 0){
-            combo.currentIndex = new_selection
-        }
-        // Si la nouvelle sélection est un string, cherche l'élément avec le même index
-        else if(typeof new_selection === typeof root.selection_text){
-            for(var i = 0; i < combo.count; i++){
-                if(root.elements[i].toUpperCase() === new_selection.toUpperCase()){
-                    combo.currentIndex =  i
+        // Si la liste d'éléments contient au moins un élément
+        if (combo.count > 0) {
+            // Si la nouvelle sélection est un entier
+            if (typeof new_selection === typeof 1) {
+                // Si l'index est valide, change l'index de sélection pour le nouvel index, sinon laisse un message de registre
+                if (new_selection >= 0 && new_selection < combo.count) {
+                    combo.currentIndex = new_selection
+                }
+                else {
+                    console.log(`Le nouvel index de sélection pour le INI_combobox : \"${root.objectName}\" n'est pas dans les limites (0 <= ${new_selection} < ${combo.count} non satisfait).`)
                 }
             }
+            // Sinon (dans le cas où c'est un string)
+            else {
+                 // Cherche l'index de la sélection
+                 var selection_upper = new_selection.toString().toUpperCase()   // transforme en string (par sécurité) et le met en majuscules
+                 var index = 0
+                 while (index < combo.count && root.elements[index].toUpperCase() !== selection_upper) {
+                    index++
+                 }
+
+                 // Si l'élément avec le bon index a été trouvé, change la sélection sinon change un message de registre
+                 if (index >= 0 && index < combo.count) {
+                    combo.currentIndex = index
+                 }
+                 else {
+                    console.log(`La nouvelle sélection pour le INI_combobox : \"${root.objectName}\" n'est pas dans la liste des éléments (${new_selection} =/= ${root.elements}).`)
+                 }
+            }
+        }
+        else {
+            console.log(`Le INI_combobox : \"${root.objectName}\" n'a aucun élément à sélectionner. Impossible de changer la sélection à ` + ((typeof new_selection == typeof 1) ? `${new_selection}.` : `\"${new_selection}\".`))
         }
     }
 
-    //Fonction permettant de faire clignoter les bordures (pour indiquer quelque chose à faire)
+    // Fonction de clignotement des bordures (met le button en valeur)
     function blink(time=3, period=0.5, color=root.yellow) {
-        //Vérifie d'abord que la couleur envoyée est bonne, sinon la met en jaune
-        var regex_color = new RegExp("^#(?:[0-9a-fA-F]{3}){1,2}$")
-        if(!regex_color.test(color)) {
-            color = root.yellow
-        }
+        // Si le temps et la période sont supérieurs à 0
+        if(time > 0 && period > 0) {
+            // Vérifie que la couleur envoyée est bonne, sinon la met en jaune
+            var regex_color = new RegExp("^#(?:[0-9a-fA-F]{3}){1,2}$")
+            if(!regex_color.test(color)) {
+                console.log(`Valeur hex : \"${color}\" pour le clignotement du INI_button : \"${root.objectName}\" invalide. Clignotement en jaune.`)
+                color = root.yellow
+            }
 
-        //S'assure que la temps est au moins supérieur à la moitié de la période
-        if(time < period * 0.5) {
-            period = time * 2
-        }
+            // Si le temps de clignotement est inférieur à une demie période, change la période pour que le clignotement soit bon
+            period = Math.min(period, time * 2.0)
 
-        if(time > 0) {
-            //Indique au timer les différentes variables
-            timer.time_left = parseInt(time * 1000)
-            timer.period = period >= 0.001 ? parseInt(period * 1000) : 1
-            timer.blink_color = color
+            // Indique au timer les différentes variables (convertit en ms)
+            timer.time_left = time * 1000
+            timer.period = period * 1000
             timer.is_blinked = true
+            timer.blink_color = color
 
-            //Démarre la première itération du timer
+            // Démarre la première itération du timer
             timer.start()
         }
-    }
-
-    //Fonction permettant d'arréter les clignotements
-    function stop_blink() {
-    if (timer.time_left >= 0.1) {
-            timer.time_left = timer.period * 0.5
-            timer.stop()
-            timer.triggered()
+        // Sinon, la période ou le temps de clignotement est négatif, l'indique
+        else {
+            console.log(`La période et le temps de clignotement du INI_button : \"${root.objectName}\" ne peuvent pas être négatif (temps : ${time}s ; période : ${period}s)`)
         }
     }
 
-    //Timer utile pour le fonctionnement des différents mode des boutons
+    // Fonction pour arréter le clignotements des bordures
+    function stop_blink() {
+        // Réinitialise le timer (qui l'arrêtera et réinitialisera ses données)
+        timer.reset()
+    }
+
+    // Timer utile pour le fonctionnement des différents mode des boutons
     Timer {
         id: timer
 
-        property int time_left: 0
-        property int period: 0
-        property string light_shadow_color: ""
-        property string dark_shadow_color: ""
-        property bool is_blinked: false  //Permet de savoir aux bordures si elles doivent être de la couleur du clignotement
+        property double time_left: 0.0
+        property double period: 0.0
+        property bool is_blinked: false     // Indique si les coueleurs des bordures doivent être celles par défaut ou la couleur du clignotement
         property string blink_color: ""
 
-        interval: period * 0.5
+        interval: period / 2.0
         repeat: false
 
+        // Détecte lorsque le timer est arrivé à sa fin
         onTriggered: {
-            //Réduit le temps restant de l'interval
-            time_left = time_left - period
+            // Réduit le temps restant de l'interval
+            time_left = timer.time_left - timer.period / 2.0
 
-            //Si le temps restant est inférieur à la période /2 change la période pour ne pas fausser les délais
-            if(time_left < period * 0.5){
-                period = time_left * 2
-            }
+            // Si le temps de clignotement est inférieur à une demie période, change la période pour que le clignotement soit bon
+            period = Math.min(timer.period, timer.time * 2.0)
 
-            //Si le temps est fini (< 0.1ms pour éviter les problèmes de float), remet les bordures originales
-            if(time_left < 0.1){
-                is_blinked = false
+            // Si le temps est fini (< 0.1ms pour éviter les problèmes de float), remet les bordures originales et se réinitialise
+            if(timer.time_left < 0.1){
+                timer.reset()
             }
-            //Sinon inverse les couleurs des bordures et redémarre le chronomètre
+            // Sinon inverse les couleurs des bordures (en inversant is_blinked) et redémarre le chronomètre
             else {
-                is_blinked = !is_blinked
+                timer.is_blinked = !timer.is_blinked
                 timer.start()
             }
         }
+
+        // Fonction permettant de réinitialiser le timer
+        function reset() {
+            // Vide chacun des paramètres du timer
+            timer.stop()
+            timer.time_left = 0.0
+            timer.period = 0.0
+            timer.is_blinked = false
+            timer.blink_color = ""
+        }
+    }
+
+    //FIXME : à dégager
+    Rectangle {
+        id: dummy
+
+        anchors.fill: parent
+        color: root.yellow
+        visible: true
     }
 
 
-
-    //Inline component : combobox (crée une templace du combobox)
-    component DMI_combo: ComboBox {
+    // Inline component : combobox (crée une templace du combobox) -> l'instance est créée plus bas
+    component INI_combobox_template: ComboBox {
         id: body
 
         anchors.fill: parent
@@ -163,7 +202,7 @@ Item {
         font.family: "Verdana"
         flat: true
 
-        //Flèche visible lorsque le combobox est fermée
+        // Flèche visible lorsque le combobox est fermée
         indicator: Canvas {
             id: canvas
 
@@ -173,11 +212,11 @@ Item {
             height: 8 * root.ratio
 
 
-            //Permet d'ouvrir le popup quand le combobox est sélectionné et appelle le signal handler
+            // Permet d'ouvrir le popup quand le combobox est sélectionné et appelle le signal handler
             Connections {
                 target: body
 
-                //Fonction détectant quand quand le combobox fermé a été cliquée
+                // Fonction détectant quand le combobox fermé a été cliquée
                 function onPressedChanged() {
                     forceActiveFocus()
                     canvas.requestPaint()
@@ -189,7 +228,7 @@ Item {
                 }
             }
 
-            //Gère la couleur et le placement de la flèche, s'actualise à chaque changement de taille et de clique
+            // Gère la couleur et le placement de la flèche, s'actualise à chaque changement de taille et de clique
             onPaint: {
                 var ctx = getContext("2d")
                 ctx.reset()
@@ -202,7 +241,7 @@ Item {
             }
         }
 
-        //Texte visible quand le combobox est fermée
+        // Texte visible quand le combobox est fermée
         contentItem: Text {
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
@@ -218,7 +257,7 @@ Item {
             }
         }
 
-        //Rectangle visible lorsque le combobox est fermée
+        // Rectangle visible lorsque le combobox est fermée
         background: Rectangle {
             id: text_zone
 
@@ -227,7 +266,7 @@ Item {
             color: root.dark_blue
         }
 
-        //Menu de popup quand le combobox est ouverte
+        // Menu de popup quand le combobox est ouverte
         popup: Popup {
             id: popup
 
@@ -238,7 +277,7 @@ Item {
             padding: 1 * root.ratio
 
 
-            //Détecte quand celui-ci est fermé (peu importe la façon)
+            // Détecte quand celui-ci est fermé (peu importe la façon)
             onClosed: {
                 if(root.is_activable && body.count > 1 && !body.pressed && !popup.visible)
                 {
@@ -247,7 +286,7 @@ Item {
                 }
             }
 
-            //Permet de lister les différents éléments, ajoute aussi une scrollbar s'il y a plus de 4 éléments
+            // Permet de lister les différents éléments, ajoute aussi une scrollbar s'il y a plus de 4 éléments
             contentItem: ListView {
                 implicitHeight: contentHeight
 
@@ -258,7 +297,7 @@ Item {
                 ScrollIndicator.vertical: ScrollIndicator { }
             }
 
-            //Rectangle de fond (cache les widgets lorsque le combobox est ouverte
+            // Rectangle de fond (cache les widgets lorsque le combobox est ouverte
             background: Rectangle {
                 color: root.dark_blue
             }
@@ -266,15 +305,15 @@ Item {
     }
 
 
-    //Crée une instance du combobox
-    DMI_combo {
+    // Crée une instance du combobox
+    INI_combobox_template {
         id:combo
 
         anchors.fill: parent
 
         model: root.elements
 
-        //Le delegate permete de définir la composition et la forme des éléments du combobox
+        // Le delegate permet de définir la composition et la forme des éléments du combobox
         delegate: ItemDelegate {
             width: combo.width
             height: combo.height
@@ -295,7 +334,7 @@ Item {
     }
 
 
-    //titre du combobox
+    // Titre du combobox
     INI_text {
         id: title_text
 
@@ -309,8 +348,8 @@ Item {
     }
 
 
-    //Ombre extérieure
-    //Rectangle pour l'ombre extérieure supérieure
+    // Ombre extérieure
+    // Rectangle pour l'ombre extérieure supérieure
     Rectangle {
         id: out_top_shadow
 
@@ -322,7 +361,7 @@ Item {
         color: timer.is_blinked ? timer.blink_color : root.black
     }
 
-    //Rectangle pour l'ombre extérieure droite
+    // Rectangle pour l'ombre extérieure droite
     Rectangle {
         id: out_right_shadow
 
@@ -334,7 +373,7 @@ Item {
         color: (timer.is_blinked ? timer.blink_color : root.shadow)
     }
 
-    //Rectangle pour l'ombre extérieure gauche
+    // Rectangle pour l'ombre extérieure gauche
     Rectangle {
         id: out_left_shadow
 
@@ -346,7 +385,7 @@ Item {
         color: timer.is_blinked ? timer.blink_color : root.black
     }
 
-    //Rectangle pour l'ombre extérieure inférieure
+    // Rectangle pour l'ombre extérieure inférieure
     Rectangle {
         id: out_bottom_shadow
 
@@ -359,8 +398,8 @@ Item {
     }
 
 
-    //Ombre intérieure
-    //Rectangle pour l'ombre intérieur inférieure
+    // Ombre intérieure
+    // Rectangle pour l'ombre intérieur inférieure
     Rectangle {
         id: in_bottom_shadow
 
@@ -372,7 +411,7 @@ Item {
         color: root.is_positive ? (timer.is_blinked ? timer.blink_color : root.black) : "transparent"
     }
 
-    //Rectangle pour l'ombre intérieur droite
+    // Rectangle pour l'ombre intérieur droite
     Rectangle {
         id: in_right_shadow
 
@@ -384,7 +423,7 @@ Item {
         color: root.is_positive ? (timer.is_blinked ? timer.blink_color : root.black) : "transparent"
     }
 
-    //Rectangle pour l'ombre intérieur supérieure
+    // Rectangle pour l'ombre intérieur supérieure
     Rectangle {
         id: in_top_shadow
 
@@ -396,7 +435,7 @@ Item {
         color: root.is_positive ? (timer.is_blinked ? timer.blink_color : root.shadow) : "transparent"
     }
 
-    //Rectangle pour l'ombre extérieure supérieure
+    // Rectangle pour l'ombre extérieure supérieure
     Rectangle {
         id: in_left_shadow
 
