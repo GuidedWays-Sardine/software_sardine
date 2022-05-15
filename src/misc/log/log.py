@@ -318,7 +318,7 @@ def _qt_message_handler(mode, context, message) -> None:
     """
     # Vérifie que l'erreur ne fait pas partie des erreurs à sauter (pour éviter le spam en niveau debug)
     if not any(ignore in message for ignore in QT_IGNORE):
-        message = f"message : {message.split(': ', maxsplit=1)[-1]}" + \
+        message = re.split(r':[0-9]+:[0-9]*:? *', message)[-1] + \
                   (f"\n\tline: {context.line} ; file: {context.file}" if context.file is not None else "")
 
         # Pour chaque mode, met le message d'erreur sous le bon format et l'indique dans le registre
