@@ -101,6 +101,54 @@ Item{
         }
     }
 
+    function next_unit() {
+        //Cas où la liste de conversion n'est pas vide
+        if(root.conversion_list.length > 1) {
+            //trouve l'index de l'élément qui suit l'élément actuel
+            var index = 0
+            while(index < root.conversion_list.length && root.conversion_list[index][0] != unit_text.text) {
+                index += 1
+            }
+            index = (index + 1) % root.conversion_list.length
+
+            //Change l'unité aparente
+            unit_text.text = root.conversion_list[index][0]
+
+            //convertit la valeur en unité SI, puis change les facteurs et offset ainsi que la valeur actuelle
+            var converted_value = (root.visible_value - root.unit_offset) / root.unit_factor
+            root.unit_factor = root.conversion_list[index][1]
+            root.unit_offset = root.conversion_list[index][2]
+            change_value(converted_value)
+        }
+    }
+
+    function change_unit(new_unit) {
+        //Cas où la liste de conversion n'est pas vide
+        if(root.conversion_list.length > 1) {
+            //trouve l'index de l'élément qui suit l'élément actuel
+            var index = 0
+            while(index < root.conversion_list.length && root.conversion_list[index][0] != new_unit) {
+                index += 1
+            }
+            // Cas où l'unité a été trouvée
+            if (index < root.conversion_list.length) {
+                //Change l'unité aparente
+                unit_text.text = root.conversion_list[index][0]
+
+                //convertit la valeur en unité SI, puis change les facteurs et offset ainsi que la valeur actuelle
+                var converted_value = (root.visible_value - root.unit_offset) / root.unit_factor
+                root.unit_factor = root.conversion_list[index][1]
+                root.unit_offset = root.conversion_list[index][2]
+                change_value(converted_value)
+            }
+            // Cas où l'unité n'a pas été trouvée
+            else {
+                // Laisse un message de debug
+                console.log(`L'unité \"${new_unit}\" pour le INI_integerinput : \"${root.objectName}\" inexistante. \n ${root.conversion_list}`)
+            }
+        }
+    }
+
 
     //Fonction permettant de faire clignoter les bordures (pour indiquer quelque chose à faire)
     function blink(time=3, period=0.5, color=root.yellow) {
@@ -396,26 +444,9 @@ Item{
             }
 
             //Signal appelé lorsque le valueinput est double cliqué (permet de changer l'unité active)
-            onDoubleClicked:
-            {
-                //Cas où la liste de conversion n'est pas vide
-                if(root.conversion_list.length > 1 && root.is_activable) {
-                    //trouve l'index de l'élément qui suit l'élément actuel
-                    var index = 0
-                    while(index < root.conversion_list.length && root.conversion_list[index][0] != unit_text.text) {
-                        index += 1
-                    }
-                    index = (index + 1) % root.conversion_list.length
-
-                    //Change l'unité aparente
-                    unit_text.text = root.conversion_list[index][0]
-
-                    //convertit la valeur en unité SI, puis change les facteurs et offset ainsi que la valeur actuelle
-                    var converted_value = (root.visible_value - root.unit_offset) / root.unit_factor
-                    root.unit_factor = root.conversion_list[index][1]
-                    root.unit_offset = root.conversion_list[index][2]
-                    change_value(converted_value)
-                }
+            onDoubleClicked: {
+                // Passe à l'unité suivante
+                next_unit()
             }
         }
 
