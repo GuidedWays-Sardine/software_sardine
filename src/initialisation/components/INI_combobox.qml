@@ -17,7 +17,7 @@ Item {
     property double default_y: 0
     property double default_width: 100         //dimensions du combobox pour les dimensions minimales de la fenêtre (w_min*h_min)
     property double default_height: 40
-    //anchors.fill: parent
+    anchors.fill: parent
 
     // Permet à partir des valeurs de positions et dimensions par défauts de calculer le ratio à appliquer aux dimensions
     readonly property int w_min: 640
@@ -26,12 +26,6 @@ Item {
     // Permet de centrer la fenêtre lorsque le ratio de la fenêtre n'est pas la même que celui utilisé
     readonly property double x_offset: (parent.width/parent.height > w_min/h_min) && (parent.width >= w_min && parent.height >= h_min) ? (parent.width - w_min * root.ratio) / 2 : 0
     readonly property double y_offset: (parent.width/parent.height < w_min/h_min) && (parent.width >= w_min && parent.height >= h_min) ? (parent.height - h_min * root.ratio) / 2 : 0
-
-    //OPTIMIZE : passer le composant en mode anchors.fill : parent et passer chacun des composants en coordonées
-    x: root.x_offset + root.default_x * root.ratio
-    y: root.y_offset + root.default_y * root.ratio
-    width: root.default_width * root.ratio
-    height: root.default_height * root.ratio
 
     // Propriétés liées aux donnés du combobox
     property var elements: ["NaN"]                              // Définit les éléments sélectionables du combobox
@@ -55,7 +49,7 @@ Item {
     readonly property string grey: "#C3C3C3"        //partie 5.2.1.3.3  Nr 3
     readonly property string medium_grey: "#969696" //partie 5.2.1.3.3  Nr 4
     readonly property string dark_grey: "#555555"   //partie 5.2.1.3.3  Nr 5
-    readonly property string dark_blue : "#031122"  //partie 5.2.1.3.3  Nr 6
+    readonly property string dark_blue: "#031122"   //partie 5.2.1.3.3  Nr 6
     readonly property string shadow: "#08182F"      //partie 5.2.1.3.3  Nr 7
     readonly property string yellow: "#DFDF00"      //partie 5.2.1.3.3  Nr 8
     readonly property string orange: "#EA9100"      //partie 5.2.1.3.3  Nr 9
@@ -182,21 +176,16 @@ Item {
         }
     }
 
-    //FIXME : à dégager
-    Rectangle {
-        id: dummy
-
-        anchors.fill: parent
-        color: root.yellow
-        visible: true
-    }
 
 
     // Inline component : combobox (crée une templace du combobox) -> l'instance est créée plus bas
     component INI_combobox_template: ComboBox {
         id: body
 
-        anchors.fill: parent
+        x: root.x_offset + root.default_x * root.ratio
+        y: root.y_offset + root.default_y * root.ratio
+        width: root.default_width * root.ratio
+        height: root.default_height * root.ratio
 
         font.pixelSize: root.font_size * root.ratio
         font.family: "Verdana"
@@ -206,8 +195,8 @@ Item {
         indicator: Canvas {
             id: canvas
 
-            x: root.width - width - body.height/3
-            y: body.topPadding + (body.availableHeight - height) / 2
+            x: body.width - canvas.width - body.height/3
+            y: body.topPadding + (body.availableHeight - canvas.height) / 2
             width: 12 * root.ratio
             height: 8 * root.ratio
 
@@ -234,7 +223,7 @@ Item {
                 ctx.reset()
                 ctx.moveTo(0, 0)
                 ctx.lineTo(width, 0)
-                ctx.lineTo(width / 2, height)
+                ctx.lineTo(width / 2.0, height)
                 ctx.closePath()
                 ctx.fillStyle = !body.pressed && !root.is_dark_grey && body.count > 1 ? root.grey : root.dark_grey
                 ctx.fill()
@@ -272,7 +261,7 @@ Item {
 
             x: (root.is_positive ? 2 : 1) * root.ratio
             y: (root.default_height - 2) * root.ratio
-            width: root.width - (is_positive ? 4 : 2) * root.ratio
+            width: body.width - (is_positive ? 4 : 2) * root.ratio
             implicitHeight: ((body.count < root.elements_displayed ? body.height*body.count : body.height * root.elements_displayed) + (root.is_positive ? 7 : 8) * root.ratio) * (root.is_activable && body.count > 1)
             padding: 1 * root.ratio
 
@@ -309,8 +298,6 @@ Item {
     INI_combobox_template {
         id:combo
 
-        anchors.fill: parent
-
         model: root.elements
 
         // Le delegate permet de définir la composition et la forme des éléments du combobox
@@ -338,11 +325,11 @@ Item {
     INI_text {
         id: title_text
 
-        default_x: 0
-        default_y: - (root.font_size + 4) * root.ratio
+        default_x: root.default_x
+        default_y: root.default_y - 4 - font_size
 
         text: root.title
-        font_size: root.font_size * root.ratio
+        font_size: root.font_size
 
         is_dark_grey: root.is_dark_grey || root.elements.length <= 1
     }
