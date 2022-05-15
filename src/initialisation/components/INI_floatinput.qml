@@ -30,7 +30,7 @@ Item{
     //Propriétés liés aux valeurs limites et la valeur actuellement sélectionnée
     property double minimum_value: 0.0
     property double maximum_value: 1.0
-    property int decimals: 1000
+    property int decimals: 2
     property double visible_value: 0.0
     readonly property double value: (root.visible_value - root.unit_offset) / root.unit_factor
 
@@ -83,23 +83,21 @@ Item{
 
     //Fonction permettant de changer la valeur du valueinput (de manière sécurisée)
     function change_value(new_value){   //L'unité toujours en équivalent SI
-        //convertit la valeur dans la bonne unité
-        new_value = new_value * root.unit_factor + root.unit_offset
+        //convertit la valeur dans la bonne unité et le bon nombre de décimales
+        new_value = Math.floor((new_value * root.unit_factor + root.unit_offset) * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
+
+        //Rédéfinie les valeurs minimales et maximales (initialisé plus tard et laissant une "Binding loop Error")
+        var bottom = Math.floor((root.minimum_value * root.unit_factor + root.unit_offset) * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
+        var top = Math.floor((root.maximum_value * root.unit_factor + root.unit_offset) * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
 
         //Si la valeur n'est pas valide (trop grand ou trop petite) la change
-        if(new_value < Math.floor((root.minimum_value * root.unit_factor + root.unit_offset) * Math.pow(10, root.decimals))/Math.pow(10, root.decimals) ||
-           new_value > Math.floor((root.maximum_value * root.unit_factor + root.unit_offset) * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)) {
-            //console.log(`Nouvelle valeur pour le INI_floatinput : \"${root.objectName}\" invalide (${validator.bottom} < ${new_value} < ${validator.top} non vérifié)`)
-            //new_value = new_value < validator.bottom ? validator.bottom : validator.top
-        }
-        //Sinon change le nombre de décimales au bon nombre
-        else {
-            //new_value = Math.floor(new_value * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
+        if(new_value < bottom || new_value > top) {
+           console.log(`Nouvelle valeur pour le INI_floatinput : \"${root.objectName}\" invalide (${bottom} < ${new_value} < ${top} non vérifié)`)
+           new_value = new_value < bottom ? bottom : top
         }
 
         // Si la valeur vaut la valeur min sans is_max_default ou max avec is_max_default, vide la zone de texte, sinon la met à la valeur approchée au bon nombre de décimales
-        body.text = new_value
-        //body.text = ((new_value === validator.bottom && !root.is_max_default) || (new_value === validator.top && root.is_max_default)) ? "" : new_value
+        body.text = ((new_value == bottom && !root.is_max_default) || (new_value == top && root.is_max_default)) ? "" : new_value
 
         //Si la valeur a été changée, appelle le signal value_changed
         if(value !== new_value){
