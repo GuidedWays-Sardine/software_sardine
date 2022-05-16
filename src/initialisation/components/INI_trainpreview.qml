@@ -2,68 +2,70 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 
 
-//https://doc.qt.io/qt-5/qtqml-documents-definetypes.html
-//Comment créer un élément personalisé
+// https://doc.qt.io/qt-5/qtqml-documents-definetypes.html
+// Comment créer un élément personalisé
 
 
 Item {
     id: root
 
-    //Propriétés sur la position et la taille du trainpreview
-    property double default_x: 0
+    // Propriétés sur la position et la taille du INI_trainpreview
+    property double default_x: 0              // Position du INI_trainpreview pour les dimensions minimales de la fenêtre (w_min*h_min)
     property double default_y: 0
-    property double default_width: 640
+    property double default_width: 640        // Dimensions du INI_train_preview pour les dimensions minimales de la fenêtre (w_min*h_min)
     property double default_height: 40
     anchors.fill: parent
 
-    //Propriétés reliés au nombre d'éléments maximum visible dans chacune des divisions
+    // Propriétés reliés au nombre d'éléments maximum visible dans chacune des divisions
     property int visible_count: 10
     onVisible_countChanged: {
-        //S'assure que le nombre de voitures visible est supérieur à 1
-        if(visible_count < 1){
+        // Cas où le nombre d'éléments visibles par page est trop faible (doit être au moins de 1 par page)
+        if(visible_count < 1) {
+            console.log(`Le INI_trainpreview : \"${root.objectName}\" ne peut pas montrer aucune icone (${root.visible_count} demandés)`)
             visible_count = 1
         }
-
-        //S'assure aussi que la page actuellement visible contient toujours l'index
-        if(root.current_index >= (root.current_page + 1) * root.visible_count || root.current_index < root.current_page * root.visible_count) {
-            root.current_page = ((root.current_index - root.current_index) % root.visible_count) / root.visible_count
+        // Cas où le nombre d'icones à montrer est valide
+        else {
+            // S'assure aussi que la page actuellement visible contient toujours l'index
+            if(root.current_index >= (root.current_page + 1) * root.visible_count || root.current_index < root.current_page * root.visible_count) {
+                root.current_page = ((root.current_index - root.current_index) % root.visible_count) / root.visible_count
+            }
+            // Les signaux associés seront appelés dans la fonction onCurrent_pageChanged si la page a été changée
         }
-        // Les signaux associés seront appelés dans la fonction onCurrent_pageChanged si la page a été changée
     }
 
-    //Propriété sur la liste des voitures
-    property var mission_list: []      // Liste contenant le type de chacune des voitures (fret, passager, ...)
-    readonly property var prime_list: [2, 3, 5, 7, 11, 13, 17]      //permettant de varier les icones visibles en bas
-    property var position_list: []  // Liste contenant la position de chacune des voitures (avant, arrière, milieu)
+    // Propriété sur la liste des voitures
+    property var mission_list: []                               // Liste contenant le type de chacune des voitures (fret, passager, ...)
+    readonly property var prime_list: [2, 3, 5, 7, 11, 13, 17]  // Permet de varier les icones pour rend le INI_trainpreview plus dynamique
+    property var position_list: []                              // Liste contenant la position de chacune des voitures (avant, arrière, milieu)
 
-    //propriétés relié à la visibilité et la présentation de la barre
-    property bool is_visible: true
-    property bool is_activable: true
-    property bool is_positive: false
+    // Propriétés relié à la visibilité et la présentation de la barre
+    property bool is_activable: true                            // Si le INI_trainpreview peut être activée
+    property bool is_positive: false                            // Si le INI_trainpreview doit-être visible en couche positive (sinon négatif)
+    property bool is_visible: true                              // Si le INI_trainpreview est visible
 
-    //Propriétés permettant de connaitre la taille du train (et donc l'index maximal) et le nombre de pages possibles
-    readonly property int train_length: mission_list.length > position_list.length ? position_list.length : mission_list.length     //La longueur du train se base toujours sur la liste la plus courte
+    // Propriétés permettant de connaitre la taille du train (et donc l'index maximal) et le nombre de pages possibles
+    readonly property int train_length: Math.min(position_list.length, mission_list.length)  // La longueur du train se base toujours sur la liste la plus courte
     readonly property int pages_count: (((root.train_length % root.visible_count) != 0) + (root.train_length - root.train_length % root.visible_count) / root.visible_count)
     onTrain_lengthChanged: {
-        //S'assure que l'index montre bien une page contenant des voitures
+        // S'assure que l'index montre bien une page contenant des voitures
         if(root.current_index >= root.train_length){
             root.current_index = root.train_length - 1
         }
         // S'occupe de mettre à jour la page et d'appeler les différents signaux dans onCurrent_indexChanged
     }
 
-
-    //Propriété sur l'index de train à montrer
+    // Propriété sur l'index de train à montrer
     property int current_page: 0
     onCurrent_pageChanged: {
-        //S'assure que la page est bien dans la bonne zone de valeurs
+        // S'assure que la page est bien dans la bonne zone de valeurs
         if(root.current_page >= root.pages_count || root.current_page < 0){
             root.current_page = root.current_page < 0 ? 0 : root.pages_count - 1
         }
         // Appelle le signal associé au changement de page
         page_changed()
 
-        //S'assure que l'index montre bien un train de cette page
+        // S'assure que l'index montre bien un train de cette page
         if(root.current_index >= (root.current_page + 1) * root.visible_count || root.current_index < root.current_page * root.visible_count) {
             root.current_index = (root.current_index < (root.current_page * root.visible_count)) ? (root.current_page * root.visible_count) : ((root.current_page + 1) * root.visible_count - 1)
         }
@@ -73,27 +75,30 @@ Item {
     // Propriété sur l'élément sélectionné
     property int current_index: 0
     onCurrent_indexChanged: {
-        //S'assure que l'index est bien dans la bonne zone de valeurs
+        // S'assure que l'index est bien dans la bonne zone de valeurs
         if(root.current_index >= root.train_length || root.current_index < 0){
+            console.log(`Nouvel index pour le INI_trainpreview : \"${root.objectName}\" incorrent (0 < ${root.current_index} <= ${root.train_length} non satisfait).`)
             root.current_index = root.current_index < 0 ? 0 : root.train_length - 1
         }
-        //Appelle le signal pour dire que l'index a été changé
+        // Appelle le signal pour dire que l'index a été changé
         index_changed()
 
-        //S'assure que la l'index montre bien un train qui se situe dans la page actuelle
+        // S'assure que la l'index montre bien un train qui se situe dans la page actuelle
         if(root.current_index >= (root.current_page + 1) * root.visible_count || root.current_index < root.current_page * root.visible_count) {
             root.current_page = (root.current_index - (root.current_index % root.visible_count)) / root.visible_count
         }
-        //Le signal sera appelé dans onCurrent_page_Changed si la valeur a été changée
+        // Le signal sera appelé dans onCurrent_pageChanged si la valeur a été changée
     }
 
 
-    // Les signaux (permettant de détecter le changement d'index et le changement de page)
-    signal index_changed()
-    signal page_changed()
+    // Signaux à surcharger en QML ou en Python
+    signal index_changed()                  // Appelé lorsque l'index de la voiture active change (par l'utilisateur ou par une fonction
+    signal page_changed()                   // Appelé lorsque l'index de la page des voitures visible change (par l'utilisateur ou par une fonction)
 
 
-    //Bouton pour passer à la liste de gauche
+
+
+    // Bouton pour passer à la liste de gauche
     INI_button{
         id: left_list_button
         objectName: "left_list_button"
@@ -110,12 +115,15 @@ Item {
         is_activable: root.current_page > 0 && root.is_activable
         is_visible: root.is_visible
 
+
+        // Détecte lorsque le bouton est cliqué (activable que si une liste de voitures existe à gauche)
         onClicked: {
+            // Passe à la page de voitures de gauche
             root.current_page = root.current_page - 1
         }
     }
 
-    //Bouton pour passer à la liste de droite
+    // Bouton pour passer à la liste de droite
     INI_button{
         id: right_list_button
         objectName: "right_list_button"
@@ -132,10 +140,14 @@ Item {
         is_activable: root.current_page < root.pages_count - 1 && root.is_activable
         is_visible: root.is_visible
 
+
+        // Détecte lorsque le bouton est cliqué (activable que si une liste de voitures existe à droite)
         onClicked: {
+            // Passe à la page de voitures de droite
             root.current_page = root.current_page + 1
         }
     }
+
 
     // ... permettant d'indiquer qu'il y a plus de trains sur le côté gauche
     INI_button{
@@ -174,7 +186,7 @@ Item {
         is_visible: root.is_visible
     }
 
-    //Liste de boutons permettant de montrer les icones de chacune des voitures visibles
+    // Liste de boutons permettant de montrer les icones de chacune des voitures visibles
     Repeater{
         id: trains_showing
         objectName: "trains_showing"
@@ -201,7 +213,7 @@ Item {
             is_dark_grey: button_index != root.current_index
             is_visible: root.is_visible
 
-            //Fonction qui change l'index lorsque l'une des icones en bas est cliquée
+            // Détecte lorsque l'une des icones est cliqué et change l'index pour l'index de l'icone sélectionnée
             onClicked: {
                 root.current_index = root.current_page * root.visible_count + index
             }

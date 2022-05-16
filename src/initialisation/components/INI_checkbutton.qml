@@ -2,41 +2,45 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 
 
-//https://doc.qt.io/qt-5/qtqml-documents-definetypes.html
-//Comment créer un élément personalisé
+// https://doc.qt.io/qt-5/qtqml-documents-definetypes.html
+// Comment créer un élément personalisé
 
-//https://doc.qt.io/qt-5/qtquickcontrols2-customize.html#customizing-button
-//Comment personaliser un bouton
-//Ici le INI_checkbutton utilise une structure similaire au INI_button. on déplace juste le texte en dehors du bouton, et l'image d'une croix apparait quand le checkbutton est activé
+// https://doc.qt.io/qt-5/qtquickcontrols2-customize.html#customizing-button
+// Comment personaliser un bouton (Le INI_checkbutton se base surtout sur le INI_button)
 
 
 Item {
     id: root
 
-
-    //Propriétés liés à la position et à la taille de l'objet
-    property double default_x: 0                //position du bouton pour les dimensions minimales (640x480)
+    // Propriétés liées à la position et à la taille du INI_checkbutton
+    property double default_x: 0              // Position du INI_checkbutton pour les dimensions minimales (640x480)
     property double default_y: 0
-    property double box_length: 20              //dimensions de la partie cochable du checkbutton quand la fenêtre fait du 640x480
+    property double box_length: 20            // Dimensions de la partie cochable du INI_checkbutton quand la fenêtre fait du 640x480
     anchors.fill: parent
 
-    //permet à partir des valeurs de positions et dimensions par défauts de calculer
-    readonly property real ratio:  (parent.width >= 640 && parent.height >= 480) ? parent.width/640 * (parent.width/640 < parent.height/480) + parent.height/480 * (parent.width/640 >= parent.height/480) : 1  //parent.height et parent.width représentent la taille de la fenêtre
+    // Calcule la taille et position réelle du composant à partir des dimensions de la fenêtre (parent) et de la taille minimale de celle-ci
+    // le INI_checkbutton ne contenant uniquement des composants INI, ces valeurs ne sont pas utilisées mais restent présentent par souci de normalisation
+    readonly property int w_min: 640
+    readonly property int h_min: 480
+    readonly property real ratio:  (parent.width >= w_min && parent.height >= h_min) ? parent.width/w_min * (parent.width/w_min < parent.height/h_min) + parent.height/h_min * (parent.width/w_min >= parent.height/h_min) : 1
+    // Si le ratio n'est pas le même que celui de la fenêtre en taille minimale, décalle les composants pour qu'ils restent centrés
+    readonly property double x_offset: (parent.width/parent.height > w_min/h_min) && (parent.width >= w_min && parent.height >= h_min) ? (parent.width - w_min * root.ratio) / 2 : 0
+    readonly property double y_offset: (parent.width/parent.height < w_min/h_min) && (parent.width >= w_min && parent.height >= h_min) ? (parent.height - h_min * root.ratio) / 2 : 0
 
-    //Propriétés liés à l'image et au texte que l'utilisateur peut rajouter sur le checkbutton
-    property string title: ""                //texte à afficher à côté du corp du checkbutton
-    property int font_size: 12               //police du texte
+    // Propriétés liées au titre du INI_checkbutton
+    property string title: ""                 // Texte à afficher à côté du corp du INI_checkbutton
+    property int font_size: 12                // Police du texte
 
-    //Propriétés liés à l'état du combobox
-    property bool is_checked: false          //si le bouton est activé
-    onIs_checkedChanged : value_changed()
-    property bool is_activable: true         //si le bouton peut être activée
-    property bool is_dark_grey: !is_activable//est ce que le texte doit-être en gris foncé ?
-    property bool is_positive: false         //si le bouton doit-être visible en couche positive (sinon négatif)
-    property bool is_visible: true           //si le bouton est visible
+    // Propriétés liées à l'état du INI_checkbutton
+    property bool is_checked: false           // Si le bouton est activé
+    onIs_checkedChanged : root.value_changed()
+    property bool is_activable: true          // Si le bouton peut être activée
+    property bool is_dark_grey: !is_activable // Si le texte doit-être en gris foncé ?
+    property bool is_positive: false          // Si le bouton doit-être visible en couche positive (sinon négatif)
+    property bool is_visible: true            // Si le bouton est visible
     visible : root.is_visible
 
-    //Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
+    // Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
     readonly property string white: "#FFFFFF"       //partie 5.2.1.3.3  Nr 1
     readonly property string black: "#000000"       //partie 5.2.1.3.3  Nr 2
     readonly property string grey: "#C3C3C3"        //partie 5.2.1.3.3  Nr 3
@@ -49,30 +53,32 @@ Item {
     readonly property string red: "#BF0002"         //partie 5.2.1.3.3  Nr 10
 
 
-    //Différents signal handlers (à écrire en python)
-    signal clicked()                         //détecte quand le bouton est cliqué (après que l'état ait été changé)
-    signal value_changed()                   //détecte quand la valeur a été changée
+    // Signaux à surcharger en QML ou en python
+    signal clicked()                          // Appelé lorsque le INI_checkbutton est relaché
+    signal value_changed()                    // Appelé lorsque l'état du INI_checkbutton change (par fonction ou clic)
 
 
-    //Fonction permettant de faire clignoter les bordures (pour indiquer quelque chose à faire
+    // Fonction de clignotement des bordures (met le INI_checkbutton en valeur)
     function blink(time=3, period=0.5, color=root.yellow) {
+        // Appelle la fonction de clignotement du corp (la boite)
         body.blink(time, period, color)
     }
 
-    //Fonction permettant d'arréter le clignotement des bordures
+    // Fonction pour arréter le clignotement des bordures
     function stop_blink() {
+        // Appelle la fonction de clignotement du corp (la boite)
         body.stop_blink()
     }
 
 
 
-    //INI_button permettant de créer le corp du checkbutton
+    // INI_button permettant de créer le corp du INI_checkbutton
     INI_button {
         id: body
 
-        default_x: root.default_x           //position du checkbouton pour les dimensions minimales de la fenêtre (w_min*h_min)
+        default_x: root.default_x
         default_y: root.default_y
-        default_width: root.box_length      //dimensions du checkbouton pour les dimensions minimales de la fenêtre (w_min*h_min)
+        default_width: root.box_length
         default_height: root.box_length
 
         image_activable: root.is_checked ? "Navigation/grey_cross.bmp" : ""
@@ -83,17 +89,18 @@ Item {
         is_positive: root.is_positive
 
 
-        //signal permettant de détecter quand le corp du checkbutton est cliqué pour changer l'état de celui-ci et appeler le signal associé
+        // Détecte quand le corp est cliqué
         onClicked: {
-            root.is_checked = !root.is_checked
+            // Arrête le clignotement, inverse l'état et appel le bon valuechanged
             body.stop_blink()
+            root.is_checked = !root.is_checked
             root.clicked()
-            //Le signal value_changed est appelé grâce à onIs_checkedChanged
+            // Le signal value_changed est appelé grâce à onIs_checkedChanged
         }
     }
 
 
-    //text permettant d'afficher le texte du checkbutton
+    // INI_text pour le titre du INI_checkbutton
     INI_text {
         id: title_text
 
@@ -107,12 +114,13 @@ Item {
         is_clickable: root.is_activable
 
 
-        //signal permettant de détecter quand le corp du checkbutton est cliqué pour changer l'état de celui-ci et appeler le signal associé
+        // Détecte lorsque le texte est cliqué (similairement au clic sur le corp du INI_checkbutton
         onClicked: {
-            root.is_checked = !root.is_checked
+            // Arrête le clignotement, inverse l'état et appel le bon valuechanged
             body.stop_blink()
+            root.is_checked = !root.is_checked
             root.clicked()
-            //Le signal value_changed est appelé grâce à onIs_checkedChanged
+            // Le signal value_changed est appelé grâce à onIs_checkedChanged
         }
     }
 }
