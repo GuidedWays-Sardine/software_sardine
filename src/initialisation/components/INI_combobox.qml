@@ -2,71 +2,71 @@ import QtQuick 2.0
 import QtQuick.Controls 2.15
 
 
-//https://doc.qt.io/qt-5/qtqml-documents-definetypes.html
-//Comment créer un élément personalisé
+// https://doc.qt.io/qt-5/qtqml-documents-definetypes.html
+// Comment créer un élément personalisé
 
-//https://doc.qt.io/qt-5/qtquickcontrols2-customize.html#customizing-combobox
-//Comment personaliser un combobox
+// https://doc.qt.io/qt-5/qtquickcontrols2-customize.html#customizing-combobox
+// Comment personaliser un combobox
 
 
 Item {
     id:root
 
     // Propriétés liées à la position et à la taille du comobobox
-    property double default_x: 0               //position du combobox pour les dimensions minimales de la fenêtre (w_min*h_min)
+    property double default_x: 0               // Position du INI_combobox pour les dimensions minimales de la fenêtre (w_min*h_min)
     property double default_y: 0
-    property double default_width: 100         //dimensions du combobox pour les dimensions minimales de la fenêtre (w_min*h_min)
+    property double default_width: 100         // Dimensions du INI_combobox pour les dimensions minimales de la fenêtre (w_min*h_min)
     property double default_height: 40
     anchors.fill: parent
 
-    // Permet à partir des valeurs de positions et dimensions par défauts de calculer le ratio à appliquer aux dimensions
+    // Calcule la taille et position réelle du composant à partir des dimensions de la fenêtre (parent) et de la taille minimale de celle-ci
     readonly property int w_min: 640
     readonly property int h_min: 480
-    readonly property real ratio:  (parent.width >= w_min && parent.height >= h_min) ? parent.width/w_min * (parent.width/w_min < parent.height/h_min) + parent.height/h_min * (parent.width/w_min >= parent.height/h_min) : 1  //parent.height et parent.width représentent la taille de la fenêtre
-    // Permet de centrer la fenêtre lorsque le ratio de la fenêtre n'est pas la même que celui utilisé
+    readonly property real ratio:  (parent.width >= w_min && parent.height >= h_min) ? parent.width/w_min * (parent.width/w_min < parent.height/h_min) + parent.height/h_min * (parent.width/w_min >= parent.height/h_min) : 1
+    // Si le ratio n'est pas le même que celui de la fenêtre en taille minimale, décalle les composants pour qu'ils restent centrés
     readonly property double x_offset: (parent.width/parent.height > w_min/h_min) && (parent.width >= w_min && parent.height >= h_min) ? (parent.width - w_min * root.ratio) / 2 : 0
     readonly property double y_offset: (parent.width/parent.height < w_min/h_min) && (parent.width >= w_min && parent.height >= h_min) ? (parent.height - h_min * root.ratio) / 2 : 0
 
-    // Propriétés liées aux donnés du combobox
-    property var elements: ["NaN"]                              // Définit les éléments sélectionables du combobox
-    readonly property int elements_count: combo.count           // Retient le nombre d'éléments sélectionables dans le combobox
+    // Propriétés liées aux donnés du INI_combobox
+    property var elements: ["NaN"]                              // Définit les éléments sélectionables du INI_combobox ; Format : ["selection1", "selection2", ...]
+    readonly property int elements_count: combo.count           // Retient le nombre d'éléments sélectionables dans le INI_combobox
     property int elements_displayed: 4                          // Définit le nombre d'éléments visibles dans le popup
     readonly property string selection_text: combo.displayText  // Texte (et index) de la sélection actuelle et précédente
     readonly property int selection_index: root.elements_count !== 0 ? combo.currentIndex : -1
     property string title: ""                                   // Texte à afficher au dessus du composant
     property int font_size: 12                                  // Police du texte
 
-    // Propriétés liées à l'état du combobox
-    property bool is_activable: true          // Si le combobox peut être activée (Elle le sera que si is_activable est à true et qu'il y a plus d'un élément dans le combobox)
+    // Propriétés liées à l'état du INI_combobox
+    property bool is_activable: true          // Si le INI_combobox peut être activée (Elle le sera que si is_activable est à true et qu'il y a plus d'un élément dans le INI_combobox)
     property bool is_dark_grey: !is_activable // Si le texte doit-être en gris foncé ?
-    property bool is_positive: false          // Si le combobox doit-être visible en couche positive (sinon négative)
-    property bool is_visible: true            // Si le combobox est visible
+    property bool is_positive: false          // Si le INI_combobox doit-être visible en couche positive (sinon négative)
+    property bool is_visible: true            // Si le INI_combobox est visible
     visible: is_visible
 
-    // Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire)
-    readonly property string white: "#FFFFFF"       //partie 5.2.1.3.3  Nr 1
-    readonly property string black: "#000000"       //partie 5.2.1.3.3  Nr 2
-    readonly property string grey: "#C3C3C3"        //partie 5.2.1.3.3  Nr 3
-    readonly property string medium_grey: "#969696" //partie 5.2.1.3.3  Nr 4
-    readonly property string dark_grey: "#555555"   //partie 5.2.1.3.3  Nr 5
-    readonly property string dark_blue: "#031122"   //partie 5.2.1.3.3  Nr 6
-    readonly property string shadow: "#08182F"      //partie 5.2.1.3.3  Nr 7
-    readonly property string yellow: "#DFDF00"      //partie 5.2.1.3.3  Nr 8
-    readonly property string orange: "#EA9100"      //partie 5.2.1.3.3  Nr 9
-    readonly property string red: "#BF0002"         //partie 5.2.1.3.3  Nr 10
+    // Couleurs (ne peuvent pas être modifiés mais permet une mise à jour facile si nécessaire) Partie 5.2.1.3.3 de la documentation "DMI ETCS"
+    readonly property string white: "#FFFFFF"
+    readonly property string black: "#000000"
+    readonly property string grey: "#C3C3C3"
+    readonly property string medium_grey: "#969696"
+    readonly property string dark_grey: "#555555"
+    readonly property string dark_blue: "#031122"
+    readonly property string shadow: "#08182F"
+    readonly property string yellow: "#DFDF00"
+    readonly property string orange: "#EA9100"
+    readonly property string red: "#BF0002"
 
 
     // Signaux à surcharger en QML ou en Python
-    signal combobox_opened()                  // Appelé lorsque le combobox s'ouvre
-    signal combobox_closed()                  // Appelé lorsque le combobox se ferme (même si la sélection ne change pas)
-    signal selection_changed()                // Appelé lorsque la sélection du combobox change (par sélection de l'utilisateur ou par fonction)
+    signal combobox_opened()                  // Appelé lorsque le INI_combobox s'ouvre
+    signal combobox_closed()                  // Appelé lorsque le INI_combobox se ferme (même si la sélection ne change pas)
+    signal selection_changed()                // Appelé lorsque la sélection du INI_combobox change (par sélection de l'utilisateur ou par fonction)
 
 
-    //Fonction pour changer l'index du combobox en fonction de l'index ou du texte de la sélection souhaité
+    // Fonction pour changer l'index du INI_combobox en fonction de l'index ou du texte de la sélection souhaité
     function change_selection(new_selection){
-        // Si la liste d'éléments contient au moins un élément
+        // Cas où la liste d'éléments n'est pas vide
         if (combo.count > 0) {
-            // Si la nouvelle sélection est un entier
+            // Cas où la nouvelle sélection est un entier
             if (typeof new_selection === typeof 1) {
                 // Si l'index est valide, change l'index de sélection pour le nouvel index, sinon laisse un message de registre
                 if (new_selection >= 0 && new_selection < combo.count) {
@@ -76,12 +76,12 @@ Item {
                     console.log(`Le nouvel index de sélection pour le INI_combobox : \"${root.objectName}\" n'est pas dans les limites (0 <= ${new_selection} < ${combo.count} non satisfait).`)
                 }
             }
-            // Sinon (dans le cas où c'est un string)
+            // Cas où la sélection est un string (ou autre mais automatiquement convertit en string)
             else {
                  // Cherche l'index de la sélection
-                 var selection_upper = new_selection.toString().toUpperCase()   // transforme en string (par sécurité) et le met en majuscules
+                 var selection_upper = new_selection.toString().toLowerCase()   // transforme en string (par sécurité) et le met en majuscules
                  var index = 0
-                 while (index < combo.count && root.elements[index].toUpperCase() !== selection_upper) {
+                 while (index < combo.count && root.elements[index].toLowerCase() !== selection_upper) {
                     index++
                  }
 
@@ -94,19 +94,20 @@ Item {
                  }
             }
         }
+        // Cas où la liste ne contient aucun élément de sélection
         else {
             console.log(`Le INI_combobox : \"${root.objectName}\" n'a aucun élément à sélectionner. Impossible de changer la sélection à ` + ((typeof new_selection == typeof 1) ? `${new_selection}.` : `\"${new_selection}\".`))
         }
     }
 
-    // Fonction de clignotement des bordures (met le button en valeur)
+    // Fonction de clignotement des bordures (met le INI_combobox en valeur)
     function blink(time=3, period=0.5, color=root.yellow) {
         // Si le temps et la période sont supérieurs à 0
         if(time > 0 && period > 0) {
             // Vérifie que la couleur envoyée est bonne, sinon la met en jaune
             var regex_color = new RegExp("^#(?:[0-9a-fA-F]{3}){1,2}$")
             if(!regex_color.test(color)) {
-                console.log(`Valeur hex : \"${color}\" pour le clignotement du INI_button : \"${root.objectName}\" invalide. Clignotement en jaune.`)
+                console.log(`Valeur hex : \"${color}\" pour le clignotement du INI_combobox : \"${root.objectName}\" invalide. Clignotement en jaune.`)
                 color = root.yellow
             }
 
@@ -124,7 +125,7 @@ Item {
         }
         // Sinon, la période ou le temps de clignotement est négatif, l'indique
         else {
-            console.log(`La période et le temps de clignotement du INI_button : \"${root.objectName}\" ne peuvent pas être négatif (temps : ${time}s ; période : ${period}s)`)
+            console.log(`La période et le temps de clignotement du INI_combobox : \"${root.objectName}\" ne peuvent pas être négatif (temps : ${time}s ; période : ${period}s)`)
         }
     }
 
@@ -140,7 +141,7 @@ Item {
 
         property double time_left: 0.0
         property double period: 0.0
-        property bool is_blinked: false     // Indique si les coueleurs des bordures doivent être celles par défaut ou la couleur du clignotement
+        property bool is_blinked: false     // Indique si les couleurs des bordures doivent être celles par défaut ou la couleur du clignotement
         property string blink_color: ""
 
         interval: period / 2.0
@@ -178,7 +179,7 @@ Item {
 
 
 
-    // Inline component : combobox (crée une templace du combobox) -> l'instance est créée plus bas
+    // Inline component : INI_combobox_template (crée une templace du combobox) -> l'instance est créée plus bas
     component INI_combobox_template: ComboBox {
         id: body
 
@@ -191,7 +192,7 @@ Item {
         font.family: "Verdana"
         flat: true
 
-        // Flèche visible lorsque le combobox est fermée
+        // Flèche à l'intérieur à droite du combobox
         indicator: Canvas {
             id: canvas
 
@@ -201,11 +202,11 @@ Item {
             height: 8 * root.ratio
 
 
-            // Permet d'ouvrir le popup quand le combobox est sélectionné et appelle le signal handler
+            // Permet d'ouvrir le popup quand le INI_combobox est sélectionné et appelle le signal handler
             Connections {
                 target: body
 
-                // Fonction détectant quand le combobox fermé a été cliquée
+                // Fonction détectant quand le INI_combobox fermé a été cliquée
                 function onPressedChanged() {
                     forceActiveFocus()
                     canvas.requestPaint()
@@ -230,7 +231,7 @@ Item {
             }
         }
 
-        // Texte visible quand le combobox est fermée
+        // Texte visible quand le INI_combobox est fermée
         contentItem: Text {
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
@@ -240,13 +241,13 @@ Item {
             color: !body.pressed && !root.is_dark_grey && body.count > 1 ? root.grey : root.dark_grey
 
 
-            //Détecte quand la valeur du combobox est changé
+            // Détecte quand la valeur du INI_combobox est changé
             onTextChanged: {
                 root.selection_changed()
             }
         }
 
-        // Rectangle visible lorsque le combobox est fermée
+        // Rectangle visible lorsque le INI_combobox est fermée
         background: Rectangle {
             id: text_zone
 
@@ -255,7 +256,7 @@ Item {
             color: root.dark_blue
         }
 
-        // Menu de popup quand le combobox est ouverte
+        // Menu de popup quand le INI_combobox est ouverte
         popup: Popup {
             id: popup
 
@@ -286,7 +287,7 @@ Item {
                 ScrollIndicator.vertical: ScrollIndicator { }
             }
 
-            // Rectangle de fond (cache les widgets lorsque le combobox est ouverte
+            // Rectangle de fond (cache les widgets lorsque le INI_combobox est ouverte
             background: Rectangle {
                 color: root.dark_blue
             }
@@ -294,13 +295,13 @@ Item {
     }
 
 
-    // Crée une instance du combobox
+    // Crée une instance du INI_combobox_template
     INI_combobox_template {
         id:combo
 
         model: root.elements
 
-        // Le delegate permet de définir la composition et la forme des éléments du combobox
+        // Le delegate permet de définir la composition et la forme des éléments du INI_combobox
         delegate: ItemDelegate {
             width: combo.width
             height: combo.height
@@ -321,7 +322,7 @@ Item {
     }
 
 
-    // Titre du combobox
+    // Titre du INI_combobox
     INI_text {
         id: title_text
 
