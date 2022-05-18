@@ -125,7 +125,7 @@ def get_conversion_list(unit_list):
 
     Parameters
     ----------
-    unit_list: `list[str] | tuple[str]`
+    unit_list: `list[str] | tuple[str] | str`
         Liste des unités de conversion (doivent avoir la même dimension).
 
     Returns
@@ -134,6 +134,10 @@ def get_conversion_list(unit_list):
         Liste des conversions d'unités.
     """
     conversion_list = []
+
+    # Dans le cas où la liste d'unité n'est ni un list ni un tuple (donc un str), le transforme en tuple
+    if isinstance(unit_list, str):
+        unit_list = (unit_list,)
 
     # Pour chacune des unités de la liste
     for unit_name in unit_list:
