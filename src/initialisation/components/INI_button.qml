@@ -61,7 +61,8 @@ Item {
     readonly property string red: "#BF0002"
 
     // Chemin d'accès vers les icones utiles pour le INI_button
-    readonly property string symbols_path : "../assets/"
+    readonly property string symbols_path: "../assets/symbols/"
+    readonly property string sounds_path: "../assets/sounds/"
 
 
     // Signaux à surchager en QML ou en Python
