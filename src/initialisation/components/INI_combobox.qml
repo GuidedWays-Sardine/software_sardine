@@ -28,7 +28,7 @@ Item {
     readonly property double y_offset: (parent.width/parent.height < w_min/h_min) && (parent.width >= w_min && parent.height >= h_min) ? (parent.height - h_min * root.ratio) / 2 : 0
 
     // Propriétés liées aux donnés du INI_combobox
-    property var elements: ["NaN"]                              // Définit les éléments sélectionables du INI_combobox ; Format : ["selection1", "selection2", ...]
+    property var elements: []                                   // Définit les éléments sélectionables du INI_combobox ; Format : ["selection1", "selection2", ...]
     readonly property int elements_count: combo.count           // Retient le nombre d'éléments sélectionables dans le INI_combobox
     property int elements_displayed: 4                          // Définit le nombre d'éléments visibles dans le popup
     readonly property string selection_text: combo.displayText  // Texte (et index) de la sélection actuelle et précédente
