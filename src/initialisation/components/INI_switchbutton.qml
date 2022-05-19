@@ -163,7 +163,7 @@ Item {
             body.stop_blink()
 
             // Cas où le INI_switchbutton contient plus d'un élément
-            if (root.element.length > 1) {
+            if (root.elements.length > 1) {
                 // Récupère l'index de l'éméent active et passe au suivant
                 var index = root.elements.indexOf(root.image_mode ? image : text)
                 index = (index + 1) % root.elements.length
