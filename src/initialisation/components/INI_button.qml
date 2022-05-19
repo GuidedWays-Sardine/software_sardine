@@ -86,13 +86,8 @@ Item {
             // Indique au timer les différentes variables (convertit en ms)
             timer.time_left = time * 1000
             timer.period = period * 1000
-            timer.light_shadow_color = root.light_shadow_color
-            timer.dark_shadow_color = root.dark_shadow_color
+            timer.is_blinked = true
             timer.blink_color = color
-
-            // Change la couleur des bordures
-            root.light_shadow_color = color
-            root.dark_shadow_color = color
 
             // Démarre la première itération du timer
             timer.start()
@@ -115,8 +110,7 @@ Item {
 
         property double time_left: 0.0
         property double period: 0.0
-        property string light_shadow_color: ""
-        property string dark_shadow_color: ""
+        property bool is_blinked: false     // Indique si les couleurs des bordures doivent être celles par défaut ou la couleur du clignotement
         property string blink_color: ""
 
         interval: period / 2.0
@@ -134,28 +128,20 @@ Item {
             if(timer.time_left < 0.1){
                 timer.reset()
             }
-            // Sinon inverse les couleurs des bordures et redémarre le chronomètre
+            // Sinon inverse les couleurs des bordures (en inversant is_blinked) et redémarre le chronomètre
             else {
-                root.light_shadow_color = root.light_shadow_color == timer.blink_color ? timer.light_shadow_color : timer.blink_color
-                root.dark_shadow_color = root.dark_shadow_color == timer.blink_color ? timer.dark_shadow_color : timer.blink_color
+                timer.is_blinked = !timer.is_blinked
                 timer.start()
             }
         }
 
         // Fonction permettant de réinitialiser le timer
         function reset() {
-            // Arrête le timer
+            // Vide chacun des paramètres du timer
             timer.stop()
-
-            // Réinisialise les couleurs des bordures à celles précédemment utilisées
-            root.light_shadow_color = timer.light_shadow_color
-            root.dark_shadow_color = timer.dark_shadow_color
-
-            // Efface toutes les valeurs entrées du timer
             timer.time_left = 0.0
             timer.period = 0.0
-            timer.light_shadow_color = ""
-            timer.dark_shadow_color = ""
+            timer.is_blinked = false
             timer.blink_color = ""
         }
     }
@@ -262,7 +248,7 @@ Item {
         anchors.left: body.left
         height: 1 * root.ratio
 
-        color: !body.button_pressed ? (root.light_shadow_color == "" ? root.shadow : root.light_shadow_color) : "transparent"
+        color: timer.is_blinked ? timer.blink_color : (!body.button_pressed ? (root.light_shadow_color == "" ? root.shadow : root.light_shadow_color) : "transparent")
     }
 
     // Rectangle pour l'ombre extérieure droite
@@ -274,7 +260,7 @@ Item {
         anchors.top: body.top
         width: 1 * root.ratio
 
-        color: !body.button_pressed ? (root.light_shadow_color == "" ? root.shadow : root.light_shadow_color) : "transparent"
+        color: timer.is_blinked ? timer.blink_color : (!body.button_pressed ? (root.light_shadow_color == "" ? root.shadow : root.light_shadow_color) : "transparent")
     }
 
     // Rectangle pour l'ombre extérieure supérieure
@@ -286,7 +272,7 @@ Item {
         anchors.right: out_right_shadow.left
         height: 1 * root.ratio
 
-        color: !body.button_pressed ? (root.dark_shadow_color == "" ? root.black : root.dark_shadow_color) : "transparent"
+        color: timer.is_blinked ? timer.blink_color : (!body.button_pressed ? (root.dark_shadow_color == "" ? root.black : root.dark_shadow_color) : "transparent")
     }
 
     // Rectangle pour l'ombre extérieure gauche
@@ -298,7 +284,7 @@ Item {
         anchors.bottom: out_bottom_shadow.top
         width: 1 * root.ratio
 
-        color: !body.button_pressed ? (root.dark_shadow_color == "" ? root.black : root.dark_shadow_color) : "transparent"
+        color: timer.is_blinked ? timer.blink_color : (!body.button_pressed ? (root.dark_shadow_color == "" ? root.black : root.dark_shadow_color) : "transparent")
     }
 
 
@@ -312,7 +298,7 @@ Item {
         anchors.right: out_right_shadow.left
         height: 1 * root.ratio
 
-        color: is_positive && !body.button_pressed ? (root.dark_shadow_color == "" ? root.black : root.dark_shadow_color) : "transparent"
+        color: timer.is_blinked ? timer.blink_color : (is_positive && !body.button_pressed ? (root.dark_shadow_color == "" ? root.black : root.dark_shadow_color) : "transparent")
     }
 
     // Rectangle pour l'ombre intérieure droite
@@ -324,7 +310,7 @@ Item {
         anchors.top: out_top_shadow.bottom
         width: 1 * root.ratio
 
-        color: is_positive && !body.button_pressed ? (root.dark_shadow_color == "" ? root.black : root.dark_shadow_color) : "transparent"
+        color: timer.is_blinked ? timer.blink_color : (is_positive && !body.button_pressed ? (root.dark_shadow_color == "" ? root.black : root.dark_shadow_color) : "transparent")
     }
 
     // Rectangle pour l'ombre intérieure supérieure
@@ -336,7 +322,7 @@ Item {
         anchors.right: in_right_shadow.left
         height: 1 * root.ratio
 
-        color: is_positive && !body.button_pressed ? (root.light_shadow_color == "" ? root.shadow : root.light_shadow_color) : "transparent"
+        color: timer.is_blinked ? timer.blink_color : (is_positive && !body.button_pressed ? (root.light_shadow_color == "" ? root.shadow : root.light_shadow_color) : "transparent")
     }
 
     // Rectangle pour l'ombre intérieure gauche
@@ -348,6 +334,6 @@ Item {
         anchors.bottom: in_bottom_shadow.top
         width: 1 * root.ratio
 
-        color: is_positive && !body.button_pressed ? (root.light_shadow_color == "" ? root.shadow : root.light_shadow_color) : "transparent"
+        color: timer.is_blinked ? timer.blink_color : (is_positive && !body.button_pressed ? (root.light_shadow_color == "" ? root.shadow : root.light_shadow_color) : "transparent")
     }
 }
