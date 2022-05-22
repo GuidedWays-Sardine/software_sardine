@@ -38,7 +38,7 @@ Item {
 
     // Propriétés liées à l'état du INI_button
     property bool is_activable: true          // Si le bouton peut être activée
-    property bool is_dark_grey: !is_activable // Si ce que le texte doit-être en gris foncé ?
+    property bool is_dark_grey: !is_activable // Si le texte doit-être en gris foncé ?
     property bool is_positive: false          // Si le bouton doit-être visible en couche positive (sinon négatif)
     property bool is_visible: true            // Si le bouton est visible
     visible: root.is_visible
