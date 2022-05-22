@@ -61,6 +61,8 @@ Item{
 
 
     // Signaux à surcharger en QML ou en Python
+    signal focus_gained()                     // Appelé lorsque le composant passe en mode édition (permet d'afficher le clavier virtuel)
+    signal focus_lost()                       // Appelé lorsque le composant sort du mode édition (permet de cacher le clavier virtuel)
     signal value_changed()                    // Appelé lorsque le texte a été changé (par l'utilisateur ou par une fonction)
 
 
@@ -216,7 +218,16 @@ Item{
 
         // Détecte lorsque le composant perd le focus (lorsque la barre clignotante disparait de l'encadré)
         onCursorVisibleChanged: {
+            // Arrête le potentiel clignotement du composant
             root.stop_blink()
+
+            // Si l'édition commence appelle le signal focus_gained, si l'édition s'arrête appelle le signal focus_list
+            if (body.cursorVisble) {
+                root.focus_gained()
+            }
+            else {
+                root.focus_lost()
+            }
         }
     }
 
