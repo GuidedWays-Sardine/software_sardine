@@ -84,6 +84,12 @@ Item{
             console.log(`Le nouveau texte pour le INI_stringinput : \"${root.objectName}\" contient des charactères interdits (\"${new_corrected_value}\" -> \"${new_value}\" [< > : “ / \\ | ? *])`)
         }
 
+        // S'assure que le texte corrigé n'est pas trop long
+        if (new_corrected_value.length > root.max_text_length) {
+            console.log(`Le nouveau texte pour le INI_stringinput : \"${root.objectName}\" ; \"${new_corrected_value}\" est trop long (${new_corrected_value.length} charactères contre ${root.max_text_length} maximum).`)
+            new_corrected_value = new_corrected_value.slice(0, root.max_text_length)
+        }
+
         // Si la nouvelle valeur est différente de l'ancienne, la change et appelle le signal value_changed()
         if(new_corrected_value != body.text){
             body.text = new_corrected_value
