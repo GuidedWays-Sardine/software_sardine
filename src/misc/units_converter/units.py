@@ -47,9 +47,10 @@ Units = {   # Unités sans dimensions
          "C": Dimension("C", factor=1, offset=273.15, temperature=1),                 # Temperature
          "F": Dimension("F", factor=5/9, offset=255.372, temperature=1),
             # Unités complexes
-         "W": Dimension("W", factor=1, mass=1, length=2, time=-3),                    # Watt
+         "W": Dimension("W", factor=1, mass=1, length=2, time=-3),                    # Watt/Horse Power
          "kW": Dimension("kW", factor=10**3, mass=1, length=2, time=-3),
          "MW": Dimension("MW", factor=10**6, mass=1, length=2, time=-3),
+         "hp": Dimension("hp", factor=745.7, mass=1, length=2, time=-3),
          "N": Dimension("N", factor=1, mass=1, length=1, time=-2),                    # Newton
          "kN": Dimension("kN", factor=10**3, mass=1, length=1, time=-2),
          "MN": Dimension("MN", factor=10**6, mass=1, length=1, time=-2),
@@ -63,7 +64,10 @@ Units = {   # Unités sans dimensions
          "MOhm": Dimension("MOhm", factor=10**6, mass=1, length=2, time=-3, current=-2),
          "l": Dimension("l", factor=10**-3, length=3),                                # Volume
          "floz": Dimension("floz", factor=1/33814, length=3),
-         "gal": Dimension("gal", factor=1/264, length=3)
+         "gal": Dimension("gal", factor=1/264, length=3),
+         "Pa": Dimension("Pa", factor=1, mass=1, length=-1, time=-2),                 # Pascal/bar
+         "hPa": Dimension("hPa", factor=10, mass=1, length=-1, time=-2),
+         "bar": Dimension("bar", factor=10**5, mass=1, length=-1, time=-2)
 }
 
 
