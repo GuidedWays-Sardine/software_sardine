@@ -37,12 +37,12 @@ Item{
     readonly property int value: (root.visible_value - root.unit_offset) / root.unit_factor
 
     // Propriétés sur les textes d'habillages ainsi que l'unité
-    property string title: ""                 // Texte à afficher au dessus du composant
     property string unit: ""                  // Valeur à changer pour le cas d'une unité non physique
     property var conversion_list: []          // Liste de conversions dans le cas d'unités physiques ; Format : [["name", factor(int), offset(int)], ...]
     property string unit_name: unit_text.text // Nom de l'unité actuellement utilisée
     property double unit_factor: 1.0          // Facteur de conversion (SI -> unité actuelle)
-    property double unit_offset: 0.0          // Décallage de conversion (SI -> unité actuelle)
+    property double unit_offset: 0.0          // Décalage de conversion (SI -> unité actuelle)
+    property string title: ""                 // Texte à afficher au dessus du composant
     property int font_size: 12                // Taille de la police pour le titre (font_size) et pour les unités (unit_font_size)
     property int unit_font_size: root.font_size / 2
 
@@ -303,7 +303,7 @@ Item{
     onUnitChanged: {
         // Cas où une unité est envoyée (sinon réinitialisée par onConversion_listChanged)
         if (root.unit != "") {
-            // Crée une liste de conversion contenant l'unité et un facteur 1 et un décallage 0
+            // Crée une liste de conversion contenant l'unité et un facteur 1 et un décalage 0
             root.conversion_list = [[root.unit, 1, 0]]
             // Le signal onConversion_listChanged s'occupe du reste
         }
@@ -313,10 +313,10 @@ Item{
     onConversion_listChanged: {
         // Cas où la liste contient au moins un élément
         if (root.conversion_list.length > 0) {
-            // Vérifie pour chacune des conversions si le facteur et le décallage sont des entiers
+            // Vérifie pour chacune des conversions si le facteur et le décalage sont des entiers
             var bad_conversions = ""
             for(var i = 0; i < root.conversion_list.length; i++) {
-                // Si le facteur de conversion ou le décallage ne sont pas des entiers, ajoute la ligne dans le message de registre
+                // Si le facteur de conversion ou le décalage ne sont pas des entiers, ajoute la ligne dans le message de registre
                 if(parseInt(root.conversion_list[i][1]) != root.conversion_list[i][1] ||
                    parseInt(root.conversion_list[i][2]) != root.conversion_list[i][2]) {
                     bad_conversions = bad_conversions + `\n  -  ${root.conversion_list[i][0]} : ${root.conversion_list[i][1]} -> ${root.conversion_list[i][2]}`
@@ -326,7 +326,7 @@ Item{
             // Cas où au moins une mauvaise conversion a été détectée
             if (bad_conversions != "") {
                 // Indique des conversions qui ne sont pas des entiers dans le registre
-                console.log(`Les facteurs et décallages du composant INI_integerinput : \"${root.objectName}\" doivent être des entiers : ${bad_conversions}`)
+                console.log(`Les facteurs et décalages du composant INI_integerinput : \"${root.objectName}\" doivent être des entiers : ${bad_conversions}`)
 
                 // Prend la valeur approchée de tous les coeficients et décalages
                 var new_conversion_list = []
@@ -344,7 +344,7 @@ Item{
                 while(index < root.conversion_list.length && root.conversion_list[index][0] != unit_text.text) {
                     index += 1
                 }
-                // L'unité a été changée si le nom ou le facteur ou le décallage sont différents
+                // L'unité a été changée si le nom ou le facteur ou le décalage sont différents
                 var is_unit_changed = (index >= root.conversion_list.length || root.conversion_list[index][1] != root.unit_factor || root.conversion_list[index][2] != root.unit_offset)
 
                 // Si l'unité n'a pas été trouvée, repasse l'index à 0
