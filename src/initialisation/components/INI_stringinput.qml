@@ -213,6 +213,9 @@ Item{
 
         // Détecte quand le texte entrée est changé et vérifie si la valeur entrée est valide
         onDisplayTextChanged: {
+            // Commence par arrêter le clignotement
+            root.stop_blink()
+
             value_changed()
         }
 
