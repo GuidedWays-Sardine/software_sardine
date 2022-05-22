@@ -30,13 +30,13 @@ class Dimension:
     # Facteur (comparé au système international)
     __factor = 0
 
-    # décallage (comparé au système international)
+    # décalage (comparé au système international)
     __offset = 0
 
     @functools.cache
     def __init__(self, name, factor=1.0, offset=0.0,
                  length=0, mass=0, time=0, current=0, temperature=0, light_intensity=0, matter_quantity=0):
-        """Initialise une unité grâce à son facteur et décallage ainsi que ses dimensions
+        """Initialise une unité grâce à son facteur et décalage ainsi que ses dimensions
 
         Parameters
         ----------
@@ -45,7 +45,7 @@ class Dimension:
         factor: `float | int`
             Facteur entre l'unité SI et cette unité (Unit = SI * factor + offset) ;
         offset: `float | int`
-            Décallage en 0 entre l'unité SI et cette unité (Unit = SI * factor + offset) ;
+            Décalage en 0 entre l'unité SI et cette unité (Unit = SI * factor + offset) ;
         length: `float | int`
             Dimension pour l'unité de longueur (SI : m) ;
         mass: `float | int`
@@ -153,7 +153,7 @@ class Dimension:
         # Si la valeur est un nombre, retourne la conversion de ce nombre de l'unité SI à l'unité envoyée
         if isinstance(other, (float, int)):
             return (other - self.__offset) * self.__pow__(-1).__factor
-        # On sait que la seul dimension avec des unités à décallage est la température (avec le Celsius et le Farenheit)
+        # On sait que la seul dimension avec des unités à décalage est la température (avec le Celsius et le Farenheit)
         # Si des [Θ] sont divisés par des [Θ]^-1 ou inversement, jette une erreur (les [Θ]^2 n'existent pas)
         elif isinstance(other, Dimension) and \
                 (not (self.__dimensions["temperature"] + other.__dimensions["temperature"]) in (-1, 0, 1) or
@@ -235,7 +235,7 @@ class Dimension:
         # Si la valeur dans la division est un nombre, retourne la multiplication de l'unité par l'inverse de other
         elif isinstance(other, (float, int)):
             return self * (1/other)
-        # On sait que la seul dimension avec des unités à décallage est la température (avec le Celsius et le Farenheit)
+        # On sait que la seul dimension avec des unités à décalage est la température (avec le Celsius et le Farenheit)
         # Si des [Θ] sont divisés par des [Θ]^-1 ou inversement, jette une erreur (les [Θ]^2 n'existent pas)
         elif isinstance(other, Dimension) and \
                 not (self.__dimensions["temperature"] - other.__dimensions["temperature"]) in (-1, 0, 1):
@@ -285,7 +285,7 @@ class Dimension:
         """
         # Si le type de la puissance est un int ou un float
         if isinstance(power, (int, float)):
-            # On sait que la seul dimension avec des unités à décallage est la température (avec Celsius et Farenheit)
+            # On sait que la seul dimension avec des unités à décalage est la température (avec Celsius et Farenheit)
             # Si des [Θ] sont divisés par des [Θ]^-1 ou inversement, jette une erreur (les [Θ]^2 n'existent pas)
             if self.__dimensions["temperature"] != 0 and power not in (-1, 0, 1):
                 raise ValueError("La dimensions de température ne peut pas être différente de -1 ; 0 ; 1. " +
@@ -348,7 +348,7 @@ class Dimension:
         factor: `float`
             Facteur de multiplication ;
         offset: `float`
-            Décallage à rajouter.
+            Décalage à rajouter.
         """
         return 1/self.__factor, - self.__offset / self.__factor
 
@@ -360,6 +360,6 @@ class Dimension:
         factor: `float`
             Facteur de multiplication ;
         offset: `float`
-            Décallage à rajouter.
+            Décalage à rajouter.
         """
         return self.__factor, self.__offset
