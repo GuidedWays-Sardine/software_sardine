@@ -68,6 +68,9 @@ Item{
     readonly property string red: "#BF0002"
 
     // Signaux à surcharger en QML ou en Python
+
+    signal focus_gained()                     // Appelé lorsque le composant passe en mode édition (permet d'afficher le clavier virtuel)
+    signal focus_lost()                       // Appelé lorsque le composant sort du mode édition (permet de cacher le clavier virtuel)
     signal value_changed()                    // Appelé lorsque la valeur a été changée (par l'utilisateur ou par une fonction)
     signal unit_changed()                     // Appelé lorsque l'unité a été changée (par l'utilisateur ou par une fonction)
 
@@ -411,6 +414,7 @@ Item{
             onClicked: {
                 if (root.is_activable) {
                     body.forceActiveFocus()
+                    root.focus_gained()
                 }
             }
 
@@ -480,6 +484,9 @@ Item{
                     value_changed()
                 }
             }
+
+            // Indique que le composant a perdu le focus
+            root.focus_lost()
         }
     }
 
