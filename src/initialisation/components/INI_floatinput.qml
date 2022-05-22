@@ -38,12 +38,12 @@ Item{
     readonly property double value: (root.visible_value - root.unit_offset) / root.unit_factor
 
     // Propriétés sur les textes d'habillages
-    property string title: ""                 // Texte à afficher au dessus du composant
     property string unit: ""                  // Valeur à changer pour le cas d'une unité non physique
     property var conversion_list: []          // Liste de conversions dans le cas d'unités physiques ; Format : [["name", factor(double), offset(double)], ...]
     property string unit_name: unit_text.text // Nom de l'unité actuellement utilisée
     property double unit_factor: 1.0          // Facteur de conversion (SI -> unité actuelle)
-    property double unit_offset: 0.0          // Décallage de conversion (SI -> unité actuelle)
+    property double unit_offset: 0.0          // Décalage de conversion (SI -> unité actuelle)
+    property string title: ""                 // Texte à afficher au dessus du composant
     property int font_size: 12                // Taille de la police pour le titre (font_size) et pour les unités (unit_font_size)
     property int unit_font_size: root.font_size / 2
 
@@ -308,7 +308,7 @@ Item{
     onUnitChanged: {
         // Cas ou une unité est entrée
         if (root.unit !== "") {
-            // Crée une liste de conversion contenant l'unité et un facteur 1 et un décallage 0
+            // Crée une liste de conversion contenant l'unité et un facteur 1 et un décalage 0
             root.conversion_list = [[root.unit, 1.0, 0.0]]
             // Le signal onConversion_listChanged s'occupera du reste
         }
@@ -323,7 +323,7 @@ Item{
             while(index < root.conversion_list.length && root.conversion_list[index][0] != unit_text.text) {
                 index += 1
             }
-            // L'unité a été changée si le nom ou le facteur ou le décallage sont différents
+            // L'unité a été changée si le nom ou le facteur ou le décalage sont différents
             var is_unit_changed = (index >= root.conversion_list.length || root.conversion_list[index][1] != root.unit_factor || root.conversion_list[index][2] != root.unit_offset)
 
             // Si l'unité n'a pas été trouvée, repasse l'index à 0
