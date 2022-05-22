@@ -33,7 +33,7 @@ Item{
     // Propriétés liées aux valeurs limites et la valeur actuellement sélectionnée
     property double minimum_value: 0.0        // Valeur minimale et maximale
     property double maximum_value: 1.0
-    property int decimals: 2                  // Nombre de chiffres maximum après la virgule
+    property int decimals: 2                  // Nombre de chiffres maximum après la virgule (pour les unités SI, varie selon l'unité sélectionée)
     property double visible_value: 0.0        // Valeur visible (prise en compte des taux de conversions)/Valeur enregistrée (équivalent unités SI)
     readonly property double value: (root.visible_value - root.unit_offset) / root.unit_factor
 
@@ -88,11 +88,11 @@ Item{
     // Fonction permettant de changer la valeur du INI_floatinput (de manière sécurisée)
     function change_value(new_value){    // L'unité toujours en équivalent SI
         // Convertit la valeur dans la bonne unité et le bon nombre de décimales
-        new_value = Math.floor((new_value * root.unit_factor + root.unit_offset) * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
+        new_value = Math.floor((new_value * root.unit_factor + root.unit_offset) * Math.pow(10, validator.decimals))/Math.pow(10, validator.decimals)
 
         // Rédéfinie les valeurs minimales et maximales (initialisé plus tard et laissant une "Binding loop Error")
-        var bottom = Math.floor((root.minimum_value * root.unit_factor + root.unit_offset) * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
-        var top = Math.floor((root.maximum_value * root.unit_factor + root.unit_offset) * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
+        var bottom = Math.floor((root.minimum_value * root.unit_factor + root.unit_offset) * Math.pow(10, validator.decimals))/Math.pow(10, validator.decimals)
+        var top = Math.floor((root.maximum_value * root.unit_factor + root.unit_offset) * Math.pow(10, validator.decimals))/Math.pow(10, validator.decimals)
 
         // Si la valeur n'est pas valide (trop grand ou trop petite) la change
         if(new_value < bottom || new_value > top) {
@@ -396,9 +396,9 @@ Item{
 
             locale: "RejectGroupSeparator"
 
-            decimals: root.decimals
-            bottom: Math.floor((root.minimum_value * root.unit_factor + root.unit_offset) * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
-            top: Math.floor((root.maximum_value * root.unit_factor + root.unit_offset) * Math.pow(10, root.decimals))/Math.pow(10, root.decimals)
+            decimals: Math.max(root.decimals - parseInt(Math.log10(root.unit_factor)), 0)    // Le nombre de décimales dépend de l'unité actuelle
+            bottom: Math.floor((root.minimum_value * root.unit_factor + root.unit_offset) * Math.pow(10, validator.decimals))/Math.pow(10, validator.decimals)
+            top: Math.floor((root.maximum_value * root.unit_factor + root.unit_offset) * Math.pow(10, validator.decimals))/Math.pow(10, validator.decimals)
         }
 
         // Mouse area permettant de détecter le double clic (et de changer d'unité)
