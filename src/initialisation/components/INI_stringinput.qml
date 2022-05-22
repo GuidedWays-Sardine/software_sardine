@@ -33,7 +33,7 @@ Item{
     // Propriétés liées aux valeurs limites et la valeur actuellement sélectionnée
     property int max_text_length: 1000        // Nombre de charactères maximum de la chaine de charactères
     onMax_text_lengthChanged: {root.max_text_length = Math.max(root.max_text_length, 0)}    // S'assure que la taille maximale est toujours positive
-    readonly property string text: body.text  // Texte entré dans la zone de texte
+    readonly property string value: body.text  // Texte entré dans la zone de texte
 
     // Propriétés sur le titre et le texte
     property string title: ""                 // Texte à afficher au dessus du composant

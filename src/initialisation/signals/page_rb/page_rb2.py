@@ -139,14 +139,14 @@ class PageRB2:
         page_settings = sd.SettingsDictionary()
 
         # Vérifie si le fichier a eu un nom donné
-        file_name = self.train_name_widget.property("text")
+        file_name = self.train_name_widget.property("value")
         if file_name:
             # Rajoute l'extension si nécessaire et appelle la fonction de sauvegarde (definit plus bas)
             file_name += ".train" if file_name and not file_name.lower().endswith(".train") else ""
             self.save_train_settings_file(f"{self.train_settings_folder_path}{file_name}")
 
             # Ajoute le nom du fichier dans le dictionnaire de paramètres
-            page_settings["train_name"] = self.train_name_widget.property('text')
+            page_settings["train_name"] = self.train_name_widget.property('value')
         else:
             log.warning("Impossible de sauvegarder le fichier de paramètres train, aucun nom de fichier entré.",
                         prefix="Sauvegarde des données train")
@@ -165,8 +165,8 @@ class PageRB2:
         log.info(f"Tentative de sauvegarde des paramètres trains dans : {file_path}",
                  prefix="Sauvegarde des données train")
 
-        train_settings= sd.SettingsDictionary()
-        train_settings["train_name"] = self.train_name_widget.property('text')
+        train_settings = sd.SettingsDictionary()
+        train_settings["train_name"] = self.train_name_widget.property('value')
 
         # Commence par ajouter le mode de paramétrage
         train_settings["mode"] = str(self.current_mode)
@@ -366,7 +366,7 @@ class PageRB2:
             Est ce que la page de paramètre est complétée ?
         """
         # Retourne vrai si le nom du fichier a été complété (autre variables complétés par défaut)
-        if not self.train_name_widget.property("text"):
+        if not self.train_name_widget.property("value"):
             self.train_name_widget.blink(None, None, None)
             return False
 
@@ -424,7 +424,7 @@ class PageRB2:
         Demande à l'utilisateur de confirmer le nom du fichier, puis le sauvegarde
         """
         # Commence par créer le chemin vers le fichier
-        file_name = self.train_name_widget.property("text")
+        file_name = self.train_name_widget.property("value")
         file_name += ".train" if file_name and not file_name.lower().endswith(".train") else ""
 
         # Ouvre la boite de dialoque pour confirmer l'enregistrement du fichier

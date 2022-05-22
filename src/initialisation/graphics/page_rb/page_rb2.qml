@@ -850,8 +850,8 @@ Item {
 
         text: "Sauvegarder"
 
-        is_activable: train_name_stringinput.text != ""
-        is_positive: train_name_stringinput.text != ""
+        is_activable: train_name_stringinput.value != ""
+        is_positive: train_name_stringinput.value != ""
     }
 
     //Bouton de configuration freinage
