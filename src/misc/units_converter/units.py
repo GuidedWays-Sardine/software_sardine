@@ -14,8 +14,10 @@ from src.misc.units_converter.dimension import Dimension
 # Dictionaire contenant toutes les unités SI de base
 # factor ; offset tel que : [Unit] = [SI] * factor + offset     ; google : [Unit] to [SI]
 Units = {   # Unités sans dimensions
-         "":    Dimension(name="1", offset=0, factor=1),
-         "1":   Dimension(name="1", offset=0, factor=1),
+         "":    Dimension("1",   factor=1),                                           # Sans dimensions
+         "1":   Dimension("1",   factor=1),
+         "%":   Dimension("%",   factor=10**-2),
+         "‰":   Dimension("‰",   factor=10**-3),
             # Unités SI
          "m":   Dimension("m",   factor=1, length=1),
          "kg":  Dimension("kg",  factor=1, mass=1),
