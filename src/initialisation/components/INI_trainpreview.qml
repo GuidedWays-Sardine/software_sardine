@@ -203,7 +203,7 @@ Item {
             default_height: root.default_height * 0.5
 
             image_activable: root.mission_list.length > button_index && root.position_list.length > button_index ?
-                             ("Train_icons/" + root.mission_list[button_index] + (root.prime_list.includes(button_index % (root.visible_count + 3)) ? "/empty/" : "/full/") + (is_dark_grey ? "dark_" : "") + "grey_" + root.position_list[button_index] + ".png") : ""
+                             ("Train_preview/" + root.mission_list[button_index] + (root.prime_list.includes(button_index % (root.visible_count + 3)) ? "/empty/" : "/full/") + (is_dark_grey ? "dark_" : "") + "grey_" + root.position_list[button_index] + ".png") : ""
             image_not_activable: ""
             text: is_activable ? (button_index + 1).toString() : ""
             font_size: 8
