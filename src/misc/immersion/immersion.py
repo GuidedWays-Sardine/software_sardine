@@ -17,6 +17,7 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log as log
 import src.misc.window_manager as wm
 from src.misc.immersion.immersion_window import ImmersionWindow, LOADING_PATH, STILL_PATH, UNLOADING_PATH
+import src.misc.decorators as decorators
 
 
 # Liste des fenêtres pour le mode immersion et des index de fenêtres à sauter
@@ -31,6 +32,38 @@ class Mode(Enum):
     LOADING = 2
     STILL = 3
     UNLOADING = 4
+
+
+@decorators.UniqueCall
+def __initialise_immersion_windows() -> None:
+    """Initialise toutes les fenêtres d'immersion"""
+    initial_time = time.perf_counter()
+    try:
+        # Initialise chacune des fenêtres (selon le nombre, la taille et la position des écrans)
+        for screen_index in range(1, wm.screens_count() + 1):
+            IMMERSION.append(ImmersionWindow(position=wm.get_screen(screen_index)[0],
+                                             size=wm.get_screen(screen_index)[1]))
+    except Exception as error:
+        # Si une erreur est trouvé lors de l'initialisation du module immersion, laisse un message de registre
+        log.error("Erreur lors de l'initialisation des fenêtres d'imersion. Module désactivé pour la simulation.",
+                  exception=error, prefix="Chargement module immersion")
+        IMMERSION.clear()
+    else:
+        # Si les fenêtres ont été chargées correctement,indique le temps de chargement des fenêtre d'immersion
+        log.info(f"Initialisation de {len(IMMERSION)} fenêtre{'s' * (len(IMMERSION) > 1)} d'immersion en " +
+                 f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.",
+                 prefix="Chargement module immersion")
+
+    # Indique pour l'image et les vidéos de chargement/déchargement si le chemin indiqué est valide
+    if not os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{STILL_PATH}"):
+        log.warning(f"image statique du module immersion introuvable:\n\t" +
+                    f"{PROJECT_DIR}src\\misc\\immersion\\{STILL_PATH}", prefix="Chargement module immersion")
+    if not os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{LOADING_PATH}"):
+        log.warning(f"vidéo de chargement du module immersion introuvable:\n\t" +
+                    f"{PROJECT_DIR}src\\misc\\immersion\\{LOADING_PATH}", prefix="Chargement module immersion")
+    if not os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{UNLOADING_PATH}"):
+        log.warning(f"vidéo de déchargement du module immersion introuvable:\n\t" +
+                    f"{PROJECT_DIR}src\\misc\\immersion\\{UNLOADING_PATH}", prefix="Chargement module immersion")
 
 
 def change_mode(new_mode) -> None:
@@ -56,25 +89,7 @@ def change_mode(new_mode) -> None:
 
     # First generate the windows if they aren't generated
     if not IMMERSION:
-        initial_time = time.perf_counter()
-        for screen_index in range(1, wm.screens_count() + 1):
-            IMMERSION.append(ImmersionWindow(position=wm.get_screen(screen_index)[0],
-                                             size=wm.get_screen(screen_index)[1]))
-
-        # Indique le temps de chargement des fenêtre d'immersion
-        log.info(f"Initialisation de {len(IMMERSION)} fenêtre{'s' * (len(IMMERSION) > 1)} d'immersion en " +
-                 f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.", prefix="Chargement module immersion")
-
-        # Indique pour l'image et les vidéos de chargement/déchargement si le chemin indiqué est valide
-        if not os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{STILL_PATH}"):
-            log.warning(f"image statique du module immersion introuvable:\n\t" +
-                        f"{PROJECT_DIR}src\\misc\\immersion\\{STILL_PATH}", prefix="Chargement module immersion")
-        if not os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{LOADING_PATH}"):
-            log.warning(f"vidéo de chargement du module immersion introuvable:\n\t" +
-                        f"{PROJECT_DIR}src\\misc\\immersion\\{LOADING_PATH}", prefix="Chargement module immersion")
-        if not os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{UNLOADING_PATH}"):
-            log.warning(f"vidéo de déchargement du module immersion introuvable:\n\t" +
-                        f"{PROJECT_DIR}src\\misc\\immersion\\{UNLOADING_PATH}", prefix="Chargement module immersion")
+        __initialise_immersion_windows()
 
     # Now find what immersion mode was sent and change the behavior of the immersion mode depending on it
     if new_mode == Mode.EMPTY:
