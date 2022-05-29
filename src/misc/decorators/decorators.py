@@ -237,21 +237,22 @@ class UIupdate:
 
     def __call__(self, *args, **kwargs):
         """Fonction appelée lors de l'appel de la fonction ciblée par le décorateur."""
-        # Génère la liste des arguments (fusion des *args, **kwargs et des arguments par défaut
-        self.__ui_thread.set_arguments(*args, **kwargs)
-
         # Si on se trouve dans le thread principal, appel directement la fonction (optimisation)
         # Sinon, démarre le QThread (appelant sa fonction run() -> la fonction envoyée) et attend que l'appel se finisse
         if threading.current_thread().__class__.__name__ == '_MainThread':
             # QtSignal récupère une exception que si la fonction est appelée dans un thread secondaire
             try:
-                self.__ui_thread.get_func()(*self.__ui_thread.get_args())
+                self.__ui_thread.get_func()(*args, **kwargs)
             except Exception as error:
                 function_name = str(self.__ui_thread.get_func())[10:].split(" at ")[0]
                 log.warning(message=f"Exception jetée dans le signal : {function_name}().", exception=error,
                             prefix=f"Signal : \"{function_name}\"")
             self.__ui_thread.clear_arguments()
         else:
+            # Génère la liste des arguments (fusion des *args, **kwargs et des arguments par défaut)
+            self.__ui_thread.set_arguments(*args, **kwargs)
+
+            # Appelle la fonction dans le thread UI et attend que l'appel se finisse
             self.__ui_thread.start()
             self.__ui_thread.wait()
 
