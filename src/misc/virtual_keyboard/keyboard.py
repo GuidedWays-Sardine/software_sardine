@@ -17,11 +17,14 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.decorators as decorators
 import src.misc.log as log
+import src.misc.window_manager as wm
 from src.misc.virtual_keyboard.mode import KeyboardMode, get_keyboard_from_language
 
 
 # Instance du clavier virtuel
 KEYBOARD = []
+NUMPAD_SIZE = (240, 300)        # Tailles maximales pour le pavé numérique et le clavier
+KEYBOARD_SIZE = (900, 300)
 
 
 class VirtualKeyboard:
@@ -108,6 +111,7 @@ class VirtualKeyboard:
         """Bouge la fenêtre aux coordonées (absolus) envoyées
 
         Parameters
+        ----------
         x: `int`
             Coordonées x à partir du coin haut, gauche du premier écran ;
         y: `int`
@@ -115,6 +119,39 @@ class VirtualKeyboard:
         """
         self.__win.setProperty("x", x)
         self.__win.setProperty("y", y)
+
+    def resize(self, width_factor, height_factor):
+        """Redimenssione le clavier virtuel en fonction de sa taille théorique maximale et de ses facteurs.
+
+        Parameters
+        ----------
+        width_factor: `float`
+            Facteur de réduction sur la largeur du composant (compris entre 0.0 et 1.0) ;
+        height_factor: `float`
+            Facteur de réduction sur la hauteur du composant (compris entre 0.0 et 1.0).
+        """
+        keyboard_size = KEYBOARD_SIZE if self.__win.property("keyboard").toVariant() else NUMPAD_SIZE
+
+        # Vérifie que les facteurs sont biens entre 0 et 1 (sinon l'indique dans le registre)
+        if width_factor <= 0 or height_factor <= 0:
+            log.debug(f"Les facteurs de conversions pour le clavier numériques doivent être strictement positifs " +
+                      f"(width_factor = {width_factor} ; height_factor = {height_factor}).",
+                      prefix="Clavier virtuel")
+        elif width_factor > 1 or height_factor > 1:
+            log.debug(f"Le clavier numérique ne peut pas avoir une taille supérieure à sa taille maximale " +
+                      f"(width_factor = {width_factor} ; height_factor = {height_factor}).",
+                      prefix="Clavier virtuel")
+
+        # Calcule les dimensions finales du clavier et le redimensionne
+        width = min(max(keyboard_size[0] * width_factor, 1), keyboard_size[0])
+        height = min(max(keyboard_size[1] * height_factor, 1), keyboard_size[1])
+        self.__win.setProperty("width", width)
+        self.__win.setProperty("height", height)
+
+        # Si les nouvelles dimensions de la fenêtre sont inférieures à celles maximales, l'indique dans le registre
+        if 0 < width_factor < 1 or 0 < height_factor < 1:
+            log.debug(f"Pas suffisament d'espace pour afficher le clavier virtuel en ses dimensions maximales " +
+                      f"({width}*{height} au lieu de {keyboard_size[0]}*{keyboard_size[1]})")
 
     def show(self):
         """Montre le clavier virtuel"""
