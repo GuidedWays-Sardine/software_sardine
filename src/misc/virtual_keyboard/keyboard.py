@@ -143,8 +143,8 @@ class VirtualKeyboard:
                       prefix="Clavier virtuel")
 
         # Calcule les dimensions finales du clavier et le redimensionne
-        width = min(max(keyboard_size[0] * width_factor, 1), keyboard_size[0])
-        height = min(max(keyboard_size[1] * height_factor, 1), keyboard_size[1])
+        width = min(max(round(keyboard_size[0] * width_factor), 1), keyboard_size[0])
+        height = min(max(round(keyboard_size[1] * height_factor), 1), keyboard_size[1])
         self.__win.setProperty("width", width)
         self.__win.setProperty("height", height)
 
@@ -306,19 +306,17 @@ def show_keyboard(window, widget, language=KeyboardMode.NUMPAD, skip_list=()):
             margins = [0, 0, size[0], size[1]]
 
         # Récupère le ratio de réduction entre la taile du clavier maximale et celle permise pour chaque emplacement
-        margins = [min(margins[0] / size[0], 1),
-                   min(margins[1] / size[1], 1),
-                   min(margins[2] / size[0], 1),
-                   min(margins[3] / size[1], 1)]
+        margins = [max(min(margins[0] / size[0], 1), 0),
+                   max(min(margins[1] / size[1], 1), 0),
+                   max(min(margins[2] / size[0], 1), 0),
+                   max(min(margins[3] / size[1], 1), 0)]
 
         # Choisis maintenant la position du composant de la sorte suivante :
         #  - de préférence en bas à gauche (index 0 et 1)
         #  - si emplacement trop petit -> le place là où il rentre en entier
         #  - s'il rentre en entier nulle part -> le rentre là où il sera le plus grand (et redimensionne le clavier)
-        print(margins[3], margins[1], y, height)
-        print(margins[3] == 1 or margins[3] > margins[1])
-        KEYBOARD[0].move_to(int(x if margins[2] == 1 or margins[2] > margins[0] else (x + width - size[0] * margins[0])),
-                            int((y + height) if margins[3] == 1 or margins[3] > margins[1] else (y - size[1] * margins[1])))
+        KEYBOARD[0].move_to(round(x if margins[2] == 1 or margins[2] > margins[0] else (x + width - size[0] * margins[0])),
+                            round((y + height) if margins[3] == 1 or margins[3] > margins[1] else (y - size[1] * margins[1])))
 
         # Si le clavier a du être réduit, le redimensionne par le facteur
         KEYBOARD[0].resize(max(margins[0], margins[2]), max(margins[1], margins[3]))
