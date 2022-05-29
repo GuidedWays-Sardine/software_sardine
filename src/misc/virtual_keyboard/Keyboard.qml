@@ -220,9 +220,9 @@ Window {
                  readonly property int column: index   // Permet de stocker le numéro de touche de la ligne actuelle
 
                  x: root.width / root.numpad_keyboard[row].length * column
-                 y: root.height / root.numpad_keyboard.length * row
+                 y: root.height / (root.numpad_keyboard.length + 1) * row
                  width: root.width / root.numpad_keyboard[row].length
-                 height: root.height / root.numpad_keyboard.length
+                 height: root.height / (root.numpad_keyboard.length + 1)
 
                  keys: root.numpad_keyboard[row][column]
                  skip_list: root.skip_list
@@ -243,5 +243,32 @@ Window {
                  onClicked: { root.key_clicked(key) }
             }
         }
+    }
+
+    KeyButton {
+        id: numpad_delete
+
+             x: 0
+             y: root.height / (root.numpad_keyboard.length + 1) * root.numpad_keyboard.length
+             width: root.width
+             height: root.height / (root.numpad_keyboard.length + 1)
+
+             keys: "⇐"
+
+             is_pushbutton: true
+             is_special_key: true
+             visible: root.keyboard.length == 0
+
+             background_default_color: root.key_background_default_color
+             background_hover_color: root.key_background_hover_color
+             background_hold_color: root.key_background_hold_color
+             text_inactive_color: root.key_text_inactive_color
+             text_active_color: root.key_text_active_color
+             text_inactive_hovered_color: root.key_text_inactive_hovered_color
+             text_active_hovered_color: root.key_text_active_hovered_color
+
+
+             // Rappelle les signaux du clavier lorsque la touche est cliquée
+             onPushed: { root.key_pushed("backspace") }
     }
 }
