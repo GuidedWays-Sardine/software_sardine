@@ -11,7 +11,7 @@ Window {
     // Propriétés sur les dimensions du clavier virtuel
     x: 0
     y: 0
-    width: root.keyboard.length === 0 ? 260 : 900
+    width: 240   // Dimensions conseillées pour un NUMPAD -> changer manuellement selon le type de clavier et la taille disponible
     height: 300
 
     // Propriétés pour définir la fenêtre sans bordure et toujours au dessus de tout.
