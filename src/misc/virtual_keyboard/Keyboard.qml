@@ -129,7 +129,7 @@ Window {
     }
 
     // Liste des touches pour la barre du bas ; format : [["valeur visible", "valeur envoyée", espace utilisé], ...
-    readonly property var bottom_keys: [["⇧", "shiftleft", 2], ["Alt Gr", "altright", 2], [" ", " ", 5], ["←", "left", 1], ["→", "right", 1], ["⇐", "delete", 2]]
+    readonly property var bottom_keys: [["⇧", "shiftleft", 2], ["Alt Gr", "altright", 2], [" ", " ", 5], ["←", "left", 1], ["→", "right", 1], ["⇐", "backspace", 2]]
 
     // Repeater pour chacunes des touches ci-dessus
     Repeater {
