@@ -76,7 +76,7 @@ def __get_unit(unit_name):
 
 
 def __divide_unit_string(unit_string):
-    """Dvise le texte d'une unité à chaque fois que l'un des charactère suivant est rencontré : (* ; ^ ; /).
+    """Divise le texte d'une unité à chaque fois que l'un des charactère suivant est rencontré : (* ; ^ ; /).
     Si une parenthèse fermée ou la fin du texte est trouvée, retourne.
     Si une parenthèse ouverte est trouvée, rappelle la fonction récursivement.
 
