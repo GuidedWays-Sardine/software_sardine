@@ -40,6 +40,7 @@ Window {
 
     // Signal à surcharger en QML ou en Python
     signal key_clicked(var key)         // Appelé lorsqu'une touche est cliquée, envoie la touche (si non push_locked)
+    signal key_pushed(var key)          // Appelé lorsqu'une touche spéciale () est cliquée, envoye la touche (si non push_locked)
     signal key_pressed(var key)         // Appelé lorsqu'une touche est cliquée et passe en mode pressé (si push_locked)
     signal key_released(var key)        // Appelé lorsqu'une touche est cliquée et sort du mode pressé (si push_locked)
 
@@ -102,7 +103,7 @@ Window {
                 is_caps: root.is_caps
                 is_altgr: root.is_altgr
                 is_pushbutton: true
-                is_multikey: true
+                is_special_key: false
 
                 background_default_color: root.key_background_default_color
                 background_hover_color: root.key_background_hover_color
@@ -146,7 +147,7 @@ Window {
              is_caps: root.is_caps
              is_altgr: root.is_altgr
              is_pushbutton: row >= 2        // Seul la touche maj et alt_gr sont en commutateur
-             is_multikey: false
+             is_special_key: true
 
              background_default_color: root.key_background_default_color
              background_hover_color: root.key_background_hover_color
@@ -158,9 +159,7 @@ Window {
 
 
              // Appelé lorsque la touche est cliquée, renvoie la valeur caché derrière la touche
-             onClicked: {
-                 root.key_clicked(root.bottom_keys[row][1])
-             }
+             onPushed: { root.key_pushed(root.bottom_keys[row][1]) }
 
              // Appelé lorsqu'une touche de type commutateur passe en mode enfoncé (touche maj et alt gr)
              onPressed: {
@@ -220,9 +219,10 @@ Window {
                  height: root.height / root.numpad_keyboard.length
 
                  keys: root.numpad_keyboard[row][column]
+                 skip_list: root.skip_list
 
                  is_pushbutton: true
-                 is_multikey: false
+                 is_special_key: false
 
                  background_default_color: root.key_background_default_color
                  background_hover_color: root.key_background_hover_color

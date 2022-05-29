@@ -17,11 +17,11 @@ Item {
     property var skip_list: []
 
     // Propriétés sur le mode de la touche
-    property bool is_multikey: true     // Indique si chacune des lettre de keys représentent une valeur (normal, caps et altgr) ou si c'est une unique touche
-    property bool is_pushbutton: true   // Indique si la touche est un bouton poussoir (s'il est enclenché que si appuyé) ou de type  commutateur (rest enfoncé quand appuyé et se relache quand appuyé de nouveau)
+    property bool is_special_key: false  // Indique si chacune des lettre de keys représentent une valeur (normal, caps et altgr) ou si c'est une unique touche
+    property bool is_pushbutton: true    // Indique si la touche est un bouton poussoir (s'il est enclenché que si appuyé) ou de type  commutateur (rest enfoncé quand appuyé et se relache quand appuyé de nouveau)
     // Une touche ne peut pas être multikey et un commutateur (pas un bouton poussoir)
-    property bool is_caps: false        // Indique si la touche active est celle des majuscules (valeur supérieure, gauche)
-    property bool is_altgr: false       // Indique si la touche active est celle des valeurs tierces (valeur inférieure, droite)
+    property bool is_caps: false         // Indique si la touche active est celle des majuscules (valeur supérieure, gauche)
+    property bool is_altgr: false        // Indique si la touche active est celle des valeurs tierces (valeur inférieure, droite)
     // Seule l'une des propriétés peut-être activée en même temps. Si aucune ne l'est la touche normale est active (valeur inférieure gauche)
 
     // Couleurs de la touche
@@ -35,9 +35,10 @@ Item {
 
 
     // Signal à surcharger en QML ou en Python
-    signal clicked(var key)         // Appelé lorsque la touche est cliqué, envoie la touche (si non push_locked)
-    signal pressed(var key)         // Appelé lorsque la touche est cliqué et passe en mode pressé (si push_locked)
-    signal released(var key)        // Appelé lorsque la touche est cliqué et sort du mode pressé (si push_locked)
+    signal clicked(var key)              // Appelé lorsqu'une touche classique (qui ressort une lettre) est cliquée, envoie la touche (si non push_locked)
+    signal pushed(var key)               // Appelé lorsqu'une touche spéciale (qui génère une action) est cliquée
+    signal pressed(var key)              // Appelé lorsque la touche est cliqué et passe en mode pressé (si push_locked)
+    signal released(var key)             // Appelé lorsque la touche est cliqué et sort du mode pressé (si push_locked)
 
 
     // Fonctions permettant de changer l'état d'appui d'un commutateur
@@ -73,11 +74,11 @@ Item {
     }
 
     // Appelé lorsque la touche change son mode (clé multiple ou unique)
-    onIs_multikeyChanged: {
-        // Cas où le mode multiclé est passé alors que la touche est de type commutateur (incompatible), repasse en mode bouton poussoir
-        if (root.is_multikey && !root.is_pushbutton) {
+    onIs_special_keyChanged: {
+        // Cas où la touche n'est pas en mode spécial mais est de type commutateur (incompatible), repasse en mode bouton poussoir
+        if (!root.is_special_key && !root.is_pushbutton) {
             root.is_pushbutton = true
-            console.log(`Une touche ne peut pas être commutateur et multi-valeurs (touche : \"${root.keys}\").`)
+            console.log(`Une touche de type commutateur doit obligatoirement être une touche spéciale (touche : \"${root.keys}\").`)
         }
     }
 
@@ -92,7 +93,7 @@ Item {
         // Cas où la touche passe en mode commutateur
         else if (!root.is_pushbutton) {
             // Définit le mode de la touche comme clé simple (désactive le mode multi-clé)
-            root.is_multikey = false
+            root.is_special_key = true
         }
     }
 
@@ -109,11 +110,12 @@ Item {
           anchors.fill: parent
           anchors.margins: Math.min(root.width, root.height) * 0.02
 
-          enabled: root.is_multikey
-                   ?     // Cas du mode multi-clé activée, la touche est active si la sous-clé active de celle-ci existe et n'est pas dans la liste des touches interdites
-                    (root.keys.length > (1 * root.is_caps + 2 * root.is_altgr) && !root.skip_list.includes(root.keys[Math.min(1 * root.is_caps + 2 * root.is_altgr, root.keys.length - 1)]))
-                   :     // Cas où le multi-touches n'est pas activé, active la touche si un texte a été envoyé
+          enabled: root.is_special_key
+                   ?     // Cas où la touche est une touche spéciale, active la touche si un texte a été envoyé
                     (root.keys.length > 0 && !root.skip_list.includes(root.keys))
+                   :     // Cas où la touche n'est pas spéciale, active la touche si la sous-clé active existe et n'est pas dans la liste des touches interdites
+                    (root.keys.length > (1 * root.is_caps + 2 * root.is_altgr) && !root.skip_list.includes(root.keys[Math.min(1 * root.is_caps + 2 * root.is_altgr, root.keys.length - 1)]))
+
           hoverEnabled: body.enabled
           focusPolicy: Qt.NoFocus
 
@@ -137,9 +139,13 @@ Item {
                       root.released(root.keys)
                   }
               }
-              // Cas où la touche est de type poussoir, appelle le signal de clique en envoyant la sous-touche correspondante
+              // Cas où la touche est de type poussoir et est spéciale -> appuie sur la touche correspondante
+              else if (root.is_special_key) {
+                    root.pushed(root.keys)
+              }
+              // Cas àù la touche est de type poussoir et n'est pas spéciale -> clique sur la sous-touche correspondate
               else {
-                  root.clicked(root.keys[Math.min(1 * root.is_caps + 2 * root.is_altgr, root.keys.length - 1)])
+                    root.clicked(root.keys[Math.min(1 * root.is_caps + 2 * root.is_altgr, root.keys.length - 1)])
               }
           }
 
@@ -171,17 +177,16 @@ Item {
               id: default_key
 
               anchors.bottom: body.bottom
-              anchors.bottomMargin: root.is_multikey ? root.height * 0.04 : (root.height - default_key.font.pixelSize) / 2.2    // En bas à droite si mode multi_key sinon centré
+              anchors.bottomMargin: !root.is_special_key && root.keys.length > 1 ? root.height * 0.04 : (root.height - default_key.font.pixelSize) / 2.2    // Centré si clé spéciale ou unique sinon en bas à droite
               anchors.left: body.left
               anchors.leftMargin: root.height * 0.1
 
               font.pixelSize: root.height * 0.36
 
-              text: root.is_multikey ? (root.keys.length >= 1 ? root.keys[0] : "") :   // Cas de touche de type bouton poussoir, affiche la première lettre
-                                       root.keys
+              text: root.is_special_key ? root.keys : (root.keys.length >= 1 ? root.keys[0] : "")  // Si clé spéciale, affiche toutes les lettres sinon que la première
 
               color: (root.is_caps || root.is_altgr || !body.enabled)
-                     ?   // Cas où la touche ne peut pas être activé (mauvais sous clavier, touche interdite) + couleur du texte selon la couleur du fond
+                     ?   // Cas où la touche ne peut pas être activée (mauvais sous clavier, touche interdite) + couleur du texte selon la couleur du fond
                          (((body.hovered && !body.is_clicked) || (body.is_clicked && !body.hovered)) ? root.text_inactive_hovered_color : root.text_inactive_color)
                      :   // Cas où la touche peut être activée (bon clavier et touche non interdite) + couleur du texte selon la couleur du fond
                          (((body.hovered && !body.is_clicked) || (body.is_clicked && !body.hovered)) ? root.text_active_hovered_color : root.text_active_color)
@@ -198,10 +203,10 @@ Item {
 
               font.pixelSize: root.height * 0.36
 
-              text: root.is_multikey && root.keys.length >= 2 ? root.keys[1] : ""  // Affiche le texte si lla touche est de type bouton poussoir et qu'il y a au moins deux lettres
+              text: !root.is_special_key && root.keys.length >= 2 ? root.keys[1] : ""  // Affiche le texte si la touche n'est pas spéciale et qu'il y a au moins deux lettres
 
               color: (!root.is_caps || root.is_altgr || !body.enabled)
-                     ?   // Cas où la touche ne peut pas être activé (mauvais sous clavier, touche interdite) + couleur du texte selon la couleur du fond
+                     ?   // Cas où la touche ne peut pas être activée (mauvais sous clavier, touche interdite) + couleur du texte selon la couleur du fond
                          (((body.hovered && !body.is_clicked) || (body.is_clicked && !body.hovered)) ? root.text_inactive_hovered_color : root.text_inactive_color)
                      :   // Cas où la touche peut être activée (bon clavier et touche non interdite) + couleur du texte selon la couleur du fond
                          (((body.hovered && !body.is_clicked) || (body.is_clicked && !body.hovered)) ? root.text_active_hovered_color : root.text_active_color)
@@ -218,9 +223,10 @@ Item {
 
               font.pixelSize: root.height * 0.36
 
-              text: root.is_multikey && root.keys.length >= 3 ? root.keys[2] : ""
+              text: !root.is_special_key && root.keys.length >= 3 ? root.keys[2] : ""  // Affiche le texte si la touche n'est pas spéciale et qu'il y a au moins trois lettres
+
               color: (root.is_caps || !root.is_altgr || !body.enabled)
-                     ?   // Cas où la touche ne peut pas être activé (mauvais sous clavier, touche interdite) + couleur du texte selon la couleur du fond
+                     ?   // Cas où la touche ne peut pas être activée (mauvais sous clavier, touche interdite) + couleur du texte selon la couleur du fond
                          (((body.hovered && !body.is_clicked) || (body.is_clicked && !body.hovered)) ? root.text_inactive_hovered_color : root.text_inactive_color)
                      :   // Cas où la touche peut être activée (bon clavier et touche non interdite) + couleur du texte selon la couleur du fond
                          (((body.hovered && !body.is_clicked) || (body.is_clicked && !body.hovered)) ? root.text_active_hovered_color : root.text_active_color)
