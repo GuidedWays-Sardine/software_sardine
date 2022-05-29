@@ -282,11 +282,46 @@ def show_keyboard(window, widget, language=KeyboardMode.NUMPAD, skip_list=()):
             width = widget.property("width")
             height = widget.property("height")
 
-        # TODO l'algorithme pour trouver la meilleure position de la fenêtre
+        # Récupère les dimensions du type de clavier utilisé
+        size = KEYBOARD_SIZE if get_keyboard_from_language(language).value else NUMPAD_SIZE
 
+        # Récupère la fenêtre où se situe  le composant
+        screens = wm.screens_list()
+        screen_index = [i + 1 for i in range(len(screens))
+                        if (screens[i][0][0] - 1 - 24) <= x <= (screens[i][0][0] + screens[i][1][0] - 24)
+                        and (screens[i][0][1] - 1 - 24) <= y <= (screens[i][0][1] + screens[i][1][1] - 24)]
 
-        # Déplace la fenêtre aux meilleurs coordonées inscrites
-        KEYBOARD[0].move_to(x, y + height)
+        # Si l'écran a été trouvé
+        if screen_index:
+            screen = wm.get_screen(screen_index[0])
+            margins = [x + width - screen[0][0],
+                       y - screen[0][1],
+                       screen[0][0] + screen[1][0] - x,
+                       screen[0][1] + screen[1][1] - (y + height)]
+        else:
+            # L'indique dans le registre et définit des données pour que le clavier se place en bas à gauche
+            object_name = widget.property("objectName") if widget.property("objectName") is not None else ""
+            log.debug(f"Impossible de localiser le composant \"{object_name}\" risque de mauvais placement du clavier.",
+                      prefix="Clavier virtuel")
+            margins = [0, 0, size[0], size[1]]
+
+        # Récupère le ratio de réduction entre la taile du clavier maximale et celle permise pour chaque emplacement
+        margins = [min(margins[0] / size[0], 1),
+                   min(margins[1] / size[1], 1),
+                   min(margins[2] / size[0], 1),
+                   min(margins[3] / size[1], 1)]
+
+        # Choisis maintenant la position du composant de la sorte suivante :
+        #  - de préférence en bas à gauche (index 0 et 1)
+        #  - si emplacement trop petit -> le place là où il rentre en entier
+        #  - s'il rentre en entier nulle part -> le rentre là où il sera le plus grand (et redimensionne le clavier)
+        print(margins[3], margins[1], y, height)
+        print(margins[3] == 1 or margins[3] > margins[1])
+        KEYBOARD[0].move_to(int(x if margins[2] == 1 or margins[2] > margins[0] else (x + width - size[0] * margins[0])),
+                            int((y + height) if margins[3] == 1 or margins[3] > margins[1] else (y - size[1] * margins[1])))
+
+        # Si le clavier a du être réduit, le redimensionne par le facteur
+        KEYBOARD[0].resize(max(margins[0], margins[2]), max(margins[1], margins[3]))
 
         # Montre le clavier virtuel et redonne le focus au composant édité
         KEYBOARD[0].show()
