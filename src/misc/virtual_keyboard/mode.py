@@ -33,7 +33,7 @@ def get_keyboard_from_language(language):
 
     Parameters
     ----------
-    language: `string`
+    language: `string | KeyboardMode`
         Langue du clavier à récupérer (non sensible aux minuscules et majuscules)
 
     Returns
@@ -41,6 +41,10 @@ def get_keyboard_from_language(language):
     keyboard: `KeyboardMode`
         Clavier de la langue correspondante (anglais si langue introuvable).
     """
+    # Si la langue est déjà un clavier, retourne le clavier
+    if isinstance(language, KeyboardMode):
+        return language
+
     # Convertit tous les charactères particuliers en charactères classiques (é -> e ; ç -> c) et passe en majuscule
     modified = ''.join(c for c in unicodedata.normalize('NFD', language) if unicodedata.category(c) != 'Mn').upper()
 
