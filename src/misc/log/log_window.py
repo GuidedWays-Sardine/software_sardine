@@ -195,6 +195,7 @@ class LogWindow(QTextEdit):
         self.hide()
 
 
+@decorators.UniqueCall
 def __initialise_log_window() -> None:
     """[Fonction privée] Initialise l'instance de la fenêtre de registre (Initialisée en même temps que le registre)."""
     if QApplication.instance() is not None and not len(INSTANCE):
