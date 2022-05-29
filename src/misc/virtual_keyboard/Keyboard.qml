@@ -47,8 +47,10 @@ Window {
 
     // Appelé lorsque le clavier change -> désactive la touche maj et alt_gr
     onKeyboardChanged: {
-        root.is_caps = false
-        root.is_altgr = false
+        if (root.keyboard.length == 0) {
+            root.is_caps = false
+            root.is_altgr = false
+        }
     }
 
     // Appelé lorsque le mode majuscule du clavier change
