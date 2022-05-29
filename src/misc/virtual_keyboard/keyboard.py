@@ -323,7 +323,7 @@ def show_keyboard(window, widget, language=KeyboardMode.NUMPAD, skip_list=()):
 
         # Montre le clavier virtuel et redonne le focus au composant édité
         KEYBOARD[0].show()
-        window.give_focus()
+        window.requestActivate()
 
 
 @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)

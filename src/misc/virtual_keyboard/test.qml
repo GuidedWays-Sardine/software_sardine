@@ -37,12 +37,6 @@ Window {
     }
 
 
-    // Fonction pour redonner le focus à la fenêtre
-    function give_focus() {
-        window.requestActivate()
-    }
-
-
     // Floatinput pour tester : le numpad ; la désactivation du - pour les valeurs positives
     INI_floatinput {
         id: test_float

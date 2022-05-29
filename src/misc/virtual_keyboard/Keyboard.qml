@@ -45,12 +45,6 @@ Window {
     signal key_released(var key)        // Appelé lorsqu'une touche est cliquée et sort du mode pressé (si push_locked)
 
 
-    // Fonction permettant de redonner le focus à la fenêtre
-    function give_focus() {
-        root.requestActivate()
-    }
-
-
     // Appelé lorsque le clavier change -> désactive la touche maj et alt_gr
     onKeyboardChanged: {
         root.is_caps = false
