@@ -4,10 +4,12 @@ import sys
 import time
 from enum import Enum
 from functools import lru_cache
+import threading
 
 
 # Librairies graphiques
 from PyQt5.QtWidgets import QApplication
+from PyQt5.QtCore import QTimer
 import cv2 as cv
 
 
@@ -134,6 +136,14 @@ def change_mode(new_mode) -> None:
             window.set_deactivated()
         log.info("Changement du mode immersion : mode désactivé.",
                  prefix="Module immersion")
+
+    # Si la fonction est appelée dans le thread principal, execute l'application pendant 5ms pour mettre à jour le mode
+    # Attention, cela ne marche que pour les modes DEACTIVATED, EMPTY et STILL
+    # Pour les modes LOADING et UNLOADING, il faut utiliser des threads d'attente et les fonctions (un)loading_duration
+    if threading.current_thread().__class__.__name__ == '_MainThread' and \
+            new_mode in (Mode.DEACTIVATED, Mode.EMPTY, Mode.STILL):
+        QTimer.singleShot(5, lambda: QApplication.instance().quit())
+        QApplication.instance().exec()
 
 
 def change_skip_list(skip_list=(), new_mode=Mode.EMPTY) -> None:
