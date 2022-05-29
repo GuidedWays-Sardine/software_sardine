@@ -235,7 +235,7 @@ def log_window_frameless(visible=None) -> None:
 
         # Si le mode de visibilité doit être changé, le change
         if visible is not None:
-            log_window_visibility(visible)
+            change_log_window_visibility(visible)
 
 
 def log_window_windowed(visible=None) -> None:
@@ -252,12 +252,12 @@ def log_window_windowed(visible=None) -> None:
 
         # Si le mode de visibilité doit être changé, le change
         if visible is not None:
-            log_window_visibility(visible)
+            change_log_window_visibility(visible)
 
 
 @decorators.UIupdate
 @decorators.QtSignal(log_level=Level.WARNING, end_process=False)
-def log_window_visibility(visible=True) -> None:
+def change_log_window_visibility(visible=True) -> None:
     """Change la visibilité de la fenêtre.
 
     Parameters
@@ -270,6 +270,16 @@ def log_window_visibility(visible=True) -> None:
         INSTANCE[0].show()
     elif INSTANCE and not visible:
         INSTANCE[0].hide()
+
+
+def show_log_window():
+    """Montre la fenêtre de registre"""
+    change_log_window_visibility(visible=True)
+
+
+def hide_log_window():
+    """Cache la fenêtre de registre"""
+    change_log_window_visibility(visible=False)
 
 
 def set_log_window_geometry(settings, key, visible=None) -> None:
@@ -290,7 +300,7 @@ def set_log_window_geometry(settings, key, visible=None) -> None:
         wm.set_window_geometry(INSTANCE[0], settings, key, (640, 128))
 
         if visible is not None:
-            log_window_visibility(visible)
+            change_log_window_visibility(visible)
 
 
 def get_log_window_geometry(settings, key) -> None:
