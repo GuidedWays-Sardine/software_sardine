@@ -15,7 +15,7 @@ Window {
     height: 300
 
     // Propriétés pour définir la fenêtre sans bordure et toujours au dessus de tout.
-    flags: Qt.FramelessWindowHint | Qt.Window | Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus
+    flags: Qt.FramelessWindowHint | Qt.Window | Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus | Qt.WA_ShowWithoutActivating | Qt.Tool
     color: keyboard_background_color
 
 
