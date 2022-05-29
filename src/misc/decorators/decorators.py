@@ -19,6 +19,37 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log as log
 
 
+# Appel : @decorators.UniqueCall
+class UniqueCall:
+    """Décorateur a utiliser pour les fonctions ne devant être appelées qu'une fois"""
+    # Fonction concernée
+    __function = None
+
+    # Indicateur pour savoir si la fonction a déjà été appelée
+    __already_called = False
+
+    def __init__(self, function):
+        """Fonction appelée lors de l'initialisation de la fonction ciblée par le décorateur.
+
+        Parameters
+        ----------
+        function: `function`
+            fonction à appeler une unique fois.
+        """
+        self.__function = function
+
+    def __call__(self, *args, **kwargs):
+        """Fonction appelée lors de l'appel de la fonction ciblée par le décorateur."""
+        # Si la fonction n'a pas déjà été appelée, l'appelle et indique qu'elle a été appelée
+        if not self.__already_called:
+            self.__function(*args, **kwargs)
+            self.__already_called = True
+
+    def __get__(self, obj, objtype):
+        """Support instance methods."""
+        return functools.partial(self.__call__, obj)
+
+
 # Appel : @decorators.CommandBoardComponent
 def CommandBoardComponent():
     """décorateur permettant de récupérer les exceptions lors de l'initialision d'une des sous-classe pour le pupitre"""
