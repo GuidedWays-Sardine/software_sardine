@@ -230,6 +230,37 @@ def change_skip_list(skip_list=()):
         KEYBOARD[0].change_skip_list(skip_list)
 
 
+def change_keyboard_activability(activable=True):
+    """Indique si le clavier virtuel peut s'afficher ou non.
+
+    Patameters
+    ----------
+    activable: `bool`
+        Le clavier virtuel sera-t-il montré lorsqu'un composant connecté récupère la main.
+    """
+    # Si un clavier n'a pas été initialisé, essaye de l'initialiser
+    if not KEYBOARD:
+        initialise_keyboard()
+
+    # Si un clavier a été initialisé, change son activability
+    if KEYBOARD:
+        KEYBOARD[0].is_activated(new_state=activable)
+
+        # Si le clavier a été désactivé, le cache
+        if not activable:
+            hide_keyboard()
+
+
+def activate_keyboard():
+    """Active le clavier virtuel (ne le montre pas, juste l'active)."""
+    change_keyboard_activability(True)
+
+
+def deactivate_keyboard():
+    """Désactive le clavier virtuel (et le cache)"""
+    change_keyboard_activability(False)
+
+
 @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
 def show_keyboard(window, widget, language=KeyboardMode.NUMPAD, skip_list=()):
     """Montre le clavier virtuel.
@@ -253,8 +284,8 @@ def show_keyboard(window, widget, language=KeyboardMode.NUMPAD, skip_list=()):
     if not KEYBOARD:
         initialise_keyboard()
 
-    # Si le clavier a été initialisé
-    if KEYBOARD:
+    # Si le clavier a été initialisé et qu'il est activé
+    if KEYBOARD and KEYBOARD[0].is_activated():
         # Change le clavier actuel et la liste des charactères inteerdits
         change_mode(language)
         change_skip_list(skip_list)
