@@ -31,8 +31,10 @@ Item{
     readonly property double y_offset: (parent.width/parent.height < w_min/h_min) && (parent.width >= w_min && parent.height >= h_min) ? (parent.height - h_min * root.ratio) / 2 : 0
 
     // Propriétés liées aux valeurs limites et la valeur actuellement sélectionnée
-    property double minimum_value: 0.0        // Valeur minimale et maximale
+    property double minimum_value: 0.0        // Valeur minimale et maximale (en unité SI et en unité actuelle)
     property double maximum_value: 1.0
+    readonly property double visible_minimum_value: validator.bottom
+    readonly property double visible_maximum_value: validator.top
     property int decimals: 2                  // Nombre de chiffres maximum après la virgule (pour les unités SI, varie selon l'unité sélectionée)
     property double visible_value: 0.0        // Valeur visible (prise en compte des taux de conversions)/Valeur enregistrée (équivalent unités SI)
     readonly property double value: (root.visible_value - root.unit_offset) / root.unit_factor
@@ -420,8 +422,8 @@ Item{
 
             // Détecte lorsque le INI_floatinput est double cliqué, permet de changer l'unité active
             onDoubleClicked: {
-                // Passe à l'unité suivante
                 next_unit()
+                root.focus_gained()
             }
         }
 
