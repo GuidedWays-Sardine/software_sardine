@@ -9,7 +9,7 @@ import pyautogui
 # Librairies graphiques
 from PyQt5.QtQml import QQmlApplicationEngine
 from PyQt5.QtWidgets import QMainWindow
-from PyQt5.QtCore import QObject, Qt
+from PyQt5.QtCore import QObject
 
 
 # Librairies SARDINE
