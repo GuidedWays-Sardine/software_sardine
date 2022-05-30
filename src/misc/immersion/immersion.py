@@ -37,7 +37,7 @@ class Mode(Enum):
 
 
 @decorators.UniqueCall
-def __initialise_immersion_windows() -> None:
+def initialise_immersion_windows() -> None:
     """Initialise toutes les fenêtres d'immersion"""
     initial_time = time.perf_counter()
     try:
@@ -91,7 +91,7 @@ def change_mode(new_mode) -> None:
 
     # First generate the windows if they aren't generated
     if not IMMERSION:
-        __initialise_immersion_windows()
+        initialise_immersion_windows()
 
     # Now find what immersion mode was sent and change the behavior of the immersion mode depending on it
     if new_mode == Mode.EMPTY:
