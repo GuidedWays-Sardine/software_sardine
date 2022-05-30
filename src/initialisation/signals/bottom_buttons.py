@@ -2,6 +2,7 @@
 import os
 import sys
 import time
+import re
 
 
 # Librairies graphiques
@@ -31,7 +32,7 @@ class BottomButtons:
             L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
         initial_time = time.perf_counter()
-        log.info("Chargement des boutons inférieurs.")
+        log.info("Chargement des boutons inférieurs (Quitter, Ouvrir, Sauvegarder, Lancer).")
 
         # Boutons quitter/lancer (obligatoires pour le lancement de l'application)
         application.win.findChild(QObject, "quit_button").clicked.connect(lambda: self.on_quit_clicked(application))
@@ -41,12 +42,12 @@ class BottomButtons:
         if any([page is not None and not isinstance(page, QObject) for page in application.pages_list]):
             application.win.findChild(QObject, "open_button").clicked.connect(lambda: self.on_open_clicked(application))
             application.win.findChild(QObject, "save_button").clicked.connect(lambda: self.on_save_clicked(application))
-            log.info("Boutons ouvrir et fermer visibles car au moins une page de paramètres chargée entièrement.")
+            log.info("Au moins une page de paramètres correctement chargée. Boutons ouvrir et sauvegarder activés.")
         else:
             # Sinon, cache les boutons
             application.win.findChild(QObject, "open_button").setProperty("visible", False)
             application.win.findChild(QObject, "save_button").setProperty("visible", False)
-            log.info("Boutons ouvrir et fermer cachés car aucune page de paramètres n'a été chargée entièrement.")
+            log.info("Aucune page de paramètres correctement chargée. Boutons ouvrir et sauvegarder cachés.")
 
         log.info(f"Boutons inférieurs chargés en " +
                  f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n")
@@ -92,13 +93,15 @@ class BottomButtons:
                 application.pages_list[application.active_page_index - 1].on_page_closed(application)
             log.info(f"Fermeture de la page de paramètres page_rb{application.active_page_index}.\n")
 
-            log.change_log_prefix("Récupération des données")
             application.launch_simulator = True
             QApplication.instance().quit()
         else:
             # Sinon récupère les pages non complètes, laisse un message de registre et se met sur la page non complétée
             non_completed_pages = tuple(index + 1 for index, completed in enumerate(page_complete) if not completed)
-            log.debug(f"Les pages de paramètres : {non_completed_pages} ne sont pas complétées.")
+            if len(non_completed_pages) == 1:
+                log.debug(f"La page de paramètre page_rb{non_completed_pages[0]} est incomplète.")
+            else:
+                log.debug(f"Les pages de paramètres {[f'page_rb{i}' for i in non_completed_pages]} sont incomplètes.")
             application.right_buttons.on_new_page_selected(application,
                                                            application.pages_list[non_completed_pages[0] - 1].engine,
                                                            non_completed_pages[0])
@@ -120,16 +123,14 @@ class BottomButtons:
 
         # Si un fichier a bien été sélectionné
         if file_path[0] != "":
-            # Change le préfixe du registre pour indiquer que les données de l'applications d'initialisation sont changées
-            log.change_log_prefix("Changement des données")
-
             #Récupère les données dans le fichier sélectionné et les envoies à set_settings
+            file_path = re.split(r"[/\\]+", file_path)[-1].split(".")[0]
             settings = sd.SettingsDictionary()
-            settings.open(file_path[0])
-            application.set_settings(settings)
-
-            # Remet le préfixe de registre de la page active
-            log.change_log_prefix(f"page_rb{application.active_page_index}")
+            log.add_empty_lines()
+            if settings.open(file_path[0]):
+                log.info(f"Chargement des paramètres \"{file_path}\" et mise à jour de l'application.",
+                         prefix="Mise à jour paramètres généraux")
+                application.set_settings(settings)
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_save_clicked(self, application):
@@ -148,16 +149,10 @@ class BottomButtons:
 
         # Si un fichier a bien été sélectionné
         if file_path[0] != "":
-            # Change le préfixe du registre pour indiquer que les données de l'applications d'initialisation sont sauvegardées
-            log.change_log_prefix("Sauvegarde des données")
-
             # Récupère les paramètres de l'application d'initialisation, les stockes et les enregistres dans le fichier
             settings = sd.SettingsDictionary()
             settings.update(application.get_settings())
             settings.save(file_path[0])
-
-            # Remet le préfixe de registre de la page active
-            log.change_log_prefix(f"page_rb{application.active_page_index}")
 
     def change_language(self, application, translations):
         """Permet à partir d'un dictionnaire de traduction de traduire le textes des 4 boutons inférieurs.
