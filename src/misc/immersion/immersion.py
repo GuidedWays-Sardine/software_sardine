@@ -183,14 +183,14 @@ def loading_duration():
 
     Returns
     -------
-    loading_duration: `float`
-        Durée de la vidéo (0 si la vidéo n'existe pas).
+    loading_duration: `int`
+        Durée de la vidéo (0 si la vidéo n'existe pas) en millisecondes.
     """
     if os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{LOADING_PATH}"):
         cap = cv.VideoCapture(f"{PROJECT_DIR}src\\misc\\immersion\\{LOADING_PATH}")
-        return cap.get(cv.CAP_PROP_FRAME_COUNT) / cap.get(cv.CAP_PROP_FPS)
+        return int(cap.get(cv.CAP_PROP_FRAME_COUNT) / cap.get(cv.CAP_PROP_FPS) * 1000)
     else:
-        return 0.0
+        return 0
 
 
 @lru_cache(maxsize=1)
@@ -199,11 +199,11 @@ def unloading_duration():
 
     Returns
     -------
-    loading_duration: `float`
-        Durée de la vidéo (0 si la vidéo n'existe pas).
+    loading_duration: `int`
+        Durée de la vidéo (0 si la vidéo n'existe pas) en millisecondes.
     """
     if os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{UNLOADING_PATH}"):
         cap = cv.VideoCapture(f"{PROJECT_DIR}src\\misc\\immersion\\{UNLOADING_PATH}")
-        return cap.get(cv.CAP_PROP_FRAME_COUNT) / cap.get(cv.CAP_PROP_FPS)
+        return int(cap.get(cv.CAP_PROP_FRAME_COUNT) / cap.get(cv.CAP_PROP_FPS) * 1000)
     else:
-        return 0.0
+        return 0
