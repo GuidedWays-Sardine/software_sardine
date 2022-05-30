@@ -193,23 +193,6 @@ def initialise_keyboard():
                   exception=error, prefix="Clavier virtuel")
 
 
-def change_skip_list(skip_list=()):
-    """Change la liste des charactères interdits.
-
-    Parameters
-    ----------
-    skip_list: `list[str] | tuple[str]`
-        Liste des charactères interdits.
-    """
-    # Si un clavier n'a pas été initialisé, essaye de l'initialiser
-    if not KEYBOARD:
-        initialise_keyboard()
-
-    # Si un clavier a été initialisé, change la skip_list
-    if KEYBOARD:
-        KEYBOARD[0].change_skip_list(skip_list)
-
-
 def change_mode(language=KeyboardMode.NUMPAD):
     """Change le mode/la langue du clavier virtuel.
 
@@ -228,6 +211,23 @@ def change_mode(language=KeyboardMode.NUMPAD):
     # Si un clavier a directement été envoyé, le définit
     elif KEYBOARD and isinstance(language, KeyboardMode):
         KEYBOARD[0].change_keyboard(language)
+
+
+def change_skip_list(skip_list=()):
+    """Change la liste des charactères interdits.
+
+    Parameters
+    ----------
+    skip_list: `list[str] | tuple[str]`
+        Liste des charactères interdits.
+    """
+    # Si un clavier n'a pas été initialisé, essaye de l'initialiser
+    if not KEYBOARD:
+        initialise_keyboard()
+
+    # Si un clavier a été initialisé, change la skip_list
+    if KEYBOARD:
+        KEYBOARD[0].change_skip_list(skip_list)
 
 
 @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
