@@ -76,6 +76,8 @@ class VirtualKeyboard:
                      f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.",
                      prefix="Chargement clavier virtuel")
 
+    @decorators.UIupdate
+    @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
     def change_keyboard(self, keyboard_mode) -> None:
         """Change le mode/la langue du clavier virtuel.
 
@@ -97,6 +99,8 @@ class VirtualKeyboard:
             log.warning(f"{keyboard_mode} n'est pas de type KeyboardMode, changement de langue non pris en compte.,",
                         prefix="Clavier virtuel")
 
+    @decorators.UIupdate
+    @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
     def change_skip_list(self, skip_list):
         """Change la liste des charactères interdits (ceux-ci apparaitront mais ne seront pas sélectionable).
 
@@ -107,6 +111,8 @@ class VirtualKeyboard:
         """
         self.__win.setProperty("skip_list", list(skip_list))
 
+    @decorators.UIupdate
+    @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
     def move_to(self, x, y):
         """Bouge la fenêtre aux coordonées (absolus) envoyées
 
@@ -120,6 +126,8 @@ class VirtualKeyboard:
         self.__win.setProperty("x", x)
         self.__win.setProperty("y", y)
 
+    @decorators.UIupdate
+    @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
     def resize(self, width_factor, height_factor):
         """Redimenssione le clavier virtuel en fonction de sa taille théorique maximale et de ses facteurs.
 
@@ -153,10 +161,14 @@ class VirtualKeyboard:
             log.debug(f"Pas suffisament d'espace pour afficher le clavier virtuel en ses dimensions maximales " +
                       f"({width}*{height} au lieu de {keyboard_size[0]}*{keyboard_size[1]})")
 
+    @decorators.UIupdate
+    @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
     def show(self):
         """Montre le clavier virtuel"""
         self.__win.show()
 
+    @decorators.UIupdate
+    @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
     def hide(self):
         """Cache le clavier virtuel"""
         self.__win.hide()
@@ -183,6 +195,8 @@ class VirtualKeyboard:
 
 
 @decorators.UniqueCall
+@decorators.UIupdate
+@decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
 def initialise_keyboard():
     """Initialise le clavier virtuel. Si celui-ci ne s'initialise par correctement, il ne pourra pas être utilisé."""
     # Essaye d'initialiser le clavier virtuel. Si celui-ci contient une erreur, l'indique dans le registre
