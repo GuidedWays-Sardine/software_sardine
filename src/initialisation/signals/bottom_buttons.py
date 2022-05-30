@@ -16,6 +16,7 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.settings_dictionary as sd
 import src.misc.log as log
 import src.misc.decorators as decorators
+import src.misc.virtual_keyboard as vk
 import src.initialisation.initialisation_window as ini
 
 
@@ -48,6 +49,10 @@ class BottomButtons:
             application.win.findChild(QObject, "open_button").setProperty("visible", False)
             application.win.findChild(QObject, "save_button").setProperty("visible", False)
             log.info("Aucune page de paramètres correctement chargée. Boutons ouvrir et sauvegarder cachés.")
+
+        # Connecte le checkbutton pour le clavier virtuel à la fonction correspondante
+        application.win.findChild(QObject, "virtual_keyboard_check").value_changed.connect(lambda: self.on_virtual_keyboard_checked(application))
+        self.on_virtual_keyboard_checked(application)
 
         log.info(f"Boutons inférieurs chargés en " +
                  f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n")
@@ -154,6 +159,20 @@ class BottomButtons:
             settings.update(application.get_settings())
             settings.save(file_path[0])
 
+
+    @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
+    def on_virtual_keyboard_checked(self, application):
+        """Change la possibilité d'afficher le clavier ou non selon la demande de l'utilisateur
+
+        Parameters
+        ----------
+        application: `ini.InitialisationWindow`
+            L'instance source de l'application d'initialisation, pour les widgets
+        """
+        # Appelle la fonction pour changer l'activabilité du clavier virtuel, selon la valeur du checkbutton
+        virtual_keyboard_active = application.win.findChild(QObject, "virtual_keyboard_check").property("is_checked")
+        vk.change_keyboard_activability(activable=virtual_keyboard_active)
+
     def change_language(self, application, translations):
         """Permet à partir d'un dictionnaire de traduction de traduire le textes des 4 boutons inférieurs.
 
@@ -169,3 +188,7 @@ class BottomButtons:
             # Récupère le bouton associé à l'id et change son texte
             button = application.win.findChild(QObject, button_id)
             button.setProperty("text", translations[button.property("text")])
+
+        # Traduit le checkbutton du clavier virtuel
+        virtual_keyboard_check = application.win.findChild(QObject, "virtual_keyboard_check")
+        virtual_keyboard_check.setProperty("title", translations[virtual_keyboard_check.property("title")])

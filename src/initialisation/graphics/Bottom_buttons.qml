@@ -11,8 +11,8 @@ Item {
 
 
 
-    //Bouton quitter
-    INI_button{
+    // Bouton quitter
+    INI_button {
         id: quit_button
         objectName: "quit_button"
 
@@ -29,8 +29,25 @@ Item {
     }
 
 
-    //Bouton ouvrir
-    INI_button{
+    // Checkbutton pour le clavier virtuel
+    INI_checkbutton {
+        id: virtual_keyboard_check
+        objectName: "virtual_keyboard_check"
+
+        default_x: 120
+        default_y: 425 // 415 + (50 - 30) / 2
+        box_length: 30
+
+        title: "Clavier virtuel"
+
+        is_checked: true
+        is_activable: true
+        is_positive: true
+        is_visible: true
+    }
+
+    // Bouton ouvrir
+    INI_button {
         id: open_button
         objectName: "open_button"
 
@@ -46,8 +63,8 @@ Item {
         is_visible: true
     }
 
-    //Bouton sauvegarder
-    INI_button{
+    // Bouton sauvegarder
+    INI_button {
         id: save_button
         objectName: "save_button"
 
@@ -63,8 +80,8 @@ Item {
         is_visible: true
     }
 
-    //Bouton lancer
-    INI_button{
+    // Bouton lancer
+    INI_button {
         id: launch_button
         objectName: "launch_button"
 
