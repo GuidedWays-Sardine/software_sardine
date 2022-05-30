@@ -158,15 +158,15 @@ def change_mode(new_mode, function=None) -> None:
 
         # Si aucune fonction n'a été envoyée, ou que le type n'est pas bon, laisse un message de warning
         # Et execute l'application le temps qu'il faut pour jouer la vidéo entièrement
-        if "__call__" not in dir():
+        if "__call__" not in dir(function):
             # Si aucune fonction n'a été envoyée
             if function is None:
                 log.warning(f"Aucune fonction envoyée lors de la vidéo de {'dé' if new_mode == Mode.UNLOADING else ''}" +
-                            f"chargement. Application mise en pause pour {video_time * 1000} secondes.")
+                            f"chargement. Application mise en pause pour {video_time / 1000} secondes.")
             # Si quelque chose a été envoyée mais qu'elle ne peut pas être appelée (__call__ manquant)
             else:
                 log.warning(f"L'object \"{function}\" ne peut pas être appelée. Application mise en pause pour " +
-                            f"{video_time * 1000} pour la vidéo de {'dé' if new_mode == Mode.UNLOADING else ''}chargement.")
+                            f"{video_time / 1000} pour la vidéo de {'dé' if new_mode == Mode.UNLOADING else ''}chargement.")
 
             # Execute l'application pendant le temps nécessaire
             QTimer.singleShot(video_time, lambda: QApplication.instance().quit())
