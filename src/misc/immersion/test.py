@@ -16,10 +16,17 @@ import src.misc.log as log
 import src.misc.immersion as immersion
 
 
+def random_print():
+    for i in range(10):
+        print(i)
+        time.sleep(1)
+
+
 def worker():
     # Fais des essais pour différents skip list
     for s_l in [(), (2,)]:
         immersion.change_skip_list(s_l, immersion.Mode.DEACTIVATED)
+        time.sleep(0.5)
         immersion.change_mode(immersion.Mode.LOADING)
         time.sleep(immersion.loading_duration())
         print(f"loading done : {immersion.loading_duration()}")
@@ -34,9 +41,11 @@ def worker():
 
 if __name__ == "__main__":
     # Create the application, a thread to do the actions and starts the application
-    log.initialise(save=False)
     app = QApplication(sys.argv)
-    immersion.change_mode(immersion.Mode.EMPTY)
+    log.initialise(save=True, terminal=True)
+    immersion.initialise_immersion_windows()
+
+    immersion.change_mode(immersion.Mode.LOADING, function=random_print)
 
     worker_thread = threading.Thread(target=worker)
     worker_thread.start()
