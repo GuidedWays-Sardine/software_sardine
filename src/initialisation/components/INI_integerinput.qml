@@ -31,8 +31,10 @@ Item{
     readonly property double y_offset: (parent.width/parent.height < w_min/h_min) && (parent.width >= w_min && parent.height >= h_min) ? (parent.height - h_min * root.ratio) / 2 : 0
 
     // Propriétés liées aux valeurs limites et la valeur actuellement entrée
-    property int minimum_value: 0             // Valeur minimale et maximale
+    property int minimum_value: 0             // Valeur minimale et maximale (en unité SI et en unité actuelle)
     property int maximum_value: 1
+    readonly property int visible_minimum_value: validator.bottom
+    readonly property int visible_maximum_value: validator.top
     property int visible_value: 0             // Valeur visible (prise en compte des taux de conversions)/Valeur enregistrée (équivalent unités SI)
     readonly property int value: (root.visible_value - root.unit_offset) / root.unit_factor
 
@@ -435,7 +437,10 @@ Item{
             }
 
             // Détecte lorsque le INI_integerinput est double cliqué, permet de changer l'unité active
-            onDoubleClicked: next_unit()
+            onDoubleClicked: {
+                next_unit()
+                root.focus_gained()
+            }
         }
 
         // Détecte quand le texte entré est changé et vérifie si la valeur entrée est valide
