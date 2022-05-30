@@ -225,7 +225,7 @@ Item{
             root.stop_blink()
 
             // Si l'édition commence appelle le signal focus_gained, si l'édition s'arrête appelle le signal focus_list
-            if (body.cursorVisble) {
+            if (body.cursorVisible) {
                 root.focus_gained()
             }
             else {
