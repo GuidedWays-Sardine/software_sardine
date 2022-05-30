@@ -68,7 +68,7 @@ def initialise_immersion_windows() -> None:
                     f"{PROJECT_DIR}src\\misc\\immersion\\{UNLOADING_PATH}", prefix="Chargement module immersion")
 
 
-def change_mode(new_mode) -> None:
+def change_mode(new_mode, function=None) -> None:
     """Fonction permettant de changer le mode du mode immersion.
 
     Parameters
@@ -78,7 +78,12 @@ def change_mode(new_mode) -> None:
         EMPTY -> Les fenêtres sont visibles (sauf celles à sauter) avec un fond uni ;
         LOADING -> Les fenêtres sont visibles (sauf celles à sauter) avec l'animation de chargement -> mode STILL ;
         STILL -> Les fenêtres sont visibles (sauf celles à sauter) avec le logo du simulateur au centre ;
-        UNLOADING -> Les fenêtres sont visibles (sauf celles à sauter) avec l'animation de déchargement -> mode EMPTY.
+        UNLOADING -> Les fenêtres sont visibles (sauf celles à sauter) avec l'animation de déchargement -> mode EMPTY ;
+    function: `function | None`
+        Fonction à executer en arrière plan dans le cas du mode chargement/déchargement afin d'optimiser le simulateur.
+        Sort dés que la vidéo de chargement/déchargement ET la fonction ont finis.
+        La fonction sera executé dans un thread parrallèle. Attention au data races et à aux composants graphiques.
+        Les arguments doivent être inclus directement dans la fonction envoyer (utiliser un lambda si nécessaire)
 
     Raises
     ------
@@ -139,14 +144,43 @@ def change_mode(new_mode) -> None:
 
     # Si la fonction est appelée dans le thread principal, execute l'application pendant 5ms pour mettre à jour le mode
     # Attention, cela ne marche que pour les modes DEACTIVATED, EMPTY et STILL
-    # Pour les modes LOADING et UNLOADING, il faut utiliser des threads d'attente et les fonctions (un)loading_duration
     if threading.current_thread().__class__.__name__ == '_MainThread' and \
             new_mode in (Mode.DEACTIVATED, Mode.EMPTY, Mode.STILL):
         QTimer.singleShot(5, lambda: QApplication.instance().quit())
         QApplication.instance().exec()
+    # Si le mode mode loading/unloading est détecté, que le thread est le thread principal, que la vidéo existe,
+    # met en pause l'application le temps de la vidéo de (dé)chargement et execute la fonction envoyée en fond si existe
+    if threading.current_thread().__class__.__name__ == "_MainThread" and \
+            ((new_mode == Mode.LOADING and os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{LOADING_PATH}")) or
+             (new_mode == Mode.UNLOADING and os.path.isfile(f"{PROJECT_DIR}src\\misc\\immersion\\{UNLOADING_PATH}"))):
+        # Récupère le temps de la vidéo de chargement/déchargement
+        video_time = loading_duration() if new_mode == Mode.LOADING else unloading_duration()
+
+        # Si aucune fonction n'a été envoyée, ou que le type n'est pas bon, laisse un message de warning
+        # Et execute l'application le temps qu'il faut pour jouer la vidéo entièrement
+        if "__call__" not in dir():
+            # Si aucune fonction n'a été envoyée
+            if function is None:
+                log.warning(f"Aucune fonction envoyée lors de la vidéo de {'dé' if new_mode == Mode.UNLOADING else ''}" +
+                            f"chargement. Application mise en pause pour {video_time * 1000} secondes.")
+            # Si quelque chose a été envoyée mais qu'elle ne peut pas être appelée (__call__ manquant)
+            else:
+                log.warning(f"L'object \"{function}\" ne peut pas être appelée. Application mise en pause pour " +
+                            f"{video_time * 1000} pour la vidéo de {'dé' if new_mode == Mode.UNLOADING else ''}chargement.")
+
+            # Execute l'application pendant le temps nécessaire
+            QTimer.singleShot(video_time, lambda: QApplication.instance().quit())
+            QApplication.instance().exec()
+        # Si une fonction appelable a été envoyée, execute la fonction dans un thread parallèle et lance la vidéo
+        else:
+            worker_thread = threading.Thread(target=function)
+            worker_thread.start()
+            QTimer.singleShot(video_time, lambda: QApplication.instance().quit())
+            QApplication.instance().exec()
+            worker_thread.join()
 
 
-def change_skip_list(skip_list=(), new_mode=Mode.EMPTY) -> None:
+def change_skip_list(skip_list=(), new_mode=Mode.EMPTY, function=None) -> None:
     """Fonction permettant de rajouter des écrans à désactiver (et donc à sauter).
 
     Parameters
@@ -158,7 +192,12 @@ def change_skip_list(skip_list=(), new_mode=Mode.EMPTY) -> None:
         EMPTY -> Les fenêtres sont visibles (sauf celles à sauter) avec un fond uni ;
         LOADING -> Les fenêtres sont visibles (sauf celles à sauter) avec l'animation de chargement -> mode STILL ;
         STILL -> Les fenêtres sont visibles (sauf celles à sauter) avec le logo du simulateur au centre ;
-        UNLOADING -> Les fenêtres sont visibles (sauf celles à sauter) avec l'animation de déchargement -> mode EMPTY.
+        UNLOADING -> Les fenêtres sont visibles (sauf celles à sauter) avec l'animation de déchargement -> mode EMPTY ;
+    function: `function | None`
+        Fonction à executer en arrière plan dans le cas du mode chargement/déchargement afin d'optimiser le simulateur.
+        Sort dés que la vidéo de chargement/déchargement ET la fonction ont finis.
+        La fonction sera executé dans un thread parrallèle. Attention au data races et à aux composants graphiques.
+        Les arguments doivent être inclus directement dans la fonction envoyer (utiliser un lambda si nécessaire)
     """
     # Réinitialise la liste des SKIP_LIST et rajoute chacun des index écrans
     SKIP_LIST.clear()
