@@ -5,10 +5,15 @@ import re
 import functools
 
 
+# Livbrairies graphiques
+from PyQt5.QtCore import QObject
+
+
 # Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log as log
+import src.misc.decorators as decorators
 
 
 class TranslationDictionary(dict):
@@ -63,6 +68,45 @@ class TranslationDictionary(dict):
         except KeyError:
             log.debug(f"Aucune traduction correspondant à la clé : \"{key}\".")
             return key
+
+    @decorators.UIupdate
+    @decorators.QtSignal(log_level=log.Level.DEBUG, end_process=False)
+    def translate_widget_property(self, widget=None, parent=None, widget_name=None, property_name="") -> None:
+        """Traduit la propriété d'un composant.
+
+        Parameters
+        ----------
+        widget: `QObject`
+            Composant à traduire (dans le cas où le composant est directement envoyé) ;
+        parent: `QObject | QWindow`
+            Fenêtre/Page contenant le composant (dans le cas où le composant doit-être récupéré) ;
+        widget_name: `str`
+            Nom (objectName) du composant (dans le cas où le composant doit-être récupéré) ;
+        property_name: `string`
+            Nom de la propriété à traduire.
+        """
+        # Si le composant a directement été envoyé et qu'une propriété a été envoyée aussi
+        if widget is not None and property_name:
+            widget.setProperty(property_name, self[widget.property(property_name)])
+        # Si le parent et le nom du composant ainsi qu'une propriété ont été envoyés
+        elif parent is not None and widget_name and property_name:
+            widget = parent.findChild(QObject, widget_name)
+            widget.setProperty(property_name, self[widget.property(property_name)])
+        # Si l'une des données n'a pas été correctement été envoyée
+        else:
+            # Si la property_name n'a pas été envoyée avec un widget, l'indique dans le registre
+            if not property_name and widget is not None:
+                log.debug(f"Aucun nom de propriété envoyé pour la traduction de \"{widget.property('objectName')}\".")
+            # Sinon, indique le nom du composant du parent et la raison dans le registre
+            elif not property_name and widget is None:
+                log.debug(f"Aucun nom de propriété envoyé pour la traduction de \"{widget_name}\"" +
+                          f"de la fenêtre/page : {parent.property('objectName')}." if parent is not None else ".")
+
+            # Si aucun composant n'a été envoyé, l'indique dans le registre
+            if not widget and not widget_name and not parent and not property_name:
+                log.debug("Appel de la fonction de traduction de composant vide, appel inutile")
+            elif not widget and not widget_name and not parent and property_name:
+                log.debug(f"Tentative du changement de la propriété \"{property_name}\" d'un composant inconnu.")
 
     def create_translation(self, file_path, current_language, new_language, delimiter=";"):
         """Ouvre un fichier de traduction et récupèré toute les traductions.
