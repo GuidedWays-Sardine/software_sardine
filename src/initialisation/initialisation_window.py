@@ -68,12 +68,6 @@ class InitialisationWindow:
         log.change_log_prefix("Chargement application d'initialisation")
         log.info(f"Début du chargement de l'application d'initialisation.")
 
-        # Commence par initialiser le mode immersion en mode EMPTY
-        immersion.change_mode(immersion.Mode.EMPTY)
-
-        # Calls the function to get the screens once to log the amount of screens
-        wm.screens_list()
-
         # Cherche pour le fichier QML avec tous les éléments de la fenêtre d'initialisation
         self.engine = QQmlApplicationEngine()
         self.engine.load(self.initialisation_window_file_path)
