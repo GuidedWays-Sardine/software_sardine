@@ -10,20 +10,32 @@ from PyQt5.QtWidgets import QApplication
 # Librairies SARDINE
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
-import src.misc.log as log
 import src.initialisation as ini
 import src.simulation as sim
+import src.misc.log as log
+import src.misc.immersion as immersion
+import src.misc.window_manager as wm
+import src.misc.virtual_keyboard as vk
 
 
+# Constantes pour l'initialisation du registre
 INITIAL_LOG_LEVEL = log.Level.DEBUG
 SAVE = True
 
+# Constantes pour l'initialisation du module immersion
+DEFAULT_IMMERSION_MODE = immersion.Mode.EMPTY
+DEFAULT_SKIP_LIST = ()
+
 
 def main():
-    # Lance le registre selon les constantes définit en amont
+    # Initialise les différents modules en amont (registre, écrans, immersion, clavier virtuel)
     application = QApplication(sys.argv)        # Une seule QApplication peut être créée durant toute la simulation
     log.initialise(log_level=INITIAL_LOG_LEVEL, save=SAVE)
-    log.info(f"Lancement de l'application d'initialisation du simulateur.\n\n\n")
+    wm.screens_list()
+    immersion.change_skip_list(skip_list=DEFAULT_SKIP_LIST, new_mode=DEFAULT_IMMERSION_MODE)
+    vk.initialise_keyboard()
+    log.add_empty_lines(lines_count=3, log_level=log.Level.INFO)
+    log.info(f"Lancement de l'application d'initialisation du simulateur.\n\n")
 
     # Application d'initialisation : Permet de rentrer tous les paramètres de simulation de façon simple
     settings = {}
