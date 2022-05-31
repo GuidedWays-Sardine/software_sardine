@@ -135,12 +135,12 @@ class BottomButtons:
         """
         # Ouvre la fenêtre d'ouverture de fichier pour sélectionner le fichier à ouvrir
         file_path = QFileDialog.getOpenFileName(caption="Ouvrir un fichier de configuration",
-                                                directory=f"{PROJECT_DIR}settings\\general_settings",
+                                                directory=application.general_settings_folder_path,
                                                 filter="Fichiers de configuration Sardine (*.settings)")
 
         # Si un fichier a bien été sélectionné
         if file_path[0] != "":
-            #Récupère les données dans le fichier sélectionné et les envoies à set_settings
+            # Récupère les données dans le fichier sélectionné et les envoies à set_settings
             file_path = re.split(r"[/\\]+", file_path)[-1].split(".")[0]
             settings = sd.SettingsDictionary()
             log.add_empty_lines()
@@ -171,7 +171,7 @@ class BottomButtons:
         else:
             # Récupère le nom du fichier à travers le sauvegardeur de windows
             file_path = QFileDialog.getSaveFileName(caption="Sauvegarder un fichier de configuration",
-                                                    directory=f"{PROJECT_DIR}settings\\general_settings",
+                                                    directory=application.general_settings_folder_path,
                                                     filter="Fichiers de configuration Sardine (*.settings)")
 
             # Si un fichier a bien été sélectionné
