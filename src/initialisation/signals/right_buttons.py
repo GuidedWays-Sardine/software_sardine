@@ -52,7 +52,11 @@ class RightButtons:
                                                                      for f in os.listdir(self.graphic_page_folder_path)
                                                                      if f.startswith("page_rb") and f.endswith(".qml")))
         if not_exist:
-            log.warning(f"Les pages de paramètres : {not_exist} N'ont aucun fichier graphique(.qml) associés.\n")
+            if len(not_exist) == 1:
+                log.warning(f"La page de paramètre page_rb{not_exist[0]} n'a aucun fichier graphique (.qml) associé.\n")
+            else:
+                log.warning(f"Les pages de paramètres (page_rb) {not_exist} " +
+                            f"n'ont aucun fichier graphique (.qml) associé.\n")
 
         # Pour toutes les pages de paramètres ayant un ficher graphique (.qml) existant
         for index in (int(f[7:-4]) for f in os.listdir(self.graphic_page_folder_path)
@@ -63,8 +67,8 @@ class RightButtons:
             page_button = self.right_buttons.findChild(QObject, f"rb{index}")
 
             initial_time = time.perf_counter()
-            log.change_log_prefix(f"Initialisation page_rb{index}")
-            log.info(f"Tentative du chargement de la page_rb{index}.")
+            log.change_log_prefix(f"Chargement page_rb{index}")
+            log.info(f"Chargement de la page_rb{index}.")
 
             # Essaye d'initialiser la page et si elle est correctement initialisé, tente de charger les signals
             if self.initialise_page(application, engine, index, page_button):
@@ -75,7 +79,7 @@ class RightButtons:
                     log.info(f"Chargement partiel (graphique uniquement) de la page_rb{index} en " +
                              f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n")
 
-        log.change_log_prefix("Initialisation application d'initialisation")
+        log.change_log_prefix("Chargement application d'initialisation")
 
     def initialise_page(self, application, engine, index, page_button):
         """Fonction permettant d'initialiser une des pages de l'application d'initialisation lié à un bouton de droite.
@@ -113,7 +117,7 @@ class RightButtons:
             # Connect le bouton de droite à une fonction permettant de charger la page et d'appeler d'autres fonctions :
             # Une pour décharger la page active, et l'autre pour charger la nouvelle page
             page_button.clicked.connect(lambda new_page=engine, new_index=index:
-                                           self.on_new_page_selected(application, new_page, new_index))
+                                        self.on_new_page_selected(application, new_page, new_index))
             return True
         else:
             # Sinon définit le bouton comme non activable et en négatif et enlève le potentiel texte
@@ -170,7 +174,7 @@ class RightButtons:
                 return True
         else:
             # Sinon pas de signals handlers associé, le précise dans les logs
-            log.warning(f"La page_rb{index} n'a pas de fichier signals. la page sera visible mais non fonctionnelle.")
+            log.warning(f"La page_rb{index} n'a pas de fichier signaux. la page sera visible mais non fonctionnelle.")
             return False
 
     @staticmethod
