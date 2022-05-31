@@ -69,7 +69,7 @@ class InitialisationWindow:
         log.info(f"Début du chargement de l'application d'intialisation.")
 
         # Commence par initialiser le mode immersion en mode EMPTY
-        immersion.change_mode(immersion.Mode.DEACTIVATED)
+        immersion.change_mode(immersion.Mode.EMPTY)
 
         # Calls the function to get the screens once to log the amount of screens
         wm.screens_list()
@@ -104,9 +104,6 @@ class InitialisationWindow:
             default_settings.open(self.default_settings_file_path)
             self.set_settings(default_settings, True)
 
-            # Essaye de changer la position de la fenêtre
-            vp.set_window_position(self.win, "initialisation.", default_settings, (640, 480))
-
         # Indique le temps de chargement de l'application
         log.info(f"Application d'initialisation chargée en " +
                  f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n")
@@ -123,8 +120,6 @@ class InitialisationWindow:
 
         # Montre la fenêtre principale,  et Lance l'application
         self.win.show()
-        self.win.closed.connect(lambda: QApplication.instance().quit())
-        immersion.change_mode(immersion.Mode.EMPTY)
         QApplication.instance().exec()
 
         # Quand l'application est fermée, cache la fenêtre de l'application d'initialisation et ses fenêtres annexes
