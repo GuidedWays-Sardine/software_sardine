@@ -24,13 +24,13 @@ class BottomButtons:
     """Classe s'occupant du chargement et du fonctionnement des boutons inférieurs de l'application d'initialisation"""
 
     def __init__(self, application):
-        """Permet d'initialiser les boutons permanents (quitter, ouvrir, sauvegarder, lancer) en bas de la fenêtre.
-        Connecte chaque bouton à sa fonctionalité (nécessaires au bon fonctionnement de l'application d'initialisation)
+        """Initialise les boutons permanents (quitter, ouvrir, sauvegarder, lancer) en bas de la fenêtre ainsi que les
+        différents éléments d'ouverture et de sauvegarde fichiers.
 
         Parameters
         ----------
         application: `ini.InitialisationWindow`
-            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+            Instance source de l'application d'initialisation, (pour intérargir avec l'application).
         """
         initial_time = time.perf_counter()
         log.info("Chargement des boutons inférieurs (Quitter, Ouvrir, Sauvegarder, Lancer).")
@@ -69,12 +69,13 @@ class BottomButtons:
 
     @decorators.QtSignal(log_level=log.Level.CRITICAL, end_process=True)
     def on_quit_clicked(self, application):
-        """Ferme la fenêtre d'initialisation
+        """Ferme la fenêtre d'initialisation.
+        Appelé lorsque le bouton fermer est cliqué.
 
         Parameters
         ----------
         application: `ini.InitialisationWindow`
-            L'instance source de l'application d'initialisation, pour les widgets
+            Instance source de l'application d'initialisation, pour les widgets.
         """
         # ferme la page puis l'application
         if "on_page_closed" in dir(application.pages_list[application.active_page_index - 1]):
@@ -85,12 +86,13 @@ class BottomButtons:
 
     @decorators.QtSignal(log_level=log.Level.CRITICAL, end_process=True)
     def on_launch_clicked(self, application):
-        """Ferme la fenêtre d'initialisation et indique au programme de récupérer les données entrées
+        """Ferme la fenêtre d'initialisation et indique au programme de récupérer les données entrées.
+        Appelé lorsque le bouton de lancer est cliqué.
 
         Parameters
         ----------
         application: `ini.InitialisationWindow`
-            L'instance source de l'application d'initialisation, pour les widgets
+            Instance source de l'application d'initialisation, pour les widgets.
         """
         # Récupère la liste des pages complétées ou non. Une page est compléte si :
         # - la page n'a pas de partie logique (elle sera donc de type QObject ou None)
@@ -123,13 +125,13 @@ class BottomButtons:
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_open_clicked(self, application):
-        """Fonction appelée lorsque le bouton ouvrir est cliqué.
-        Permet l'ouverture d'un fichier texte et la récupération de ses paramètres.
+        """Ouvre le dialogue d'ouverture de fichier.
+        Appelé lorsque le bouton ouvrir est cliqué.
 
         Parameters
         ----------
         application: `ini.InitialisationWindow`
-            L'instance source de l'application d'initialisation, pour les widgets
+            Instance source de l'application d'initialisation, pour les widgets.
         """
         # Ouvre la fenêtre d'ouverture de fichier pour sélectionner le fichier à ouvrir
         file_path = QFileDialog.getOpenFileName(caption="Ouvrir un fichier de configuration",
@@ -149,13 +151,13 @@ class BottomButtons:
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_save_clicked(self, application):
-        """Fonction appelée lorsque le bouton sauvegarder est cliqué.
-        Permet la sauvegarde d'un fichier avec les settings.
+        """Ouvre le dialogue de sauvegarde de fichier, ou le popup de sauvegare dans le cas du clavier virtuel.
+        Appelée lorsque le bouton sauvegarder est cliqué.
 
         Parameters
         ----------
         application: `ini.InitialisationWindow`
-            L'instance source de l'application d'initialisation, pour les widgets
+            Instance source de l'application d'initialisation, pour les widgets.
         """
         # Si le clavier virtuel est activé
         if application.win.findChild(QObject, "virtual_keyboard_check").property("is_checked"):
@@ -181,12 +183,13 @@ class BottomButtons:
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_save_popup_confirm_clicked(self, application):
-        """Récupère le nom de fichier entrer dans la popup
+        """Récupère le nom de fichier entrer dans le popup.
+        Appelé lorsque le bouton confirmer du popup de sauvegarder fichier avec clavier virtuel est cliqué.
 
         Parameters
         ----------
         application: `ini.InitialisationWindow`
-            L'instance source de l'application d'initialisation, pour les widgets
+            Instance source de l'application d'initialisation, pour les widgets.
         """
         # Ferme le popup
         application.win.findChild(QObject, "save_popup").close()
@@ -213,26 +216,26 @@ class BottomButtons:
 
     @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
     def on_virtual_keyboard_checked(self, application):
-        """Change la possibilité d'afficher le clavier ou non selon la demande de l'utilisateur
+        """Change la possibilité d'afficher le clavier ou non selon la demande de l'utilisateur.
 
         Parameters
         ----------
         application: `ini.InitialisationWindow`
-            L'instance source de l'application d'initialisation, pour les widgets
+            Instance source de l'application d'initialisation, pour les widgets.
         """
         # Appelle la fonction pour changer l'activabilité du clavier virtuel, selon la valeur du checkbutton
         virtual_keyboard_active = application.win.findChild(QObject, "virtual_keyboard_check").property("is_checked")
         vk.change_keyboard_activability(activable=virtual_keyboard_active)
 
     def change_language(self, application, translations):
-        """Permet à partir d'un dictionnaire de traduction de traduire le textes des 4 boutons inférieurs.
+        """Traduit le texte des différents boutons et popups à partir d'un dictionnaire de traductions.
 
         Parameters
         ----------
         application: `InitialisationWindow`
-            L'instance source de l'application d'initialisation, pour les widgets
+            Instance source de l'application d'initialisation, pour les widgets ;
         translations: `TranslationDictionary`
-            dictionaire contenant les traductions
+            Dictionnaire contenant les traductions.
         """
         # Pour chaque boutons : traduit le texte
         for button_id in ["quit_button", "launch_button", "open_button", "save_button", "confirm_button"]:
