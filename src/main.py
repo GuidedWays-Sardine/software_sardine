@@ -60,8 +60,8 @@ def main():
 
     # Change le niveau de log à celui précisé par l'utilisateur et enlève tout préfixe
     log.change_log_prefix()
-    log.add_empty_lines()
-    log.info(f"Lancement du simulateur.\n\n\n")
+    log.add_empty_lines(lines_count=3, log_level=log.Level.INFO)
+    log.info(f"Lancement du simulateur.\n\n")
     log.change_log_level(settings.get_value("log_level", INITIAL_LOG_LEVEL))
 
     # Application de simulation : gère les différents modules de simulation
