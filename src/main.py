@@ -4,8 +4,6 @@ import os
 
 
 # Librairies graphiques
-import time
-
 from PyQt5.QtWidgets import QApplication
 
 
