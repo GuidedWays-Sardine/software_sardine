@@ -289,7 +289,7 @@ def set_log_window_geometry(settings, key, visible=None) -> None:
     Parameters
     ----------
     settings: `sd.SettingsDictionary | dict[str, int]`
-        Dictionaire de paramètres contenant les informations sur la fenêtre.
+        Dictionnaire de paramètres contenant les informations sur la fenêtre.
         Données requises : {key}.screen_index, {key}.x, {key}.y, {key}.w, {key}.h ;
     key: `str`
         Clé à partir de laquelle, les paramètres écrans seront lus ;
@@ -310,7 +310,7 @@ def get_log_window_geometry(settings, key) -> None:
     Parameters
     ----------
     settings: `sd.SettingsDictionary | dict[str, int]`
-        Dictionaire de paramètres où les informations seront stockées.
+        Dictionnaire de paramètres où les informations seront stockées.
         Données requises : {key}.screen_index, {key}.x, {key}.y, {key}.w, {key}.h ;
     key: `str`
         Clé avec laquelle les dimensions seront enregistrées.

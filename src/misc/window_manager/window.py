@@ -27,7 +27,7 @@ def set_window_geometry(window, settings, key, minimum_size=(124, 48)) -> None:
     window: `QMainWindow | QObject`
         Fenêtre à redimensionnée, peut provenir d'un QMainWindow (python) ou d'un Window (QML) ;
     settings: `sd.SettingsDictionary | dict[str, int]`
-        Dictionaire de paramètres contenant les informations sur la fenêtre.
+        Dictionnaire de paramètres contenant les informations sur la fenêtre.
         Données requises : {key}.screen_index, {key}.x, {key}.y, {key}.w, {key}.h ;
     key: `str`
         Clé à partir de laquelle, les paramètres écrans seront lus ;
@@ -57,7 +57,7 @@ def set_window_geometry(window, settings, key, minimum_size=(124, 48)) -> None:
     else:
         titlebar_height = window.geometry().y() - window.framePosition().y()
 
-    # Vérifie que chacun des paramètres nécessaires sont présents dans le dictionaire de paramètres
+    # Vérifie que chacun des paramètres nécessaires sont présents dans le dictionnaire de paramètres
     if all(((f"{key}{p}" in settings) for p in ("screen_index", "x", "y", "w", "h"))):
         try:
             # Récupère l'index de l'écran, cache la fenêtre s'il vaut 0, le met à 1 si trop peu d'écrans sont connectés.
@@ -122,7 +122,7 @@ def get_window_geometry(window, settings, key) -> None:
     window: `QMainWindow | QObject`
         Fenêtre dont la géométrie doit être récupérée, peut provenir d'un QMainWindow (python) ou d'un Window (QML) ;
     settings: `sd.SettingsDictionary | dict[str, int]`
-        Dictionaire de paramètres où les informations seront stockées.
+        Dictionnaire de paramètres où les informations seront stockées.
         Données requises : {key}.screen_index, {key}.x, {key}.y, {key}.w, {key}.h ;
     key: `str`
         Clé avec laquelle les dimensions seront enregistrées.

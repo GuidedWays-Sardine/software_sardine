@@ -20,7 +20,7 @@ class SettingsDictionary(dict):
     """Classe permettant de convertir un fichier de paramètres en un dictionnaire fonctionnel"""
 
     def __init__(self, settings=None):
-        """Initialise le dictionaire de paramètres.
+        """Initialise le dictionnaire de paramètres.
 
         Parameters
         ----------
@@ -30,7 +30,7 @@ class SettingsDictionary(dict):
         # Initialise la base du dictionnaire de paramètres
         super().__init__()
 
-        # Si un dictionaire de paramètres a été envoyé ajoute chacun de ses arguments
+        # Si un dictionnaire de paramètres a été envoyé ajoute chacun de ses arguments
         if isinstance(settings, dict):
             for key, value in settings.items():
                 self.__setitem__(key, value)
@@ -126,8 +126,8 @@ class SettingsDictionary(dict):
                     # Cas où un dictionnaire de traduction a été envoyé, pour traduire la sélection
                     component.change_selection(translations[value])
                 else:
-                    # Cas où l'utilisateur a oublié d'envoyer un dictionaire de paramètres
-                    log.debug(f"Changement de sélection avec la clé \"{key}\", sans dictionaire de traductions.")
+                    # Cas où l'utilisateur a oublié d'envoyer un dictionnaire de paramètres
+                    log.debug(f"Changement de sélection avec la clé \"{key}\", sans dictionnaire de traductions.")
                     component.change_selection(value)
             # Cas général où la propriété peut être changée sans fonction
             else:
@@ -142,7 +142,7 @@ class SettingsDictionary(dict):
                       f"\"{property_name}\" avec la clé \"{key}\".")
 
     def save(self, file_path, delimiter=";"):
-        """Sauvegarde les paramètres du dictionaire dans un fichier.
+        """Sauvegarde les paramètres du dictionnaire dans un fichier.
 
         Parameters
         ----------

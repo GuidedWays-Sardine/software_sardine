@@ -11,7 +11,7 @@ import src.misc.log as log
 from src.misc.units_converter.dimension import Dimension
 
 
-# Dictionaire contenant toutes les unités SI de base
+# Dictionnaire contenant toutes les unités SI de base
 # factor ; offset tel que : [Unit] = [SI] * factor + offset     ; google : [Unit] to [SI]
 Units = {   # Unités sans dimensions
          "":    Dimension("1",   factor=1),                                           # Sans dimensions

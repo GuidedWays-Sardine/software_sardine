@@ -20,7 +20,7 @@ class TranslationDictionary(dict):
     """Classe permettant de convertir un fichier de traduction en un dictionnaire de traductions fonctionnel."""
 
     def __init__(self, translations=None):
-        """Initialise le dictionaire de traductions.
+        """Initialise le dictionnaire de traductions.
 
         Parameters
         ----------
@@ -30,7 +30,7 @@ class TranslationDictionary(dict):
         # Initialise la base du dictionnaire de paramètres
         super().__init__()
 
-        # Si un dictionaire de paramètres a été envoyé ajoute chacun de ses arguments
+        # Si un dictionnaire de paramètres a été envoyé ajoute chacun de ses arguments
         if isinstance(translations, dict):
             for key, value in translations.items():
                 self.__setitem__(key, value)
