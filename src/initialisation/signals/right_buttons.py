@@ -37,7 +37,7 @@ class RightButtons:
         application: `ini.InitialisationWindow`
             Instance source de l'application d'initialisation, (pour intérargir avec l'application) ;
         translations: `td.TranslationDictionary`
-            Traductions (clés = anglais -> valeurs = langue actuelle)  pour traduire les noms de dossiers (en anglais).
+            Traductions (clés = anglais -> valeurs = langue actuelle)  pour traduire les noms de dossiers et de modules.
         """
         # Récupère les boutons de droite à partir de la fenêtre
         self.right_buttons = application.win.findChild(QObject, "right_buttons")
@@ -140,7 +140,7 @@ class RightButtons:
         page_button: `QObject`
             Bouton auquel est relié la page (généralement d'id : page_rb + index) ;
         translations: `td.TranslationDictionary`
-            Traductions (clés = anglais -> valeurs = langue actuelle) pour traduire les noms de dossiers (en anglais).
+            Traductions (clés = anglais -> valeurs = langue actuelle) pour traduire les noms de dossiers et de modules.
 
         Returns
         -------
