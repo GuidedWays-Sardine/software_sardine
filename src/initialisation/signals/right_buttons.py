@@ -177,7 +177,8 @@ class RightButtons:
             log.warning(f"La page_rb{index} n'a pas de fichier signals. la page sera visible mais non fonctionnelle.")
             return False
 
-    def are_page_functions_there(self, page):
+    @staticmethod
+    def are_page_functions_there(page):
         """Permet, à partir d'une page de paramètres correctement chargée, d'indiquer si toutes les fonctions
         potentiellement nécessaires au fonctionnement de celle-ci sont présentes.
 
