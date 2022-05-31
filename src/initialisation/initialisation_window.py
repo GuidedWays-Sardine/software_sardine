@@ -144,7 +144,10 @@ class InitialisationWindow:
 
         # Dans le cas où des fonctions get_settings sont détectés, récupère les paramètres de l'application
         if any(["get_settings" in dir(page) for page in self.pages_list]):
-            log.info(f"Récupération des paramètres de l'application.")
+            log.info(f"Récupération des paramètres de l'application d'initialisation.")
+
+            # Récupère l'indication du clavier virtuel
+            settings["virtual_keyboard"] = self.win.findChild(QObject, "virtual_keyboard_check").property("is_checked")
 
             # Récupère l'écran sur lequel se situe la fenêtre d'initialisation.
             vp.get_window_position(self.win, "initialisation.", settings)
@@ -198,6 +201,10 @@ class InitialisationWindow:
         # Récupère la traduction par rapport à l'anglais car les paramètres textuels sont stockés en anglais
         translations = td.TranslationDictionary()
         translations.create_translation(self.translation_file_path, "English", self.language)
+
+        # Change la valeur pour indiquer si le checkbutton est activé
+        if settings.get_value("virtual_keyboard") is not None:
+            self.win.findChild(QObject, "virtual_keyboard_check").setProperty("is_checked", bool(settings["virtual_keyboard"]))
 
         # Pour chaque page ayant une partie logique fonctionnelle et une fonction set_settings:
         for page in (p for p in self.pages_list if "set_settings" in dir(p)):
