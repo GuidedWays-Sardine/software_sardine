@@ -205,17 +205,17 @@ class PageRB1:
             traductions (clés = langue actuelle -> valeurs = nouvelle langue)
         """
         # Traduit le nom de la catégorie
-        self.page_button.setProperty("text", translations[self.page_button.property("text")])
+        translations.translate_widget_property(widget=self.page_button, property_name="text")
 
         # Traduit le titre de tous les widgets qui en ont un
         for widget_id in ["data_check", "dashboard_check", "data_save_check", "ccs_check", "log_switchbutton",
                           "language_combo", "dmi_combo", "renard_check", "camera_check", "command_board_combo"]:
-            widget = self.page.findChild(QObject, widget_id)
-            widget.setProperty("title", translations[widget.property("title")])
+            translations.translate_widget_property(parent=self.page, widget_name=widget_id,
+                                                   property_name="title")
 
         # Traduit le texte du bouton d'ouverture du popup de pupitre
-        widget = self.page.findChild(QObject, "command_board_popup_button")
-        widget.setProperty("text", translations[widget.property("text")])
+        translations.translate_widget_property(parent=self.page, widget_name="command_board_popup_button",
+                                               property_name="text")
 
         # Traduit les clés du log_converter (Les valeurs sur le composant sont traduites juste en dessous)
         keys = list(self.log_converter)
@@ -227,10 +227,8 @@ class PageRB1:
 
         # Pour les combobox et switchbutton traduit chaque élément qui contient une traduction et remet la sélection
         for widget_id in ["log_switchbutton", "command_board_combo", "dmi_combo"]:
-            widget = self.page.findChild(QObject, widget_id)
-            selection_index = widget.property("selection_index")
-            widget.setProperty("elements", [translations[e] for e in widget.property("elements").toVariant()])
-            widget.change_selection(selection_index)
+            translations.translate_widget_property(parent=self.page, widget_name=widget_id,
+                                                   property_name="elements")
 
     @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
     def on_language_changed(self, application):
