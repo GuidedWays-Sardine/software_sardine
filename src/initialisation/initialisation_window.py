@@ -50,19 +50,14 @@ class InitialisationWindow:
     launch_simulator = False
 
     def __init__(self):
-        """initialise toutes les fenêtre du programme d'initialisation du simulateur sardine
-
-        Parameters
-        ----------
-        app: `QApplication`
-            L'application sur laquelle l'application d'initialisation va se lancer (un maximum par lancement)
+        """Initialise l'application d'initialisation du simulateur et toutes ces fenêtre et ses paramètres par défaut.
 
         Raises
         ------
         FileNotFoundError
-            Soulevé quand le fichier .qml de la fenêtre d'initialisation n'est pas trouvé
+            Jetée quand le fichier .qml de la fenêtre d'initialisation n'est pas trouvé ;
         SyntaxError
-            Soulevé quand le fichier .qml de la fenêtre d'initialisation a une erreur de syntaxe et n'est pas lisible
+            Jetée quand le fichier .qml de la fenêtre d'initialisation a une erreur de syntaxe et n'est pas lisible.
         """
         initial_time = time.perf_counter()
         log.change_log_prefix("Chargement application d'initialisation")
@@ -83,9 +78,11 @@ class InitialisationWindow:
             self.win = self.engine.rootObjects()[0]
             self.win.closed.connect(lambda: QApplication.instance().quit())
 
-        # Charge la traduction Anglais -> langue actuel (Français) et charge les pages de paramètres et les boutons.
+        # Charge la traduction Anglais -> langue actuel (Français) Pour la lecture de certains noms de dossiers.
         translations = td.TranslationDictionary()
         translations.create_translation(self.translation_file_path, "English", self.language)
+
+        # Initialise les pages de paramètres (avec les boutons de droite) et les boutons inférieurs
         self.right_buttons = rb.RightButtons(self, translations)
         self.bottom_buttons = bb.BottomButtons(self)
 
@@ -124,12 +121,12 @@ class InitialisationWindow:
         self.win.hide()
 
     def get_settings(self):
-        """Récupère les paramètres des différentes pages de paramètres en appelant chaque fonction get_settings()
+        """Récupère les paramètres des différentes pages de paramètres en appelant chaque fonction get_settings().
 
         Returns
         -------
         settings : `sd.SettingsDictionary`
-            un dictionaire de paramètres avec tous les paramètres du simulateur
+            Dictionnaire de paramètres avec tous les paramètres du simulateur.
         """
         log.add_empty_lines()
         initial_time = time.perf_counter()
@@ -179,14 +176,14 @@ class InitialisationWindow:
         return settings
 
     def set_settings(self, settings, resize_popup=False):
-        """A partir d'un dictionnaire de valeur, essaye de changer les settings des différentes pages
+        """A partir d'un dictionnaire de paramètres, change les paramètres des différentes pages.
 
         Parameters
         ----------
         settings: `sd.SettingsDictionary`
-            Un dictionnaire contenant toutes les valeurs relevés dans le fichier.
+            Dictionnaire contenant toutes les valeurs relevés dans le fichier ;
         resize_popup: `bool`
-            Les popups doivent-elles être redimensionnées ?
+            Si les popups doivent être redimensionnées.
         """
         # Change le préfix pour indiquer que les paramètres vont être mis à jour
         log.change_log_prefix("Mise à jour paramètres, généraux")
@@ -233,12 +230,12 @@ class InitialisationWindow:
         log.change_log_prefix(f"page_rb{self.active_page_index}")
 
     def change_language(self, new_language):
-        """Permet à partir d'un dictionaire de traduction, de traduire les textes de l'application d'initialisation
+        """A partir d'un dictionnaire de traduction, traduit les textes de l'application d'initialisation.
 
         Parameters
         ----------
         new_language: `str`
-            la nouvelle langue de l'application
+            Nouvelle langue de l'application.
         """
         # Dans le cas où la langue actuelle et la nouvelle langue sont les mêmes, l'indique et retourne
         if self.language.lower() == new_language.lower():
