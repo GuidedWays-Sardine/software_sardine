@@ -253,26 +253,5 @@ class InitialisationWindow:
             # change la langue actuelle pour la nouvelle langue envoyée
             self.language = new_language
 
-            log.info(f"La langue de l'application d'initialisation a été changée en " +
-                     f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n")
-        else:
-            log.warning("Traduction impossible, aucune traduction trouvées.\n")
-
-
-def main():
-    log.initialise(log_level=log.Level.DEBUG, save=True)
-
-    # Lance l'application d'initialisation
-    app = QApplication(sys.argv)
-    application = InitialisationWindow()
-
-    if application.launch_simulator:
-        log.info(str(application.get_settings()), prefix="Données Collectées")
-
-    log.stop()
-    application.get_settings()
-    application.set_settings(settings, resize_popup=False)
-
-
-if __name__ == "__main__":
-    main()
+        # Remet le préfix à celui de la page
+        log.change_log_prefix(f"page_rb{self.active_page_index}")
