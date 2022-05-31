@@ -65,8 +65,8 @@ class InitialisationWindow:
             Soulevé quand le fichier .qml de la fenêtre d'initialisation a une erreur de syntaxe et n'est pas lisible
         """
         initial_time = time.perf_counter()
-        log.change_log_prefix("Initialisation application d'initialisation")
-        log.info(f"Début du chargement de l'application d'intialisation.")
+        log.change_log_prefix("Chargement application d'initialisation")
+        log.info(f"Début du chargement de l'application d'initialisation.")
 
         # Commence par initialiser le mode immersion en mode EMPTY
         immersion.change_mode(immersion.Mode.EMPTY)
@@ -98,11 +98,14 @@ class InitialisationWindow:
         # Vérifie si un fichier de paramètres par défaut existe
         if os.path.isfile(self.default_settings_file_path):
             # S'il existe, l'ouvre, récupère ses données et les changent dans l'application d'initialisation
-            log.change_log_prefix("Ouverture fichier default.settings")
-            log.info(f"Chargement des paramètres par défauts du fichier default.settings")
+            log.info(f"Chargement des paramètres par défaut et mise à jour de l'application.",
+                     prefix="Mise à jour paramètres, généraux")
             default_settings = sd.SettingsDictionary()
-            default_settings.open(self.default_settings_file_path)
-            self.set_settings(default_settings, True)
+            if default_settings.open(self.default_settings_file_path):
+                self.set_settings(default_settings, True)
+            log.change_log_prefix("Chargement application d'initialisation")
+        else:
+            log.info(f"Aucun fichier de paramètres par défaut.\n\t{self.default_settings_file_path}")
 
         # Indique le temps de chargement de l'application
         log.info(f"Application d'initialisation chargée en " +
@@ -119,6 +122,7 @@ class InitialisationWindow:
                 self.pages_list[self.active_page_index - 1].on_page_opened(self)
 
         # Montre la fenêtre principale,  et Lance l'application
+        log.change_log_window_visibility(True)
         self.win.show()
         QApplication.instance().exec()
 
@@ -136,6 +140,9 @@ class InitialisationWindow:
         log.add_empty_lines()
         initial_time = time.perf_counter()
         settings = sd.SettingsDictionary()
+
+        # Change le préfix pour indiquer que les paramètres vont être récupérés
+        log.change_log_prefix("Récupération paramètres")
 
         # Dans le cas où des fonctions get_settings sont détectés, récupère les paramètres de l'application
         if any(["get_settings" in dir(page) for page in self.pages_list]):
@@ -158,7 +165,7 @@ class InitialisationWindow:
                     settings.update(page.get_settings(translations))
                 except Exception as error:
                     # Récupère une potentielle erreur dans la fonction d'écriture des valeurs
-                    log.warning(f"Erreur lors de la récupération des paramètres pour la page_rb{page_index}.",
+                    log.warning(f"Erreur lors de la récupération des paramètres sur la page_rb{page_index}.",
                                 exception=error)
 
             log.info(f"Récupération de {len(settings)} paramètres dans l'application d'initialisation en" +
@@ -166,9 +173,14 @@ class InitialisationWindow:
         elif os.path.isfile(self.default_settings_file_path):
             # Sinon récupère les paramètres du fichier par défaut s'il existe
             settings.open(self.default_settings_file_path)
-            log.add_empty_lines()
+            log.warning("Aucune fonction \"get_settings\" détectée. Récupération des paramètres par défaut.\n")
         else:
-            log.warning("Aucune page de paramètres correctement chargée et pas de fichier default.settings.\n")
+            # Si même le fichier de paramètres par défaut n'existe pas, retourne un dictionnaire de paramètres vide
+            log.warning("Aucune fonction \"get_settings\" détectée. Aucun fichier de paramètres par défaut détecté. " +
+                        "Liste de paramètres retournée vide.\n")
+
+        # Remet le préfix de la page de paramètres actuelle
+        log.change_log_prefix(f"page_rb{self.active_page_index}")
 
         return settings
 
@@ -182,7 +194,8 @@ class InitialisationWindow:
         resize_popup: `bool`
             Les popups doivent-elles être redimensionnées ?
         """
-        log.info(f"Changement de paramètres sur l'application d'initialisation.")
+        # Change le préfix pour indiquer que les paramètres vont être mis à jour
+        log.change_log_prefix("Mise à jour paramètres, généraux")
 
         # Si le combobox pour choisir la langue existe (page_rb1 chargée), alors change la langue dans cette combobox
         if self.pages_list[0] is not None and not isinstance(self.pages_list[0], QQmlApplicationEngine) \
@@ -210,7 +223,7 @@ class InitialisationWindow:
                 count += 1
             except Exception as error:
                 # Permet de rattraper une potentielle erreur dans la fonction get_settings()
-                log.warning(f"Erreur lors du changement des paramètres pour la page_rb{page.index}.",
+                log.warning(f"Erreur lors de la mise à jour des paramètres sur la page_rb{page.index}.",
                             exception=error)
 
         # Si les fenêtre doivent être redimensionées, change la taille de la fenêtre principale et de registre
@@ -219,8 +232,11 @@ class InitialisationWindow:
             log.set_log_window_geometry(settings, "initialisation log window")
 
         # Indique le nombre de pages dont les paramètres on été changés
-        log.info(f"Paramètres correctement changés sur {count} pages en " +
+        log.info(f"Paramètres correctement changés sur {count} page{'s' if count > 1 else ''} en " +
                  f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n")
+
+        # Remet le préfix à la page de paramètres actuelle
+        log.change_log_prefix(f"page_rb{self.active_page_index}")
 
     def change_language(self, new_language):
         """Permet à partir d'un dictionaire de traduction, de traduire les textes de l'application d'initialisation
@@ -230,13 +246,23 @@ class InitialisationWindow:
         new_language: `str`
             la nouvelle langue de l'application
         """
-        initial_time = time.perf_counter()
-        log.info(f"Changement de la langue, mise à jour de la langue de l'application d'initialisation.")
+        # Dans le cas où la langue actuelle et la nouvelle langue sont les mêmes, l'indique et retourne
+        if self.language.lower() == new_language.lower():
+            log.debug(f"La langue actuelle de l'application d'initialisation est déjà \"{self.language}\".\n")
+            return
 
+        # Change le préfix temporairement pour indiquer la traduction de l'application d'initialisation
+        initial_time = time.perf_counter()
+        log.add_empty_lines()
+        log.change_log_prefix("Traduction application d'initialisation")
+
+        # Récupère les traductions
         translations = td.TranslationDictionary()
         translations.create_translation(self.translation_file_path, self.language, new_language)
 
         if translations:
+            log.info(f"Traduction de l'application d'initialisation ({self.language} -> {new_language})")
+
             # Appel de la fonction set_languages pour les boutons du bas
             self.bottom_buttons.change_language(self, translations)
 
@@ -247,8 +273,12 @@ class InitialisationWindow:
                     page.change_language(translations)
                 except Exception as error:
                     # Permet de rattraper une potentielle erreur dans la fonction get_settings()
-                    log.warning(f"Erreur lors du changement de langue pour la page_rb{page.index}.",
+                    log.warning(f"Erreur lors de la traduction de la page_rb{page.index}.",
                                 exception=error)
+
+            # Indique le temps de traduction
+            log.info(f"Traduction de l'application d'initialisation de \"{self.language}\" à \"{new_language}\" en " +
+                     f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n")
 
             # change la langue actuelle pour la nouvelle langue envoyée
             self.language = new_language
