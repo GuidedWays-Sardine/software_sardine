@@ -43,9 +43,10 @@ def main():
         # Initialise et lance l'application d'initialisation.
         initialisation = ini.InitialisationWindow()
 
-        # Si le bouton lancer a été cliqué, récupère les informations, sinon sort
+        # Si le bouton lancer a été cliqué, récupère les informations, les stockes et les sauvegardes sinon sort
         if initialisation.launch_simulator:
             settings = initialisation.get_settings()
+            settings.save(f"{application.general_settings_folder_path}\\last.settings")
             del initialisation
         else:
             log.add_empty_lines()
