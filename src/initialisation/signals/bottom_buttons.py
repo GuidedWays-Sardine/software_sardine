@@ -239,16 +239,13 @@ class BottomButtons:
         """
         # Pour chaque boutons : traduit le texte
         for button_id in ["quit_button", "launch_button", "open_button", "save_button", "confirm_button"]:
-            translations.translate_widget_property(parent=application.win,
-                                                   widget_name=button_id,
+            translations.translate_widget_property(parent=application.win, widget_name=button_id,
                                                    property_name="text")
 
         # Traduit le checkbutton du clavier virtuel
-        translations.translate_widget_property(parent=application.win,
-                                               widget_name="virtual_keyboard_check",
+        translations.translate_widget_property(parent=application.win, widget_name="virtual_keyboard_check",
                                                property_name="title")
 
         # Traduit le placeholder_text
-        translations.translate_widget_property(parent=application.win,
-                                               widget_name="file_name_stringinput",
+        translations.translate_widget_property(parent=application.win, widget_name="file_name_stringinput",
                                                property_name="placeholder_text")
