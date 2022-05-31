@@ -11,8 +11,10 @@ Window {
     minimumHeight: 480
     color: "#031122"
     title: "Initialisation Sardine"
-    //Flags permettant de laisser la fenêtre toujours au dessus et de laisser uniquement le bouton de fermeture
-    flags: Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint | Qt.CustomizeWindowHint | Qt.Dialog | Qt.WindowTitleHint
+    visible: false
+
+    // Flags permettant de laisser uniquement le bouton de fermeture de la fenêtre sur la titlebar
+    flags: Qt.WindowCloseButtonHint | Qt.CustomizeWindowHint | Qt.Dialog | Qt.WindowTitleHint
 
 
     //Signal utilisé pour détecter quand le fenêtre est fermée et quitter l'application
