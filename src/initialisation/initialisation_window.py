@@ -5,7 +5,7 @@ import time
 
 
 # Librairies graphiques
-from PyQt5.QtWidgets import QApplication, QDesktopWidget
+from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QObject
 from PyQt5.QtQml import QQmlApplicationEngine
 
@@ -72,7 +72,7 @@ class InitialisationWindow:
         immersion.change_mode(immersion.Mode.DEACTIVATED)
 
         # Calls the function to get the screens once to log the amount of screens
-        vp.get_screens_informations()
+        wm.screens_list()
 
         # Cherche pour le fichier QML avec tous les éléments de la fenêtre d'initialisation
         self.engine = QQmlApplicationEngine()
@@ -150,7 +150,8 @@ class InitialisationWindow:
             settings["virtual_keyboard"] = self.win.findChild(QObject, "virtual_keyboard_check").property("is_checked")
 
             # Récupère l'écran sur lequel se situe la fenêtre d'initialisation.
-            vp.get_window_position(self.win, "initialisation.", settings)
+            wm.get_window_geometry(self.win, settings, "initialisation.")
+            log.get_log_window_geometry(settings, "initialisation log window")
 
             # Récupère la traduction anglaise car les paramètres textuels sont stockés en anglais
             translations = td.TranslationDictionary()
@@ -216,6 +217,11 @@ class InitialisationWindow:
                 # Permet de rattraper une potentielle erreur dans la fonction get_settings()
                 log.warning(f"Erreur lors du changement des paramètres pour la page_rb{page.index}.",
                             exception=error)
+
+        # Si les fenêtre doivent être redimensionées, change la taille de la fenêtre principale et de registre
+        if resize_popup:
+            wm.set_window_geometry(self.win, settings, "initialisation.", (640, 480))
+            log.set_log_window_geometry(settings, "initialisation log window")
 
         # Indique le nombre de pages dont les paramètres on été changés
         log.info(f"Paramètres correctement changés sur {count} pages en " +
