@@ -87,7 +87,7 @@ class InitialisationWindow:
                               self.initialisation_window_file_path)
         else:
             self.win = self.engine.rootObjects()[0]
-            self.win.hide()
+            self.win.closed.connect(lambda: QApplication.instance().quit())
 
         # Charge la traduction Anglais -> langue actuel (Français) et charge les pages de paramètres et les boutons.
         translations = td.TranslationDictionary()
