@@ -85,28 +85,42 @@ class TranslationDictionary(dict):
         property_name: `string`
             Nom de la propriété à traduire.
         """
-        # Si le composant a directement été envoyé et qu'une propriété a été envoyée aussi
-        if widget is not None and property_name:
-            widget.setProperty(property_name, self[widget.property(property_name)])
-        # Si le parent et le nom du composant ainsi qu'une propriété ont été envoyés
-        elif parent is not None and widget_name and property_name:
-            widget = parent.findChild(QObject, widget_name)
-            widget.setProperty(property_name, self[widget.property(property_name)])
-        # Si l'une des données n'a pas été correctement été envoyée
-        else:
-            # Si la property_name n'a pas été envoyée avec un widget, l'indique dans le registre
-            if not property_name and widget is not None:
-                log.debug(f"Aucun nom de propriété envoyé pour la traduction de \"{widget.property('objectName')}\".")
-            # Sinon, indique le nom du composant du parent et la raison dans le registre
-            elif not property_name and widget is None:
-                log.debug(f"Aucun nom de propriété envoyé pour la traduction de \"{widget_name}\"" +
-                          f"de la fenêtre/page : {parent.property('objectName')}." if parent is not None else ".")
+        # Si la property_name n'a pas été envoyée avec un widget, l'indique dans le registre
+        if not property_name and not widget:
+            log.debug(f"Aucun nom de propriété envoyé pour la traduction de \"{widget.property('objectName')}\".")
+            return
+        # Sinon, indique le nom du composant du parent et la raison dans le registre
+        elif not property_name and not widget:
+            log.debug(f"Aucun nom de propriété envoyé pour la traduction de \"{widget_name}\"" +
+                      f"de la fenêtre/page : {parent.property('objectName')}." if parent is not None else ".")
+            return
 
-            # Si aucun composant n'a été envoyé, l'indique dans le registre
-            if not widget and not widget_name and not parent and not property_name:
-                log.debug("Appel de la fonction de traduction de composant vide, appel inutile")
-            elif not widget and not widget_name and not parent and property_name:
-                log.debug(f"Tentative du changement de la propriété \"{property_name}\" d'un composant inconnu.")
+        # Si aucun composant n'a été envoyé, l'indique dans le registre
+        if not widget and (not widget_name or not parent) and not property_name:
+            log.debug("Appel de la fonction de traduction de composant vide, appel inutile")
+            return
+        elif not widget and (not widget_name or not parent) and property_name:
+            log.debug(f"Tentative du changement de la propriété \"{property_name}\" d'un composant inconnu.")
+            return
+
+        # Si le composant doit étre récupéré à partir de son parent et de son nom, le récupère
+        if not widget and parent and widget_name:
+            widget = parent.findChild(QObject, widget_name)
+
+        # Si la propriétée à traduire est une liste d'élément, traduit la liste d'éléments
+        if property_name == "elements":
+            # Récupère l'index de la sélection actuelle (pour la remettre après la traduction)
+            selection_index = widget.property("selection_index")
+
+            # Traduit chacun des éléments du composant
+            widget.setProperty("elements", [self[e] for e in widget.property("elements").toVariant()])
+
+            # Si l'index de sélection ne vaut pas None (si la propriété existe, met à jour l'index)
+            if selection_index is not None:
+                widget.change_selection(selection_index)
+        # Sinon, traduit simplement le texte de la propriété
+        else:
+            widget.setProperty(property_name, self[widget.property(property_name)])
 
     def create_translation(self, file_path, current_language, new_language, delimiter=";"):
         """Ouvre un fichier de traduction et récupèré toute les traductions.
