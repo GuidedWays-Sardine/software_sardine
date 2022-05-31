@@ -234,12 +234,18 @@ class BottomButtons:
         translations: `TranslationDictionary`
             dictionaire contenant les traductions
         """
-        # Pour chaque boutons : récupère le texte, prend sa traduction dans translations et change son texte
-        for button_id in ["quit_button", "launch_button", "open_button", "save_button"]:
-            # Récupère le bouton associé à l'id et change son texte
-            button = application.win.findChild(QObject, button_id)
-            button.setProperty("text", translations[button.property("text")])
+        # Pour chaque boutons : traduit le texte
+        for button_id in ["quit_button", "launch_button", "open_button", "save_button", "confirm_button"]:
+            translations.translate_widget_property(parent=application.win,
+                                                   widget_name=button_id,
+                                                   property_name="text")
 
         # Traduit le checkbutton du clavier virtuel
-        virtual_keyboard_check = application.win.findChild(QObject, "virtual_keyboard_check")
-        virtual_keyboard_check.setProperty("title", translations[virtual_keyboard_check.property("title")])
+        translations.translate_widget_property(parent=application.win,
+                                               widget_name="virtual_keyboard_check",
+                                               property_name="title")
+
+        # Traduit le placeholder_text
+        translations.translate_widget_property(parent=application.win,
+                                               widget_name="file_name_stringinput",
+                                               property_name="placeholder_text")
