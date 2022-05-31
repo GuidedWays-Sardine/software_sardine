@@ -43,6 +43,16 @@ class BottomButtons:
         if any([page is not None and not isinstance(page, QObject) for page in application.pages_list]):
             application.win.findChild(QObject, "open_button").clicked.connect(lambda: self.on_open_clicked(application))
             application.win.findChild(QObject, "save_button").clicked.connect(lambda: self.on_save_clicked(application))
+            application.win.findChild(QObject, "confirm_button").clicked.connect(lambda: self.on_save_popup_confirm_clicked(application))
+
+            # Connecte le clavier virtuel à l'entrée de valeur du popup save (si aucun clavier physique)
+            application.win.findChild(QObject, "file_name_stringinput").focus_gained.connect(
+                lambda: vk.show_keyboard(window=application.win,
+                                         widget=application.win.findChild(QObject, "save_popup"),
+                                         language=application.language,
+                                         skip_list=["<", ">", ":", "\"", "/", "\\", "|", "?", "*"]))
+            application.win.findChild(QObject, "file_name_stringinput").focus_lost.connect(vk.hide_keyboard)
+
             log.info("Au moins une page de paramètres correctement chargée. Boutons ouvrir et sauvegarder activés.")
         else:
             # Sinon, cache les boutons
@@ -147,18 +157,59 @@ class BottomButtons:
         application: `ini.InitialisationWindow`
             L'instance source de l'application d'initialisation, pour les widgets
         """
-        # Ouvre la fenêtre de sauvegarde et enregegistre le fichier si un nom a été donné
+        # Si le clavier virtuel est activé
+        if application.win.findChild(QObject, "virtual_keyboard_check").property("is_checked"):
+            # Récupère et vide le stringinput du popup
+            application.win.findChild(QObject, "file_name_stringinput").clear()
+
+            # Affiche le popup pour entrer le nom du fichier et le sauvegarder
+            save_popup = application.win.findChild(QObject, "save_popup")
+            save_popup.open()
+        # Sinon, affiche la fenêtre de sauvegarde du fichier
+        else:
+            # Récupère le nom du fichier à travers le sauvegardeur de windows
+            file_path = QFileDialog.getSaveFileName(caption="Sauvegarder un fichier de configuration",
+                                                    directory=f"{PROJECT_DIR}settings\\general_settings",
+                                                    filter="Fichiers de configuration Sardine (*.settings)")
+
+            # Si un fichier a bien été sélectionné
+            if file_path[0] != "":
+                # Récupère les paramètres de l'application d'initialisation, les enregistres dans le fichier
+                settings = sd.SettingsDictionary()
+                settings.update(application.get_settings())
+                settings.save(file_path[0])
+
+    @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
+    def on_save_popup_confirm_clicked(self, application):
+        """Récupère le nom de fichier entrer dans la popup
+
+        Parameters
+        ----------
+        application: `ini.InitialisationWindow`
+            L'instance source de l'application d'initialisation, pour les widgets
+        """
+        # Ferme le popup
+        application.win.findChild(QObject, "save_popup").close()
+
+        # Récupère le nom du fichier et vide l'entrée
+        file_popup_name = application.win.findChild(QObject, "file_name_stringinput")
+        file_name = file_popup_name.property("value")
+        file_popup_name.clear()
+
+        # Si le nom de fichier ne finit pas avec la bonne extension, l'ajoute
+        file_name += ".settings" if not file_name.endswith(".settings") else ""
+
+        # Récupère le nom du fichier à travers le sauvegardeur de windows
         file_path = QFileDialog.getSaveFileName(caption="Sauvegarder un fichier de configuration",
-                                                directory=f"{PROJECT_DIR}settings\\general_settings",
+                                                directory=f"{PROJECT_DIR}settings\\general_settings\\{file_name}",
                                                 filter="Fichiers de configuration Sardine (*.settings)")
 
         # Si un fichier a bien été sélectionné
         if file_path[0] != "":
-            # Récupère les paramètres de l'application d'initialisation, les stockes et les enregistres dans le fichier
+            # Récupère les paramètres de l'application d'initialisation, les enregistres dans le fichier
             settings = sd.SettingsDictionary()
             settings.update(application.get_settings())
             settings.save(file_path[0])
-
 
     @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
     def on_virtual_keyboard_checked(self, application):
