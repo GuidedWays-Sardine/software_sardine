@@ -30,17 +30,14 @@ class RightButtons:
     logic_page_folder_path = f"{PROJECT_DIR}src\\initialisation\\signals\\page_rb\\"
 
     def __init__(self, application, translations):
-        """
-        Permet d'initialiser les 8 boutons permanents (rb1 -> rb8) situés à droite de la fenêtre.
-        Connecte chaque bouton à sa page de paramètres associés
+        """Initialise les 8 boutons permanents (rb1 -> rb8) situés à droite de la fenêtre et leurs pages de paramètres.
 
         Parameters
         ----------
         application: `ini.InitialisationWindow`
-            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+            Instance source de l'application d'initialisation, (pour intérargir avec l'application) ;
         translations: `td.TranslationDictionary`
-            traductions (clés = anglais -> valeurs = langue actuelle)
-            Utile pour traduire les noms de dossiers et de fenêtres sauvegardés en anglais
+            Traductions (clés = anglais -> valeurs = langue actuelle)  pour traduire les noms de dossiers (en anglais).
         """
         # Récupère les boutons de droite à partir de la fenêtre
         self.right_buttons = application.win.findChild(QObject, "right_buttons")
@@ -82,24 +79,23 @@ class RightButtons:
         log.change_log_prefix("Chargement application d'initialisation")
 
     def initialise_page(self, application, engine, index, page_button):
-        """Fonction permettant d'initialiser une des pages de l'application d'initialisation lié à un bouton de droite.
-        Celle-ci sera initialiser si elle existe et qu'elle a un format valide
+        """Initialise une des pages de l'application d'initialisation si elle existe et a un format valide.
 
         Parameters
         ----------
         application: `ini.InitialisationWindow`
-            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+            Instance source de l'application d'initialisation, (pour intérargir avec l'application) ;
         engine: `QQmlApplicationEngine`
-            La QQmlApplicationEngine sur laquelle on a tenté de charger la page
+            QQmlApplicationEngine sur lequel la page a possiblement été chargée ;
         index: `int`
-            index de la page (1 pour le bouton d'en haut -> 8 pour le bouton d'en bas
+            Index de la page (1 pour le bouton d'en haut -> 8 pour le bouton d'en bas) ;
         page_button: `QObject`
-            Le bouton auquel sera relié la page (généralement d'id : page_rb + index)
+            Bouton auquel est relié la page (généralement d'id : page_rb + index).
 
         Returns
         -------
         graphics_loaded: `bool`
-            La partie graphique de la page a-t-elle été chargé correctement ?
+            Si la partie graphique de la page a correctement été chargé.
         """
         # Si la page est chargée, alors elle existe et elle est ajoutée
         if engine.rootObjects():
@@ -130,27 +126,26 @@ class RightButtons:
             return False
 
     def initialise_signals(self, application, engine, index, page_button, translations):
-        """Permet lorsqu'une page de paramètres de l'application a été chargée, de charger les signals ainsi
-        que des fonctions de bases (get_settings() et set_settings()) si celle-ci existe
+        """Dans le cas où la partie graphique d'une page a été chargée correctement, tente de charger sa partie logique.
+        Gère aussi les vérifications annexes afin de s'assurer de la présence des fonctions nécessaires.
 
         Parameters
         ----------
         application: `ini.InitialisationWindow`
-            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+            Instance source de l'application d'initialisation, (pour intérargir avec l'application) ;
         engine: `QQmlApplicationEngine`
-            La QQmlApplicationEngine sur laquelle on a tenté de charger la page
+            QQmlApplicationEngine sur lequel la page a possiblement été chargée ;
         index: `int`
-            index de la page (1 pour le bouton d'en haut -> 8 pour le bouton d'en bas
+            Index de la page (1 pour le bouton d'en haut -> 8 pour le bouton d'en bas) ;
         page_button: `QObject`
-            Le bouton auquel sera relié la page (généralement d'id : page_rb + index)
+            Bouton auquel est relié la page (généralement d'id : page_rb + index) ;
         translations: `td.TranslationDictionary`
-            traductions (clés = anglais -> valeurs = langue actuelle)
-            Utile pour traduire les noms de dossiers et de fenêtres sauvegardés en anglais
+            Traductions (clés = anglais -> valeurs = langue actuelle) pour traduire les noms de dossiers (en anglais).
 
         Returns
         -------
         logic_loaded: `bool`
-            La partie fonctionnelle de la page a-t-elle été chargé correctement ?
+            Si la partie fonctionnelle de la page a été correctement chargée ?
         """
         # Vérifie si la page a des signals handlers associés (en recherchant un ficher .py associé)
         if os.path.isfile(f"{self.logic_page_folder_path}page_rb{index}.py"):
@@ -179,13 +174,12 @@ class RightButtons:
 
     @staticmethod
     def are_page_functions_there(page):
-        """Permet, à partir d'une page de paramètres correctement chargée, d'indiquer si toutes les fonctions
-        potentiellement nécessaires au fonctionnement de celle-ci sont présentes.
+        """Indique dans le registre les fonctions manquantes d'une page de paramètres.
 
         Parameters
         ----------
         page: `PageRBX`
-            page à vérifier (celle-ci doit être de type PageRBX)
+            page à vérifier (celle-ci doit être de type PageRBX).
         """
         # Dans l'ordre : get_settings, set_settings, change_language, on_page_opened, on_page_closed
         for function in ["get_settings", "set_settings", "change_language", "on_page_opened", "on_page_closed"]:
@@ -194,17 +188,17 @@ class RightButtons:
 
     @decorators.QtSignal(log_level=log.Level.CRITICAL, end_process=True)
     def on_new_page_selected(self, application, engine, new_index):
-        """Fonction permettant le changement de la page de paramètres active lorsqu'un bouton rb est cliqué
-        Appelle aussi deux fonctions permettant le déchargement de la page actuelle et le chargement de la nouvelle page
+        """Change la page de paramètres active pour la page sélectionnée (avec le bouton de droite).
+        Appelé lorsqu'un des bouton de droite est cliqué.
 
         Parameters
         ----------
         application: `ini.InitialisationWindow`
-            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+            Instance source de l'application d'initialisation, (pour intérargir avec l'application) ;
         engine: `QQmlApplicationEngine`
-            La QQmlApplicationEngine sur laquelle on a tenté de charger la page
+            QQmlApplicationEngine sur lequel la page a possiblement été chargée ;
         new_index: `int`
-            index de la page de paramètre à charger (de 1 à 8)
+            Index de la page de paramètre à charger (de 1 à 8).
         """
         # Vérifie que la page que l'on veut charger n'est pas celle qui est déjà chargée
         if new_index != application.active_page_index:
@@ -213,7 +207,7 @@ class RightButtons:
                 # Si c'est le cas, appelle la fonction de fermeture de la page
                 application.pages_list[application.active_page_index - 1].on_page_closed(application)
 
-            # Indique que l'on sort de l'ancienne page, change le préfixe et indique que l'on rentre dans la nouvelle page
+            # Indique que l'on sort de l'ancienne page, change le préfixe et indique que l'on rentre dans la nouvelle
             log.info(f"Fermeture de la page de paramètres page_rb{application.active_page_index}.\n")
             log.change_log_prefix(f"page_rb{new_index}")
             log.info(f"Ouverture de la page de paramètres page_rb{new_index}.")
