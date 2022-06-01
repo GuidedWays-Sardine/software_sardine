@@ -13,11 +13,11 @@ Window {
     color: "#031122"
     flags: Qt.FramelessWindowHint | Qt.Window | Qt.WindowStaysOnTopHint
 
-    //Propriétés à définir lors de l'initialisation
+    // Propriété à définir lors de l'initialisation, index à afficher au centre du bouton
     property int index: -1
 
 
-    //Signal permettant de faire clignoter les bordures à chaque fois que les popup apparaissent
+    // Signal permettant de faire clignoter les bordures à chaque fois que les popup apparaissent
     onVisibleChanged: {
         if(screen_index_window.visible) {
             screen_index.blink()
@@ -25,7 +25,7 @@ Window {
     }
 
 
-    //Boutton inactivable contenant le numéro de la fenètre
+    // Boutton inactivable contenant le numéro de la fenètre
      INI_button{
         id: screen_index
         objectName: "screen_index"
@@ -40,7 +40,6 @@ Window {
 
         is_activable: false
         is_positive: true
-        is_visible: true
         is_dark_grey: false
     }
 }
