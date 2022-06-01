@@ -69,8 +69,8 @@ class BottomButtons:
 
     @decorators.QtSignal(log_level=log.Level.CRITICAL, end_process=True)
     def on_quit_clicked(self, application):
-        """Ferme la fenêtre d'initialisation.
-        Appelé lorsque le bouton fermer est cliqué.
+        """Signal appelé lorsque le bouton fermer est cliqué.
+        Ferme la fenêtre d'initialisation.
 
         Parameters
         ----------
@@ -86,8 +86,8 @@ class BottomButtons:
 
     @decorators.QtSignal(log_level=log.Level.CRITICAL, end_process=True)
     def on_launch_clicked(self, application):
-        """Ferme la fenêtre d'initialisation et indique au programme de récupérer les données entrées.
-        Appelé lorsque le bouton de lancer est cliqué.
+        """Signal appelé lorsque le bouton de lancer est cliqué.
+        Ferme la fenêtre d'initialisation et indique au programme de récupérer les données entrées.
 
         Parameters
         ----------
@@ -125,8 +125,8 @@ class BottomButtons:
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_open_clicked(self, application):
-        """Ouvre le dialogue d'ouverture de fichier.
-        Appelé lorsque le bouton ouvrir est cliqué.
+        """Signal appelé lorsque le bouton ouvrir est cliqué.
+        Ouvre le dialogue d'ouverture de fichier.
 
         Parameters
         ----------
@@ -151,8 +151,8 @@ class BottomButtons:
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_save_clicked(self, application):
-        """Ouvre le dialogue de sauvegarde de fichier, ou le popup de sauvegare dans le cas du clavier virtuel.
-        Appelée lorsque le bouton sauvegarder est cliqué.
+        """Signal appelée lorsque le bouton sauvegarder est cliqué.
+        Ouvre le dialogue de sauvegarde de fichier, ou le popup de sauvegare dans le cas du clavier virtuel.
 
         Parameters
         ----------
@@ -183,8 +183,8 @@ class BottomButtons:
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_save_popup_confirm_clicked(self, application):
-        """Récupère le nom de fichier entrer dans le popup.
-        Appelé lorsque le bouton confirmer du popup de sauvegarder fichier avec clavier virtuel est cliqué.
+        """Signal appelé lorsque le bouton confirmer du popup de sauvegarder fichier avec clavier virtuel est cliqué.
+        Récupère le nom de fichier entrer dans le popup.
 
         Parameters
         ----------
@@ -216,7 +216,8 @@ class BottomButtons:
 
     @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
     def on_virtual_keyboard_checked(self, application):
-        """Change la possibilité d'afficher le clavier ou non selon la demande de l'utilisateur.
+        """Signal appelé lorsque le checkbutton du clavier virtuel change d'état.
+        Change la possibilité d'afficher le clavier ou non selon la demande de l'utilisateur.
 
         Parameters
         ----------
