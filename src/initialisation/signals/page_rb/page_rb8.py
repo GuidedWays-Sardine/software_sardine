@@ -18,6 +18,7 @@ import src.misc.settings_dictionary as sd
 import src.misc.translation_dictionary as td
 import src.misc.log as log
 import src.misc.decorators as decorators
+import src.misc.virtual_keyboard as vk
 
 
 class PageRB8:
@@ -67,6 +68,21 @@ class PageRB8:
         self.page = engine.rootObjects()[0]
         self.page_button = page_button
         self.page_button.setProperty("text", self.name)
+
+        # Pour chacun des éléments de paramétrage écran
+        for index in range(4):
+            # Récupère le widget de paramétrage écran
+            window_parameters = self.page.get_window_parameters_at(index)
+
+            # Pour chacune des zones d'entrées de texte
+            for widget_id in ["x_input", "y_input", "width_input", "height_input"]:
+                # Connecte le composant d'entrée de valeur pour faire apparaitre et disparaitre le clavier virtuel
+                window_parameters.findChild(QObject, widget_id).focus_gained.connect(
+                    lambda: vk.show_keyboard(window=application.win,
+                                             widget=window_parameters.findChild(QObject, widget_id).sender(),
+                                             language=vk.KeyboardMode.NUMPAD,
+                                             skip_list=("-", ".")))
+                window_parameters.findChild(QObject, widget_id).focus_lost.connect(vk.hide_keyboard)
 
         # Passe sur chacun des écrans connectés à l'ordinateur et génère la fenêtre graphique associée
         self.screen_index_engine = QQmlApplicationEngine()
