@@ -182,7 +182,7 @@ class PageRB1:
         settings.update_ui_parameter(self.page.findChild(QObject, "data_save_check"), "is_checked", "save_data")
 
     def change_language(self, translations):
-        """A partir d'un dictionnaire de paramètres, change les paramètres des différentes pages.
+        """A partir d'un dictionnaire de traductions, traduit les différents composants de la page_rb1.
 
         Parameters
         ----------
@@ -217,8 +217,8 @@ class PageRB1:
 
     @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
     def on_language_changed(self, application):
-        """Change la langue du simulateur selon la sélection de l'utilisateur.
-        Appelé lorsque la sélection du combobox change.
+        """Signal appelé lorsque la sélection du combobox langues change.
+        Change la langue du simulateur selon la sélection de l'utilisateur.
 
         Parameters
         ----------
