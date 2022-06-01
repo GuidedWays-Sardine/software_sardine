@@ -1,6 +1,7 @@
 # Librairies par défaut
 import os
 import sys
+import re
 
 
 # Librairies graphiques
@@ -101,13 +102,21 @@ class PageRB8:
                         # Si jamais une des données n'est pas au bon format, laisse un message d'erreur
                         log.warning(f"Paramètres écrans au mauvais format sur la ligne :\n\t\t{line}", exception=error)
                 else:
-                    log.warning(f"Nombe d'informations fenêtres insuffisantes sur la ligne :\n\t\t{line}")
+                    log.warning(f"Nombe d'informations fenêtres (5 minimum) insuffisantes sur la ligne :\n\t{line}")
+
+            # Récupère le nom de la catégorie (enlève le chiffre en amont et l'extension de fichier et enlève les _)
+            category_name = re.sub(r"^[0-9]* *- *", "", file_path).rsplit(".", maxsplit=1)[0].replace("_", " ")
+
+            # Rajoute la traduction dans la liste de traduction de catégories
+            self.category_translations[category_name] = translations[category_name]
+
+            # Sauvegarde les paramètres par défaut et entrées avec comme clé la traduction actuelle de la catégorie
+            self.windows_defaults[translations[category_name]] = windows_defaults
+            self.windows_settings[translations[category_name]] = windows_settings
 
             # Rajouter cette série d'écran à la catégorie
-            log.info(f"{len(windows_defaults)} fenêtres trouvées ({windows_defaults.keys()}) dans la catégorie" +
-                     f"{translations[file_path.replace('_', ' ')[3:-8]]}. Dans le fichier\n\t{file_path}")
-            self.windows_defaults[translations[file_path.replace("_", " ")[3:-8]]] = windows_defaults
-            self.windows_settings[translations[file_path.replace("_", " ")[3:-8]]] = windows_settings
+            log.info(f"{len(windows_defaults)} fenêtre{'s' * (len(windows_defaults) > 1)} {list(windows_defaults)}" +
+                     f"dans la catégorie \"{translations[category_name]}\"/\"{category_name}\". \n\t{file_path}")
 
         # Définit le fonctionnement de base des boutons supérieurs et inférieurs
         if self.windows_defaults:
