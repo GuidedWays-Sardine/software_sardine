@@ -41,6 +41,10 @@ class PageRB8:
     category_active = ""
     screen_list_active = 0
 
+    # Dictionaires de traductions pour simplifier et clarifier l'accès des paramètres
+    category_translations = td.TranslationDictionary()
+    windows_translations = td.TranslationDictionary()
+
     # Chemins d'accès vers les différents fichiers nécessaires au fonctionnement de la page
     screen_index_file_path = f"{PROJECT_DIR}src\\initialisation\\graphics\\page_rb\\page_rb8\\screen_index_window.qml"
     windows_settings_folder_path = f"{PROJECT_DIR}settings\\windows_settings\\"
@@ -114,6 +118,9 @@ class PageRB8:
                     try:
                         windows_defaults[translations[info[0]]] = [True, int(info[1]), int(info[2]), info[3].lower() == "true", info[4].lower() == "true"]
                         windows_settings[translations[info[0]]] = [0, False, [0, 0], [0, 0], False]
+
+                        # Rajoute la traduction du nom de la fenêtre
+                        self.windows_translations[info[0]] = translations[info[0]]
                     except Exception as error:
                         # Si jamais une des données n'est pas au bon format, laisse un message d'erreur
                         log.warning(f"Paramètres écrans au mauvais format sur la ligne :\n\t\t{line}", exception=error)
@@ -330,6 +337,12 @@ class PageRB8:
             # Si la catégorie est la catégorie active, traduit la catégorie active
             if self.category_active == category_key:
                 self.category_active = translations[self.category_active]
+
+        # Traduit les valeurs des traductions de catégories et d'écrans
+        for category in self.category_translations:
+            self.category_translations[category] = translations[self.category_translations[category]]
+        for window in self.windows_translations:
+            self.windows_translations[window] = translations[self.windows_translations[window]]
 
         # Remets à jour la page actuelle et le titre de la catégorie
         self.page.findChild(QObject, "category_title").setProperty("text", self.category_active)
@@ -577,9 +590,9 @@ class PageRB8:
         """
         # Récupère si le checkbutton est activé, le nom de la catégorie et des écrans à modifier
         is_checked = application.pages_list[0].page.findChild(QObject, "camera_check").property("is_checked")
-        category = list(self.windows_defaults)[0]
-        screen_virtual_line = list(self.windows_defaults[category])[2]
-        screen_camera_train = list(self.windows_defaults[category])[3]
+        category = self.category_translations["SARDINE simulator"]
+        screen_virtual_line = self.windows_translations["Virtual line (UE5)"]
+        screen_camera_train = self.windows_translations["Camera Train (Renard)"]
 
         # Change la paramétrabilité des écrans souhaités
         self.windows_defaults[category][screen_virtual_line][0] = not is_checked
@@ -603,8 +616,8 @@ class PageRB8:
         """
         # Récupère si le checkbutton est activé, le nom de la catégorie et des écrans à modifier
         is_checked = application.pages_list[0].page.findChild(QObject, "ccs_check").property("is_checked")
-        category = list(self.windows_defaults)[1]
-        screen_tco = list(self.windows_defaults[category])[0]
+        category = self.category_translations["Cebtralised Control Station (CCS)"]
+        screen_tco = self.windows_translations["Optical Control Panel (OCP)"]
 
         # Change la paramétrabilité des écrans souhaités
         self.windows_defaults[category][screen_tco][0] = is_checked
@@ -625,10 +638,10 @@ class PageRB8:
         """
         # Récupère si les données sont activées et si elles sont activées en mode dashboard
         is_data_checked = application.pages_list[0].page.findChild(QObject, "data_check").property("is_checked")
-        is_dashboard_checked = application.pages_list[0].page.findChild(QObject, "dashboard_check").property("is_clicked")
-        category = list(self.windows_defaults)[2]
-        screen_graphs = list(self.windows_defaults[category])
-        screen_dashboard = screen_graphs[0]
+        is_dashboard_checked = application.pages_list[0].page.findChild(QObject, "dashboard_check").property("is_checked")
+        category = self.category_translations["Data visualisation"]
+        screen_graphs = list(self.windows_defaults[category])[1:]
+        screen_dashboard = self.windows_translations["Dashboard"]
 
         # Met à jour les propriétés du dashboard
         for screen in screen_graphs:
