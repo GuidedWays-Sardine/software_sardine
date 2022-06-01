@@ -384,11 +384,8 @@ Item{
         // Si la valeur visible n'est pas dans le rang correct
         if (root.visible_value < validator.bottom || root.visible_value > validator.top) {
             console.log(`Nouvelle valeur pour le INI_integerinput : \"${root.objectName}\" invalide (${validator.bottom} < ${root.visible_value} < ${validator.top} non vérifié)`)
-            root.visible_value < validator.bottom ? (root.is_max_default ? validator.bottom : "") : (root.is_max_default ? "" : validator.top)
+            body.text = root.visible_value < validator.bottom ? (root.is_max_default ? validator.bottom : "") : (root.is_max_default ? "" : validator.top)
         }
-        // Change le texte et appelle le signal value changed
-        body.text = root.visible_value
-        value_changed()
     }
 
     // Zone d'entrée de texte
