@@ -109,8 +109,8 @@ Item {
 
             // stringinput pour entrer la valeur
             INI_stringinput {
-                id: file_name_stringinput
-                objectName: "file_name_stringinput"
+                id: file_name_input
+                objectName: "file_name_input"
 
                 default_x: 0
                 default_y: 0
@@ -138,7 +138,7 @@ Item {
                 text: "Valider"
                 font_size: 12 * save_button.ratio
 
-                is_activable: file_name_stringinput.value.length > 0
+                is_activable: file_name_input.value.length > 0
                 is_positive: true
             }
         }

@@ -46,12 +46,12 @@ class BottomButtons:
             application.win.findChild(QObject, "confirm_button").clicked.connect(lambda: self.on_save_popup_confirm_clicked(application))
 
             # Connecte le clavier virtuel à l'entrée de valeur du popup save (si aucun clavier physique)
-            application.win.findChild(QObject, "file_name_stringinput").focus_gained.connect(
+            application.win.findChild(QObject, "file_name_input").focus_gained.connect(
                 lambda: vk.show_keyboard(window=application.win,
                                          widget=application.win.findChild(QObject, "save_popup"),
                                          language=application.language,
                                          skip_list=["<", ">", ":", "\"", "/", "\\", "|", "?", "*"]))
-            application.win.findChild(QObject, "file_name_stringinput").focus_lost.connect(vk.hide_keyboard)
+            application.win.findChild(QObject, "file_name_input").focus_lost.connect(vk.hide_keyboard)
 
             log.info("Au moins une page de paramètres correctement chargée. Boutons ouvrir et sauvegarder activés.")
         else:
@@ -162,7 +162,7 @@ class BottomButtons:
         # Si le clavier virtuel est activé
         if application.win.findChild(QObject, "virtual_keyboard_check").property("is_checked"):
             # Récupère et vide le stringinput du popup
-            application.win.findChild(QObject, "file_name_stringinput").clear()
+            application.win.findChild(QObject, "file_name_input").clear()
 
             # Affiche le popup pour entrer le nom du fichier et le sauvegarder
             save_popup = application.win.findChild(QObject, "save_popup")
@@ -195,7 +195,7 @@ class BottomButtons:
         application.win.findChild(QObject, "save_popup").close()
 
         # Récupère le nom du fichier et vide l'entrée
-        file_popup_name = application.win.findChild(QObject, "file_name_stringinput")
+        file_popup_name = application.win.findChild(QObject, "file_name_input")
         file_name = file_popup_name.property("value")
         file_popup_name.clear()
 
@@ -247,5 +247,5 @@ class BottomButtons:
                                                property_name="title")
 
         # Traduit le placeholder_text
-        translations.translate_widget_property(parent=application.win, widget_name="file_name_stringinput",
+        translations.translate_widget_property(parent=application.win, widget_name="file_name_input",
                                                property_name="placeholder_text")
