@@ -25,8 +25,8 @@ Item {
     property var initial_settings: [] //Format [window_index, fullscreen_check, [x, y], [width, height]]
     onInitial_settingsChanged: {
         //Si au moins un argument a été donné, change la sélection pour l'écran sélectionné
-        if(root.is_activable && initial_settings.length >= 1) {
-            window_index_combo.change_selection(initial_settings[0])
+        if(root.is_activable && root.initial_settings.length >= 1) {
+            window_index_combo.change_selection(root.initial_settings[0])
 
             //Si un écran particulier a été sélectionné et que plus d'informations ont été données, change si l'écran est en plein écran
             if(window_index_combo.selection_index > 0 && initial_settings.length >= 2) {
@@ -109,8 +109,8 @@ Item {
         INI_text{
             id: window_index_text
 
-            default_x: body.default_x + 2 + root.font_size
-            default_y: body.default_y - 2 + root.font_size
+            default_x: body.default_x + root.font_size / 2
+            default_y: body.default_y + root.font_size / 2
 
             text: root.window_name
             font_size: root.font_size
@@ -125,8 +125,8 @@ Item {
             id: window_index_combo
             objectName: "window_index_combo"
 
-            default_x: body.default_x + 1
-            default_y: body.default_y + 51
+            default_x: body.default_x + 1 + root.font_size / 2
+            default_y: body.default_y + 51 - root.font_size / 2
             default_width: 100
             default_height: 24
 
@@ -181,8 +181,8 @@ Item {
             objectName: "fullscreen_check"
 
             box_length: 16
-            default_x: 396
-            default_y: window_index_text.default_y - (box_length - root.font_size) * 0.5
+            default_x: 396 - root.font_size / 2
+            default_y: window_index_text.default_y + 2
 
             title: root.fullscreen_text
             font_size: root.font_size
@@ -207,7 +207,7 @@ Item {
         INI_integerinput {
             id: x_input
 
-            default_x: body.default_x + 370 + 2*46 - default_width * 4 - 8 * root.font_size
+            default_x: body.default_x + 370 + 2*46 - default_width * 4 - 8 * root.font_size - root.font_size / 2
             default_y: window_index_combo.default_y
             default_width: default_height * 2
             default_height: window_index_combo.default_height
@@ -218,7 +218,7 @@ Item {
             font_size: root.font_size 
 
             is_max_default: false
-            is_activable: root.screen_valid && window_index_combo.selection_index !== 0 && !fullscreen_on_check.is_checked
+            is_activable: root.screen_valid && window_index_combo.selection_index !== 0 && !fullscreen_check.is_checked
             is_positive: false
             is_visible: root.window_name != ""
 
@@ -235,7 +235,7 @@ Item {
         INI_integerinput {
             id: y_input
 
-            default_x: body.default_x + 370 + 2*46 - default_width * 3 - 6 * root.font_size
+            default_x: body.default_x + 370 + 2*46 - default_width * 3 - 6 * root.font_size - root.font_size / 2
             default_y: window_index_combo.default_y
             default_width: default_height * 2
             default_height: window_index_combo.default_height
@@ -264,7 +264,7 @@ Item {
         INI_integerinput {
             id: width_input
 
-            default_x: body.default_x + 370 + 2*46 - default_width * 2 - 2 * root.font_size
+            default_x: body.default_x + 370 + 2*46 - default_width * 2 - 2 * root.font_size - root.font_size / 2
             default_y: window_index_combo.default_y
             default_width: default_height * 2
             default_height: window_index_combo.default_height
@@ -284,7 +284,7 @@ Item {
         INI_integerinput {
             id: height_input
 
-            default_x: body.default_x + 370 + 2*46 - default_width
+            default_x: body.default_x + 370 + 2*46 - default_width - root.font_size / 2
             default_y: window_index_combo.default_y
             default_width: default_height * 2
             default_height: window_index_combo.default_height
