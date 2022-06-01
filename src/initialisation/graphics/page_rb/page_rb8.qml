@@ -10,16 +10,16 @@ Item {
     id: page_rb8
     objectName: "page_rb8"
 
-    //Propriété pour avoir la dimension des écrans (la liste sera mise à jour automatiquement)
+    // Propriété pour avoir la dimension des écrans (la liste sera mise à jour automatiquement)
     property var screens_size: []
 
-    //propriétés sur le nom, les dimensions minimales de chaque écran
+    // Propriétés sur le nom, les dimensions minimales de chaque écran
     property var windows_name: []
     property var windows_activable: []
     property var minimum_wh: []
     property var initial_settings: []
 
-    //Propriétés sur les textes à traduire
+    // Propriétés sur les textes à traduire
     property string none_text: "Aucun"
     property string fullscreen_text: "Plein écran ?"
     property string window_index_text: "Index écran :"
@@ -44,12 +44,12 @@ Item {
     function get_values() {
         var values = []
         
-        for(let i = 0; i < Math.min(windows_name.length , 4); i++) {
-            //Récupère le composant de paramètre à l'index actuel (entre 0 et 4)
+        for(var i = 0; i < Math.min(windows_name.length , 4); i++) {
+            // Récupère le composant de paramètre à l'index actuel (entre 0 et 4)
             var window = windows.itemAt(i)
             
-            //Récupère tous les paramètres et les rajoutes méthodiquement à la liste de paramètres
-            //Format : [window_name, [window_index, fullscreen_on_check, [x, y], [width, height]]]
+            // Récupère tous les paramètres et les rajoutes méthodiquement à la liste de paramètres
+            // Format : [window_name, [window_index, fullscreen_check, [x, y], [width, height]]]
             values.push([window.window_name,
                          [window.selected_window,
                           window.is_fullscreen,
@@ -59,7 +59,7 @@ Item {
         return values
     }
 
-    //Fonction permettant de faire clignoter l'écran à l'index envoyé
+    // Fonction permettant de faire clignoter l'écran à l'index envoyé
     function blink(index) {
         if(index < page_rb8.windows_name.length) {
             windows.itemAt(page_rb8.windows_name.length - index - 1).blink()
@@ -67,7 +67,8 @@ Item {
     }
 
 
-    //Flèche de droite pour naviguer à gauche sur les catégories d'écrans
+
+    // Flèche de droite pour naviguer à gauche sur les catégories d'écrans
     INI_button {
         id: left_category_button
         objectName: "left_category_button"
@@ -84,7 +85,7 @@ Item {
         is_positive: true
     }
 
-    //Encadré permettant d'afficher le nom de la catégorie d'écrans
+    // Encadré permettant d'afficher le nom de la catégorie d'écrans
     INI_button {
         id: category_title
         objectName: "category_title"
@@ -101,7 +102,7 @@ Item {
         is_dark_grey: page_rb8.windows_name.length == 0
     }
 
-    //Flèche de droite pour naviguer à droite sur les catégories d'écran
+    // Flèche de droite pour naviguer à droite sur les catégories d'écran
     INI_button {
         id: right_category_button
         objectName: "right_category_button"
@@ -118,16 +119,18 @@ Item {
         is_positive: true
     }
 
+    // Repeater pour les 4 windows parameters maximum à afficher
     Repeater {
         id: windows
+        objectName: "windows"
         
         model : page_rb8.windows_name.length
         
         Window_parameters {
             //id: window
 
-            //Propriété permetant d'inverser l'index pour charger les zones de paramètres dans le désordre
-            //(pour ne pas cacher les bordures du combobox par le composant du dessous) mais pour charger les données dans le bon ordre
+            // Propriété permetant d'inverser l'index pour charger les zones de paramètres dans le désordre
+            // (pour ne pas cacher les bordures du combobox par le composant du dessous) mais pour charger les données dans le bon ordre
             property int real_index: page_rb8.windows_name.length - index - 1
 
             position_index: real_index
@@ -143,7 +146,7 @@ Item {
         }
     }
 
-    //checkbutton pour savoir si l'application doit éteindre les écrans qui ne sont pas utilisés
+    // Checkbutton pour savoir si l'application doit éteindre les écrans qui ne sont pas utilisés
     INI_checkbutton {
         id: immersion_check
         objectName: "immersion_check"
@@ -158,7 +161,7 @@ Item {
         is_checked: true
     }
 
-    //Flèche de droite pour naviguer sur la liste des écrans d'une même catégorie
+    // Flèche de droite pour naviguer sur la liste des écrans d'une même catégorie
     INI_button {
         id: left_window_button
         objectName: "left_window_button"
