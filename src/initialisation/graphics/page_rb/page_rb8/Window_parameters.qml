@@ -97,6 +97,7 @@ Item {
     //Bouton permettant de créer l'encadré du combobox et contenant tous les éléments de paramétrage
     INI_button {
         id: body
+        objectName: "body"
 
         default_x: 54
         default_y: 15 + 40 + root.position_index * body.default_height
@@ -209,6 +210,7 @@ Item {
         //integerinput pour la position x de la fenêtre
         INI_integerinput {
             id: x_input
+            objectName: "x_input"
 
             default_x: body.default_x + 370 + 2*46 - default_width * 4 - 8 * root.font_size - root.font_size / 2
             default_y: window_index_combo.default_y
@@ -237,6 +239,7 @@ Item {
         //integerinput pour la position y de la fenêtre
         INI_integerinput {
             id: y_input
+            objectName: "y_input"
 
             default_x: body.default_x + 370 + 2*46 - default_width * 3 - 6 * root.font_size - root.font_size / 2
             default_y: window_index_combo.default_y
@@ -266,6 +269,7 @@ Item {
         //integerinput pour la hauteur de la fenêtre
         INI_integerinput {
             id: width_input
+            objectName: "width_input"
 
             default_x: body.default_x + 370 + 2*46 - default_width * 2 - 2 * root.font_size - root.font_size / 2
             default_y: window_index_combo.default_y
@@ -286,6 +290,7 @@ Item {
         //integerinput pour la hauteur de la fenêtre
         INI_integerinput {
             id: height_input
+            objectName: "height_input"
 
             default_x: body.default_x + 370 + 2*46 - default_width - root.font_size / 2
             default_y: window_index_combo.default_y
