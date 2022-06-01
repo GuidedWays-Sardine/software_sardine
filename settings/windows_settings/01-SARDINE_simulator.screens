@@ -4,3 +4,4 @@ Virtual buttons                     ;0      ;0      ;False                 ;Fals
 Virtual line (UE5)                  ;1080   ;720    ;False                 ;True
 Camera train (Renard)               ;1080   ;720    ;False                 ;True
 Train systems and breakdown control ;720    ;720    ;False                 ;False
+Simulation log window               ;640    ;128    ;False                 ;False

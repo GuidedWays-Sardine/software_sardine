@@ -112,6 +112,7 @@ Boutons virtuels;Virtual buttons
 Ligne virtuelle (UE5);Virtual line (UE5)
 Train caméra (Renard);Camera train (Renard)
 Gestion des systèmes et pannes train;Train systems and breakdown control
+Fenêtre d'affichage registre simulation;Simulation log window
 
 Poste de Commande Centralisé (PCC);Centralised Control Station (CCS)
 Tableau de Contrôle Optique (TCO);Optical Control Panel (OCP)
