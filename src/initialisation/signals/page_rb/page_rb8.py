@@ -22,9 +22,9 @@ import src.misc.virtual_keyboard as vk
 
 
 class PageRB8:
-    """classe pour la page de paramètres 8"""
+    """Classe pour la page de paramètres 8"""
 
-    # variables nécessaire au bon fonctionnement de la page
+    # Variables nécessaire au bon fonctionnement de la page
     index = 8   # Attention dans les tableaux l'index commence à 0
     name = "Écrans"
     engine = None
@@ -50,21 +50,20 @@ class PageRB8:
     windows_settings_folder_path = f"{PROJECT_DIR}settings\\windows_settings\\"
 
     def __init__(self, application, engine, index, page_button, translations):
-        """Fonction d'initialisation de la page de paramtètres 8
+        """Initialise la page de paramtètres 8
 
         Parameters
         ----------
         application: `ini.InitialisationWindow`
-            L'instance source de l'application d'initialisation
+            Instance source de l'application d'initialisation ;
         engine: `QQmlApplicationEngine`
-            La QQmlApplicationEngine de la page à charger
+            QQmlApplicationEngine de la page à charger ;
         index: `int`
-            Index de la page (1 pour le bouton haut -> 8 pour le bouton bas
-        button: `QObject`
-            Le bouton auquel sera relié la page (id : page_rb + index)
+            Index de la page (1 pour le bouton haut -> 8 pour le bouton bas) ;
+        page_button: `QObject`
+            Bouton auquel sera relié la page (id : page_rb + index) ;
         translations : ``td.TranslationDictionary`
-            Traductions (clés = anglais -> valeurs = langue actuelle).
-            Utile pour traduire les noms de dossiers et de modules.
+            Traductions (clés = anglais -> valeurs = langue actuelle) pour traduire les noms de dossiers et de modules.
         """
         # Stocke les informations nécessaires au fonctionnement de la page
         self.index = index
@@ -105,17 +104,17 @@ class PageRB8:
 
         # Pour chacun des fichiers dans le répertoire de paramètres d'écrans
         for file_path in (f for f in os.listdir(self.windows_settings_folder_path) if f.endswith(".screens")):
-            # Ouvre le fichier, et crée un dictionaire vide pour les écrans dans le fichier
+            # Ouvre le fichier, et crée un dictionnaire vide pour les écrans dans le fichier
             file = open(f"{self.windows_settings_folder_path}{file_path}", "r", encoding="utf-8-sig")
             windows_defaults = {}
             windows_settings = {}
 
             # Pour chacune des lignes contenant des informations
             for line in (l for l in file.readlines() if l != "\n" and l[0] != "#"):
-                # Rajoute les paramètres par défaut et crée une ligne de paramètres (incomplet par défaut)
                 info = list(map(str.strip, line.rstrip("\n").split(";")))
                 if len(info) >= 5:
                     try:
+                        # Rajoute les paramètres par défaut et crée une ligne de paramètres (incomplet par défaut)
                         windows_defaults[translations[info[0]]] = [True, int(info[1]), int(info[2]), info[3].lower() == "true", info[4].lower() == "true"]
                         windows_settings[translations[info[0]]] = [0, False, [0, 0], [0, 0], False]
 
@@ -123,7 +122,7 @@ class PageRB8:
                         self.windows_translations[info[0]] = translations[info[0]]
                     except Exception as error:
                         # Si jamais une des données n'est pas au bon format, laisse un message d'erreur
-                        log.warning(f"Paramètres écrans au mauvais format sur la ligne :\n\t\t{line}", exception=error)
+                        log.warning(f"Paramètres écrans au mauvais format sur la ligne :\n\t{line}", exception=error)
                 else:
                     log.warning(f"Nombe d'informations fenêtres (5 minimum) insuffisantes sur la ligne :\n\t{line}")
 
@@ -165,20 +164,20 @@ class PageRB8:
 
         # connecte les différents boutons des autres pages à la paramétrabilité de certaines fenêtres
         try:
-            # FEATURE : Ajouter les conditions dans des fonctions annexes comme ci-dessous pour les autres pages
+            # ENHANCE : Ajouter les conditions dans des fonctions annexes comme ci-dessous pour les autres pages
             self.connect_page_rb1(application)
             # Aucune fonction pour la page_rb2
 
         except Exception as error:
-            log.error("Erreur lors de la connexion des composants au paramétrage de leur écran.\n", exception=error)
+            log.error("Erreur lors de la connexion des composants au paramétrage de leur écran.", exception=error)
 
     def connect_page_rb1(self, application):
-        """Fonction permettant de connecter les différents composants de la page de paramètres page_rb1 à leurs fenêtres
+        """Connecte les différents composants de la page de paramètres page_rb1 à leurs fenêtres.
 
         Parameters
         ----------
         application: `ini.InitialisationWindow`
-            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+            Instance source de l'application d'initialisation, (pour intérargir avec l'application).
         """
         # Dans le cas où la première page de paramètre a été chargée entièrement correctement
         if application.pages_list[0] is not None and not isinstance(application.pages_list[0], QQmlApplicationEngine):
@@ -199,31 +198,31 @@ class PageRB8:
                 lambda: self.on_data_checked(application))
             self.on_data_checked(application)
         else:
-            log.warning(f"""Certains paramétrages d'écrans dépendent du bon fonctionnement de la page_rb1.
-                        \t\tCeux-ci ne peuvent pas se charger correctement.\n""")
+            log.warning(f"Certains paramètrages d'écrans dépendent du bon fonctionnement de la page_rb1." +
+                        f"Ceux-ci ne pourront pas être paramétrés.")
 
-            # Désactive l'écran train caméra
+            # Désactive l'écran train caméra (simulation avec ligne UE5 par défaut)
             category = list(self.windows_defaults)[0]
             screen_camera_train = list(self.windows_defaults[category])[3]
             self.windows_defaults[category][screen_camera_train][0] = False
 
-            # Désactive les graphes
+            # Désactive les graphes (dashboard et fenêtré), visible que si el dashboard est activé
             category = list(self.windows_defaults)[2]
             for screen_graph in self.windows_defaults[category]:
                 self.windows_defaults[category][screen_graph][0] = False
 
     def get_settings(self, translations):
-        """Récupère les paramètres de la page de paramètres page_rb8
+        """Récupère les paramètres de la page de paramètres page_rb8.
 
         Parameters
         ----------
         translations: `td.TranslationDictionnary`
-            traductions (clés = langue actuelle -> valeurs = anglais)
+            Traductions (clés = langue actuelle -> valeurs = anglais).
 
         Returns
         -------
         page_settings : `sd.SettingsDictionnary`
-            dictionaire de paramètres de la page de paramètres page_rb8
+            Dictionnaire de paramètres de la page de paramètres page_rb8.
         """
         # Initialise les paramètres récupérés et récupère le paramètre sur si les écrans sont éteins
         page_settings = sd.SettingsDictionary()
@@ -254,16 +253,16 @@ class PageRB8:
         return page_settings
 
     def set_settings(self, settings, translations, resize_popup=False):
-        """Change les paramètres de la page de paramètres page_rb8
+        """Change les paramètres de la page de paramètres page_rb8.
 
         Parameters
         ----------
         settings: `sd.SettingsDictionary`
-            Dictionnaire contenant les nouveaux paramètres à utiliser.
+            Dictionnaire contenant les nouveaux paramètres à utiliser ;
         translations: `td.TranslationDictionary`
-            Traductions (clés = anglais -> valeurs = langue actuelle)
+            Traductions (clés = anglais -> valeurs = langue actuelle) :
         resize_popup: `bool`
-            Les popups doivent-elles être redimensionnées ?
+            Si les popups doivent être redimensionnées.
         """
         # Change la valeur pour les écrans noirs
         settings.update_ui_parameter(self.page.findChild(QObject, "immersion_check"), "is_checked", "immersion")
@@ -290,18 +289,18 @@ class PageRB8:
                         self.windows_settings[category_key][screen_key][3][0] = settings[windows_settings_key + "w"]
                         self.windows_settings[category_key][screen_key][3][1] = settings[windows_settings_key + "h"]
                 except KeyError:
-                    log.debug(f"L'écran : {windows_settings_key} n'a pas de paramètres sauvegardés.")
+                    log.debug(f"L'écran \"{windows_settings_key}\" n'a pas de paramètres sauvegardés.")
 
         # Met à jour la page visible de settings
         self.change_visible_screen_list()
 
     def change_language(self, translations):
-        """Permet à partir d'un dictionaire de traduction, de traduire les textes de la page de paramètres
+        """A partir d'un dictionnaire de traductions, traduit les différents composants de la page_rb8.
 
         Parameters
         ----------
         translations: `td.TranslationDictionary`
-            dictionaire de traduction (clés = langue actuelle -> valeurs = nouvelle langue)
+            Traductions (clés = langue actuelle -> valeurs = nouvelle langue).
         """
         # Traduit le nom de la catégorie
         self.page_button.setProperty("text", translations[self.page_button.property("text")])
@@ -316,7 +315,7 @@ class PageRB8:
         for category_key in list(self.windows_defaults):
             # Pour chaque écrans de chaques catégories
             for screen_key in list(self.windows_defaults[category_key]):
-                # Traduit la clé d'écran pour le dictionaire de paramètres choisis et de paramètres par défaut
+                # Traduit la clé d'écran pour le dictionnaire de paramètres choisis et de paramètres par défaut
                 self.windows_defaults[category_key][translations[screen_key]] = self.windows_defaults[category_key][screen_key]
                 self.windows_settings[category_key][translations[screen_key]] = self.windows_settings[category_key][screen_key]
 
@@ -325,7 +324,7 @@ class PageRB8:
                     self.windows_defaults[category_key].pop(screen_key)
                     self.windows_settings[category_key].pop(screen_key)
 
-            # Traduit la clé de catégorie pour le dictionaire de paramètres choisis et de paramètres par défaut
+            # Traduit la clé de catégorie pour le dictionnaire de paramètres choisis et de paramètres par défaut
             self.windows_defaults[translations[category_key]] = self.windows_defaults[category_key]
             self.windows_settings[translations[category_key]] = self.windows_settings[category_key]
 
@@ -349,15 +348,14 @@ class PageRB8:
         self.change_visible_screen_list()
 
     def is_page_valid(self):
-        """Méthode permettant d'indiquer si la page de paramètres est complétée.
+        """Vérifie si la page de paramètre est complétée.
         Valide si toutes les fenêtres obligatoires de modules utilisés pour la simulation sont paramétrés.
 
         Returns
         -------
         is_page_valid: `bool`
-            Est ce que la page de paramètre est complétée ?
+            Si la page de paramètres est complétée.
         """
-
         # Récupère les valeurs actuellement sur l'écran
         old_screens_values = self.page.get_values().toVariant()
         for index in range(0, len(old_screens_values)):
@@ -407,13 +405,13 @@ class PageRB8:
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_page_opened(self, application):
-        """Fonction appelée lorsque la page de paramètres 8 est chargée.
-        Permet d'afficher les fenêtre d'index et actualise les paramètres des écrans visibles
+        """Appelée lorsque la page de paramètres 8 est montrée.
+        Affiche les fenêtres d'index écrans et actualise les paramètres des écrans visibles.
 
         Parameters
         ----------
         application: `ini.InitialisationWindow`
-            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+            Instance source de l'application d'initialisation, (pour intérargir avec l'application).
         """
         # Rend visible tous les écrans d'index
         for screen_index_window in self.screen_index_windows:
@@ -424,26 +422,26 @@ class PageRB8:
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_page_closed(self, application):
-        """Fonction appelée quand la page de paramètres 8 est fermée.
-        Permet de cacher les différentes fenêtres d'index
+        """Appelée quand la page de paramètres 8 est fermée.
+        Récupère les paramètres de la page active et cache les fenêtres d'index.
 
         Parameters
         ----------
         application: `ini.InitialisationWindow`
-            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+            Instance source de l'application d'initialisation, (pour intérargir avec l'application).
         """
         # Cache toutes les fenêtres d'index
         for screen_index_window in self.screen_index_windows:
             screen_index_window.hide()
 
-        # récupère les valeurs des écrans actuels et les sauvegarde
+        # Récupère les valeurs des écrans actuels et les sauvegarde
         screens_values = self.page.get_values().toVariant()
         for index in range(0, len(screens_values)):
             self.windows_settings[self.category_active][screens_values[index][0]] = screens_values[index][1]
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_left_category_button_clicked(self):
-        """Signal appelé quand le bouton pour passer à la catégorie de paramétraghes d'écran de gauche est cliqué.
+        """Signal appelé lorsque le bouton pour passer à la catégorie de fenêtres de gauche est cliqué.
         Attention ce signal doit être appelé uniquement si la page de gauche existe, sous risque de crash.
         """
         # Récupère les valeurs actuellement sur l'écran
@@ -472,7 +470,7 @@ class PageRB8:
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_right_category_button_clicked(self):
-        """Signal appelé quand le bouton pour passer à la catégorie de paramétraghes d'écran de droite est cliqué.
+        """Signal appelé lorsque le bouton pour passer à la catégorie de fenêtres de droite est cliqué.
         Attention ce signal doit être appelé uniquement si la page de droite existe, sous risque de crash.
         """
         # Récupère les valeurs actuellement sur l'écran
@@ -501,7 +499,7 @@ class PageRB8:
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_left_window_button_pressed(self):
-        """Signal appelé quand le bouton pour passer à la série de paramétraghes d'écran de gauche d'une catégorie est cliqué.
+        """Signal appelé lorsque le bouton pour passer à la série de fenêtres de gauche d'une catégorie est cliqué.
         Attention ce signal doit être appelé uniquement si la série d'écrans de gauche existe, sous risque de crash.
         """
         # Récupère les valeurs actuellement sur l'écran
@@ -515,7 +513,7 @@ class PageRB8:
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_right_window_button_pressed(self):
-        """Signal appelé quand le bouton pour passer à la série de paramétraghes d'écran de droite d'une catégorie est cliqué.
+        """Signal appelé lorsque le bouton pour passer à la série de fenêtres de droite d'une catégorie est cliqué.
         Attention ce signal doit être appelé uniquement si la série d'écrans de droite existe, sous risque de crash.
         """
         # Récupère les valeurs actuellement sur l'écran
@@ -528,8 +526,9 @@ class PageRB8:
         self.change_visible_screen_list()
 
     def change_visible_screen_list(self):
-        """Met à jour la liste de paramétrages écrans visible par l"utilisateur.
-        A appeler dans le cas où la catégorie ou la série d'écran a été changé ou que les paramètres défauts de l'écrans ont été changés.
+        """Met à jour la liste de paramétrages écrans visible par l"utilisateur. A appeler si :
+        - la catégorie ou la série d'écran a été changé ;
+        - les paramètres défauts de l'écrans ont été changés.
         """
         # Essaye de récupérer le dictionnaire des écrans de la catégorie sélectionnée et récupère leurs clés
         category_screen_dict = self.windows_defaults[self.category_active]
@@ -581,12 +580,12 @@ class PageRB8:
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_camera_train_checked(self, application):
         """Signal appelé lorsque le checkbutton camera_check est coché ou décoché.
-        Permet de mettre à jour la paramétrabilité des fenêtres Train caméra et ligne virtuelle
+        Met à jour la paramétrabilité des fenêtres Train caméra et ligne virtuelle.
 
         Parameters
         ----------
         application: `ini.InitialisationWindow`
-            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+            Instance source de l'application d'initialisation, (pour intérargir avec l'application).
         """
         # Récupère si le checkbutton est activé, le nom de la catégorie et des écrans à modifier
         is_checked = application.pages_list[0].page.findChild(QObject, "camera_check").property("is_checked")
@@ -607,12 +606,12 @@ class PageRB8:
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_ccs_checked(self, application):
         """Signal appelé lorsque le checkbutton camera_check est coché ou décoché.
-        Permet de mettre à jour la paramétrabilité des fenêtres TCO du PCC
+        Met à jour la paramétrabilité des fenêtres TCO du PCC.
 
         Parameters
         ----------
         application: `InitialisationWindow`
-            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+            Instance source de l'application d'initialisation, (pour intérargir avec l'application).
         """
         # Récupère si le checkbutton est activé, le nom de la catégorie et des écrans à modifier
         is_checked = application.pages_list[0].page.findChild(QObject, "ccs_check").property("is_checked")
@@ -629,12 +628,12 @@ class PageRB8:
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_data_checked(self, application):
         """Signal appelé lorsque le checkbutton camera_check est coché ou décoché.
-        Permet de mettre à jour la paramétrabilité des fenêtres des courbes de paramètres en direct
+        Met à jour la paramétrabilité des fenêtres des courbes de paramètres en direct.
 
         Parameters
         ----------
         application: `InitialisationWindow`
-            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+            Instance source de l'application d'initialisation, (pour intérargir avec l'application).
         """
         # Récupère si les données sont activées et si elles sont activées en mode dashboard
         is_data_checked = application.pages_list[0].page.findChild(QObject, "data_check").property("is_checked")
