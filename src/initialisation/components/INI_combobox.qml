@@ -150,10 +150,10 @@ Item {
         // Détecte lorsque le timer est arrivé à sa fin
         onTriggered: {
             // Réduit le temps restant de l'interval
-            time_left = timer.time_left - timer.period / 2.0
+            timer.time_left = timer.time_left - timer.period / 2.0
 
             // Si le temps de clignotement est inférieur à une demie période, change la période pour que le clignotement soit bon
-            period = Math.min(timer.period, timer.time * 2.0)
+            timer.period = Math.min(timer.period, timer.time_left * 2.0)
 
             // Si le temps est fini (< 0.1ms pour éviter les problèmes de float), remet les bordures originales et se réinitialise
             if(timer.time_left < 0.1){
