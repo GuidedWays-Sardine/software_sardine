@@ -160,6 +160,12 @@ Item {
                     y_input.clear()
                     width_input.clear()
                     height_input.clear()
+
+                    // Met les valeurs maximales à 0 pour ne pas que les composants soient éditables
+                    x_input.maximum_value = 0
+                    y_input.maximum_value = 0
+                    width_input.maximum_value = 0
+                    height_input.maximum_value = 0
                 }
                 // Cas où un écran a été sélectioné
                 else {
