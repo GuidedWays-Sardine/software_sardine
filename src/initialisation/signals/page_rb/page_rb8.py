@@ -303,13 +303,13 @@ class PageRB8:
             Traductions (clés = langue actuelle -> valeurs = nouvelle langue).
         """
         # Traduit le nom de la catégorie
-        self.page_button.setProperty("text", translations[self.page_button.property("text")])
+        translations.translate_widget_property(widget=self.page_button, property="text")
 
         # Change la traduction des différents textes de l'écran
-        self.page.setProperty("none_text", translations[self.page.property("none_text")])
-        self.page.setProperty("fullscreen_text", translations[self.page.property("fullscreen_text")])
-        self.page.setProperty("window_index_text", translations[self.page.property("window_index_text")])
-        self.page.setProperty("immersion_text", translations[self.page.property("immersion_text")])
+        translations.translate_widget_property(widget=self.page, property="none_text")
+        translations.translate_widget_property(widget=self.page, property="fullscreen_text")
+        translations.translate_widget_property(widget=self.page, property="window_index_text")
+        translations.translate_widget_property(widget=self.page, property="immersion_text")
 
         # Pour chaque catégories
         for category_key in list(self.windows_defaults):
