@@ -63,6 +63,9 @@ Item {
         while((screens_list.length - 1) < screens_size.length) {
             screens_list.push(screens_list.length.toString())
         }
+        // Met à jour la liste des écrans dans le combobox
+        // Ajouter des éléments dans la liste ne met pas à jour le composant
+        window_index_combo.elements = root.screens_list
     }
 
     //Valeurs dans le cas où la fenêtre doit avoir une taille minimale
