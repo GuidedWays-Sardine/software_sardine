@@ -22,7 +22,7 @@ Item {
     }
 
     //Informations et fonctions sur l'écran affiché et fonction pour mettre à jour l'encadré de paramètres
-    property var initial_settings: [] //Format [window_index, fullscreen_on_check, [x, y], [width, height]]
+    property var initial_settings: [] //Format [window_index, fullscreen_check, [x, y], [width, height]]
     onInitial_settingsChanged: {
         //Si au moins un argument a été donné, change la sélection pour l'écran sélectionné
         if(root.is_activable && initial_settings.length >= 1) {
@@ -30,7 +30,7 @@ Item {
 
             //Si un écran particulier a été sélectionné et que plus d'informations ont été données, change si l'écran est en plein écran
             if(window_index_combo.selection_index > 0 && initial_settings.length >= 2) {
-                fullscreen_on_check.is_checked = initial_settings[1]
+                fullscreen_check.is_checked = initial_settings[1]
 
                 //Si la fenêtre n'est pas en plein écran et que des données ont été fournis pour la position et la taille de l'écran
                 if(!initial_settings[1] && initial_settings.length >= 4 && initial_settings[2].length >= 2 && initial_settings[3].length >= 2){
@@ -71,13 +71,13 @@ Item {
 
     //Valeur à récupérer (les dimensions, la position, l'écran sélectionné)
     property int selected_window: window_index_combo.selection_index
-    property bool is_fullscreen: fullscreen_on_check.is_checked
+    property bool is_fullscreen: fullscreen_check.is_checked
     property int input_x: x_input.value
     property int input_y: y_input.value
     property int input_width: width_input.value
     property int input_height: height_input.value
 
-    // propriétés permettant de mettre à jour les différents texts communs de la page (ici que le texte du fullscreen_on_check)
+    // propriétés permettant de mettre à jour les différents texts communs de la page (ici que le texte du fullscreen_check)
     property string fullscreen_text: "Plein écran ?"
     property string window_index_text: "Index écran :"
     property string none_text: "Aucun"
@@ -146,7 +146,7 @@ Item {
                 //cas si l'écran est passé à aucun
                 if(window_index_combo.selection_text === window_index_combo.elements[0]) {
                     //décoche l'option fullscreen et remet à 0 les valeurs des input pour les dimensions de la fenêtre
-                    fullscreen_on_check.is_checked = false
+                    fullscreen_check.is_checked = false
                     x_input.clear()
                     y_input.clear()
                     width_input.clear()
@@ -168,8 +168,8 @@ Item {
                         root.screen_valid = false
                     }
 
-                    //Active la combobox plein écran si l'écran sélectionné est valide
-                    fullscreen_on_check.is_checked = root.screen_valid
+                    //Active le combobox plein écran si l'écran sélectionné est valide
+                    fullscreen_check.is_checked = root.screen_valid
                 }
             }
         }
@@ -177,7 +177,8 @@ Item {
 
         //Checkbutton pour savoir si l'écran sera en fullscreen
         INI_checkbutton {
-            id: fullscreen_on_check
+            id: fullscreen_check
+            objectName: "fullscreen_check"
 
             box_length: 16
             default_x: 396
@@ -245,7 +246,7 @@ Item {
             font_size: root.font_size 
 
             is_max_default: false
-            is_activable: root.screen_valid && window_index_combo.selection_index !== 0 && !fullscreen_on_check.is_checked
+            is_activable: root.screen_valid && window_index_combo.selection_index !== 0 && !fullscreen_check.is_checked
             is_positive: false
             is_visible: root.window_name != ""
 
@@ -274,7 +275,7 @@ Item {
             font_size: root.font_size 
 
             is_max_default: root.screen_valid && window_index_combo.selection_index !== 0
-            is_activable: root.screen_valid && window_index_combo.selection_index !== 0 && !fullscreen_on_check.is_checked
+            is_activable: root.screen_valid && window_index_combo.selection_index !== 0 && !fullscreen_check.is_checked
             is_positive: false
             is_visible: root.window_name != ""
         }
@@ -294,7 +295,7 @@ Item {
             font_size: root.font_size 
 
             is_max_default: root.screen_valid && window_index_combo.selection_index !== 0
-            is_activable: root.screen_valid && window_index_combo.selection_index !== 0 && !fullscreen_on_check.is_checked
+            is_activable: root.screen_valid && window_index_combo.selection_index !== 0 && !fullscreen_check.is_checked
             is_positive: false
             is_visible: root.window_name != ""
         }
