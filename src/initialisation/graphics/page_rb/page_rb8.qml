@@ -148,7 +148,19 @@ Item {
         }
     }
 
-            is_activable : page_rb8.windows_activable.length > real_index && page_rb8.window_name != "" ? page_rb8.windows_activable[real_index] : false
+    Repeater {
+        id: blank_panes
+
+        model: left_window_button.is_visible ? (4 - page_rb8.windows_name.length) : 0
+
+        INI_button {
+            default_x: 54
+            default_y: 15 + 40 + (4 - index - 1) * 76
+            default_width: 380 + 2 * 46
+            default_height: 76
+
+            is_positive: false
+            is_activable: false
         }
     }
 
