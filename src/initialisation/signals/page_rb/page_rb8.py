@@ -86,18 +86,18 @@ class PageRB8:
 
         # Passe sur chacun des écrans connectés à l'ordinateur et génère la fenêtre graphique associée
         self.screen_index_engine = QQmlApplicationEngine()
-        self.screen_index_windows = [QObject()] * len(vp.get_screens_informations())
+        self.screen_index_windows = [QObject()] * wm.screens_count()
         for screen_index in range(0, len(self.screen_index_windows)):
             # Charge une fenêtre d'index et mets le bon index et la place au bon endroit
             self.screen_index_engine.load(self.screen_index_file_path)
             self.screen_index_windows[screen_index] = self.screen_index_engine.rootObjects()[-1]
             self.screen_index_windows[screen_index].setProperty("index", screen_index + 1)
-            self.screen_index_windows[screen_index].setPosition(vp.get_screens_informations()[screen_index][0][0],
-                                                                vp.get_screens_informations()[screen_index][0][1])
+            self.screen_index_windows[screen_index].setPosition(wm.get_screen(screen_index + 1)[0][0],
+                                                                wm.get_screen(screen_index + 1)[0][1])
             self.screen_index_windows[screen_index].hide()
 
         # Envoie la dimension des fenêtre à la partie graphique de la page
-        self.page.setProperty("screens_size", [list(sd[1]) for sd in vp.get_screens_informations()])
+        self.page.setProperty("screens_size", [list(s_d[1]) for s_d in wm.screens_list()])
 
         # Pour chacun des fichiers dans le répertoire de paramètres d'écrans
         for file_path in (f for f in os.listdir(self.windows_settings_folder_path) if f.endswith(".screens")):
