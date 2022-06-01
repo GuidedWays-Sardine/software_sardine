@@ -26,7 +26,21 @@ Item {
     property string immersion_text: "Eteindre les écrans qui ne sont pas utilisés ?"
 
 
-    //fonction permettant de récupérer les différentes valeurs des pages
+    // Fonction permettant de récupérer un des objets windows_parameters (retourne même si le window_parameter n'est actuellement pas visible).
+    // Utile lors de l'initialisation pour connecter le clavier virtuel à chacun des sous composants.
+    function get_window_parameters_at(index) {
+        // Cas où l'index est valide (compris entre 0 et 3, retourne le bon élément
+        if (index >= 0 && index < 4) {
+            return windows.itemAt(index)
+        }
+        // Cas où l'index n'est pas valide (laisse un message d'erreur, None sera retourné)
+        else {
+            console.log(`Index envoyé pour récupérer le windows parameters invalide (0 <= ${index} <= 3 non satisfait).`)
+        }
+    }
+
+
+    // Fonction permettant de récupérer les différentes valeurs des pages
     function get_values() {
         var values = []
         
