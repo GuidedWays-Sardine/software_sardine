@@ -124,10 +124,11 @@ Item {
         id: windows
         objectName: "windows"
         
-        model : page_rb8.windows_name.length
+        model : 4
         
         Window_parameters {
-            //id: window
+            id: window_parameters
+            objectName: "window_parameters"
 
             // Propriété permetant d'inverser l'index pour charger les zones de paramètres dans le désordre
             // (pour ne pas cacher les bordures du combobox par le composant du dessous) mais pour charger les données dans le bon ordre
@@ -137,10 +138,15 @@ Item {
 
             screens_size: page_rb8.screens_size
 
-            window_name : page_rb8.windows_name.length > real_index ? windows_name[real_index].toString() : ""
-            minimum_width: page_rb8.minimum_wh.length > real_index && page_rb8.minimum_wh[real_index].length >= 2 ? page_rb8.minimum_wh[real_index][0] : 0
-            minimum_height: page_rb8.minimum_wh.length > real_index && page_rb8.minimum_wh[real_index].length >= 2 ? page_rb8.minimum_wh[real_index][1] : 0
-            initial_settings: page_rb8.initial_settings.length > real_index ? page_rb8.initial_settings[real_index] : []
+            window_name : real_index >= 0 && page_rb8.windows_name.length > real_index ? page_rb8.windows_name[real_index].toString() : ""
+            minimum_width: real_index >= 0 && page_rb8.minimum_wh.length > real_index && page_rb8.minimum_wh[real_index].length >= 2 ? page_rb8.minimum_wh[real_index][0] : 0
+            minimum_height: real_index >= 0 && page_rb8.minimum_wh.length > real_index && page_rb8.minimum_wh[real_index].length >= 2 ? page_rb8.minimum_wh[real_index][1] : 0
+            initial_settings: real_index >= 0 && page_rb8.initial_settings.length > real_index ? page_rb8.initial_settings[real_index] : []
+
+            is_activable: real_index >= 0 && page_rb8.window_name != "" && page_rb8.windows_activable.length > real_index ? page_rb8.windows_activable[real_index] : false
+            visible: real_index >= 0
+        }
+    }
 
             is_activable : page_rb8.windows_activable.length > real_index && page_rb8.window_name != "" ? page_rb8.windows_activable[real_index] : false
         }
