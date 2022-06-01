@@ -54,7 +54,7 @@ Item {
                          [window.selected_window,
                           window.is_fullscreen,
                           [window.input_x, window.input_y],
-                          [window.input_height, window.input_width]]])
+                          [window.input_width, window.input_height]]])
         }
         return values
     }
