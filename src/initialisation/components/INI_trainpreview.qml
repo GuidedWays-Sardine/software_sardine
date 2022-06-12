@@ -12,9 +12,12 @@ Item {
     // Propriétés sur la position et la taille du INI_trainpreview
     property double default_x: 0              // Position du INI_trainpreview pour les dimensions minimales de la fenêtre (w_min*h_min)
     property double default_y: 0
-    property double default_width: 640        // Dimensions du INI_train_preview pour les dimensions minimales de la fenêtre (w_min*h_min)
+    property double default_width: 640        // Dimensions du INI_trainpreview pour les dimensions minimales de la fenêtre (w_min*h_min)
     property double default_height: 40
     anchors.fill: parent
+
+    // Propriété sur le dossier dans lequel se situe les images (situé dans {PROJECT_dir/src/initialisation/assets/symbols/})
+    readonly property string symbols_path: "INI_trainpreview/"
 
     // Propriétés reliés au nombre d'éléments maximum visible dans chacune des divisions
     property int visible_count: 10
@@ -203,7 +206,7 @@ Item {
             default_height: root.default_height * 0.5
 
             image_activable: root.mission_list.length > button_index && root.position_list.length > button_index ?
-                             ("Train_preview/" + root.mission_list[button_index] + (root.prime_list.includes(button_index % (root.visible_count + 3)) ? "/empty/" : "/full/") + (is_dark_grey ? "dark_" : "") + "grey_" + root.position_list[button_index] + ".png") : ""
+                             (root.symbols_path + root.mission_list[button_index] + (root.prime_list.includes(button_index % (root.visible_count + 3)) ? "/empty/" : "/full/") + (is_dark_grey ? "dark_" : "") + "grey_" + root.position_list[button_index] + ".png") : ""
             image_not_activable: ""
             text: is_activable ? (button_index + 1).toString() : ""
             font_size: 8
