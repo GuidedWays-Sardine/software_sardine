@@ -106,12 +106,12 @@ Item {
         Rectangle {
             id: anchor_point
 
-            x: root.default_x * root.ratio
-            y: root.default_y * root.ratio
-            width: root.default_width * root.ratio
-            height root.default_height * root.ratio
+            x: root.x_offset + (root.default_x + 1 + root.is_positive) * root.ratio
+            y: root.y_offset + (root.default_y + 1 + root.is_positive) * root.ratio
+            width: (root.default_width - 2 - 2 * root.is_positive) * root.ratio
+            height: (root.default_height - 2 - 2 * root.is_positive) * root.ratio
 
-            // définit le rectangle comme transparent (utilisé uniquement pour correctement placer les images)
+            // Définit le rectangle comme transparent (utilisé uniquement pour correctement placer les images)
             border.width: 0
             border.color: "transparent"
             color: "transparent"
