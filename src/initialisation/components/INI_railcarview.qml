@@ -37,45 +37,51 @@ Item {
     visible: root.is_visible
     onIs_visibleChanged: { if (root.is_visible) { root.view_changed() } }
 
-    // Propriétés nécessaires à la configuration de la voiture centrale
-    property string central_railcar_mission: ""
-    property string central_railcar_position: "middle"
-    property bool central_railcar_left_bogie_axles_count: 0
-    onCentral_railcar_left_bogie_axles_countChanged: { if (root.central_railcar_left_bogie_axles_count <= 0) { root.central_railcar_left_bogie_jacob = false } }
-    property bool central_railcar_left_bogie_jacob: false
-    property int central_railcar_central_bogies_count: 0
-    onCentral_railcar_central_bogies_countChanged: { if (central_railcar_central_bogies_count % 2 != 1) { root.central_railcar_central_bogie_axles_count = 0 } }
-    property int central_railcar_central_bogie_axles_count: 0
-    property bool central_railcar_right_bogie_axles_count: 0
-    onCentral_railcar_right_bogie_axles_countChanged: { if (root.central_railcar_left_bogie_axles_count <= 0) { root.central_railcar_left_bogie_jacob = false } }
-    property bool central_railcar_right_bogie_jacob: false
-    property int doors_count: 0
+    // Propriétés sur la position de la voiture dans le train et comment celui-ci est visualisé dans le train_preview relié
+    // Permet de charger les intérieurs full/empty selon celles montrés dans les vignettes
+    readonly property var prime_list: [2, 3, 5, 7, 11, 13, 17]
+    property int railcar_count: 1
+    property int railcar_index: 0
+    property int train_preview_visible_count: 10
+
+    // Propriétés nécessaires à la configuration de la voiture actuellement paramétrée
+    property string current_railcar_mission: ""                 // Informations générales
+    property string current_railcar_position: "middle"
+
+    property int current_railcar_front_bogie_axles_count: 0     // Bogie avant (à gauche)
+    onCurrent_railcar_front_bogie_axles_countChanged: { if (root.current_railcar_front_bogie_axles_count <= 0) { root.current_railcar_front_bogie_jacob = false } }
+    property bool current_railcar_front_bogie_jacob: false
+    onCurrent_railcar_front_bogie_jacobChanged: { if (root.current_railcar_back_bogie_jacob) { root.previous_railcar_axles_count = 0 } }
+
+    property int current_railcar_middle_bogies_count: 0         // Bogies centraux
+    onCurrent_railcar_middle_bogies_countChanged: { if (current_railcar_middle_bogies_count % 2 != 1) { root.current_railcar_middle_bogie_axles_count = 0 } }
+    property int current_railcar_middle_bogie_axles_count: 0
+
+    property int current_railcar_back_bogie_axles_count: 0      // Bogie arrière (à droite)
+    onCurrent_railcar_back_bogie_axles_countChanged: { if (root.current_railcar_front_bogie_axles_count <= 0) { root.current_railcar_front_bogie_jacob = false } }
+    property bool current_railcar_back_bogie_jacob: false
+    onCurrent_railcar_back_bogie_jacobChanged: { if (root.current_railcar_back_bogie_jacob) { root.next_railcar_axles_count = 0 } }
+
+    property int doors_count: 0                                 // Autres informations sur la voiture actuelle
     property int levels_count: 0
     property int pantographs_count: 0
     property int thermics_count: 0
 
     // Propriétés nécessaires à la configuration de la voiture de gauche
-    property bool left_railcar: false
-    property string left_railcar_mission: ""
-    property string left_railcar_position: "middle"
-    // On ne considère pas les portes et l'intérieur, trop loins pour être visibles
-    readonly property bool left_railcar_bogie_jacob: root.central_railcar_left_bogie_jacob
-    onLeft_railcar_bogie_jacobChanged: { if (root.left_railcar_bogie_jacob) { root.left_railcar_bogie_axles_count = 0 } }
-    property int left_railcar_bogie_axles_count: 0
+    property string previous_railcar_mission: ""                // Informations générales
+    property string previous_railcar_position: "middle"
+
+    property int previous_railcar_axles_count: 0                // Informations sur le nombre de bogies de l'essieu arrière de la voiture précédente
+    onPrevious_railcar_axles_countChanged: { if (root.current_railcar_front_bogie_jacob) { root.previous_railcar_axles_count = 0 } }
+    // Les autres éléments ne sont pas visible (permet une simplification des images)
 
     // Propriétés nécessaires à la configuration de la voiture de droite
-    property bool right_railcar: false
-    property string right_railcar_mission: ""
-    property string right_railcar_position: "middle"
-    // On ne considère pas les portes et l'intérieur, trop loins pour être visibles
-    readonly property bool right_railcar_bogie_jacob: root.central_railcar_right_bogie_jacob
-    onRight_railcar_bogie_jacobChanged: { if (root.right_railcar_bogie_jacob) { root.right_railcar_bogie_axles_count = 0 } }
-    property int right_railcar_bogie_axles_count: 0
+    property string next_railcar_mission: ""                    // Informations générales
+    property string next_railcar_position: "middle"
 
-
-    // Chemin d'accès vers les icones utiles pour le INI_button
-    readonly property string symbols_path: "../assets/symbols/"
-    readonly property string sounds_path: "../assets/sounds/"
+    property int next_railcar_axles_count: 0
+    onNext_railcar_axles_countChanged: { if (root.current_railcar_back_bogie_jacob) { root.next_railcar_axles_count = 0 } }
+    // Les autres éléments ne sont pas visible (permet une simplification des images)
 
 
     // Signaux à surchager en QML ou en Python
