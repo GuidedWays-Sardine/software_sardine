@@ -118,7 +118,45 @@ Item {
         }
 
 
-        // voitures suivantes et précédentes
+        // Images pour les attelages
+        // Attelage entre la voiture précédente (à gauche) et actuelle (visible si la voiture paramétrée n'est pas la première)
+        Image {
+            id: previous_coupler
+
+            anchors.bottom: anchor_point.bottom
+            anchors.left: anchor_point.left
+            anchors.right: anchor_point.right
+            fillMode: Image.PreserveAspectFit
+
+            source: root.symbols_path + "previous_coupler.png"
+
+            visible: root.railcar_index != 0
+
+
+            // Appelé lorsque l'icone est cachée ou montrée
+            onVisibleChanged: root.view_changed()
+        }
+
+        // Attelage entre la voiture suivante (à droite) et actuelle (visible si la voiture paramétrée n'est pas la dernière)
+        Image {
+            id: next_coupler
+
+            anchors.bottom: anchor_point.bottom
+            anchors.left: anchor_point.left
+            anchors.right: anchor_point.right
+            fillMode: Image.PreserveAspectFit
+
+            source: root.symbols_path + "next_coupler.png"
+
+            visible: root.railcar_index < root.railcar_count - 1
+
+
+            // Appelé lorsque l'icone est cachée ou montrée
+            onVisibleChanged: root.view_changed()
+        }
+
+
+        // Voitures suivantes et précédentes
         // Image pour la voiture de gauche
         Image {
             id: left_railcar
