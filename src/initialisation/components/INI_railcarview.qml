@@ -20,6 +20,9 @@ Item {
     property double default_height: 132
     anchors.fill: parent
 
+    // Chemin d'accès vers les icones utiles pour les différentes images du INI_railcarview
+    readonly property string symbols_path: "../assets/symbols/INI_railcarview/"
+
     // Calcule la taille et position réelle du composant à partir des dimensions de la fenêtre (parent) et de la taille minimale de celle-ci
     readonly property int w_min: 640
     readonly property int h_min: 480
