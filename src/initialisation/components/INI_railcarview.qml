@@ -16,7 +16,7 @@ Item {
     // Propriétés liées à la position et à la taille du bouton
     property double default_x: 30             // Position du INI_railcarview pour les dimensions minimales de la fenêtre (w_min*h_min)
     property double default_y: 0
-    property double default_width: 580        // Dimensions du INI_railcar_view pour les dimensions minimales de la fenêtre (w_min*h_min)
+    property double default_width: 580        // Dimensions du INI_railcarview pour les dimensions minimales de la fenêtre (w_min*h_min)
     property double default_height: 132
     anchors.fill: parent
 
@@ -159,203 +159,256 @@ Item {
         // Voitures suivantes et précédentes
         // Image pour la voiture de gauche
         Image {
-            id: left_railcar
+            id: previous_railcar
 
             anchors.bottom: anchor_point.bottom
             anchors.left: anchor_point.left
             anchors.right: anchor_point.right
+            fillMode: Image.PreserveAspectFit
 
-            source: root.symbols_path + "Railcar_view/" +               // Chemin d'accès de vers toutes les images
-                    root.left_railcar_mission + "/left_railcar_" +      // Mission de la voiture de gauche et début du nom du fichier
-                    root.left_railcar_position + "_" +                  // Position de la voiture de gauche dans le train
-                    root.left_railcar_bogie_jacob ? "jacob_bogie.png" : // Cas où le bogie est jacobien fini le chemin correspondant
-                    (["without_bogie.png", "with_axle.png", "with_bogie"][Math.min(Math.max(root.left_railcar_bogie_axles_count, 0), 2)])
-                    // Sinon, charge selon le nombre d'essieux (0, 1 2+) (min_max pour rester dans les index correspondantts)
-
+            source: root.symbols_path +                                             // Chemin vers les images
+                    root.previous_railcar_mission + "/" +                           // Dossier selon la mission de la voiture précédente
+                    "Previous_railcar/previous_railcar_" +                          // Dossier de la voiture précédente
+                    root.previous_railcar_position + "_" +                          // Type de position de la voiture
+                    root.current_railcar_front_bogie_jacob ? "jacob_bogie.png" :    // Indique si le bogie est articulé
+                    (["no", "one", "two", "three", "more"][Math.min(root.previous_railcar_axles_count, 4)] + "_axles.png")
+                    // Sinon indique le nombre d'essieux dans le bogie
 
             // Visible si une voiture est envoyée et que son type est non vide
-            visible: root.is_visible && (root.left_railcar && root.left_railcar_mission != "")
+            visible: root.is_visible && (root.previous_railcar_exist && root.previous_railcar_mission != "")
 
 
+            // Appelé lorsque l'image visible change (même si l'image n'existe pas)
             onSourceChanged: { if(visible) { root.view_changed() } }
+
+            // Appelé lorsque l'icone est cachée ou montrée
+            onVisibleChanged: root.view_changed()
         }
 
         // Image pour la voiture de droite
         Image {
-            id: right_railcar
+            id: next_railcar
 
             anchors.bottom: anchor_point.bottom
             anchors.left: anchor_point.left
             anchors.right: anchor_point.right
+            fillMode: Image.PreserveAspectFit
 
-            source: root.symbols_path + "Railcar_view/" +                 // Chemin d'accès de vers toutes les images
-                    root.right_railcar_mission + "/right_railcar_" +      // Mission de la voiture de droite et début du nom du fichier
-                    root.right_railcar_position + "_" +                   // Position de la voiture de droite dans le train
-                    root.right_railcar_bogie_jacob ? "jacob_bogie.png" :  // Cas où le bogie est jacobien fini le chemin correspondant
-                    (["without_bogie.png", "with_axle.png", "with_bogie"][Math.min(Math.max(root.right_railcar_bogie_axles_count, 0), 2)])
-                    // Sinon, charge selon le nombre d'essieux (0, 1 2+) (min_max pour rester dans les index correspondantts)
-
+            source: root.symbols_path +                                             // Chemin vers les images
+                    root.next_railcar_mission + "/" +                               // Dossier selon la mission de la voiture suivante
+                    "Next_railcar/next_railcar_" +                                  // Dossier de la voiture suivante
+                    root.next_railcar_position + "_" +                              // Type de position de la voiture
+                    root.current_railcar_back_bogie_jacob ? "jacob_bogie.png" :     // Indique si le bogie est articulé
+                    (["no", "one", "two", "three", "more"][Math.min(root.previous_railcar_axles_count, 4)] + "_axles.png")
+                    // Sinon indique le nombre d'essieux dans le bogie
 
             // Visible si une voiture est envoyée et que son type est non vide
-            visible: root.is_visible && (root.left_railcar && root.left_railcar_mission != "")
+            visible: root.is_visible && (root.current_railcar_back_bogie_jacob && root.next_railcar_mission != "")
 
 
+            // Appelé lorsque l'image visible change (même si l'image n'existe pas)
             onSourceChanged: { if(visible) { root.view_changed() } }
+
+            // Appelé lorsque l'icone est cachée ou montrée
+            onVisibleChanged: root.view_changed()
         }
 
 
         // Structure de la voiture centrale
         // Image pour la structure supérieure de la voiture centrale
         Image {
-            id: central_railcar_top_structure
+            id: current_railcar_top_structure
 
             anchors.bottom: anchor_point.bottom
             anchors.left: anchor_point.left
             anchors.right: anchor_point.right
+            fillMode: Image.PreserveAspectFit
 
-            source: root.symbols_path + "Railcar_view/" +                 // Chemin d'accès vers toutes les images
-                    root.central_railcar_mission + "/" +                  // Mission de la voiture centrale
-                    root.central_railcar_position + "_top_structure.png"  // Position de la voiture dans le train et fin du fichier
+            source: root.symbols_path +                                             // Chemin vers les images
+                    root.current_railcar_mission + "/" +                            // Dossier selon la mission de la voiture centrale
+                    "Frame/Top/" +                                                  // Dossier de la structure supérieure
+                    root.current_railcar_position + "_top_structure.png"            // Position de la voiture dans le train et fin du fichier
 
-            visible: root.is_visible && (root.central_railcar_mission != "")
+            // Visible si une mission pour la voiture centrale a été envoyée
+            visible: root.is_visible && (root.current_railcar_mission != "")
 
 
+            // Appelé lorsque l'image visible change (même si l'image n'existe pas)
             onSourceChanged: { if(visible) { root.view_changed() } }
+
+            // Appelé lorsque l'icone est cachée ou montrée
+            onVisibleChanged: root.view_changed()
         }
 
         // Image pour l'emplacement bogie gauche
         Image {
-            id: central_railcar_left_bogie_structure
+            id: current_railcar_front_bogie_structure
 
             anchors.bottom: anchor_point.bottom
             anchors.left: anchor_point.left
             anchors.right: anchor_point.right
+            fillMode: Image.PreserveAspectFit
 
-            source: root.symbols_path + "Railcar_view/" +                 // Chemin d'accès vers toutes les images
-                    root.central_railcar_mission + "/" +                  // Mission de la voiture centrale
-                    root.central_railcar_left_bogie_jacob ? "jacob" :     // Cas où le bogie est jacobien, laisse une encoche sur le coin
-                    (root.central_railcar_left_bogie_axles_count > 0 ? "classic" : "no") +
-                    // Cas où le bogie n'est pas jacobien, vérifie s'il y en a un ou si ce côté de la rame est suspendue
-                    "_left_bogie.png"                                     // Fini le chemin d'accès
+            source: root.symbols_path +                                             // Chemin vers les images
+                    root.current_railcar_mission +                                  // Dossier selon la mission de la voiture centrale
+                    "/Frame/Front/front_" +                                         // Dossier de la structure inférieure avant (gauche)
+                    (root.current_railcar_front_bogie_jacob ? "jacob" :             // Indique si le bogie est articulé
+                    (root.current_railcar_front_bogie_axles_count > 0 ? "classic" : "no")) +
+                    // Sinon indique si le bogie est classique où s'il n'existe pas
+                    "_bogie.png"                                                    // Fin du fichier
 
+            // Visible si une mission pour la voiture centrale a été envoyée
+            visible: root.is_visible && (root.current_railcar_mission != "")
 
-            visible: root.is_visible && (root.central_railcar_mission != "")
-
-
+            // Appelé lorsque l'image visible change (même si l'image n'existe pas)
             onSourceChanged: { if(visible) { root.view_changed() } }
+
+            // Appelé lorsque l'icone est cachée ou montrée
+            onVisibleChanged: root.view_changed()
         }
 
         // Image pour l'emplacement bogie gauche
         Image {
-            id: central_railcar_central_bogie_structure
+            id: current_railcar_middle_bogie_structure
 
             anchors.bottom: anchor_point.bottom
             anchors.left: anchor_point.left
             anchors.right: anchor_point.right
+            fillMode: Image.PreserveAspectFit
 
-            source: root.symbols_path + "Railcar_view/" +                 // Chemin d'accès vers toutes les images
-                    root.central_railcar_mission + "/" +                  // Mission de la voiture centrale
-                    root.central_railcar_central_bogies_count <= 1 ? ["no", "one"][Math.max(root.central_railcar_central_bogies_count, 0)] :
+            source: root.symbols_path +                                             // Chemin vers les images
+                    root.current_railcar_mission +                                  // Dossier selon la mission de la voiture centrale
+                    "/Frame/Middle/middle_" +                                       // Dossier de la structure inférieure centrale
+                    (root.current_railcar_middle_bogies_count <= 1 ? ["no", "one"][Math.max(root.current_railcar_middle_bogies_count, 0)] :
                     // Cas où le nombre de bogies centraux vaut 0 ou 1, accède directement au bon bogie par index
-                    ["even", "odd"][root.central_railcar_central_bogies_count % 2] +
+                    ["even", "odd"][root.current_railcar_middle_bogies_count % 2]) +
                     // Sinon accède aux bogies paires ou impaires selon le reste de la division par 2
-                    "_central_bogie.png"                                  // Fini le chemin d'accès
+                    "_bogie.png"                                                    // Fin du fichier
 
-            visible: root.is_visible && (root.central_railcar_mission != "")
+            visible: root.is_visible && (root.current_railcar_mission != "")
 
 
+            // Appelé lorsque l'image visible change (même si l'image n'existe pas)
             onSourceChanged: { if(visible) { root.view_changed() } }
+
+            // Appelé lorsque l'icone est cachée ou montrée
+            onVisibleChanged: root.view_changed()
         }
 
-        // Image pour l'emplacement bogie droite
+        // Image pour l'emplacement bogie gauche
         Image {
-            id: central_railcar_right_bogie_structure
+            id: current_railcar_back_bogie_structure
 
             anchors.bottom: anchor_point.bottom
             anchors.left: anchor_point.left
             anchors.right: anchor_point.right
+            fillMode: Image.PreserveAspectFit
 
-            source: root.symbols_path + "Railcar_view/" +                 // Chemin d'accès vers toutes les images
-                    root.central_railcar_mission + "/" +                  // Mission de la voiture centrale
-                    root.central_railcar_right_bogie_jacob ? "jacob" :    // Cas où le bogie est jacobien, laisse une encoche sur le coin
-                    (root.central_railcar_right_bogie_axles_count > 0 ? "classic" : "no") +
-                    // Cas où le bogie n'est pas jacobien, vérifie s'il y en a un ou si ce côté de la rame est suspendue
-                    "_right_bogie.png"                                    // Fini le chemin d'accès
+            source: root.symbols_path +                                             // Chemin vers les images
+                    root.current_railcar_mission +                                  // Dossier selon la mission de la voiture centrale
+                    "/Frame/Back/back_" +                                           // Dossier de la structure inférieure arrière (droite)
+                    (root.current_railcar_back_bogie_jacob ? "jacob" :              // Indique si le bogie est articulé
+                    (root.current_railcar_back_bogie_axles_count > 0 ? "classic" : "no")) +
+                    // Sinon indique si le bogie est classique où s'il n'existe pas
+                    "_bogie.png"                                                    // Fin du fichier
+
+            // Visible si une mission pour la voiture centrale a été envoyée
+            visible: root.is_visible && (root.current_railcar_mission != "")
 
 
-            visible: root.is_visible && (root.central_railcar_mission != "")
-
-
+            // Appelé lorsque l'image visible change (même si l'image n'existe pas)
             onSourceChanged: { if(visible) { root.view_changed() } }
-        }
 
+            // Appelé lorsque l'icone est cachée ou montrée
+            onVisibleChanged: root.view_changed()
+        }
 
         // Bogies de la voiture centrale
         // Image pour le bogie de gauche
         Image {
-            id: central_railcar_left_bogie
+            id: current_railcar_front_bogie
 
             anchors.bottom: anchor_point.bottom
             anchors.left: anchor_point.left
             anchors.right: anchor_point.right
+            fillMode: Image.PreserveAspectFit
 
-            source: root.symbols_path + "Railcar_view/" +                 // Chemin d'accès vers toutes les images
-                    root.central_railcar_mission + "/front_" +            // Mission de la voiture centrale et début du nom du fichier
-                    root.central_railcar_left_bogie_jacob ? "jacob_" : "classic_" +
+            source: root.symbols_path +                                             // Chemin vers les images
+                    (root.current_railcar_front_bogie_jacob ? root.previous_railcar_mission : root.current_railcar_mission) +
+                    // Dossier selon la mission de la voiture centrale si bogie classic, sinon mission de la voiture précédente si articulé
+                    // Cela permet une cohérence lors du paramétrage d'un bogie articulé entre deux voitures de missions différentes
+                    "/Bogies/Front/front_" +                                        // Dossier du bogie avant (gauche)
+                    (root.current_railcar_front_bogie_jacob ? "jacob_" : "classic_") +
                     // Définit si le bogie est classique ou articulé
-                    ["one", "two", "three", "more"][Math.max(Math.min(root.central_railcar_left_bogie_axles_count, 4), 1) - 1] +
+                    ["one", "two", "three", "more"][Math.max(Math.min(root.current_railcar_front_bogie_axles_count, 4), 1) - 1] +
                     // Définit le nombre d'essieux sur le bogie
-                    "_axles.png"                                          // Fini le chemin d'accès
+                    "_axles.png"                                                    // Fin du fichier
+
+            // Visible si une mission pour la voiture centrale a été envoyée et qu'un bogie existe sur cet emplacement
+            visible: root.is_visible && (root.current_railcar_mission != "" && root.current_railcar_front_bogie_axles_count > 0)
 
 
-            visible: root.is_visible && (root.central_railcar_mission != "" && root.central_railcar_left_bogie_axles_count > 0)
-
-
+            // Appelé lorsque l'image visible change (même si l'image n'existe pas)
             onSourceChanged: { if(visible) { root.view_changed() } }
+
+            // Appelé lorsque l'icone est cachée ou montrée
+            onVisibleChanged: root.view_changed()
         }
 
         // Image pour le bogie centrale
         Image {
-            id: central_railcar_central_bogie
+            id: current_railcar_middle_bogie
 
             anchors.bottom: anchor_point.bottom
             anchors.left: anchor_point.left
             anchors.right: anchor_point.right
+            fillMode: Image.PreserveAspectFit
 
-            source: root.symbols_path + "Railcar_view/" +                 // Chemin d'accès vers toutes les images
-                    root.central_railcar_mission + "/front_" +            // Mission de la voiture centrale et début du nom du fichier
-                    ["one", "two", "three", "more"][Math.max(Math.min(root.central_railcar_central_bogie_axles_count, 4), 1) - 1] +
+            source: root.symbols_path +                                             // Chemin d'accès vers toutes les images
+                    root.current_railcar_mission +                                  // Dossier selon la mission de la voiture centrale
+                    "/Bogies/Middle/middle_" +                                      // Dossier du bogie central
+                    ["one", "two", "three", "more"][Math.max(Math.min(root.current_railcar_middle_bogie_axles_count, 4), 1) - 1] +
                     // Définit le nombre d'essieux sur le bogie
-                    "_axles.png"                                          // Fini le chemin d'accès
+                    "_axles.png"                                                    // Fin du fichier
+
+            // Visible si une mission valide a été fourni et que le nombre de bogies centraux est impaire
+            visible: root.is_visible && (root.current_railcar_mission != "" && root.current_railcar_middle_bogies_count > 0 && root.current_railcar_middle_bogies_count % 2 == 1)
 
 
-            visible: root.is_visible && (root.central_railcar_mission != "" && root.central_railcar_central_bogies_count > 0 && root.central_railcar_central_bogies_count % 2 == 1)
-
-
+            // Appelé lorsque l'image visible change (même si l'image n'existe pas)
             onSourceChanged: { if(visible) { root.view_changed() } }
+
+            // Appelé lorsque l'icone est cachée ou montrée
+            onVisibleChanged: root.view_changed()
         }
 
         // Image pour le bogie de droite
         Image {
-            id: central_railcar_right_bogie
+            id: current_railcar_back_bogie
 
             anchors.bottom: anchor_point.bottom
             anchors.left: anchor_point.left
             anchors.right: anchor_point.right
+            fillMode: Image.PreserveAspectFit
 
-            source: root.symbols_path + "Railcar_view/" +                 // Chemin d'accès vers toutes les images
-                    root.central_railcar_mission + "/front_" +            // Mission de la voiture centrale et début du nom du fichier
-                    root.central_railcar_right_bogie_jacob ? "jacob_" : "classic_" +
+            source: root.symbols_path +                                             // Chemin vers les images
+                    root.current_railcar_mission +                                  // Dossier selon la mission de la voiture centrale
+                    "/Bogies/Back/back_" +                                          // Dossier du bogie avant (gauche)
+                    (root.current_railcar_back_bogie_jacob ? "jacob_" : "classic_") +
                     // Définit si le bogie est classique ou articulé
-                    ["one", "two", "three", "more"][Math.max(Math.min(root.central_railcar_right_bogie_axles_count, 4), 1) - 1] +
+                    ["one", "two", "three", "more"][Math.max(Math.min(root.current_railcar_back_bogie_axles_count, 4), 1) - 1] +
                     // Définit le nombre d'essieux sur le bogie
-                    "_axles.png"                                          // Fini le chemin d'accès
+                    "_axles.png"                                                    // Fin du fichier
+
+            // Visible si une mission pour la voiture centrale a été envoyée et qu'un bogie existe sur cet emplacement
+            visible: root.is_visible && (root.current_railcar_mission != "" && root.current_railcar_front_bogie_axles_count > 0)
 
 
-            visible: root.is_visible && (root.central_railcar_mission != "" && root.central_railcar_right_bogie_axles_count > 0)
-
-
+            // Appelé lorsque l'image visible change (même si l'image n'existe pas)
             onSourceChanged: { if(visible) { root.view_changed() } }
+
+            // Appelé lorsque l'icone est cachée ou montrée
+            onVisibleChanged: root.view_changed()
         }
 
 
@@ -367,17 +420,22 @@ Item {
             anchors.bottom: anchor_point.bottom
             anchors.left: anchor_point.left
             anchors.right: anchor_point.right
+            fillMode: Image.PreserveAspectFit
 
-            source: root.symbols_path + "Railcar_view/" +                 // Chemin d'accès vers toutes les images
-                    root.central_railcar_mission + "/" +                  // Mission de la voiture centrale
-                    root.central_railcar_position + "_"                   // Position de la voiture dans le train
-                    root.doors_count.toString() + "_doors.png"            // Indication du nombre de portes et fini le chemin du fichier
+            source: root.symbols_path +                                         // Chemin vers les images
+                    root.current_railcar_mission + "/" +                        // Dossier selon la mission de la voiture centrale
+                    root.current_railcar_position + "_" +                       // Position de la voiture dans le train
+                    root.doors_count.toString() + "_doors.png"                  // Indication du nombre de portes et fin du fichier
+
+            // Visible si une mission pour la voiture centrale a été envoyée et que le nombre de porte est positif
+            visible: root.is_visible && (root.current_railcar_mission != "" && root.doors_count > 0)
 
 
-            visible: root.is_visible && (root.central_railcar_mission != "" && root.doors_count > 0)
-
-
+            // Appelé lorsque l'image visible change (même si l'image n'existe pas)
             onSourceChanged: { if(visible) { root.view_changed() } }
+
+            // Appelé lorsque l'icone est cachée ou montrée
+            onVisibleChanged: root.view_changed()
         }
 
         // Intérieur
@@ -387,61 +445,76 @@ Item {
             anchors.bottom: anchor_point.bottom
             anchors.left: anchor_point.left
             anchors.right: anchor_point.right
+            fillMode: Image.PreserveAspectFit
 
-            source: root.symbols_path + "Railcar_view/" +                 // Chemin d'accès vers toutes les images
-                    root.central_railcar_mission + "/" +                  // Mission de la voiture centrale
-                    root.central_railcar_position + "_"                   // Position de la voiture dans le train
-                    root.doors_count.toString() + "_doors_" +             // Indication du nombre de portes
-                    root.levels_count.toString() + "_levels.png"          // Indication du nombre de niveaux et fini le chemin du fichier
+            source: root.symbols_path +                                             // Chemin vers les images
+                    root.current_railcar_mission + "/" +                            // Dossier selon la mossion de la voiture centrale
+                    root.current_railcar_position + "_" +                           // Position de la voiture dans le train
+                    root.doors_count.toString() + "_doors_" +                       // Indication du nombre de portes
+                    root.levels_count.toString() + "_levels.png"                    // Indication du nombre de niveaux et fin du fichier
+
+            // Visible si une mission pour la voiture centrale a été envoyée et que le nombre de porte et de niveaux est positif
+            visible: root.is_visible && (root.current_railcar_mission != "" && root.doors_count >= 0 && root.levels_count >= 0)
 
 
-            visible: root.is_visible && (root.central_railcar_mission != "" && root.doors_count >= 0 && root.levels_count >= 0)
-
-
+            // Appelé lorsque l'image visible change (même si l'image n'existe pas)
             onSourceChanged: { if(visible) { root.view_changed() } }
+
+            // Appelé lorsque l'icone est cachée ou montrée
+            onVisibleChanged: root.view_changed()
         }
 
 
         // Systèmes d'alimentations électriques et combustibles
         // Pantographes
         Image {
-            id: interior
+            id: pantograph
 
             anchors.bottom: anchor_point.bottom
             anchors.left: anchor_point.left
             anchors.right: anchor_point.right
+            fillMode: Image.PreserveAspectFit
 
-            source: root.symbols_path + "Railcar_view/" +                 // Chemin d'accès vers toutes les images
-                    root.central_railcar_mission + "/" +                  // Mission de la voiture centrale
-                    root.central_railcar_position + "_"                   // Position de la voiture dans le train
+            source: root.symbols_path +                                             // Chemin vers les images
+                    root.current_railcar_mission + "/" +                            // Dossier selon la mission de la voiture centrale
+                    root.current_railcar_position + "_"                             // Position de la voiture dans le train
                     ["one", "two", "more"][Math.max(Math.min(root.pantographs_count, 3),1) - 1] +
-                    // Indique le nombre de pantographes (1, 2 3+)
-                    "_pantographs.png"                                    // Fini le chemin du fichier
+                    // Indique le nombre de pantographes (1, 2, 3+)
+                    "_pantographs.png"                                              // Fin du fichier
+
+            // Visible si une mission pour la voiture centrale a été envoyée et que le nombre de pantographes est strictement positif
+            visible: root.is_visible && (root.current_railcar_mission != "" && root.pantographs_count > 0)
 
 
-            visible: root.is_visible && (root.central_railcar_mission != "" && root.pantographs_count > 0)
-
-
+            // Appelé lorsque l'image visible change (même si l'image n'existe pas)
             onSourceChanged: { if(visible) { root.view_changed() } }
+
+            // Appelé lorsque l'icone est cachée ou montrée
+            onVisibleChanged: root.view_changed()
         }
 
         // Thermiques
         Image {
-            id: interior
+            id: thermic
 
             anchors.bottom: anchor_point.bottom
             anchors.left: anchor_point.left
             anchors.right: anchor_point.right
+            fillMode: Image.PreserveAspectFit
 
-            source: root.symbols_path + "Railcar_view/" +                 // Chemin d'accès vers toutes les images
-                    root.central_railcar_mission + "/" +                  // Mission de la voiture centrale
-                    root.central_railcar_position + "_thermic.png"        // Position de la voiture dans le train et fini le fichier
+            source: root.symbols_path +                                                 // Chemin vers les images
+                    root.current_railcar_mission + "/" +                                // Dossier selon la mission de la voiture centrale
+                    root.current_railcar_position + "_thermic.png"                      // Position de la voiture dans le train et fin du fichier
+
+            // Visible si une mission pour la voiture centrale a été envoyée et que le nombre de systèmes thermiques est positif
+            visible: root.is_visible && (root.current_railcar_mission != "" && root.thermics_count > 0)
 
 
-            visible: root.is_visible && (root.central_railcar_mission != "" && root.thermics_count > 0)
-
-
+            // Appelé lorsque l'image visible change (même si l'image n'existe pas)
             onSourceChanged: { if(visible) { root.view_changed() } }
+
+            // Appelé lorsque l'icone est cachée ou montrée
+            onVisibleChanged: root.view_changed()
         }
     }
 }
