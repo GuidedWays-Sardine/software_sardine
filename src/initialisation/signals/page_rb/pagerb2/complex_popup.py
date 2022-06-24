@@ -23,7 +23,7 @@ import src.initialisation.signals.page_rb.page_rb2 as prb2
 class ComplexPopup:
     """classe contenant toutes les fonctions pour la page de paramètre train en mode complexe"""
 
-    # Eléments nécessaires au fonctionnement de la popup
+    # Eléments nécessaires au fonctionnement du popup
     loaded = False
     app = None
     engine = None
@@ -35,11 +35,11 @@ class ComplexPopup:
     # Stocke la page parent
     parent = None
 
-    # Constantes sur les emplacements des différents fichiers et dossiers nécessaires au fonctionement de la popup
+    # Constantes sur les emplacements des différents fichiers et dossiers nécessaires au fonctionement du popup
     graphic_file_path = f"{PROJECT_DIR}src\\initialisation\\graphics\\page_rb\\page_rb2\\complex_popup.qml"
 
     def __init__(self, page_rb):
-        """Fonction d'initialisation de la popup de paramétrage complexe train (reliée à la page_rb2)
+        """Fonction d'initialisation du popup de paramétrage complexe train (reliée à la page_rb2)
 
         Parameters
         ----------
@@ -49,13 +49,14 @@ class ComplexPopup:
         Raises
         ------
         FileNotFoundError
-            Soulevé quand le fichier .qml de la fenêtre d'initialisation n'est pas trouvé
+            Jetée quand le fichier .qml de la fenêtre d'initialisation n'est pas trouvé
         SyntaxError
-            Soulevé quand le fichier .qml de la fenêtre d'initialisation a une erreur de syntaxe et n'est pas lisible
+            Jetée quand le fichier .qml de la fenêtre d'initialisation a une erreur de syntaxe et n'est pas lisible
         """
-        log.change_log_prefix("Initialisation popup train")
+        initial_time = time.perf_counter()
+        log.info("Chargement du popup paramétrage train complexe.")
 
-        # Initialise la popup de paramétrage complexe
+        # Initialise le popup de paramétrage complexe
         self.engine = QQmlApplicationEngine()
         self.engine.load(self.graphic_file_path)
 
@@ -67,7 +68,7 @@ class ComplexPopup:
             # Récupère le bouton des modes, le rend activable et le connecte à sa fonction
             self.win.closed.connect(lambda: self.win.hide())
 
-            # Connecte tous les boutons nécessaires au fonctionnement de la popup de paramétrage complex
+            # Connecte tous les boutons nécessaires au fonctionnement du popup de paramétrage complex
             self.parent = page_rb
             self.win.findChild(QObject, "generate_button").clicked.connect(self.on_complex_generate_clicked)
             self.win.railcar_changed.connect(self.on_railcar_changed)
@@ -76,23 +77,23 @@ class ComplexPopup:
             # Indique les choix de matériel roulant et de positions possible
             self.win.setProperty("positions_type", [key.value for key in tdb.Position])
             self.win.setProperty("missions_type", [key.value for key in tdb.Mission])
-            # Feature : rajouter le nombre maximum de portes et de niveaux pour les différents systèmes
+            # ENHANCE : rajouter le nombre maximum de portes et de niveaux pour les différents systèmes
             self.win.setProperty("max_doors_list", [0 if key == tdb.Mission.FREIGHT else
                                                     4 for key in tdb.Mission])
-            self.win.setProperty("max_levels_list", [2 if key == tdb.Mission.PASSENGER else
+            self.win.setProperty("max_levels_list", [2 if key == tdb.Mission.PASSENGERS else
                                                      0 if key == tdb.Mission.FREIGHT else
                                                      1 for key in tdb.Mission])
 
             # Indique que la fenêtre est complètement
             self.loaded = True
-            log.info("Chargement de la popup de paramétrage complexe réussi avec succès.")
-            log.change_log_prefix("Initialisation")
+            log.info("Chargement du popup de paramétrage complexe en" +
+                     f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.")
         else:
             # Sinon laisse un message de warning selon si le fichier est introuvable ou contient des erreurs
             if os.path.isfile(self.graphic_file_path):
-                raise SyntaxError(f"le fichier graphique de la popup complexe contient des erreurs.\n\t{self.graphic_file_path}")
+                raise SyntaxError(f"le fichier graphique du popup complexe contient des erreurs.\n\t{self.graphic_file_path}")
             else:  # Cas où le fichier n'existe pas
-                raise FileNotFoundError(f"Le fichier graphique de la popup complexe n'a pas été trouvé.\n\t{self.graphic_file_path}")
+                raise FileNotFoundError(f"Le fichier graphique du popup complexe n'a pas été trouvé.\n\t{self.graphic_file_path}")
 
     @decorators.QtSignal(log_level=log.Level.ERROR, end_process=False)
     def on_complex_generate_clicked(self):
@@ -103,7 +104,7 @@ class ComplexPopup:
             self.train_database = tdb.TrainDatabase(simple_parameters)
         except Exception as error:
             # S'il y a une erreur, laisse un message d'erreur et désactive le mode complexe
-            log.error("Impossible de correctement générer le train, mode complexe désactivé.\n",
+            log.error("Impossible de générer le train, mode complexe désactivé.\n",
                       exception=error, prefix="Génération train complexe")
             self.win.hide()
             self.win.setProperty("generated", False)
@@ -131,7 +132,7 @@ class ComplexPopup:
             self.update_popup(0)
 
     def update_constants(self, train_settings):
-        """Fonction permettant de mettre à jour les différentes constantes de la popup complexe
+        """Fonction permettant de mettre à jour les différentes constantes du popup complexe
 
         Parameters
         ----------
@@ -174,7 +175,7 @@ class ComplexPopup:
         Returns
         -------
         train_parameters: `sd.SettingsDictionary`
-            Dictionaire de paramètre avec tous les paramètres complexes du train, vide si aucun train initialisé
+            Dictionnaire de paramètre avec tous les paramètres complexes du train, vide si aucun train initialisé
         """
         if self.train_database:
             return self.train_database.get_settings()
@@ -187,7 +188,7 @@ class ComplexPopup:
         Parameters
         ----------
         train_parameters: `sd.SettingsDictionary`
-            Dictionaire contenant toutes les données complexes du train
+            Dictionnaire contenant toutes les données complexes du train
         """
         try:
             self.train_database = tdb.TrainDatabase(train_parameters)
@@ -227,7 +228,7 @@ class ComplexPopup:
 
     @decorators.QtSignal(log_level=log.Level.WARNING, end_process=False)
     def on_railcar_changed(self):
-        """signal appelé lorsque la voiture paramétrée dans la popup complexe a changée.
+        """signal appelé lorsque la voiture paramétrée dans le popup complexe a changée.
         Récupère les données du popup, les changent dans la base de données et met à jour le popup et page de paramètres
         """
         # Récupère d'abord les index de la voiture à décharger et de celle à charger
@@ -237,13 +238,13 @@ class ComplexPopup:
         # Appelle d'abord la fonction pour mettre à jour la base de données avec les données visibles
         self.update_database(previous_railcar_index)
 
-        # Appelle ensuite la fonction pour mettre à jour la popup avec les nouvelles données
+        # Appelle ensuite la fonction pour mettre à jour le popup avec les nouvelles données
         self.update_popup(current_railcar_index)
 
         # FEATURE : aussi mettre à jour les données simple (pour rendre le truc plus dynamique et correct)
 
     def update_database(self, railcar_index):
-        """Fonction permettant de récupérer les valeurs de la popup et de les stoquer dans la base de données
+        """Fonction permettant de récupérer les valeurs du popup et de les stoquer dans la base de données
         Attention, l'appel de cette fonction écrase les données de la voiture paramétrée
 
         Parameters
@@ -265,7 +266,7 @@ class ComplexPopup:
                                                                                      parameters[9], parameters[10])
 
         # S'occupe du bogie avant
-        # Récupère les données du bogie sur la popup complexe
+        # Récupère les données du bogie sur le popup complexe
         front_bogie_data = self.win.findChild(QObject, "front_bogie").get_values().toVariant()
         # Si les données sont vides ou que articulé est désactivé :
         if not front_bogie_data or not front_bogie_data[4]:
@@ -322,7 +323,7 @@ class ComplexPopup:
             self.train_database.systems.traction.remove_bogie(middle_bogies[r_i], self.train_database)
 
         # S'occupe du bogie arrière (très similairement au bogie avant)
-        # Récupère les données du bogie sur la popup complexe
+        # Récupère les données du bogie sur le popup complexe
         back_bogie_data = self.win.findChild(QObject, "back_bogie").get_values().toVariant()
         # Si les données sont vides ou que articulé est désactivé :
         if not back_bogie_data or not back_bogie_data[4]:
@@ -354,8 +355,8 @@ class ComplexPopup:
             self.train_database.systems.braking.modify_brakes_count(back_bogie[0], back_modify_brakes)
 
     def update_popup(self, index):
-        """Fonction permettant de récupérer les valeurs de la base de données et de les mettre sur la popup
-        Attention, l'appel de cette fonction écrase les données visibles sur la popup de paramétrage complexe
+        """Fonction permettant de récupérer les valeurs de la base de données et de les mettre sur le popup
+        Attention, l'appel de cette fonction écrase les données visibles sur le popup de paramétrage complexe
 
         Parameters
         ----------
