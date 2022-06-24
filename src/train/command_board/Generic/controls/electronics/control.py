@@ -20,7 +20,7 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.log as log
 import src.misc.settings_dictionary as sd
-import src.train.train_database.database as tdb
+import src.train.train_database as tdb
 import src.train.command_board.Generic.actions.actions as actions
 import src.train.command_board.Generic.default_components.components as components
 
