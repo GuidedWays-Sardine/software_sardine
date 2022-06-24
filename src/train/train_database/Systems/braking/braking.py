@@ -32,7 +32,7 @@ class Braking:
         Parameters
         ----------
         train_settings: `sd.SettingsDictionary`
-            Dictionaire de paramètres train
+            Dictionnaire de paramètres train
         """
         # Récupère les valeurs pour le freinage rhéostatique et par régénération
         self.regenerative_activated = train_settings.get_value("regenerative", False)
@@ -178,7 +178,7 @@ class Braking:
             for _ in range(abs(brakes_count)):
                 self.get_brake_list(brakes_type).append(brakes_type(bogie, brakes_parameters))
         except TypeError as error:
-            log.debug(f"Impossible de rajouter le système de freinage envoyé ({brakes_type}).", exception=error)
+            log.warning(f"Impossible de rajouter le système de freinage envoyé ({brakes_type}).", exception=error)
 
     def remove_brakes(self, bogie, brakes_type, brakes_count=1):
         """fonction permettant d'enlever un certain nombre de systèmes de freinage spécifiques
@@ -197,8 +197,8 @@ class Braking:
 
         # Laisse un message de debug si l'utilisateur essaye d'enlever plus de systèmes de freinages que ce qu'il y a
         if brakes_count > bogies_brakes_count:
-            log.debug(f"Pas suffisament de systèmes de freinages à enlever ({brakes_count} > {bogies_brakes_count})." +
-                      f" Nombre de systèmes de freinage remis à 0.")
+            log.debug(f"Pas suffisament de systèmes de freinages à enlever ({brakes_count} > {bogies_brakes_count}). " +
+                      f"Nombre de systèmes de freinage remis à 0.")
 
         # Enlève autant de systèmes de freinaque de demandés (tous si pas suffisant)
         for _ in range(min(bogies_brakes_count, abs(brakes_count))):
