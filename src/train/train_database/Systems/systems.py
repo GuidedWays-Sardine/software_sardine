@@ -8,7 +8,7 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 
 import src.misc.log as log
 import src.misc.settings_dictionary as sd
-import src.train.train_database.database as tdb
+import src.train.train_database as tdb
 import src.train.train_database.Systems.frame.frame as frame
 import src.train.train_database.Systems.electric.electric as electric
 import src.train.train_database.Systems.traction.traction as traction
@@ -17,7 +17,7 @@ import src.train.train_database.Systems.braking.braking as braking
 
 
 class Systems:
-    """Classe permettant le fonctionnemetn des différents systèmes du train"""
+    """Classe permettant le fonctionnement des différents systèmes du train"""
     # Liste de tous les systèmes nécessaires au fonctionnement du train
     # Les systèmes sont initialisés plus bas pour éviter une copie (due à la mutabilité des classes et listes)
     frame = None
@@ -159,7 +159,7 @@ class Systems:
         bonus_brakes = [train_settings[f"{b_s}_brakes_count"] - (average_brakes[i] * train_settings["bogies_count"]) for i, b_s in enumerate(["pad", "disk", "magnetic", "foucault"])]
 
         # Récupère les paramètres nécessaires pour chacun des systèmes de freinage
-        # Ces informations proviennent de la popup de freinage et sont enregistrés dans train_data
+        # Ces informations proviennent du popup de freinage et sont enregistrés dans train_data
         brakes_parameters = [None,
                              None,
                              None,
@@ -197,7 +197,7 @@ class Systems:
         next_bogies_count = train_settings["bogies_count"]
 
         # stocke dans une varible temporaire la mission générale du train (pour simplifier sa lecture
-        general_mission = tdb.Mission[str(train_settings.get_value("mission", "Mission.PASSENGER"))[8:]]
+        general_mission = tdb.Mission[str(train_settings.get_value("mission", "Mission.PASSENGERS"))[8:]]
 
         # Passe par chacune des voitures du train
         for car_index in range(train_settings["railcars_count"]):

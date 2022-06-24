@@ -68,7 +68,7 @@ class Magnetic:
         Returns
         -------
         settings_dictionary: `sd.SettingsDictionary`
-            dictionaire des paramètres avec tous les paramètres techniques du système de freinage magnétique.
+            dictionnaire des paramètres avec tous les paramètres techniques du système de freinage magnétique.
         """
         parameters = sd.SettingsDictionary()
         prefix = f"bogie{list_index}.magnetic"

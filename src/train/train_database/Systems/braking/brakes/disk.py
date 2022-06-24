@@ -70,7 +70,7 @@ class Disk:
         Returns
         -------
         settings_dictionary: `sd.SettingsDictionary`
-            dictionaire des paramètres avec tous les paramètres techniques du système de freinage par disque.
+            dictionnaire des paramètres avec tous les paramètres techniques du système de freinage par disque.
         """
         parameters = sd.SettingsDictionary()
         prefix = f"bogie{list_index}.disk"

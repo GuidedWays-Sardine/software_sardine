@@ -70,7 +70,7 @@ class Pad:
         Returns
         -------
         settings_dictionary: `sd.SettingsDictionary`
-            dictionaire des paramètres avec tous les paramètres techniques du système de freinage par semelle.
+            dictionnaire des paramètres avec tous les paramètres techniques du système de freinage par semelle.
         """
         parameters = sd.SettingsDictionary()
         prefix = f"bogie{list_index}.pad"

@@ -7,7 +7,7 @@ import os
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.settings_dictionary as sd
-import src.train.train_database.database as tdb
+import src.train.train_database as tdb
 
 
 class Railcar:
@@ -157,7 +157,7 @@ class Railcar:
         Returns
         -------
         settings_dictionary: `sd.SettingsDictionary`
-            dictionaire des paramètres avec tous les paramètres de la voiture
+            dictionnaire des paramètres avec tous les paramètres de la voiture
         """
         parameters = sd.SettingsDictionary()
         prefix = f"railcar{self.position_index}"      # stocke dans une variable compacte l'index de la voiture

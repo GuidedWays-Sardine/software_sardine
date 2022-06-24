@@ -86,7 +86,7 @@ class Frame:
         Returns
         -------
         settings_dictionary: `sd.SettingsDictionary`
-            dictionaire des paramètres avec tous les paramètres de toutes les voitures du train
+            dictionnaire des paramètres avec tous les paramètres de toutes les voitures du train
         """
         parameters = sd.SettingsDictionary()
 
