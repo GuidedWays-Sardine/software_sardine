@@ -237,14 +237,14 @@ Item {
                 // mets à jour la liste des images et remet l'image visible
                 var index = position_switch.selection_index
                 if(mission_combo.selection_index != -1 && root.missions_type.length > mission_combo.selection_index) {
-                    position_switch.elements = [("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_front.png"),
-                                                ("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_middle.png"),
-                                                ("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_back.png")]
+                    position_switch.elements = [("INI_trainpreview/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_front.png"),
+                                                ("INI_trainpreview/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_middle.png"),
+                                                ("INI_trainpreview/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_back.png")]
                     position_switch.change_selection(index)
                 }
             }
 
-            // Signal appelé lorsque la combobox est fermée
+            // Signal appelé lorsque le combobox est fermée
             onCombobox_closed: {
                 // Appelle le signal pour mettre à jour l'icone
                 root.update_icon()
@@ -275,9 +275,9 @@ Item {
                 // mets à jour la liste des images et remet l'image visible
                 var index = position_switch.selection_index
                 if(mission_combo.selection_index != -1 && root.missions_type.length > mission_combo.selection_index) {
-                    position_switch.elements = [("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_front.png"),
-                                                ("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_middle.png"),
-                                                ("Train_icons/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_back.png")]
+                    position_switch.elements = [("INI_trainpreview/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_front.png"),
+                                                ("INI_trainpreview/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_middle.png"),
+                                                ("INI_trainpreview/" + root.missions_type[mission_combo.selection_index] + "/full/" + (position_switch.is_activable ? "" : "dark_") + "grey_back.png")]
                     position_switch.change_selection(index)
                 }
             }
