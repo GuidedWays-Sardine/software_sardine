@@ -246,7 +246,7 @@ Item{
         // Cas où la valeur minimale est supérieure à la valeur maximale
         if(root.minimum_value > root.maximum_value){
             // Change la borne maximale pour être identique à la nouvelle borne minimale
-            console.log(`Nouvelle limite inférieure pour le INI_integerinput : \"${root.objectName}\" trop grande (min : ${validator.bottom} > ${validator.top} : max)`)
+            console.log(`Nouvelle limite inférieure pour le INI_integerinput : \"${root.objectName}\" trop grande (min : ${root.minimum_value}(SI) > ${root.maximum_value}(SI) : max)`)
             root.maximum_value = root.minimum_value
 
             // Change la valeur pour qu'elle reste dans les bornes
@@ -273,7 +273,7 @@ Item{
         // Cas où la valeur maximale est inférieure à la valeur minimale
         if(root.maximum_value < root.minimum_value){
             // Change la borne minimale pour être identique à la nouvelle borne maximale
-            console.log(`Nouvelle limite supérieure pour le INI_integerinput : \"${root.objectName}\" trop faible (max : ${validator.top} < ${validator.bottom} : min)`)
+            console.log(`Nouvelle limite supérieure pour le INI_integerinput : \"${root.objectName}\" trop faible (max : ${root.maximum_value}(SI) < ${root.minimum_value}(SI) : min)`)
             root.minimum_value = root.maximum_value
 
             // Change la valeur pour qu'elle reste dans les bornes
