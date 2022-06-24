@@ -42,15 +42,17 @@ class TrainDatabase:
     systems = None
 
     def __init__(self, train_settings):
-        """Fonction d'initialisation de la abse de données train
+        """Initialise la base de données train complexe (avec un train complexe ou simple).
 
         Parameters
         ----------
         train_settings: `sd.SettingsDictionary`
-            Dictionaire de paramètres train
+            Dictionnaire de paramètres train.
         """
         initial_time = time.perf_counter()
-        log.info("Initialisation Base de Données train", prefix="Initialisation BDD train")
+        current_prefix = log.get_log_prefix()
+        log.change_log_prefix("Génération train complexe")
+        log.info("Génération d'un train complexe.")
 
         # Initialise chacun des types de données (dynamiques, statiques, et systèmes)
         self.dynamic = dynamic.Dynamic(train_settings)
@@ -63,10 +65,12 @@ class TrainDatabase:
         log.change_log_prefix(current_prefix)
 
     def get_settings(self):
-        """Fonction permettant de récupérer tous les paramètres du train
+        """Récupère tous les paramètres du train et les convertit en dictionnaire de paramètres.
 
-        Returns: `sd.SettingsDictionary`
-            Tous les paramètres du train
+        Returns
+        -------
+        train_settings: `sd.SettingsDictionary`
+            Dictionnaire de paramètresdu train.
         """
         parameters = sd.SettingsDictionary()
 
@@ -77,18 +81,22 @@ class TrainDatabase:
         return parameters
 
     def get_graph_value(self, key):
-        """Fonction permettant d'obtenir une donnée en fonction de sa clé.
-        Utilisé pour le module de visualisation des données
+        """Obtient la donnée dynamique nécessaire en fonction de sa clé.
 
         Parameters
         ----------
         key: `str`
-            Clé de la valeur à retourner
+            Clé de la valeur. Elle correspond au nom de la variable (dans le fichier données.py) en texte.
+
+        Returns
+        -------
+        value: `Any`
+            Valeur correspondant à la clé envoyée.
 
         Raises
         ------
         KeyError:
-            Jetée lorsque la clé ne correspond à aucune valeur de la Base de Données train
+            Jetée lorsque la clé ne correspond à aucune valeur de la Base de Données train.
         """
         # FEATURE : inclure ci-dessous la valeur à retourner pour chacune des clés
         if key == "":
