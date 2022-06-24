@@ -2,7 +2,6 @@
 import sys
 import os
 import time
-from enum import Enum
 
 
 # Librairies SARDINE
@@ -13,24 +12,6 @@ import src.misc.settings_dictionary as sd
 import src.train.train_database.Dynamic.dynamic as dynamic
 import src.train.train_database.Static.static as static
 import src.train.train_database.Systems.systems as systems
-
-
-class Position(Enum):
-    """Enum permettant de savoir si la voiture est une voiture avant ou arrière (utile pour savoir l'image à charger"""
-    FRONT = "front"
-    MIDDLE = "middle"
-    BACK = "back"
-
-
-class Mission(Enum):
-    """Enum permettant de connaitre le type de mission (pour la génération"""
-    # Feature : ajouter les autres modes de transports ci-dessous. Ils seront automatiquement détectés par les modules
-    PASSENGER = "Passengers"
-    FREIGHT = "Freight"
-
-
-# Permet d'obtenir la mission avec l'index de celle-ci
-mission_getter = {i: key for i, key in enumerate(Mission)} | {key: i for i, key in enumerate(Mission)}
 
 
 class TrainDatabase:
