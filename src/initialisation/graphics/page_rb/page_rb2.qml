@@ -746,7 +746,7 @@ Item {
             default_width: pad_brakes_count_integerinput.default_width
             default_height: pad_brakes_count_integerinput.default_height
 
-            maximum_value: -foucault_brakes_count_integerinput.value + page_rb2.max_magnetic_brakes_per_axle * bogies_count_integerinput.value * (axles_per_bogie_integerinput.value - 1)
+            maximum_value: Math.max(-foucault_brakes_count_integerinput.value + page_rb2.max_magnetic_brakes_per_axle * bogies_count_integerinput.value * (axles_per_bogie_integerinput.value - 1), 0)
             minimum_value: 0
 
             title: "Nmagnétique (paires)"
@@ -767,8 +767,8 @@ Item {
             default_width: magnetic_brakes_count_integerinput.default_width
             default_height: magnetic_brakes_count_integerinput.default_height
 
-            maximum_value: -magnetic_brakes_count_integerinput.value + page_rb2.max_magnetic_brakes_per_axle * bogies_count_integerinput.value * (axles_per_bogie_integerinput.value - 1)
             minimum_value: 0
+            maximum_value: Math.max(-magnetic_brakes_count_integerinput.value + page_rb2.max_magnetic_brakes_per_axle * bogies_count_integerinput.value * (axles_per_bogie_integerinput.value - 1), 0)
 
             title: "Nfoucault (paires)"
             font_size: 12
