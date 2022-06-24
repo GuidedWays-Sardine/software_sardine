@@ -384,6 +384,12 @@ Item{
         readOnly: !root.is_activable
         echoMode: TextInput.Normal
 
+        // Met le padding pour ne pas que le text clip avec les bordures mais pour ne pas qu'il soit caché par le padding
+        topPadding: (1 + root.is_positive) * root.ratio
+        bottomPadding: (1 + root.is_positive) * root.ratio
+        leftPadding: (1 + root.font_size / 4 + root.is_positive) * root.ratio
+        rightPadding: (1 + root.font_size / 4 + root.is_positive) * root.ratio
+
         placeholderText: root.is_max_default ? validator.top : validator.bottom
         placeholderTextColor: root.is_dark_grey ? root.dark_grey : root.medium_grey
 
