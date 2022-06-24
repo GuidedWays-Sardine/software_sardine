@@ -16,7 +16,7 @@ import src.misc.log as log
 import src.misc.settings_dictionary as sd
 import src.misc.translation_dictionary as td
 import src.misc.decorators as decorators
-import src.train.train_database.database as tdb
+import src.train.train_database as tdb
 import src.initialisation.signals.page_rb.page_rb2 as prb2
 
 
