@@ -84,7 +84,7 @@ class PageRB2:
                           "pad_brakes_count_integerinput", "magnetic_brakes_count_integerinput", "regenerative_check",
                           "disk_brakes_count_integerinput", "foucault_brakes_count_integerinput", "dynamic_check"]:
             self.data_widgets[widget_id] = self.page.findChild(QObject, widget_id)
-        self.train_name_widget = self.page.findChild(QObject, "train_name_stringinput")
+        self.train_name_widget = self.page.findChild(QObject, "train_name_input")
 
         # Initialise le combobox avec les types de trains
         self.page.findChild(QObject, "mission_type_combo").setProperty("elements", [translations[key.value] for key in tdb.Mission])

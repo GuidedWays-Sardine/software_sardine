@@ -49,8 +49,8 @@ Item {
     //Nom du matériel roulant (et du fichier dans lequel il sera sauvegardé)
     //stringinput du nom du matériel roulant
     INI_stringinput{
-        id: train_name_stringinput
-        objectName: "train_name_stringinput"
+        id: train_name_input
+        objectName: "train_name_input"
 
         default_x: 54
         default_y: 40
@@ -71,9 +71,9 @@ Item {
         id: general_data_box
         objectName: "general_data_box"
 
-        default_x: train_name_stringinput.default_x
-        default_y: train_name_stringinput.default_y + train_name_stringinput.default_height
-        default_width: train_name_stringinput.default_width
+        default_x: train_name_input.default_x
+        default_y: train_name_input.default_y + train_name_input.default_height
+        default_width: train_name_input.default_width
         default_height: 3*50
 
         is_activable: false
@@ -434,9 +434,9 @@ Item {
         id: dynamic_data_box
         objectName: "dynamic_data_box"
 
-        default_x: train_name_stringinput.default_x
+        default_x: train_name_input.default_x
         default_y: general_data_box.default_y + general_data_box.default_height
-        default_width: train_name_stringinput.default_width
+        default_width: train_name_input.default_width
         default_height: 1*50 + 12
 
         is_activable: false
@@ -572,9 +572,9 @@ Item {
         id: alimentation_data_box
         objectName: "alimentation_data_box"
 
-        default_x: train_name_stringinput.default_x
+        default_x: train_name_input.default_x
         default_y: dynamic_data_box.default_y + dynamic_data_box.default_height
-        default_width: train_name_stringinput.default_width
+        default_width: train_name_input.default_width
         default_height: 1*50 - 12
 
         is_activable: false
@@ -648,9 +648,9 @@ Item {
         id: brake_data_box
         objectName: "brake_data_box"
 
-        default_x: train_name_stringinput.default_x
+        default_x: train_name_input.default_x
         default_y: alimentation_data_box.default_y + alimentation_data_box.default_height
-        default_width: train_name_stringinput.default_width
+        default_width: train_name_input.default_width
         default_height: 2*50
 
         is_activable: false
@@ -809,16 +809,16 @@ Item {
         objectName: "mode_switchbutton"
 
         default_x: 480
-        default_y: train_name_stringinput.default_y
+        default_y: train_name_input.default_y
         default_width: 100
-        default_height: train_name_stringinput.default_height
+        default_height: train_name_input.default_height
 
         elements: ["Simple", "Complexe"]
 
         title: "Paramétrage"
         font_size: 12
 
-        is_activable: false         //Activé après l'initialisation de la popup de paramétrage complexe
+        is_activable: false         //Activé après l'initialisation du popup de paramétrage complexe
         is_positive: false
     }
 
@@ -850,8 +850,8 @@ Item {
 
         text: "Sauvegarder"
 
-        is_activable: train_name_stringinput.value != ""
-        is_positive: train_name_stringinput.value != ""
+        is_activable: train_name_input.value != ""
+        is_positive: train_name_input.value != ""
     }
 
     //Bouton de configuration freinage
@@ -866,7 +866,7 @@ Item {
 
         text: "Freinage"
 
-        is_activable: false     //Activé après l'initialisation de la popup de paramétrage freinage
+        is_activable: false     //Activé après l'initialisation du popup de paramétrage freinage
         is_positive: false
     }
 
