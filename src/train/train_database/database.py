@@ -57,22 +57,10 @@ class TrainDatabase:
         self.static = static.Static(train_settings)
         self.systems = systems.Systems(train_settings)
 
-        # Récupère la quantité de chacun des systèmes du train
-        railcar_count = len(self.systems.frame.railcars)
-        bogies_count = len(self.systems.traction.bogies)
-        pad_brakes_count = len(self.systems.braking.pad_brakes)
-        disk_brakes_count = len(self.systems.braking.disk_brakes)
-        magnetic_brakes_count = len(self.systems.braking.magnetic_brakes)
-        foucault_brakes_count = len(self.systems.braking.foucault_brakes)
-        brakes_count = pad_brakes_count + disk_brakes_count + magnetic_brakes_count + foucault_brakes_count
-
-        # Indique le temps de chargement de la BDD
+        # Indique le temps de génération de la base de données train
         log.info(f"Base de Données train initialisée en " +
-                 f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\t" +
-                 f"<{railcar_count} voitures ; {bogies_count} bogies ; " +
-                 f"{brakes_count} éléments de freinage ({pad_brakes_count} semelles, {disk_brakes_count} disques, {magnetic_brakes_count} magnétiques, {foucault_brakes_count} foucault) ; " +
-                 f">",
-                 prefix="Initialisation BDD train")
+                 f"{((time.perf_counter() - initial_time)*1000):.2f} millisecondes.\n\t{self}")
+        log.change_log_prefix(current_prefix)
 
     def get_settings(self):
         """Fonction permettant de récupérer tous les paramètres du train
@@ -109,3 +97,26 @@ class TrainDatabase:
             pass
         else:
             raise KeyError(f"La clé \"{key}\" ne correspond à aucun paramètre de la Base de Données train.")
+
+    def __str__(self):
+        """Convertit la Base de données en un format lisible pour l'utilisateur.
+
+        Returns
+        -------
+        database: `str`
+            Version lisible de la base de données train
+        """
+        # ENHANCE : rajouter les différents systèmes clés du train ci-dessous
+        # Récupère la quantité de chacun des systèmes du train
+        railcar_count = len(self.systems.frame.railcars)
+        bogies_count = len(self.systems.traction.bogies)
+        pad_brakes_count = len(self.systems.braking.pad_brakes)
+        disk_brakes_count = len(self.systems.braking.disk_brakes)
+        magnetic_brakes_count = len(self.systems.braking.magnetic_brakes)
+        foucault_brakes_count = len(self.systems.braking.foucault_brakes)
+        brakes_count = pad_brakes_count + disk_brakes_count + magnetic_brakes_count + foucault_brakes_count
+
+        return (f"<{railcar_count} voitures ; {bogies_count} bogies ; " +
+
+                f"{brakes_count} éléments de freinage ({pad_brakes_count} semelles, {disk_brakes_count} disques, " +
+                f"{magnetic_brakes_count} magnétiques, {foucault_brakes_count} foucault)>")
