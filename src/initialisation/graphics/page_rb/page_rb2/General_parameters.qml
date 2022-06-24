@@ -663,12 +663,19 @@ Item {
                     a_full_floatinput.change_value(a_full_floatinput.value / full_weight_floatinput.value)
                     b_full_floatinput.change_value(b_full_floatinput.value / full_weight_floatinput.value)
                     c_full_floatinput.change_value(c_full_floatinput.value / full_weight_floatinput.value)
+
+                    //change les limites et la valeur par défaut pour le pourcentage de masse applicable
+                    percentage_floatinput.maximum_value = 100
+                    percentage_floatinput.change_value(7)
                 }
                 else {
                     //Multiplie chacun des coefficients par la masse maximale
                     a_full_floatinput.change_value(a_full_floatinput.value * full_weight_floatinput.value)
                     b_full_floatinput.change_value(b_full_floatinput.value * full_weight_floatinput.value)
                     c_full_floatinput.change_value(c_full_floatinput.value * full_weight_floatinput.value)
+
+                    //remet les limites de la masse applicable
+                    percentage_floatinput.maximum_value = 0
                 }
             }
         }
@@ -785,6 +792,25 @@ Item {
             default_y: c_full_floatinput.default_y + (c_full_floatinput.default_height - font_size) * 0.5 - 4
 
             is_dark_grey: !different_check.is_checked
+            is_visible: root.generated
+        }
+
+        INI_floatinput {
+            id: percentage_floatinput
+            objectName: "percentage_floatinput"
+
+            default_x: dynamic_full_data_box.default_x + dynamic_full_data_box.default_width - 1 - default_width
+            default_y: dynamic_full_data_box.default_y + dynamic_full_data_box.default_height - 1 - default_height
+
+            default_width: c_full_floatinput.default_width
+            default_height: c_full_floatinput.default_height
+
+            minimum_value: 0
+            maximum_value: 0
+            decimals: 2
+
+            is_positive: false
+            is_activable: m_full_check.is_checked
             is_visible: root.generated
         }
     }
