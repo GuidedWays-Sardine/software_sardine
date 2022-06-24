@@ -7,3 +7,5 @@ pandas~=1.3.4
 pyserial~=3.5
 matplotlib~=3.4.3
 Pillow~=8.4.0
+opencv-python~=4.5.5.64
+PyAutoGUI~=0.9.53
