@@ -16,7 +16,7 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__)).split("src")[0]
 sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.initialisation.initialisation_window as ini
 import src.initialisation.signals.page_rb.pagerb2.complex_popup as cp
-import src.train.train_database.database as tdb
+import src.train.train_database as tdb
 import src.misc.settings_dictionary as sd
 import src.misc.translation_dictionary as td
 import src.misc.window_manager as wm
