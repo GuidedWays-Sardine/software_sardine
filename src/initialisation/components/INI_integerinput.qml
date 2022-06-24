@@ -52,6 +52,7 @@ Item{
     property bool is_max_default: false       // Si la valeur par défaut (dans le placeholder) est la valeur max (ou min si mis sur false)
     property bool is_dark_grey: !is_activable // Si le texte doit-être en gris foncé ?
     property bool is_activable: true          // Si le INI_integerinput peut être activée
+    readonly property bool is_editing: body.cursorVisible  // Si la valeur du INI_integerinput est en train d'être éditée
     property bool is_positive: false          // Si le INI_integerinput doit-être visible en couche positive (sinon négatif)
     property bool is_visible: true            // Si le INI_integerinput est visible
     visible: root.is_visible

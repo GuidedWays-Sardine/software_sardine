@@ -42,7 +42,7 @@ Item{
     // Propriétés sur les unités et textes d'habillages
     property string unit: ""                  // Valeur à changer pour le cas d'une unité non physique
     property var conversion_list: []          // Liste de conversions dans le cas d'unités physiques ; Format : [["name", factor(double), offset(double)], ...]
-    property string unit_name: unit_text.text // Nom de l'unité actuellement utilisée
+    readonly property string unit_name: unit_text.text // Nom de l'unité actuellement utilisée
     property double unit_factor: 1.0          // Facteur de conversion (SI -> unité actuelle)
     property double unit_offset: 0.0          // Décalage de conversion (SI -> unité actuelle)
     property string title: ""                 // Texte à afficher au dessus du composant
@@ -53,6 +53,7 @@ Item{
     property bool is_max_default: false       // Si la valeur par défaut (dans le placeholder) est la valeur max (ou mini si mis sur false)
     property bool is_dark_grey: !is_activable // Si le texte doit-être en gris foncé ?
     property bool is_activable: true          // Si le INI_floatinput peut être activée
+    readonly property bool is_editing: body.cursorVisible  // Si la valeur du INI_floatinput est en train d'être éditée
     property bool is_positive: false          // Si le INI_floatinput doit-être visible en couche positive (sinon négatif)
     property bool is_visible: true            // Si le INI_floatinput est visible
     visible: root.is_visible
