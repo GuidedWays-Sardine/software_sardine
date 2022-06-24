@@ -385,30 +385,34 @@ Item {
 
         //signal appelé lorsque le nombre d'essieux entrées change
         onValueChanged: {
-            //Commence par changer la valeur dans le tableau de valeurs
-            root.axles_count[root.current_bogie_index] = value
+            //Si le composant contient des bogies à paramétrer
+            if (root.current_bogie_index < root.motorized_axles.length) {
 
-            //Ajoute/enlève autant d'éléments que nécessaires dans la liste des moteurs et de leur puissance
-            while(root.motorized_axles[root.current_bogie_index].length > value){
-                root.motorized_axles[root.current_bogie_index].pop()
-                root.motorized_axles_powers[root.current_bogie_index].pop()
-            }
-            while(root.motorized_axles[root.current_bogie_index].length < value){
-                root.motorized_axles[root.current_bogie_index].push(0)
-                root.motorized_axles_powers[root.current_bogie_index].push(0)
-            }
+                //Commence par changer la valeur dans le tableau de valeurs
+                root.axles_count[root.current_bogie_index] = value
 
-            //S'assure que l'index d'essieu est toujours dans la limite sinon le remet à la limite supérieure
-            if(root.current_axle_index >= value) {
-                root.current_axle_index = value - 1
-            }
+                //Ajoute/enlève autant d'éléments que nécessaires dans la liste des moteurs et de leur puissance
+                while(root.motorized_axles[root.current_bogie_index].length > value){
+                    root.motorized_axles[root.current_bogie_index].pop()
+                    root.motorized_axles_powers[root.current_bogie_index].pop()
+                }
+                while(root.motorized_axles[root.current_bogie_index].length < value){
+                    root.motorized_axles[root.current_bogie_index].push(0)
+                    root.motorized_axles_powers[root.current_bogie_index].push(0)
+                }
 
-            // Change le nombre de moteurs paramétrables pour le bogie (selon le nombre d'essieux disponibles
-            motorisation.model = root.motorized_axles[root.current_bogie_index].length
+                //S'assure que l'index d'essieu est toujours dans la limite sinon le remet à la limite supérieure
+                if(root.current_axle_index >= value) {
+                    root.current_axle_index = value - 1
+                }
 
-            //Mets à jour si l'essieu est motorisé pour tous les essieux
-            for (let i = 0; i < root.motorized_axles[root.current_bogie_index].length; i++) {
-                motorisation.itemAt(i).background_color = root.motorized_axles[root.current_bogie_index][i] ? dark_grey : ""
+                // Change le nombre de moteurs paramétrables pour le bogie (selon le nombre d'essieux disponibles
+                motorisation.model = root.motorized_axles[root.current_bogie_index].length
+
+                //Mets à jour si l'essieu est motorisé pour tous les essieux
+                for (var i = 0; i < root.motorized_axles[root.current_bogie_index].length; i++) {
+                    motorisation.itemAt(i).background_color = root.motorized_axles[root.current_bogie_index][i] ? dark_grey : ""
+                }
             }
         }
     }
@@ -680,7 +684,7 @@ Item {
         default_height: disk_brakes_count_integerinput.default_height
 
         minimum_value: 0
-        maximum_value: -foucault_brakes_count_integerinput.value + root.max_magnetic_brakes_per_axle * (axles_count_integerinput.value - 1)
+        maximum_value: Math.max(-foucault_brakes_count_integerinput.value + root.max_magnetic_brakes_per_axle * (axles_count_integerinput.value - 1), 0)
         is_max_default: false
         font_size: 6
 
@@ -719,7 +723,7 @@ Item {
         default_height: magnetic_brakes_count_integerinput.default_height
 
         minimum_value: 0
-        maximum_value: -magnetic_brakes_count_integerinput.value + root.max_magnetic_brakes_per_axle * (axles_count_integerinput.value - 1)
+        maximum_value: Math.max(-magnetic_brakes_count_integerinput.value + root.max_magnetic_brakes_per_axle * (axles_count_integerinput.value - 1), 0)
         is_max_default: false
         font_size: 6
 
