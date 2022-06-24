@@ -137,7 +137,7 @@ class DriverMachineInterface:
             est-ce que la partie graphique de la page a été chargée ?
         """
         # Tente de charger le fichier graphique à partir du dmi, de la section et du fichier envoyé
-        log.info(f"tentative de chargement du fichier : {file}.qml.\n")
+        log.info(f"Chargement du fichier : {file}.qml.\n")
         engine = QQmlApplicationEngine()
         engine.load(f"{PROJECT_DIR}src\\train\\DMI\\ETCS\\" + dmi.replace('.', '\\') + f"\\graphics\\{section}\\{file}.qml")
 
@@ -148,7 +148,7 @@ class DriverMachineInterface:
                 # Le rend visible sur le DMI_stackview associé à la section envoyé (attention objectName en minuscule)
                 self.dmi_window.findChild(QObject, section.lower()).set_active_page(engine.rootObjects()[0])
 
-            # Dans tous les cas, rajoute la page dans le dictionaire (pour la trouver dans le futur) et retourne vrai
+            # Dans tous les cas, rajoute la page dans le dictionnaire (pour la trouver dans le futur) et retourne vrai
             self.pages[dmi][section][file] = engine
             return True
         else:
