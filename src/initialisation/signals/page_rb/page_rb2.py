@@ -33,8 +33,8 @@ class PageRB2:
     engine = None
     page = None
     page_button = None
-    data_widgets = {}         # Dictionaire avec tous les composants contenant des valeurs sur le train
-    train_name_widget = None  # "train_name_stringinput". Permet une optimisation
+    data_widgets = {}         # Dictionnaire avec tous les composants contenant des valeurs sur le train
+    train_name_widget = None  # "train_name_input". Permet une optimisation
 
     # Variables nécessaires à l'indication du mode de paramétrage actuel
     class Mode(Enum):
@@ -58,7 +58,7 @@ class PageRB2:
         Parameters
         ----------
         application: `ini.InitialisationWindow`
-            L'instance source de l'application d'initialisation
+            Instance source de l'application d'initialisation
         engine: `QQmlApplicationEngine`
             La QQmlApplicationEngine de la page à charger
         index: `int`
@@ -86,15 +86,16 @@ class PageRB2:
             self.data_widgets[widget_id] = self.page.findChild(QObject, widget_id)
         self.train_name_widget = self.page.findChild(QObject, "train_name_stringinput")
 
-        # Initialise la combobox avec les types de trains
+        # Initialise le combobox avec les types de trains
         self.page.findChild(QObject, "mission_type_combo").setProperty("elements", [translations[key.value] for key in tdb.Mission])
 
         # Tente d'initialiser la fenêtre de paramétrage complexe
         try:
+            log.change_log_prefix("Chargement popup train complexe")
             self.complex_popup = cp.ComplexPopup(self)
         except Exception as error:
-            log.error(f"Erreur lors du chargement de la popup complexe (page_rb{self.index}).",
-                      exception=error, prefix="Initialisation popup paramétrage train")
+            log.error(f"Erreur lors du chargement du popup complexe (page_rb{self.index}).",
+                      exception=error, prefix="Chargement popup train complexe")
             log.change_log_prefix("Initialisation")
         finally:
             # Vérifie que celle-ci a été chargée et si oui, active le changement de mode et le connecte à son signal
@@ -104,20 +105,27 @@ class PageRB2:
                 mode_switchbutton.setProperty("is_positive", True)
                 mode_switchbutton.clicked.connect(self.on_mode_switchbutton_clicked)
 
+            # Remet le préfix à celui utilisé précédemment
+            log.change_log_prefix(f"Chargement page_rb{self.index}")
+
         # Tente d'initialiser la fenêtre de paramétrage freinage
         try:
+            log.change_log_prefix("Chargement popup freinage")
             raise NotImplementedError("La fenêtre de paramétrage freinage n'a pas été implémentée")
             # FEATURE : Créer la page de paramètrages des systèmes de freinages
         except Exception as error:
-            log.error("Erreur lors du chargement de la popup freinage (page_rb2).",
-                      exception=error, prefix="Initialisation popup paramétrage freinage")
+            log.error("Erreur lors du chargement du popup freinage (page_rb2).",
+                      exception=error, prefix="Chargement popup freinage")
         finally:
             # Vérifie que celle-ci a été chargée et si oui, active le paramétrage des systèmes de freinages
             if self.brake_popup is not None and self.brake_popup.loaded:
                 brake_button = self.page.findChild(QObject, "brake_button")
                 brake_button.setProperty("is_activable", True)
                 brake_button.setProperty("is_positive", True)
-                # brake_button.clicked.connect(...) # FEATURE : remplacer ... par le signal
+                # brake_button.clicked.connect(...) # FEATURE : remplacer ... par le signal d'ouverture et de fermeture du popup
+
+            # Remet le préfix à celui utilisé précédemment
+            log.change_log_prefix(f"Chargement page_rb{self.index}")
 
         # Connecte le bouton ouvrir et sauvegarder (d'un fichier de paramètres de train
         self.page.findChild(QObject, "open_button").clicked.connect(self.on_open_button_clicked)
@@ -134,9 +142,16 @@ class PageRB2:
         Returns
         -------
         page_settings : `sd.SettingsDictionnary`
-            dictionaire de paramètres de la page de paramètres page_rb2
+            dictionnaire de paramètres de la page de paramètres page_rb2
         """
         page_settings = sd.SettingsDictionary()
+
+        # Si le popup complex a été généré correctement, récupère sa position et sa taille
+        if self.complex_popup is not None and self.complex_popup.loaded:
+            wm.get_window_geometry(self.complex_popup.win, page_settings, "complex_train_popup")
+
+        # Si le popup de freinage a été généré correctement, récupère sa position et sa taille
+        # FEATURE : ajouter la récupération de la position de la fenêtre de freinage ici
 
         # Vérifie si le fichier a eu un nom donné
         file_name = self.train_name_widget.property("value")
@@ -202,6 +217,15 @@ class PageRB2:
         resize_popup: `bool`
             Les popups doivent-elles être redimensionnées ?
         """
+        # Dans le cas où il faut redimensionner les popup
+        if resize_popup:
+            # Redimensionne le popup de paramètres complexe train
+            if self.complex_popup is not None and self.complex_popup.loaded:
+                wm.set_window_geometry(self.complex_popup.win, settings,  "complex_train_popup",(640, 480))
+
+            # Redimensionne le popup de paramètres de freinage train
+            # FEATURE : Ajouter le redimensionnement de la fenêtre de paramétrage frein ici
+
         # Récupère le nom du fichier train (et regard si le paramètre existe)
         file_name = settings.get_value("train_name")
         if file_name is not None:
@@ -224,7 +248,7 @@ class PageRB2:
             Cemin d'accès vers le fichier à ouvrir (doit exister)
         """
         initial_time = time.perf_counter()
-        train_settings= sd.SettingsDictionary()
+        train_settings = sd.SettingsDictionary()
 
         # Ouvre le fichier de paramètres envoyé et récupère les différents paramètres
         train_settings.open(file_path)
@@ -242,11 +266,14 @@ class PageRB2:
             if self.current_mode == self.Mode.COMPLEX and self.complex_popup is not None and self.complex_popup.loaded:
                 # Si c'est le cas, passe en mode complexe (graphiquement et logiquement), et change les valeurs complexe
                 self.page.findChild(QObject, "mode_switchbutton").change_selection(1)  # 1 représentant le mode complexe
-                self.page.setProperty("generated", True)
-                self.complex_popup.win.setProperty("generated", True)
                 self.complex_popup.set_complex_mode_values(train_settings)
+
+                # Dans le cas où le changement des valeurs de la fenêtre complexe a rencontré un soucis, la ferme et la cache
+                self.current_mode = self.Mode.SIMPLE
+                self.page.setProperty("generated", self.complex_popup.train_database is not None)
+                self.complex_popup.win.setProperty("generated", self.complex_popup.train_database is not None)
             else:
-                # Sinon repasse en mode paramétrage simple et réinitialise la popup complexe si nécessaire
+                # Sinon repasse en mode paramétrage simple et réinitialise le popup complexe si nécessaire
                 self.page.findChild(QObject, "mode_switchbutton").change_selection(0)
                 self.page.setProperty("generated", False)
                 if self.complex_popup is not None and self.complex_popup.loaded:
@@ -257,7 +284,7 @@ class PageRB2:
             log.warning("Erreur survenu lors du changement des données train.\n",
                         exception=error, prefix="Ouverture des données train")
         else:
-            # Change le nom du fichier train dans le train_name_stringinput et indique le temps de chargement
+            # Change le nom du fichier train dans le train_name_input et indique le temps de chargement
             file_name = file_path.replace("\\", "/").rsplit("/", maxsplit=1)[1][:-6]
             self.train_name_widget.change_value(file_name)
 
@@ -332,7 +359,7 @@ class PageRB2:
         Parameters
         ----------
         application: `ini.InitialisationWindow`
-            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+            Instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
         # Dans le cas où la popop de paramètre complexe a été chargée et mode complexe a été activé, montre la fenêtre
         if self.complex_popup is not None and self.complex_popup.loaded \
@@ -347,9 +374,9 @@ class PageRB2:
         Parameters
         ----------
         application: `ini.InitialisationWindow`
-            L'instance source de l'application d'initialisation, (pour intérargir avec l'application)
+            Instance source de l'application d'initialisation, (pour intérargir avec l'application)
         """
-        # Cache la popup de paramétrage complexe
+        # Cache le popup de paramétrage complexe
         if self.complex_popup is not None and self.complex_popup.loaded:
             self.complex_popup.win.hide()
 
@@ -378,7 +405,7 @@ class PageRB2:
         Returns
         ----------
         train_settings: `sd.SettingsDictionary`
-            Dictionaire de paramètre avec tous les paramètres simples du train
+            Dictionnaire de paramètre avec tous les paramètres simples du train
         """
         train_settings= sd.SettingsDictionary()
 
@@ -406,7 +433,7 @@ class PageRB2:
             Propriétés du train
         """
         # Change le type de mission (en récupérant l'index de l'élément sauvegardé et en le changeant sur le combobox
-        mission_index = tdb.Mission[train_settings.get_value("mission", "Mission.PASSENGER")[8:]].value
+        mission_index = tdb.Mission[train_settings.get_value("mission", "Mission.PASSENGERS")[8:]].value
         self.page.findChild(QObject, "mission_type_combo").change_selection(mission_index)
 
         # Change les données de la fenêtre principale du paramétrage train
@@ -456,7 +483,7 @@ class PageRB2:
             # Sauvegarde le fichier de paramètres train
             self.open_train_settings_file(file_path[0])
 
-            # Si la popup complexe a été chargé, la montre
+            # Si le popup complexe a été chargé, la montre
             if self.complex_popup is not None and self.complex_popup.loaded:
                 self.complex_popup.win.show()
 
@@ -471,7 +498,7 @@ class PageRB2:
             if self.complex_popup is not None and self.complex_popup.loaded:
                 self.complex_popup.win.show()
         else:       # Mode simple activé
-            # Si la popup complex existe, la cache et dégénère les paramètres complexe et réinitialise les données
+            # Si le popup complex existe, la cache et dégénère les paramètres complexe et réinitialise les données
             self.current_mode = self.Mode.SIMPLE
             if self.complex_popup is not None and self.complex_popup.loaded:
                 self.complex_popup.win.hide()
