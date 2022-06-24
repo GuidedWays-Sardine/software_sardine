@@ -101,7 +101,7 @@ Item {
 
             //Mets à jours les boutons de motorisation
             motorisation.model = root.axles_count[root.current_bogie_index]
-            for (let i = 0; i < root.motorized_axles[root.current_bogie_index].length; i++) {
+            for (var i = 0; i < root.motorized_axles[root.current_bogie_index].length; i++) {
                 motorisation.itemAt(i).background_color = root.motorized_axles[root.current_bogie_index][i] ? body.dark_grey : ""
             }
 
@@ -253,7 +253,7 @@ Item {
                 axles_count_integerinput.change_value(root.axles_count[root.current_bogie_index])
 
                 //Mets à jour les boutons de motorisations pour chacun des essieux
-                for (let i = 0; i < root.motorized_axles[root.current_bogie_index].length; i++) {
+                for (var i = 0; i < root.motorized_axles[root.current_bogie_index].length; i++) {
                     motorisation.itemAt(i).background_color = root.motorized_axles[root.current_bogie_index][i] ? dark_grey : ""
                 }
 
