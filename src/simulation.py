@@ -7,7 +7,6 @@ import time
 
 # Librairies graphiques
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QDesktopWidget, QMainWindow
 from PyQt5.QtCore import Qt
 
 
@@ -17,6 +16,7 @@ sys.path.append(os.path.dirname(PROJECT_DIR))
 import src.misc.settings_dictionary as sd
 import src.misc.log as log
 import src.misc.immersion as immersion
+import src.misc.window_manager as wm
 
 
 class Simulation:
@@ -41,13 +41,13 @@ class Simulation:
     # Elément stockant la liste des fenêtre permettant d'éteindre les écrans en mode immersion
     black_screens = []
 
-    def __init__(self, data):
+    def __init__(self, settings):
         """Fonction de gestion de la simulation. S'occupe de l'initialisation, du lancemenet et de la mise à jour des
         différents modules de simulation.
 
         Parameters
         ----------
-        data: `sd.SettingsDictionary`
+        settings: `sd.SettingsDictionary`
 
         Raises
         ------
@@ -58,9 +58,21 @@ class Simulation:
         """
         # Indique le début de l'initialisation de la simulation
         initial_time = time.perf_counter()
+
+        # Redimensionne la fenêtre temporairement en bas du premier écran pour prendre 10% de la fenêtre
+        log.log_window_frameless(visible=True)
+        if settings.get_value(key="sardine simulator.simulation log window.screen_index", default=0) != 0:
+            log.set_log_window_geometry(key="log window", visible=True, settings={"log_window.screen_index": 1,
+                                                                            "log_window.x": 0,
+                                                                            "log_window.y": wm.get_screen(1)[1][1] * 0.8,
+                                                                            "log_window.w": wm.get_screen(1)[1][0],
+                                                                            "log_window.h": wm.get_screen(1)[1][1] * 0.2})
+        else:
+            log.change_log_window_visibility(visible=False)
+
         log.change_log_prefix("initialisation simulation")
         log.info("Début de l'initialisation de la simulation.\n\n")
-        self.parameters = data
+        self.parameters = settings
 
         # Change le mode d'immersion en mode chargement s'il est activé, sinon le désactive
         if "immersion" in self.parameters and self.parameters["immersion"]:
@@ -92,6 +104,7 @@ class Simulation:
 
         # Indique le temps de chargement de la simulation avant de lancer tous les modules
         log.change_log_prefix("initialisation simulation")
+        log.set_log_window_geometry(settings=settings, key="sardine simulator.simulation log window")
         log.info(f"Simulation ({len(self.components)} modules) initialisés en " +
                  f"{((time.perf_counter() - initial_time) * 1000):.2f} millisecondes.\n\n")
 
