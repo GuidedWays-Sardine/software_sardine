@@ -8,7 +8,7 @@ import QtQuick 2.15
 Item {
     id: root
 
-    //Propriétés liés à la position et à la taille de l'objet
+    //Propriétés liées à la position et à la taille de l'objet
     property int radius: 125                      //Rayon du DMI_speeddial
     property double indication_angle: 3.2         //angle (en °) de l'indication pour la vitesse permise
     property double hook_angle: 5                 //angle (en °) des crochets d'indication

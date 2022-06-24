@@ -8,7 +8,7 @@ import QtQuick 2.15
 Item {
     id: root
 
-    //Propriétés liés à la position et à la taille de l'objet
+    //Propriétés liées à la position et à la taille de l'objet
     property int default_width: 280             //dimensions du bouton pour les dimensions minimales de la fenêtre (640*480)
     property int default_height: 300
     property int default_x: 0                   //position du bouton pour les dimensions minimales de la fenêtre (640*480)

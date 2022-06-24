@@ -16,7 +16,7 @@ import QtQml 2.15
 Item {
     id: root
 
-    //Propriétés liés à la position et à la taille de l'objet
+    //Propriétés liées à la position et à la taille de l'objet
     property int default_width: 100         //dimensions du bouton pour les dimensions minimales de la fenêtre (640*480)
     property int default_height: 40
     property int default_x: 0               //position du bouton pour les dimensions minimales de la fenêtre (640*480)
@@ -29,14 +29,14 @@ Item {
     width: root.default_width * root.ratio
     height: root.default_height * root.ratio
 
-    //Propriétés liés à l'image et au texte que l'utilisateur peut rajouter sur le bouton
+    //Propriétés liées à l'image et au texte que l'utilisateur peut rajouter sur le bouton
     property string image: ""       //image à afficher en tout temps sur le bouton si image_activable et image_not_activable sont vides (peut rester vide)
     property string image_activable: ""     //image à afficher quand le bouton est cliquable (peut rester vide)
     property string image_not_activable: "" //image à afficher quand le bouton n'est pas cliquable (peut rester vide)
     property string text: ""                //texte à afficher
     property int font_size: 12              //police du texte
 
-    //Propriétés liés à l'état du bouton
+    //Propriétés liées à l'état du bouton
     property bool is_activable: true         //si le bouton peut être activée
     property bool is_dark_grey: !is_activable//est ce que le texte doit-être en gris foncé ?
     property bool is_positive: false         //si le bouton doit-être visible en couche positive (sinon négatif)
