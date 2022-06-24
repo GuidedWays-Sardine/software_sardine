@@ -39,7 +39,7 @@ Item{
     property double visible_value: 0.0        // Valeur visible (prise en compte des taux de conversions)/Valeur enregistrée (équivalent unités SI)
     readonly property double value: (root.visible_value - root.unit_offset) / root.unit_factor
 
-    // Propriétés sur les textes d'habillages
+    // Propriétés sur les unités et textes d'habillages
     property string unit: ""                  // Valeur à changer pour le cas d'une unité non physique
     property var conversion_list: []          // Liste de conversions dans le cas d'unités physiques ; Format : [["name", factor(double), offset(double)], ...]
     property string unit_name: unit_text.text // Nom de l'unité actuellement utilisée

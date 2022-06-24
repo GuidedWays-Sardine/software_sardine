@@ -38,10 +38,10 @@ Item{
     property int visible_value: 0             // Valeur visible (prise en compte des taux de conversions)/Valeur enregistrée (équivalent unités SI)
     readonly property int value: (root.visible_value - root.unit_offset) / root.unit_factor
 
-    // Propriétés sur les textes d'habillages ainsi que l'unité
+    // Propriétés sur les unités et textes d'habillages
     property string unit: ""                  // Valeur à changer pour le cas d'une unité non physique
     property var conversion_list: []          // Liste de conversions dans le cas d'unités physiques ; Format : [["name", factor(int), offset(int)], ...]
-    property string unit_name: unit_text.text // Nom de l'unité actuellement utilisée
+    readonly property string unit_name: unit_text.text // Nom de l'unité actuellement utilisée
     property double unit_factor: 1.0          // Facteur de conversion (SI -> unité actuelle)
     property double unit_offset: 0.0          // Décalage de conversion (SI -> unité actuelle)
     property string title: ""                 // Texte à afficher au dessus du composant
