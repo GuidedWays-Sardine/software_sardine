@@ -55,9 +55,13 @@ class TrainDatabase:
         log.info("Génération d'un train complexe.")
 
         # Initialise chacun des types de données (dynamiques, statiques, et systèmes)
-        self.dynamic = dynamic.Dynamic(train_settings)
-        self.static = static.Static(train_settings)
-        self.systems = systems.Systems(train_settings)
+        try:
+            self.dynamic = dynamic.Dynamic(train_settings)
+            self.static = static.Static(train_settings)
+            self.systems = systems.Systems(train_settings)
+        except Exception:
+            log.change_log_prefix(current_prefix)
+            raise
 
         # Indique le temps de génération de la base de données train
         log.info(f"Base de Données train initialisée en " +
