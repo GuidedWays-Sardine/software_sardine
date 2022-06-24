@@ -696,7 +696,7 @@ Item {
             decimals: root.abc_decimals
 
             title: "A(plein) :"
-            unit: "kN"
+            unit: m_full_check.is_checked ? "kN/t" : "kN"
             font_size: 10
 
             is_max_default: false
@@ -734,7 +734,7 @@ Item {
             decimals: root.abc_decimals
 
             title: "B(plein) :"
-            unit: "kN/(km/h)"
+            unit: m_full_check.is_checked ? "kN/t/(km/h)" : "kN/(km/h)"
             font_size: 10
 
             is_max_default: false
@@ -772,7 +772,7 @@ Item {
             decimals: root.abc_decimals
 
             title: "C(plein) :"
-            unit: "kN/(km/h)²"
+            unit: m_full_check.is_checked ? "kN/t/(km/h)²" : "kN/(km/h)²"
             font_size: 10
 
             is_max_default: false
