@@ -142,7 +142,7 @@ Window{
         default_y: generate_l1.default_y + 2 * font_size
 
         text: "Une fois le train généré, Certains paramètres seront inchangeables ou utilisés comme valeurs par défaut."
-        font_size: general_l1.font_size
+        font_size: generate_l1.font_size
 
         is_dark_grey: false
         is_visible: !complex_popup.generated
@@ -172,16 +172,22 @@ Window{
         }
     }
 
-    INI_button {        //TODO : replace with real railcar_view widget
+    INI_railcarview {
         id: railcar_view
 
-        default_x: 30
-        default_y: general_data.default_y - default_height - 14
-        default_width: 640 - (2 * 30)
-        default_height: 180
+    default_y: general_data.default_y - default_height - 14
+    current_railcar_mission: general_data.railcar_mission_type
+    current_railcar_position: general_data.railcar_position_type
+
+    current_railcar_front_bogie_axles_count: 2//back_bogie.axles_count[0]
+    current_railcar_front_bogie_jacob: front_bogie.articulated
+    current_railcar_middle_bogies_count: 0//middle_bogie.axles_count.length
+    current_railcar_middle_bogie_axles_count: 0//middle_bogie.axles_count.length ? middle_bogie.axles_count[(middle_bogie.axles_count.length - 1) / 2] : 0
+    current_railcar_back_bogie_axles_count: 2//front_bogie.axles_count[0]
+    current_railcar_back_bogie_jacob: back_bogie.articulated
+
 
         is_visible: complex_popup.generated
-        is_activable: false
     }
 
     INI_button {
